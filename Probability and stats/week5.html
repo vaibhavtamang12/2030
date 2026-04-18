@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLN & CLT — Complete Quant Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   WARM EDITORIAL — Ivory, terracotta, slate
+   ═══════════════════════════════════════════ */
+:root{
+  --ivory:   #f7f3ec;
+  --warm1:   #eee8dc;
+  --warm2:   #e0d8c8;
+  --paper:   #faf8f4;
+  --terra:   #c2522b;
+  --terra2:  #e06840;
+  --terra-p: rgba(194,82,43,.08);
+  --slate:   #2c3e50;
+  --slate2:  #3d5166;
+  --slate-p: rgba(44,62,80,.06);
+  --gold:    #c09a2e;
+  --gold-p:  rgba(192,154,46,.1);
+  --sage:    #4a7c59;
+  --sage-p:  rgba(74,124,89,.08);
+  --ink:     #1a1a1a;
+  --ink2:    #3a3a3a;
+  --muted:   #7a7060;
+  --border:  #d8d0c0;
+  --border2: #c8bfac;
+  --code-bg: #1e2027;
+  --code-fg: #e8d5b0;
+  --shadow:  0 4px 24px rgba(0,0,0,.10);
+  --shadow2: 0 2px 8px rgba(0,0,0,.07);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+
+body{
+  font-family:'DM Sans',Georgia,sans-serif;
+  background:var(--ivory);
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.80;
+}
+
+/* ── HEADER ── */
+header{
+  background:var(--slate);
+  color:var(--paper);
+  padding:0;
+  position:relative;
+  overflow:hidden;
+}
+.hdr-inner{
+  max-width:1100px;
+  margin:0 auto;
+  padding:60px 48px 52px;
+  position:relative;
+  z-index:2;
+}
+header::before{
+  content:'';
+  position:absolute;
+  right:-80px;top:-80px;
+  width:500px;height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(192,154,46,.18),transparent 70%);
+}
+header::after{
+  content:'';
+  position:absolute;
+  left:20%;bottom:-60px;
+  width:320px;height:320px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(194,82,43,.12),transparent 70%);
+}
+.hdr-tag{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--terra2);
+  margin-bottom:14px;
+}
+header h1{
+  font-family:'DM Serif Display',Georgia,serif;
+  font-size:clamp(34px,5.5vw,62px);
+  font-weight:400;
+  line-height:1.08;
+  color:#fff;
+  margin-bottom:18px;
+  max-width:750px;
+}
+header h1 i{color:var(--terra2);font-style:italic;}
+.hdr-desc{
+  font-size:16px;
+  color:rgba(255,255,255,.65);
+  max-width:560px;
+  line-height:1.65;
+  margin-bottom:28px;
+}
+.hdr-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:5px 13px;
+  border-radius:3px;
+  border:1px solid;
+}
+.pill-t{border-color:rgba(194,82,43,.5);color:var(--terra2);}
+.pill-g{border-color:rgba(74,124,89,.5);color:#7bbf8e;}
+.pill-s{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.5);}
+
+/* ── TAB BAR ── */
+.tab-bar{
+  background:var(--slate);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;
+  overflow-x:auto;
+  padding:0 32px;
+  position:sticky;top:0;z-index:100;
+  scrollbar-width:none;
+}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{
+  font-family:'Fira Code',monospace;
+  font-size:11.5px;
+  letter-spacing:.3px;
+  padding:16px 18px;
+  border:none;
+  background:transparent;
+  color:rgba(255,255,255,.38);
+  cursor:pointer;
+  white-space:nowrap;
+  border-bottom:2px solid transparent;
+  transition:all .2s;
+}
+.tab-btn:hover{color:rgba(255,255,255,.65);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--terra2);}
+
+/* ── PANELS ── */
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.panel-wrap{
+  max-width:1040px;
+  margin:0 auto;
+  padding:56px 40px 100px;
+}
+@media(max-width:640px){.panel-wrap{padding:32px 18px 80px;}}
+
+/* ── TYPOGRAPHY ── */
+.topic-eyebrow{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--terra);
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.topic-eyebrow::after{content:'';flex:1;height:1px;background:var(--border);max-width:120px;}
+
+h2{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(30px,4vw,48px);
+  font-weight:400;
+  color:var(--slate);
+  line-height:1.15;
+  margin-bottom:8px;
+}
+h2 em{color:var(--terra);font-style:italic;}
+
+h3{
+  font-family:'DM Serif Display',serif;
+  font-size:24px;
+  font-weight:400;
+  color:var(--slate);
+  margin:44px 0 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+h3::before{
+  content:'';
+  width:4px;height:24px;
+  background:var(--terra);
+  border-radius:2px;
+  flex-shrink:0;
+}
+
+h4{
+  font-family:'Fira Code',monospace;
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--slate2);
+  margin:26px 0 9px;
+}
+
+p{margin-bottom:15px;color:var(--ink2);}
+.lead{
+  font-size:19px;
+  color:var(--muted);
+  line-height:1.70;
+  margin-bottom:32px;
+  font-style:italic;
+  font-family:'DM Serif Display',serif;
+  font-weight:400;
+}
+
+/* ── DIVIDER ── */
+.hr{
+  border:none;
+  border-top:1px solid var(--border);
+  margin:48px 0;
+}
+
+/* ── CALLOUT BOXES ── */
+.box{
+  border-radius:6px;
+  padding:22px 26px;
+  margin:24px 0;
+  border:1px solid;
+}
+.box h4{margin-top:0;}
+.box-terra{background:var(--terra-p);border-color:rgba(194,82,43,.25);}
+.box-terra h4{color:var(--terra);}
+.box-terra p{color:var(--ink2);}
+.box-slate{background:var(--slate-p);border-color:rgba(44,62,80,.15);}
+.box-slate h4{color:var(--slate);}
+.box-sage{background:var(--sage-p);border-color:rgba(74,124,89,.25);}
+.box-sage h4{color:var(--sage);}
+.box-gold{background:var(--gold-p);border-color:rgba(192,154,46,.3);}
+.box-gold h4{color:var(--gold);}
+.box p:last-child{margin-bottom:0;}
+
+.insight{
+  background:var(--slate);
+  color:rgba(255,255,255,.85);
+  border-radius:8px;
+  padding:28px 32px;
+  margin:32px 0;
+  position:relative;
+  overflow:hidden;
+}
+.insight::before{
+  content:'"';
+  font-family:'DM Serif Display',serif;
+  font-size:120px;
+  color:var(--terra);
+  opacity:.2;
+  position:absolute;
+  top:-20px;right:20px;
+  line-height:1;
+}
+.insight p{color:rgba(255,255,255,.82);margin-bottom:0;}
+.insight strong{color:var(--terra2);}
+
+/* ── FORMULA BLOCKS ── */
+.formula-box{
+  background:var(--warm1);
+  border:1px solid var(--border2);
+  border-left:4px solid var(--terra);
+  border-radius:6px;
+  padding:26px 30px;
+  margin:24px 0;
+  position:relative;
+}
+.formula-tag{
+  font-family:'Fira Code',monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  background:var(--terra);
+  color:#fff;
+  padding:3px 10px;
+  border-radius:0 0 4px 0;
+  position:absolute;
+  top:0;left:0;
+}
+.fml{
+  font-family:'Fira Code',monospace;
+  font-size:17px;
+  color:var(--slate);
+  line-height:1.7;
+  margin-top:6px;
+}
+.fml-note{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:10px;
+  font-style:italic;
+}
+
+/* ── CODE BLOCKS ── */
+.code-wrap{
+  background:var(--code-bg);
+  border-radius:8px;
+  overflow:hidden;
+  margin:26px 0;
+  box-shadow:var(--shadow);
+}
+.code-bar{
+  background:#161820;
+  padding:11px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.code-dots{display:flex;gap:6px;}
+.code-dots span{width:11px;height:11px;border-radius:50%;}
+.cr{background:#ff5f57;}.cy{background:#febc2e;}.cg{background:#28c840;}
+.code-name{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  color:rgba(255,255,255,.3);
+}
+.colab-link{
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  color:var(--terra2);
+  text-decoration:none;
+  border:1px solid rgba(224,104,64,.4);
+  padding:4px 10px;
+  border-radius:3px;
+  transition:all .2s;
+}
+.colab-link:hover{background:rgba(224,104,64,.15);}
+pre{
+  padding:22px 22px;
+  overflow-x:auto;
+  font-family:'Fira Code',monospace;
+  font-size:13px;
+  line-height:1.65;
+  color:var(--code-fg);
+}
+.kw{color:#c792ea;}.fn{color:#82aaff;}.st{color:#c3e88d;}.cm{color:#546e7a;font-style:italic;}
+.nm{color:#f78c6c;}.op{color:#89ddff;}.dk{color:#ff5370;}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;margin:22px 0;}
+table{border-collapse:collapse;width:100%;font-size:14px;}
+th{
+  background:var(--slate);
+  color:#fff;
+  padding:12px 16px;
+  text-align:left;
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+td{
+  border:1px solid var(--border);
+  padding:11px 16px;
+  color:var(--ink2);
+  background:var(--paper);
+}
+tr:nth-child(even) td{background:var(--warm1);}
+.td-t{color:var(--terra);font-weight:500;font-family:'Fira Code',monospace;}
+.td-s{color:var(--slate2);font-weight:500;font-family:'Fira Code',monospace;}
+.td-g{color:var(--sage);font-weight:500;}
+
+/* ── CHARTS ── */
+.chart-card{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:22px 22px 16px;
+  margin:26px 0;
+  box-shadow:var(--shadow2);
+}
+.chart-head{
+  font-family:'DM Serif Display',serif;
+  font-size:16px;
+  color:var(--slate);
+  margin-bottom:3px;
+}
+.chart-sub{
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.5px;
+  margin-bottom:14px;
+}
+.chart-card canvas{max-height:290px;}
+.chart-2col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:26px 0;
+}
+@media(max-width:700px){.chart-2col{grid-template-columns:1fr;}}
+
+/* ── INTERACTIVE DEMO ── */
+.demo-panel{
+  background:var(--warm1);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  padding:26px;
+  margin:26px 0;
+}
+.demo-title{
+  font-family:'DM Serif Display',serif;
+  font-size:18px;
+  color:var(--slate);
+  margin-bottom:6px;
+}
+.demo-desc{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:18px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:14px;
+}
+.ctrl{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:13px;
+  flex-wrap:wrap;
+}
+.ctrl label{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  color:var(--slate2);
+  min-width:170px;
+  letter-spacing:.3px;
+}
+input[type=range]{
+  flex:1;min-width:90px;
+  accent-color:var(--terra);
+}
+select{
+  background:var(--paper);
+  border:1px solid var(--border2);
+  color:var(--ink);
+  font-family:'Fira Code',monospace;
+  font-size:12px;
+  padding:7px 10px;
+  border-radius:4px;
+  cursor:pointer;
+}
+.ctrl-val{
+  font-family:'Fira Code',monospace;
+  font-size:13px;
+  font-weight:500;
+  color:var(--terra);
+  min-width:56px;
+  text-align:right;
+}
+.readout{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px 18px;
+  font-family:'Fira Code',monospace;
+  font-size:12.5px;
+  line-height:1.9;
+  margin-top:14px;
+}
+.ro-lab{color:var(--muted);}
+.ro-val{color:var(--slate);font-weight:500;}
+.ro-t{color:var(--terra);font-weight:500;}
+.ro-g{color:var(--sage);font-weight:500;}
+.run-btn{
+  margin-top:14px;
+  background:var(--terra);
+  color:#fff;
+  border:none;
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  padding:10px 22px;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background .2s;
+}
+.run-btn:hover{background:var(--terra2);}
+
+/* ── STEP LIST ── */
+.steps{list-style:none;margin:22px 0;counter-reset:s;}
+.steps li{
+  counter-increment:s;
+  padding-left:52px;
+  margin-bottom:22px;
+  position:relative;
+}
+.steps li::before{
+  content:counter(s);
+  position:absolute;left:0;top:0;
+  width:34px;height:34px;
+  background:var(--terra);
+  color:#fff;
+  font-family:'DM Serif Display',serif;
+  font-size:17px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.steps li h5{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  font-weight:500;
+  color:var(--slate2);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:4px;
+}
+.steps li p{font-size:15px;color:var(--ink2);margin-bottom:0;}
+
+/* ── DEF LIST ── */
+dl{margin:16px 0;}
+dt{
+  font-family:'Fira Code',monospace;
+  font-size:13px;
+  color:var(--slate);
+  margin-top:16px;
+  font-weight:500;
+}
+dd{
+  margin-left:18px;
+  border-left:2px solid var(--border2);
+  padding-left:13px;
+  font-size:15px;
+  color:var(--ink2);
+  line-height:1.65;
+}
+
+/* ── EXERCISES ── */
+.ex-stack{display:flex;flex-direction:column;gap:14px;margin:22px 0;}
+.ex-card{
+  border-radius:7px;
+  padding:22px 26px;
+  border:1px solid;
+  position:relative;
+}
+.ex-card.easy{background:#f3fbf5;border-color:#b2dfcb;}
+.ex-card.med{background:#fff9ef;border-color:#f0d090;}
+.ex-card.hard{background:#fff3f0;border-color:#f0b8a8;}
+.ex-badge{
+  font-family:'Fira Code',monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:3px 10px;
+  border-radius:3px;
+  margin-bottom:10px;
+  display:inline-block;
+  font-weight:500;
+}
+.easy .ex-badge{background:#27ae60;color:#fff;}
+.med .ex-badge{background:#e6a817;color:#fff;}
+.hard .ex-badge{background:#c0392b;color:#fff;}
+.ex-num{
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+.ex-card h5{
+  font-family:'DM Serif Display',serif;
+  font-size:18px;
+  font-weight:400;
+  color:var(--slate);
+  margin-bottom:9px;
+}
+.ex-card p{font-size:15px;color:var(--ink2);margin-bottom:8px;}
+.hint-txt{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--muted);
+  font-style:italic;
+  border-top:1px solid var(--border);
+  padding-top:9px;
+}
+.hint-txt strong{color:var(--ink2);font-style:normal;}
+
+/* ── COMPARISON GRID ── */
+.cmp-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:26px 0;
+}
+@media(max-width:640px){.cmp-grid{grid-template-columns:1fr;}}
+.cmp-box{
+  border-radius:8px;
+  padding:22px 24px;
+  border:1px solid;
+}
+.cmp-lln{background:var(--terra-p);border-color:rgba(194,82,43,.3);border-top:3px solid var(--terra);}
+.cmp-clt{background:var(--slate-p);border-color:rgba(44,62,80,.2);border-top:3px solid var(--slate2);}
+.cmp-box h4{margin-top:0;}
+.cmp-lln h4{color:var(--terra);}
+.cmp-clt h4{color:var(--slate2);}
+.cmp-row{
+  display:flex;gap:9px;
+  margin-bottom:10px;
+  font-size:15px;
+  color:var(--ink2);
+  align-items:flex-start;
+}
+.cmp-dot{
+  width:7px;height:7px;border-radius:50%;
+  margin-top:8px;flex-shrink:0;
+}
+.cmp-lln .cmp-dot{background:var(--terra);}
+.cmp-clt .cmp-dot{background:var(--slate2);}
+
+/* ── RESOURCES ── */
+.res-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:14px;
+  margin:22px 0;
+}
+.res-card{
+  display:block;
+  text-decoration:none;
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:18px 20px;
+  transition:all .2s;
+  color:inherit;
+}
+.res-card:hover{
+  border-color:var(--terra);
+  box-shadow:var(--shadow);
+  transform:translateY(-2px);
+}
+.res-icon{font-size:22px;margin-bottom:8px;display:block;}
+.res-card h5{
+  font-family:'Fira Code',monospace;
+  font-size:12px;
+  color:var(--slate);
+  margin-bottom:5px;
+}
+.res-card p{font-size:13px;color:var(--muted);margin:0;line-height:1.5;}
+.res-url{
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  color:var(--terra);
+  margin-top:7px;
+  display:block;
+  word-break:break-all;
+}
+
+/* ── QUIZ ── */
+.qz-card{
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:22px 26px;
+  margin:16px 0;
+}
+.qz-q{font-size:16px;color:var(--slate);font-weight:500;margin-bottom:14px;}
+.qz-opts{list-style:none;display:grid;gap:9px;}
+.qz-opts li{display:flex;align-items:flex-start;gap:9px;}
+.qz-opts input[type=radio]{margin-top:4px;accent-color:var(--terra);cursor:pointer;}
+.qz-opts label{cursor:pointer;font-size:15px;color:var(--ink2);}
+.qz-btn{
+  margin-top:13px;
+  background:var(--slate);
+  color:#fff;
+  border:none;
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:9px 18px;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background .2s;
+}
+.qz-btn:hover{background:var(--slate2);}
+.qz-res{
+  display:none;
+  margin-top:11px;
+  padding:12px 16px;
+  border-radius:6px;
+  font-size:14px;
+  line-height:1.55;
+}
+.qz-ok{background:#edf7f0;color:var(--sage);border:1px solid #b2dfcb;}
+.qz-no{background:#fdf2f0;color:var(--terra);border:1px solid rgba(194,82,43,.3);}
+
+/* ── PATH CARDS ── */
+.path-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:16px 20px;
+  background:var(--paper);
+  border:1px solid var(--border);
+  border-radius:7px;
+  margin-bottom:11px;
+}
+.path-n{
+  width:32px;height:32px;
+  background:var(--slate);
+  color:#fff;
+  font-family:'DM Serif Display',serif;
+  font-size:17px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.path-item h5{
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  color:var(--terra);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:3px;
+}
+.path-item p{font-size:15px;color:var(--ink2);margin:0;}
+
+/* ── SVG WRAP ── */
+.svg-wrap{text-align:center;margin:30px 0;overflow-x:auto;}
+.svg-wrap svg{max-width:100%;}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--slate);
+  color:rgba(255,255,255,.4);
+  text-align:center;
+  padding:26px;
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:1px;
+}
+footer span{color:var(--terra2);}
+
+/* ── ANIM ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.tab-panel.active .panel-wrap{animation:fadeIn .3s ease;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header>
+  <div class="hdr-inner">
+    <div class="hdr-tag">Quantitative Engineering · Probability Series II</div>
+    <h1>Law of Large Numbers<br>&amp; <i>Central Limit Theorem</i></h1>
+    <p class="hdr-desc">The two theorems at the heart of why statistics works — explained from scratch, built up step by step, with interactive simulations and real quant finance applications.</p>
+    <div class="hdr-pills">
+      <span class="pill pill-t">100 % Offline</span>
+      <span class="pill pill-g">Live Simulations</span>
+      <span class="pill pill-g">Google Colab Labs</span>
+      <span class="pill pill-s">18 Practice Exercises</span>
+      <span class="pill pill-s">3 Difficulty Tiers</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════ TAB BAR ══════════════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="goTab('pre',this)">0 · Prerequisites</button>
+  <button class="tab-btn" onclick="goTab('lln',this)">1 · Law of Large Numbers</button>
+  <button class="tab-btn" onclick="goTab('clt',this)">2 · Central Limit Theorem</button>
+  <button class="tab-btn" onclick="goTab('bridge',this)">3 · LLN ↔ CLT Bridge</button>
+  <button class="tab-btn" onclick="goTab('quant',this)">4 · Quant Applications</button>
+  <button class="tab-btn" onclick="goTab('res',this)">5 · Resources</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 0 — PREREQUISITES
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-pre" class="tab-panel active">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">Read This First</div>
+  <h2>Prerequisites</h2>
+  <p class="lead">Before we touch the main theorems, let's make sure five foundational ideas feel comfortable. Each one gets a plain-English explanation right here.</p>
+
+  <div class="box box-terra">
+    <h4>⚠ Who This Section Is For</h4>
+    <p>First-time learners. If terms like "expected value" and "variance" already feel natural to you, skim the formulas and jump straight to Tab 1. Otherwise, spend 10–15 minutes here — it will make the rest click much faster.</p>
+  </div>
+
+  <h3>1 · Random Variables</h3>
+  <p>A <strong>random variable</strong> is a number whose value is determined by a random experiment. Before the experiment, the value is uncertain. After it runs, you get one specific number.</p>
+  <dl>
+    <dt>Discrete random variable</dt>
+    <dd>Takes countable separate values. Example: the number you roll on a die ∈ {1, 2, 3, 4, 5, 6}.</dd>
+    <dt>Continuous random variable</dt>
+    <dd>Takes any value in a range. Example: today's temperature, a stock's return, a person's height.</dd>
+  </dl>
+
+  <div class="box box-slate">
+    <h4>Everyday Example</h4>
+    <p>Let X = "number shown on a fair six-sided die." Before rolling, X is unknown. After rolling, you might get X = 4. The <em>distribution</em> of X is the full list of possible values and their probabilities: P(X=1)=P(X=2)=···=P(X=6)=1/6.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>2 · Expected Value E[X] — the Long-Run Average</h3>
+  <p>The expected value is the probability-weighted average of all possible values. Ask yourself: "If I ran this experiment a million times and averaged the results, what would the average be?" That answer is E[X].</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Definition</span>
+    <div class="fml">E[X] = Σ x · P(X = x)&nbsp;&nbsp;&nbsp;&nbsp;(discrete)</div>
+    <div class="fml" style="margin-top:8px">E[X] = ∫ x · f(x) dx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(continuous)</div>
+    <div class="fml-note">For a fair die: E[X] = 1·(1/6) + 2·(1/6) + 3·(1/6) + 4·(1/6) + 5·(1/6) + 6·(1/6) = 3.5</div>
+  </div>
+
+  <div class="box box-sage">
+    <h4>The Casino Interpretation</h4>
+    <p>A roulette bet on "red" wins $1 with probability 18/38, loses $1 with probability 20/38. E[payout] = 1·(18/38) + (−1)·(20/38) = −0.053. Every single spin is unpredictable — but the casino knows with near-certainty it will earn ~5.3 cents per dollar bet, because of the Law of Large Numbers (which we'll study next).</p>
+  </div>
+
+  <hr class="hr">
+  <h3>3 · Variance and Standard Deviation</h3>
+  <p>Variance measures <em>spread</em>: how far do typical values land from the mean? Standard deviation is its square root — same units as X, easier to interpret.</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Variance & Std Dev</span>
+    <div class="fml">Var(X) = E[(X − μ)²] = E[X²] − (E[X])²</div>
+    <div class="fml" style="margin-top:8px">σ = √Var(X)</div>
+    <div class="fml-note">μ = E[X]. High variance means values scatter widely. Low variance means values cluster near the mean.</div>
+  </div>
+
+  <div class="chart-2col">
+    <div class="chart-card">
+      <div class="chart-head">Low Variance — N(5, 0.25)</div>
+      <div class="chart-sub">σ = 0.5 · Values huddle tightly around μ=5</div>
+      <canvas id="varLoChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">High Variance — N(5, 4)</div>
+      <div class="chart-sub">σ = 2 · Values spread across a wide range</div>
+      <canvas id="varHiChart"></canvas>
+    </div>
+  </div>
+
+  <hr class="hr">
+  <h3>4 · Independence</h3>
+  <p>Two random variables are <strong>independent</strong> when knowing one gives zero information about the other. Think of flipping two separate fair coins — the first outcome tells you nothing about the second.</p>
+  <div class="box box-gold">
+    <h4>⚠ Critical for LLN &amp; CLT</h4>
+    <p>Both theorems assume observations are <em>i.i.d.</em> — <strong>independent and identically distributed</strong>. Independence means each observation is unaffected by the others. "Identically distributed" means all observations come from the same population. In real finance, stock returns are neither perfectly independent nor identically distributed — that's exactly why quants must understand these assumptions deeply before applying them.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>5 · The Sample Mean — Our Central Object</h3>
+  <p>Take n independent observations X₁, X₂, …, Xₙ from the same distribution. Their average is the <strong>sample mean</strong>:</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Sample Mean</span>
+    <div class="fml">X̄ₙ = (X₁ + X₂ + ··· + Xₙ) / n = (1/n) Σᵢ₌₁ⁿ Xᵢ</div>
+    <div class="fml-note">X̄ₙ is itself a random variable. Each fresh set of n observations gives a different value of X̄ₙ. The LLN tells us where X̄ₙ is heading. The CLT tells us the shape of its fluctuations around that destination.</div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">X̄ₙ is Random — Different Samples, Different Averages</div>
+    <div class="chart-sub">20 independent estimates of the mean from the same N(0,1) population, n=25 each</div>
+    <canvas id="smpMeansChart"></canvas>
+  </div>
+
+  <hr class="hr">
+  <div class="insight">
+    <p>✓ <strong>You're equipped.</strong> With random variables, expected value, variance, independence, and the sample mean in your toolkit — every idea in this guide will make complete sense. Let's move to the first theorem.</p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 1 — LAW OF LARGE NUMBERS
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-lln" class="tab-panel">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">Topic 1 of 2</div>
+  <h2>Law of <em>Large Numbers</em></h2>
+  <p class="lead">The most fundamental theorem in all of probability: as you collect more data, your sample average is guaranteed to approach the true mean. This is why data works at all.</p>
+
+  <div class="box box-terra">
+    <h4>Why Quants Need This</h4>
+    <p>Monte Carlo pricing, backtesting, risk estimation, factor models — all rely on averaging large numbers of observations. The LLN is the theorem that justifies using a sample mean to estimate a population mean. Without it, statistics would just be guessing.</p>
+  </div>
+
+  <h3>The Core Idea in Plain English</h3>
+  <p>Flip a fair coin 10 times. You might get 7 heads (70%) — that feels far from 50%. Flip 100 times: you'll probably land between 45% and 55%. Flip 10,000 times: you'll almost certainly be within 1% of 50%. The Law of Large Numbers says this isn't luck — it's mathematically guaranteed to happen as n grows.</p>
+
+  <div class="box box-slate">
+    <h4>The Insurance Company Proof-of-Concept</h4>
+    <p>An insurer can't predict if <em>you</em> will have a car accident this year. But with 1,000,000 policyholders, they can predict <em>total claims</em> with almost frightening accuracy. Individual randomness is high — but the average randomness shrinks. With enough customers, the average claim becomes practically deterministic. That's the entire insurance business model built on one theorem.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>The Two Versions</h3>
+
+  <div class="formula-box">
+    <span class="formula-tag">Weak LLN — Khinchin's Theorem</span>
+    <div class="fml">For any ε &gt; 0:&nbsp;&nbsp;P( |X̄ₙ − μ| &gt; ε ) → 0&nbsp;&nbsp;as n → ∞</div>
+    <div class="fml-note">No matter how small your tolerance ε, the probability that X̄ₙ misses μ by more than ε goes to zero. "Convergence in probability."</div>
+  </div>
+
+  <div class="formula-box">
+    <span class="formula-tag">Strong LLN — Kolmogorov's Theorem</span>
+    <div class="fml">P( lim_{n→∞} X̄ₙ = μ ) = 1</div>
+    <div class="fml-note">With probability 1, the sample mean WILL converge to μ — not just occasionally close, but permanently settling there. "Almost sure convergence." The stronger guarantee.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Version</th><th>Mathematical Statement</th><th>Convergence Type</th><th>Condition</th></tr>
+      <tr><td class="td-t">Weak LLN</td><td>P(|X̄ₙ−μ|&gt;ε) → 0</td><td>In probability</td><td>Finite mean μ</td></tr>
+      <tr><td class="td-s">Strong LLN</td><td>X̄ₙ → μ almost surely</td><td>Almost sure</td><td>Finite μ and σ²</td></tr>
+    </table>
+  </div>
+
+  <div class="box box-slate">
+    <h4>Weak vs. Strong — What's Actually Different?</h4>
+    <p><strong>Weak:</strong> At any given large n, the chance you're far from μ is tiny. But you might still drift away occasionally and return. Like a ship that's probably near its target course but might deviate briefly.</p>
+    <p><strong>Strong:</strong> The path of X̄ₙ eventually settles at μ and stays there forever. The ship reaches port and docks. A genuinely stronger statement — and the one used in practice.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>Why It Works — Proof via Chebyshev</h3>
+  <p>The cleanest proof of the Weak LLN uses Chebyshev's Inequality, which holds for <em>any</em> distribution with finite variance:</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Chebyshev's Inequality</span>
+    <div class="fml">P( |X̄ₙ − μ| ≥ ε ) ≤ Var(X̄ₙ) / ε²</div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h5>Compute Var(X̄ₙ)</h5>
+      <p>Averaging n i.i.d. variables: Var(X̄ₙ) = Var((X₁+···+Xₙ)/n) = nσ²/n² = <strong>σ²/n</strong>. Variance shrinks with sample size.</p>
+    </li>
+    <li>
+      <h5>Substitute into Chebyshev</h5>
+      <p>P(|X̄ₙ − μ| ≥ ε) ≤ σ²/(nε²). The right side goes to 0 as n → ∞ for any fixed ε and σ.</p>
+    </li>
+    <li>
+      <h5>Conclude</h5>
+      <p>Since P(|X̄ₙ − μ| ≥ ε) is squeezed between 0 and something that → 0, it must → 0. Weak LLN proved. ∎</p>
+    </li>
+  </ol>
+
+  <hr class="hr">
+  <h3>The Standard Error — How Fast Does It Converge?</h3>
+  <div class="formula-box">
+    <span class="formula-tag">Standard Error of the Mean</span>
+    <div class="fml">SE(X̄ₙ) = σ / √n</div>
+    <div class="fml-note">The spread of X̄ₙ around μ shrinks as 1/√n. To halve your error, you need 4× as many observations. To reach one decimal place more of accuracy, you need 100× as many.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>n</th><th>σ/√n (σ=1)</th><th>Approx 95% range</th><th>Practical meaning</th></tr>
+      <tr><td>10</td><td class="td-t">0.316</td><td>μ ± 0.62</td><td>Very uncertain</td></tr>
+      <tr><td>100</td><td class="td-t">0.100</td><td>μ ± 0.20</td><td>Rough estimate</td></tr>
+      <tr><td>1,000</td><td class="td-g">0.0316</td><td>μ ± 0.062</td><td>Decent precision</td></tr>
+      <tr><td>10,000</td><td class="td-g">0.0100</td><td>μ ± 0.020</td><td>Good precision</td></tr>
+      <tr><td>1,000,000</td><td class="td-g">0.001</td><td>μ ± 0.002</td><td>Very precise</td></tr>
+    </table>
+  </div>
+
+  <hr class="hr">
+  <h3>Visual — Watch the LLN in Action</h3>
+
+  <div class="chart-card">
+    <div class="chart-head">Cumulative Sample Mean — Coin Flips (μ = 0.5)</div>
+    <div class="chart-sub">5 independent paths · Each converges to the true mean</div>
+    <canvas id="llnCoinChart" height="200"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">Absolute Error |X̄ₙ − μ| Over Time</div>
+    <div class="chart-sub">Error shrinks as σ/√n · The orange band is the 95% envelope from CLT (preview)</div>
+    <canvas id="llnErrChart" height="190"></canvas>
+  </div>
+
+  <hr class="hr">
+  <h3>🎛 Interactive LLN Simulator</h3>
+
+  <div class="demo-panel">
+    <div class="demo-title">Watch the LLN Happen — Pick Any Distribution</div>
+    <div class="demo-desc">Change the distribution and sample size. Watch all paths converge to the true mean.</div>
+
+    <div class="ctrl">
+      <label>Population Distribution</label>
+      <select id="llnDist" onchange="doLLN()">
+        <option value="coin">Coin flip &nbsp;(μ = 0.5)</option>
+        <option value="die">Fair die &nbsp;(μ = 3.5)</option>
+        <option value="exp">Exponential &nbsp;(μ = 1)</option>
+        <option value="unif">Uniform [0, 1] &nbsp;(μ = 0.5)</option>
+        <option value="bern">Bernoulli(0.3) &nbsp;(μ = 0.3)</option>
+      </select>
+    </div>
+    <div class="ctrl">
+      <label>Max sample size n</label>
+      <input type="range" min="50" max="3000" value="800" id="llnN" oninput="document.getElementById('llnNv').textContent=this.value;doLLN()">
+      <span class="ctrl-val" id="llnNv">800</span>
+    </div>
+    <div class="ctrl">
+      <label>Number of paths</label>
+      <input type="range" min="1" max="8" value="5" id="llnP" oninput="document.getElementById('llnPv').textContent=this.value;doLLN()">
+      <span class="ctrl-val" id="llnPv">5</span>
+    </div>
+    <canvas id="llnSim" height="210"></canvas>
+    <div class="readout">
+      <span class="ro-lab">True μ: </span><span class="ro-t" id="llnMu">0.500</span>&nbsp;&nbsp;&nbsp;
+      <span class="ro-lab">Path 1 final X̄ₙ: </span><span class="ro-val" id="llnFinal">—</span><br>
+      <span class="ro-lab">|Error| at n=<span id="llnNshow">800</span>: </span><span class="ro-t" id="llnErr">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ro-lab">Predicted σ/√n: </span><span class="ro-val" id="llnPredSE">—</span>
+    </div>
+  </div>
+
+  <hr class="hr">
+  <div class="box box-gold">
+    <h4>⚠ The Gambler's Fallacy — LLN Does NOT Mean This</h4>
+    <p>After flipping 10 tails in a row, many people think "heads is due." This is wrong. The LLN convergence to 0.5 happens by <em>swamping</em> early deviations with huge numbers of future observations — not by the next flip being "corrected." Every flip is exactly 50/50, always, regardless of history.</p>
+    <p>The LLN says: after 10,000 more flips, those 10 early tails will be statistically irrelevant. It does NOT say: the coin will try to compensate.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>🧪 Colab Experiment 1 — LLN from Scratch</h3>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-dots"><span class="cr"></span><span class="cy"></span><span class="cg"></span></div>
+      <span class="code-name">colab_exp1_lln.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open in Colab</a>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART A: LLN for Four Different Distributions
+# ═══════════════════════════════════════════════</span>
+n_max = <span class="nm">5000</span>
+ns = np.<span class="fn">arange</span>(<span class="nm">1</span>, n_max + <span class="nm">1</span>)
+n_paths = <span class="nm">5</span>
+
+configs = [
+    (<span class="st">"Coin Flip (μ=0.5)"</span>, <span class="kw">lambda</span>: np.random.<span class="fn">randint</span>(<span class="nm">0</span>, <span class="nm">2</span>, n_max), <span class="nm">0.5</span>),
+    (<span class="st">"Exponential (μ=1)"</span>, <span class="kw">lambda</span>: np.random.<span class="fn">exponential</span>(<span class="nm">1</span>, n_max), <span class="nm">1.0</span>),
+    (<span class="st">"Uniform [0,10] (μ=5)"</span>, <span class="kw">lambda</span>: np.random.<span class="fn">uniform</span>(<span class="nm">0</span>, <span class="nm">10</span>, n_max), <span class="nm">5.0</span>),
+    (<span class="st">"Standard Normal (μ=0)"</span>, <span class="kw">lambda</span>: np.random.<span class="fn">randn</span>(n_max), <span class="nm">0.0</span>),
+]
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nm">2</span>, <span class="nm">2</span>, figsize=(<span class="nm">14</span>, <span class="nm">9</span>))
+fig.<span class="fn">suptitle</span>(<span class="st">"Law of Large Numbers — 5 Paths per Distribution"</span>,
+             fontsize=<span class="nm">14</span>, fontweight=<span class="st">"bold"</span>)
+
+<span class="kw">for</span> ax, (name, sampler, mu) <span class="kw">in</span> <span class="fn">zip</span>(axes.<span class="fn">ravel</span>(), configs):
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_paths):
+        s = <span class="fn">sampler</span>()
+        ax.<span class="fn">plot</span>(ns, np.<span class="fn">cumsum</span>(s) / ns, alpha=<span class="nm">0.7</span>, linewidth=<span class="nm">1</span>)
+    ax.<span class="fn">axhline</span>(mu, color=<span class="st">"black"</span>, lw=<span class="nm">2</span>, ls=<span class="st">"--"</span>, label=<span class="st">f"True μ = {mu}"</span>)
+    ax.set_title(name, fontweight=<span class="st">"bold"</span>)
+    ax.set_xlabel(<span class="st">"n (sample size)"</span>); ax.set_ylabel(<span class="st">"X̄ₙ"</span>)
+    ax.<span class="fn">legend</span>()
+
+plt.tight_layout(); plt.<span class="fn">show</span>()
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART B: Standard Error — Empirical vs 1/√n
+# ═══════════════════════════════════════════════</span>
+n_vals = [<span class="nm">10</span>, <span class="nm">50</span>, <span class="nm">100</span>, <span class="nm">500</span>, <span class="nm">1000</span>, <span class="nm">5000</span>, <span class="nm">10000</span>]
+reps = <span class="nm">3000</span>
+empirical_ses = []
+
+<span class="kw">for</span> n <span class="kw">in</span> n_vals:
+    means = [np.random.<span class="fn">normal</span>(<span class="nm">0</span>, <span class="nm">1</span>, n).<span class="fn">mean</span>() <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(reps)]
+    empirical_ses.<span class="fn">append</span>(np.<span class="fn">std</span>(means))
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">8</span>, <span class="nm">5</span>))
+ax.<span class="fn">loglog</span>(n_vals, empirical_ses, <span class="st">"o-"</span>, lw=<span class="nm">2</span>, label=<span class="st">"Empirical Std(X̄ₙ)"</span>)
+ax.<span class="fn">loglog</span>(n_vals, [<span class="nm">1</span>/np.<span class="fn">sqrt</span>(n) <span class="kw">for</span> n <span class="kw">in</span> n_vals], <span class="st">"--"</span>, lw=<span class="nm">2</span>, label=<span class="st">"Theoretical 1/√n"</span>)
+ax.set_title(<span class="st">"SE shrinks as 1/√n (log-log scale)"</span>)
+ax.set_xlabel(<span class="st">"n"</span>); ax.set_ylabel(<span class="st">"SE"</span>); ax.<span class="fn">legend</span>()
+ax.set_facecolor(<span class="st">"#faf8f4"</span>)
+plt.tight_layout(); plt.<span class="fn">show</span>()
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART C: Gambler's Fallacy Debunked
+# ═══════════════════════════════════════════════</span>
+<span class="fn">print</span>(<span class="st">"After 10 consecutive tails, is heads 'due'?"</span>)
+hits = <span class="nm">0</span>; trials = <span class="nm">0</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">200_000</span>):
+    streak = <span class="nm">0</span>
+    <span class="kw">while</span> streak < <span class="nm">10</span>:
+        flip = np.random.<span class="fn">randint</span>(<span class="nm">2</span>)
+        streak = streak + <span class="nm">1</span> <span class="kw">if</span> flip == <span class="nm">0</span> <span class="kw">else</span> <span class="nm">0</span>
+    hits += np.random.<span class="fn">randint</span>(<span class="nm">2</span>)
+    trials += <span class="nm">1</span>
+<span class="fn">print</span>(<span class="st">f"P(heads | 10 tails) = {hits/trials:.4f}  ← should be 0.5000"</span>)</pre>
+  </div>
+
+  <hr class="hr">
+  <h3>✏ Practice Exercises — LLN</h3>
+  <div class="ex-stack">
+
+    <div class="ex-card easy">
+      <span class="ex-badge">Easy</span>
+      <div class="ex-num">Exercise 1.1</div>
+      <h5>Coin Flip Convergence</h5>
+      <p>A fair coin is flipped n times. Define Xᵢ = 1 (heads) or 0 (tails). (a) What is E[Xᵢ] and Var(Xᵢ)? (b) What is Var(X̄ₙ)? (c) Using Chebyshev, find the minimum n such that P(|X̄ₙ − 0.5| &gt; 0.04) ≤ 0.01.</p>
+      <div class="hint-txt"><strong>Hint:</strong> Var(Bernoulli) = p(1−p) = 0.25. Apply Chebyshev: P(|X̄ₙ−μ|&gt;ε) ≤ σ²/(nε²). Set this ≤ 0.01 and solve for n.</div>
+    </div>
+
+    <div class="ex-card easy">
+      <span class="ex-badge">Easy</span>
+      <div class="ex-num">Exercise 1.2</div>
+      <h5>Standard Error Intuition</h5>
+      <p>A stock's daily return has σ = 1.5%. You have 252 trading days of data. (a) What is the standard error of the sample mean? (b) How many years of data would you need to bring SE below 0.05% per day? (c) If σ doubled to 3%, how does your answer to (b) change?</p>
+      <div class="hint-txt"><strong>Hint:</strong> SE = σ/√n. Solve σ/√n = 0.05% for n. Note that n scales as σ², so doubling σ requires 4× the data.</div>
+    </div>
+
+    <div class="ex-card med">
+      <span class="ex-badge">Medium</span>
+      <div class="ex-num">Exercise 1.3</div>
+      <h5>Casino Long-Run Edge</h5>
+      <p>American roulette: one number bet wins +35 (prob 1/38), else loses −1 (prob 37/38). (a) Find E[X] and Var(X). (b) After 10,000 spins, use Chebyshev to bound P(|X̄ₙ − E[X]| &gt; 0.10). (c) The casino processes 500,000 bets per month — is its edge guaranteed? Invoke the strong LLN to explain.</p>
+      <div class="hint-txt"><strong>Hint:</strong> E[X] = 35·(1/38) − 37/38 ≈ −0.0526. For Var: E[X²] = 35²·(1/38) + 1·(37/38), then Var = E[X²] − (E[X])².</div>
+    </div>
+
+    <div class="ex-card med">
+      <span class="ex-badge">Medium</span>
+      <div class="ex-num">Exercise 1.4</div>
+      <h5>Monte Carlo π</h5>
+      <p>Sample (U, V) uniformly from [−1,1]², define Iᵢ = 1 if Uᵢ² + Vᵢ² ≤ 1, else 0. (a) Show E[Iᵢ] = π/4. (b) By LLN, X̄ₙ → π/4 — so 4·X̄ₙ → π. (c) What n gives SE(4·X̄ₙ) &lt; 0.001? (d) Implement in Python, verify empirically.</p>
+      <div class="hint-txt"><strong>Hint:</strong> Iᵢ ~ Bernoulli(π/4). Var(Iᵢ) = (π/4)(1−π/4) ≈ 0.168. SE(4·X̄) = 4σ/√n. Solve for n.</div>
+    </div>
+
+    <div class="ex-card hard">
+      <span class="ex-badge">Hard</span>
+      <div class="ex-num">Exercise 1.5</div>
+      <h5>LLN Breakdown — Heavy Tails</h5>
+      <p>The Cauchy distribution has undefined mean. (a) Verify that ∫|x|/(π(1+x²))dx diverges — meaning E[|X|] = ∞. (b) In Python, simulate: for each of n = {100, 1000, 10000}, compute 2000 sample means and plot their histograms. Does the distribution of X̄ₙ narrow as n grows? (c) Why does LLN fail? What condition is violated?</p>
+      <div class="hint-txt"><strong>Hint:</strong> Use <code>scipy.stats.cauchy.rvs(size=(2000,n)).mean(axis=1)</code>. The Cauchy has no finite mean → LLN's prerequisite fails → sample means don't converge.</div>
+    </div>
+
+    <div class="ex-card hard">
+      <span class="ex-badge">Hard</span>
+      <div class="ex-num">Exercise 1.6 — Finance</div>
+      <h5>Backtesting &amp; Effective Sample Size</h5>
+      <p>A strategy shows X̄ = 0.09% mean daily return over 500 days, with s = 1.4%. (a) Construct a 95% confidence interval for the true μ. (b) Can you conclude μ &gt; 0 at 5% significance? (c) Returns have AR(1) autocorrelation ρ = 0.20. Compute the effective sample size n_eff ≈ n·(1−ρ)/(1+ρ) and redo the CI. (d) What is the practical conclusion?</p>
+      <div class="hint-txt"><strong>Hint:</strong> 95% CI = X̄ ± 1.96·s/√n. For (c): n_eff = 500·(0.8/1.2) ≈ 333. Autocorrelation inflates variance, making the CI wider than the naive i.i.d. formula.</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 2 — CENTRAL LIMIT THEOREM
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-clt" class="tab-panel">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">Topic 2 of 2</div>
+  <h2>Central <em>Limit Theorem</em></h2>
+  <p class="lead">Perhaps the most astonishing fact in mathematics: average enough independent things together — from <em>any</em> distribution — and the result is always, always normal.</p>
+
+  <div class="box box-slate">
+    <h4>🔗 Connects Directly to LLN</h4>
+    <p>The LLN told you <em>where</em> X̄ₙ goes: to μ. The CLT tells you <em>how</em> it gets there — the shape of the random fluctuations around μ. Together they give a complete picture. The CLT is the sharper, more powerful companion theorem.</p>
+  </div>
+
+  <h3>The Core Idea in Plain English</h3>
+  <p>You have n i.i.d. random variables. Their average converges to μ (LLN). But if you <em>zoomed in</em> on the remaining small variation around μ, what shape would it have? The CLT gives the startling answer: <strong>always the normal (Gaussian) bell curve</strong>, no matter what weird shape the original distribution had.</p>
+
+  <div class="box box-sage">
+    <h4>Why Height is Normal</h4>
+    <p>Your height is determined by thousands of genes and environmental factors — each adds a tiny, roughly independent random effect. No single factor is normally distributed. Yet their <em>sum</em> (and therefore your height) is beautifully normal. The CLT is operating here: sum enough independent, finite-variance pieces and normality emerges automatically, regardless of each piece's distribution.</p>
+    <p style="margin-bottom:0">Same logic: stock daily returns (thousands of trades summing up), exam scores (many questions), measurement errors (many small perturbations). Normality is the universal shape of <em>sums of independent things</em>.</p>
+  </div>
+
+  <hr class="hr">
+  <h3>The Formal Statement</h3>
+
+  <div class="formula-box">
+    <span class="formula-tag">Central Limit Theorem</span>
+    <div class="fml">√n · (X̄ₙ − μ) / σ &nbsp;→&nbsp; N(0, 1)&nbsp;&nbsp;in distribution, as n → ∞</div>
+    <div class="fml-note">Requires: X₁,…,Xₙ i.i.d. with E[Xᵢ]=μ and Var(Xᵢ)=σ²&lt;∞. The standardized sample mean converges to standard normal, regardless of the underlying distribution.</div>
+  </div>
+
+  <div class="formula-box">
+    <span class="formula-tag">Practical Working Form</span>
+    <div class="fml">X̄ₙ &nbsp;≈&nbsp; N(μ, σ²/n)&nbsp;&nbsp;&nbsp;&nbsp;for large n</div>
+    <div class="fml" style="margin-top:8px">Sₙ = X₁+···+Xₙ &nbsp;≈&nbsp; N(nμ, nσ²)&nbsp;&nbsp;&nbsp;&nbsp;for large n</div>
+    <div class="fml-note">These two forms are what you'll use 99% of the time in practice. "Large n" in practice often means n ≥ 30 for symmetric distributions, n ≥ 100 for heavily skewed ones.</div>
+  </div>
+
+  <h4>Unpacking the Formula — Term by Term</h4>
+  <ol class="steps">
+    <li><h5>(X̄ₙ − μ) — Center the Error</h5><p>Subtract μ so the quantity is centered at 0. By LLN this → 0, but CLT "zooms in" on the randomness that remains.</p></li>
+    <li><h5>Multiply by √n — Zoom In</h5><p>X̄ₙ−μ shrinks at rate 1/√n. Multiplying by √n stabilizes the variance at σ², letting us see the fluctuation shape clearly.</p></li>
+    <li><h5>Divide by σ — Standardize</h5><p>Makes the variance equal to 1. Now we have a mean-0, variance-1 quantity — a standard normal.</p></li>
+    <li><h5>"In distribution" — Shape Converges</h5><p>The CDF of √n(X̄ₙ−μ)/σ approaches Φ(z) at every point. The histogram of many simulated X̄ₙ values looks increasingly like a bell curve.</p></li>
+  </ol>
+
+  <hr class="hr">
+  <h3>Key Conditions for CLT</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Condition</th><th>Requirement</th><th>What Breaks Without It</th></tr>
+      <tr><td class="td-t">Finite Variance</td><td>σ² = Var(X) &lt; ∞</td><td>Cauchy distribution — CLT fails entirely</td></tr>
+      <tr><td class="td-t">Independence</td><td>X₁,…,Xₙ mutually independent</td><td>Correlation → convergence is slower, formula wrong</td></tr>
+      <tr><td class="td-t">Same Distribution</td><td>All Xᵢ from same population</td><td>Lindeberg condition handles mixing (advanced topic)</td></tr>
+      <tr><td class="td-s">Large enough n</td><td>Rule of thumb: n ≥ 30</td><td>Small n: shape still depends on original distribution</td></tr>
+    </table>
+  </div>
+
+  <hr class="hr">
+  <h3>Visual — Normality Emerges from Any Shape</h3>
+
+  <div class="chart-card">
+    <div class="chart-head">Distribution of X̄ₙ from Exponential(1) Population — varying n</div>
+    <div class="chart-sub">Exponential is right-skewed. Yet X̄ₙ becomes symmetric and bell-shaped as n grows.</div>
+    <canvas id="cltExpoChart" height="210"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-head">Distribution of X̄ₙ from Bimodal Population — varying n</div>
+    <div class="chart-sub">Bimodal (two humps) → CLT still produces a single bell curve. Astonishing.</div>
+    <canvas id="cltBiChart" height="210"></canvas>
+  </div>
+
+  <hr class="hr">
+  <h3>🎛 Interactive CLT Simulator — Watch Normality Emerge</h3>
+
+  <div class="demo-panel">
+    <div class="demo-title">Central Limit Theorem — Any Distribution Becomes Normal</div>
+    <div class="demo-desc">Choose any population. Increase n. Watch the histogram of X̄ₙ settle into a bell curve.</div>
+    <div class="ctrl">
+      <label>Population Distribution</label>
+      <select id="cltDist" onchange="doCLT()">
+        <option value="unif">Uniform [0,1] &nbsp;— flat rectangle</option>
+        <option value="exp" selected>Exponential(1) &nbsp;— skewed right</option>
+        <option value="bern">Bernoulli(0.2) &nbsp;— two spikes</option>
+        <option value="bimod">Bimodal mixture &nbsp;— two humps</option>
+        <option value="die">Die {1…6} &nbsp;— discrete steps</option>
+      </select>
+    </div>
+    <div class="ctrl">
+      <label>Sample size n per average</label>
+      <input type="range" min="1" max="120" value="10" id="cltN" oninput="document.getElementById('cltNv').textContent=this.value;doCLT()">
+      <span class="ctrl-val" id="cltNv">10</span>
+    </div>
+    <div class="ctrl">
+      <label>Simulated X̄ₙ values</label>
+      <input type="range" min="500" max="10000" value="4000" step="500" id="cltR" oninput="document.getElementById('cltRv').textContent=this.value;doCLT()">
+      <span class="ctrl-val" id="cltRv">4000</span>
+    </div>
+    <canvas id="cltSim" height="240"></canvas>
+    <div class="readout">
+      <span class="ro-lab">Population μ: </span><span class="ro-t" id="cltMu">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">Population σ: </span><span class="ro-t" id="cltSig">—</span><br>
+      <span class="ro-lab">Predicted SE = σ/√n: </span><span class="ro-val" id="cltSE">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">Observed SE: </span><span class="ro-val" id="cltObs">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">Looks normal? </span><span class="ro-g" id="cltNorm">—</span>
+    </div>
+  </div>
+
+  <hr class="hr">
+  <h3>Using CLT — Computing Probabilities</h3>
+  <p>Once you know X̄ₙ ≈ N(μ, σ²/n), compute probabilities by standardizing:</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Probability Calculation Recipe</span>
+    <div class="fml">P(X̄ₙ ≤ x) ≈ Φ( (x − μ) / (σ/√n) )</div>
+    <div class="fml-note">Φ = CDF of standard normal. Standardize → z-score = (x−μ)/(σ/√n) → look up Φ(z). In Python: <code>scipy.stats.norm.cdf(z)</code></div>
+  </div>
+
+  <h4>Fully Worked Example — Factory Bolts</h4>
+  <p>A factory produces bolts: true diameter μ = 10 mm, σ = 0.5 mm. Inspector samples n = 36 bolts. What is P(X̄₃₆ &gt; 10.15 mm)?</p>
+
+  <div class="formula-box">
+    <span class="formula-tag">Step-by-Step</span>
+    <div class="fml" style="font-size:15px;text-align:left;padding-left:10px">
+      Step 1: X̄₃₆ ~ N(10, 0.5²/36) = N(10, 0.00694)<br>
+      Step 2: SE = 0.5/√36 = 0.5/6 ≈ 0.0833<br>
+      Step 3: z = (10.15 − 10) / 0.0833 = 1.80<br>
+      Step 4: P(X̄ &gt; 10.15) = P(Z &gt; 1.80) = 1 − Φ(1.80) ≈ 1 − 0.9641 = <strong>0.036</strong>
+    </div>
+    <div class="fml-note">Only 3.6% chance of seeing a sample mean above 10.15 mm — this would be a suspicious batch. The CLT made this calculation possible.</div>
+  </div>
+
+  <hr class="hr">
+  <h3>Speed of Convergence — Berry-Esseen Theorem</h3>
+
+  <div class="box box-gold">
+    <h4>How Good Is the Normal Approximation?</h4>
+    <p>The Berry-Esseen theorem quantifies the approximation error:</p>
+    <div class="formula-box" style="margin:12px 0 0">
+      <div class="fml" style="font-size:14px">sup_z |P(√n(X̄ₙ−μ)/σ ≤ z) − Φ(z)| ≤ C · ρ / (σ³·√n)</div>
+      <div class="fml-note">ρ = E[|X−μ|³] (third absolute moment). C ≈ 0.4748. Error shrinks at rate 1/√n. Symmetric distributions converge faster; skewed ones need larger n.</div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Distribution</th><th>n=5</th><th>n=30</th><th>n=100</th><th>Convergence Speed</th></tr>
+      <tr><td class="td-g">Uniform [0,1]</td><td>Good</td><td>Excellent</td><td>Near-perfect</td><td>Fast (symmetric)</td></tr>
+      <tr><td class="td-t">Exponential(1)</td><td>Poor</td><td>Decent</td><td>Good</td><td>Moderate (skewed)</td></tr>
+      <tr><td class="td-t">Bernoulli(0.1)</td><td>Poor</td><td>Decent</td><td>Good</td><td>Slow (very skewed)</td></tr>
+      <tr><td class="td-s">Normal(μ,σ²)</td><td>Perfect</td><td>Perfect</td><td>Perfect</td><td>Already there</td></tr>
+    </table>
+  </div>
+
+  <hr class="hr">
+  <h3>🧪 Colab Experiment 2 — CLT from Scratch</h3>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-dots"><span class="cr"></span><span class="cy"></span><span class="cg"></span></div>
+      <span class="code-name">colab_exp2_clt.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open in Colab</a>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+np.random.<span class="fn">seed</span>(<span class="nm">0</span>)
+REPS = <span class="nm">10_000</span>
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART A: CLT from Three Very Different Shapes
+# ═══════════════════════════════════════════════</span>
+dists = {
+    <span class="st">"Exponential(1)\n[heavily skewed]"</span>: {
+        <span class="st">"gen"</span>: <span class="kw">lambda</span> r, n: np.random.<span class="fn">exponential</span>(<span class="nm">1</span>, (r, n)),
+        <span class="st">"mu"</span>: <span class="nm">1.0</span>, <span class="st">"sig"</span>: <span class="nm">1.0</span>,
+    },
+    <span class="st">"Bernoulli(0.1)\n[very skewed]"</span>: {
+        <span class="st">"gen"</span>: <span class="kw">lambda</span> r, n: np.random.<span class="fn">binomial</span>(<span class="nm">1</span>, <span class="nm">0.1</span>, (r, n)),
+        <span class="st">"mu"</span>: <span class="nm">0.1</span>, <span class="st">"sig"</span>: np.<span class="fn">sqrt</span>(<span class="nm">0.09</span>),
+    },
+    <span class="st">"Bimodal Mixture\n[two humps]"</span>: {
+        <span class="st">"gen"</span>: <span class="kw">lambda</span> r, n: np.<span class="fn">where</span>(
+            np.random.<span class="fn">rand</span>(r, n) < <span class="nm">0.5</span>,
+            np.random.<span class="fn">normal</span>(-<span class="nm">3</span>, <span class="nm">0.5</span>, (r, n)),
+            np.random.<span class="fn">normal</span>(<span class="nm">3</span>, <span class="nm">0.5</span>, (r, n)),
+        ),
+        <span class="st">"mu"</span>: <span class="nm">0.0</span>, <span class="st">"sig"</span>: np.<span class="fn">sqrt</span>(<span class="nm">9.25</span>),
+    },
+}
+
+n_vals = [<span class="nm">1</span>, <span class="nm">5</span>, <span class="nm">30</span>, <span class="nm">100</span>]
+colors = [<span class="st">"#c2522b"</span>, <span class="st">"#c09a2e"</span>, <span class="st">"#4a7c59"</span>, <span class="st">"#2c3e50"</span>]
+
+<span class="kw">for</span> dname, d <span class="kw">in</span> dists.<span class="fn">items</span>():
+    fig, axes = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">4</span>, figsize=(<span class="nm">16</span>, <span class="nm">4</span>))
+    fig.<span class="fn">suptitle</span>(<span class="st">f"CLT: {dname}"</span>, fontsize=<span class="nm">13</span>, fontweight=<span class="st">"bold"</span>)
+    <span class="kw">for</span> ax, n, c <span class="kw">in</span> <span class="fn">zip</span>(axes, n_vals, colors):
+        raw = d[<span class="st">"gen"</span>](REPS, n)
+        xbar = raw.<span class="fn">mean</span>(axis=<span class="nm">1</span>)
+        z = (xbar - d[<span class="st">"mu"</span>]) / (d[<span class="st">"sig"</span>] / np.<span class="fn">sqrt</span>(n))
+        ax.<span class="fn">hist</span>(z, bins=<span class="nm">60</span>, density=<span class="kw">True</span>, color=c, alpha=<span class="nm">0.7</span>)
+        zx = np.<span class="fn">linspace</span>(-<span class="nm">4</span>, <span class="nm">4</span>, <span class="nm">200</span>)
+        ax.<span class="fn">plot</span>(zx, stats.norm.<span class="fn">pdf</span>(zx), <span class="st">"k-"</span>, lw=<span class="nm">2</span>, label=<span class="st">"N(0,1)"</span>)
+        _, pval = stats.<span class="fn">shapiro</span>(z[:<span class="nm">500</span>])
+        ax.set_title(<span class="st">f"n = {n}\nShapiro p = {pval:.3f}"</span>)
+        ax.set_xlim(-<span class="nm">5</span>, <span class="nm">5</span>)
+        <span class="kw">if</span> n == <span class="nm">1</span>: ax.<span class="fn">legend</span>(fontsize=<span class="nm">8</span>)
+    plt.tight_layout(); plt.<span class="fn">show</span>()
+    <span class="fn">print</span>(<span class="st">"n=1 → original shape · n=100 → bell curve regardless of origin"</span>)
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART B: Practical Probability Calculation
+# ═══════════════════════════════════════════════</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+mu, sigma, n = <span class="nm">10.0</span>, <span class="nm">0.5</span>, <span class="nm">36</span>
+x_thresh = <span class="nm">10.15</span>
+se = sigma / np.<span class="fn">sqrt</span>(n)
+z = (x_thresh - mu) / se
+prob = <span class="nm">1</span> - norm.<span class="fn">cdf</span>(z)
+<span class="fn">print</span>(<span class="st">f"\nBolt example: P(X̄_36 > 10.15) = {prob:.4f}"</span>)
+
+<span class="cm"># Verify by simulation</span>
+sim = np.random.<span class="fn">normal</span>(mu, sigma, (REPS, n)).<span class="fn">mean</span>(axis=<span class="nm">1</span>)
+<span class="fn">print</span>(<span class="st">f"Simulated:    P(X̄_36 > 10.15) ≈ {(sim > x_thresh).mean():.4f}"</span>)
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART C: CLT Failure — Cauchy (infinite variance)
+# ═══════════════════════════════════════════════</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">3</span>, figsize=(<span class="nm">15</span>, <span class="nm">4</span>))
+<span class="kw">for</span> ax, n <span class="kw">in</span> <span class="fn">zip</span>(axes, [<span class="nm">10</span>, <span class="nm">100</span>, <span class="nm">1000</span>]):
+    cauchy_means = stats.cauchy.<span class="fn">rvs</span>(size=(REPS, n)).<span class="fn">mean</span>(axis=<span class="nm">1</span>)
+    ax.<span class="fn">hist</span>(cauchy_means, bins=<span class="nm">100</span>, density=<span class="kw">True</span>, color=<span class="st">"#c2522b"</span>, alpha=<span class="nm">0.7</span>)
+    zx = np.<span class="fn">linspace</span>(-<span class="nm">8</span>, <span class="nm">8</span>, <span class="nm">200</span>)
+    ax.<span class="fn">plot</span>(zx, norm.<span class="fn">pdf</span>(zx), <span class="st">"k--"</span>, lw=<span class="nm">2</span>, label=<span class="st">"N(0,1)"</span>)
+    ax.set_xlim(-<span class="nm">8</span>, <span class="nm">8</span>)
+    ax.set_title(<span class="st">f"Cauchy X̄ₙ · n={n} · CLT FAILS"</span>)
+    ax.<span class="fn">legend</span>()
+fig.<span class="fn">suptitle</span>(<span class="st">"Cauchy has undefined mean &amp; infinite variance → CLT breaks"</span>)
+plt.tight_layout(); plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <hr class="hr">
+  <h3>✏ Practice Exercises — CLT</h3>
+  <div class="ex-stack">
+
+    <div class="ex-card easy">
+      <span class="ex-badge">Easy</span>
+      <div class="ex-num">Exercise 2.1</div>
+      <h5>Identify X̄ₙ's Distribution</h5>
+      <p>A random variable X has μ = 20 and σ = 4. You draw n = 64 observations. (a) Write down the approximate distribution of X̄₆₄. (b) Find P(X̄₆₄ &gt; 21). (c) Find the value x such that P(X̄₆₄ ≤ x) = 0.90.</p>
+      <div class="hint-txt"><strong>Hint:</strong> X̄₆₄ ~ N(20, 16/64) = N(20, 0.25). SE = 4/8 = 0.5. For (c): 90th percentile = μ + 1.282·SE.</div>
+    </div>
+
+    <div class="ex-card easy">
+      <span class="ex-badge">Easy</span>
+      <div class="ex-num">Exercise 2.2</div>
+      <h5>CLT for a Sum</h5>
+      <p>200 customers each independently spend a random amount at a restaurant: mean ₹250, std dev ₹60. What is P(total spending &gt; ₹52,000)?</p>
+      <div class="hint-txt"><strong>Hint:</strong> S₂₀₀ ~ N(200·250, 200·60²). SE of the sum = 60·√200 ≈ 848.5. z = (52000 − 50000)/848.5.</div>
+    </div>
+
+    <div class="ex-card med">
+      <span class="ex-badge">Medium</span>
+      <div class="ex-num">Exercise 2.3</div>
+      <h5>Survey Sample Size Design</h5>
+      <p>A polling firm wants to estimate the fraction of voters supporting a policy (true p ≈ 0.55). How many people must be surveyed so that P(|X̄ₙ − 0.55| &lt; 0.03) ≥ 0.95? (This is the classic margin-of-error formula.)</p>
+      <div class="hint-txt"><strong>Hint:</strong> Need 1.96·σ/√n ≤ 0.03 where σ = √(0.55·0.45). Solve: n ≥ (1.96·σ/0.03)². This is the standard polling sample-size formula.</div>
+    </div>
+
+    <div class="ex-card med">
+      <span class="ex-badge">Medium</span>
+      <div class="ex-num">Exercise 2.4</div>
+      <h5>Dice Sum via CLT</h5>
+      <p>Roll 72 fair dice, sum the results S₇₂. (a) Find E[S₇₂] and Var(S₇₂). (b) Approximate P(S₇₂ &gt; 280) using CLT. (c) Simulate 100,000 trials in Python and compare the empirical probability to your CLT answer.</p>
+      <div class="hint-txt"><strong>Hint:</strong> Die: μ=3.5, σ²=35/12. S₇₂~N(72·3.5, 72·35/12). z=(280−252)/√210.</div>
+    </div>
+
+    <div class="ex-card hard">
+      <span class="ex-badge">Hard</span>
+      <div class="ex-num">Exercise 2.5</div>
+      <h5>Confidence Intervals &amp; Hypothesis Testing</h5>
+      <p>A quant records 180 daily returns: X̄ = 0.11%, s = 1.6%. (a) Build a 99% confidence interval for the true daily mean μ. (b) Test H₀: μ = 0 at the 1% significance level. State your decision. (c) Compute the p-value. (d) What statistical power does your test have to detect a true μ = 0.08%?</p>
+      <div class="hint-txt"><strong>Hint:</strong> 99% CI: X̄ ± 2.576·s/√n. t-stat = X̄/(s/√n). Power = P(reject H₀ | μ=0.08%) = P(|Z| &gt; z_crit when true mean shifts by 0.08%/(s/√n)).</div>
+    </div>
+
+    <div class="ex-card hard">
+      <span class="ex-badge">Hard</span>
+      <div class="ex-num">Exercise 2.6 — Finance</div>
+      <h5>Portfolio VaR via CLT</h5>
+      <p>A portfolio holds 500 independent assets each with daily return Xᵢ ~ (μᵢ=0, σᵢ=1%). Portfolio P = ΣXᵢ. (a) Use CLT to find the distribution of P. (b) Compute the 1-day 99% VaR. (c) Now add pairwise correlation ρ=0.15 between all assets — recompute Var(P) and the new VaR. (d) How does correlation impact diversification? What's the limit as ρ→1?</p>
+      <div class="hint-txt"><strong>Hint:</strong> For (a): P ~ N(0, 500·0.01²). VaR₉₉ = 2.326·σ_P. For (c): Var(ΣXᵢ) = nσ²(1+(n−1)ρ) when all pairs have correlation ρ. As ρ→1, diversification disappears.</div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 3 — BRIDGE
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-bridge" class="tab-panel">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">The Bigger Picture</div>
+  <h2>LLN <em>meets</em> CLT</h2>
+  <p class="lead">These theorems aren't rivals — they're partners. Understood together, they completely describe the behaviour of the sample mean. Here's how they fit.</p>
+
+  <h3>The Two-Theorem Story</h3>
+
+  <div class="svg-wrap">
+    <svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <rect width="700" height="360" fill="#f7f3ec" rx="12"/>
+      <text x="350" y="30" text-anchor="middle" font-family="DM Serif Display,serif" font-size="16" fill="#2c3e50">The Complete Description of X̄ₙ</text>
+
+      <!-- Central node -->
+      <ellipse cx="350" cy="180" rx="68" ry="44" fill="#fff" stroke="#c2522b" stroke-width="2"/>
+      <text x="350" y="175" text-anchor="middle" font-family="DM Serif Display,serif" font-size="19" fill="#c2522b">X̄ₙ</text>
+      <text x="350" y="194" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">sample mean</text>
+
+      <!-- LLN box -->
+      <rect x="20" y="100" width="165" height="80" rx="8" fill="#fff" stroke="#c2522b" stroke-width="1.5"/>
+      <text x="103" y="124" text-anchor="middle" font-family="DM Serif Display,serif" font-size="14" fill="#c2522b">LLN</text>
+      <text x="103" y="143" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" fill="#3d5166">X̄ₙ → μ</text>
+      <text x="103" y="159" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">WHERE it goes</text>
+      <text x="103" y="173" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">(the destination)</text>
+
+      <!-- CLT box -->
+      <rect x="515" y="100" width="165" height="80" rx="8" fill="#fff" stroke="#2c3e50" stroke-width="1.5"/>
+      <text x="598" y="124" text-anchor="middle" font-family="DM Serif Display,serif" font-size="14" fill="#2c3e50">CLT</text>
+      <text x="598" y="143" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" fill="#3d5166">Error ~ N(0,σ²/n)</text>
+      <text x="598" y="159" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">HOW it gets there</text>
+      <text x="598" y="173" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">(the journey shape)</text>
+
+      <!-- Arrows -->
+      <path d="M185,140 L282,160" stroke="#c2522b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar1)"/>
+      <path d="M515,140 L418,160" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ar2)"/>
+
+      <!-- Combined box -->
+      <rect x="130" y="270" width="440" height="70" rx="8" fill="#2c3e50"/>
+      <text x="350" y="298" text-anchor="middle" font-family="DM Serif Display,serif" font-size="15" fill="#fff">Together: X̄ₙ ≈ N( μ, σ²/n )</text>
+      <text x="350" y="318" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" fill="rgba(255,255,255,.6)">exact location + shape of uncertainty</text>
+
+      <!-- Arrow down -->
+      <path d="M350,224 L350,270" stroke="#c09a2e" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ar3)"/>
+      <text x="355" y="253" font-family="Fira Code,monospace" font-size="9" fill="#c09a2e">combined</text>
+
+      <!-- Rate label -->
+      <text x="350" y="252" text-anchor="middle" font-family="Fira Code,monospace" font-size="9" fill="#c09a2e">rate: O(1/√n)</text>
+
+      <defs>
+        <marker id="ar1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c2522b"/></marker>
+        <marker id="ar2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#2c3e50"/></marker>
+        <marker id="ar3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c09a2e"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="cmp-grid">
+    <div class="cmp-box cmp-lln">
+      <h4>Law of Large Numbers</h4>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Tells you the <em>limit</em>: X̄ₙ → μ as n → ∞</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Makes no claim about the shape of fluctuations</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Requires finite mean (Weak) or variance (Strong)</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Works for more distributions (incl. heavier tails)</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Justifies: using X̄ to estimate μ</p></div>
+    </div>
+    <div class="cmp-box cmp-clt">
+      <h4>Central Limit Theorem</h4>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Tells you the <em>shape</em>: errors are approximately normal</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Quantifies uncertainty: X̄ₙ ~ N(μ, σ²/n)</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Requires finite variance σ² &lt; ∞</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Fails for infinite-variance distributions (Cauchy)</p></div>
+      <div class="cmp-row"><div class="cmp-dot"></div><p>Justifies: confidence intervals, hypothesis tests, VaR</p></div>
+    </div>
+  </div>
+
+  <hr class="hr">
+  <h3>Combined Visual — LLN + CLT Error Bands</h3>
+  <div class="chart-card">
+    <div class="chart-head">LLN Convergence with CLT ±1.96σ/√n Error Envelope</div>
+    <div class="chart-sub">LLN: paths converge to μ · CLT: 95% of paths stay inside the orange band</div>
+    <canvas id="bridgeChart" height="220"></canvas>
+  </div>
+
+  <hr class="hr">
+  <h3>Mathematical Hierarchy</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Property</th><th>Weak LLN</th><th>Strong LLN</th><th>CLT</th></tr>
+      <tr><td>Convergence type</td><td class="td-t">In probability</td><td class="td-t">Almost sure</td><td class="td-s">In distribution</td></tr>
+      <tr><td>What converges</td><td>X̄ₙ → μ</td><td>X̄ₙ → μ</td><td class="td-s">√n(X̄ₙ−μ)/σ → N(0,1)</td></tr>
+      <tr><td>Finite mean required?</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>Finite variance required?</td><td>Often yes</td><td>Yes</td><td class="td-t">Yes (essential)</td></tr>
+      <tr><td>Gives error intervals?</td><td>No</td><td>No</td><td class="td-g">Yes ← this is the power</td></tr>
+    </table>
+  </div>
+
+  <hr class="hr">
+  <h3>🎛 Combined Demo — Both Theorems Side by Side</h3>
+
+  <div class="demo-panel">
+    <div class="demo-title">LLN + CLT Simultaneously</div>
+    <div class="demo-desc">Left: running averages converging (LLN). Right: the distribution of final averages forming a bell curve (CLT).</div>
+    <div class="ctrl">
+      <label>Distribution</label>
+      <select id="brgDist" onchange="doBridge()">
+        <option value="exp">Exponential (skewed)</option>
+        <option value="unif">Uniform [0,1]</option>
+        <option value="bimod">Bimodal</option>
+      </select>
+    </div>
+    <div class="ctrl">
+      <label>Sample size n</label>
+      <input type="range" min="5" max="400" value="80" id="brgN" oninput="document.getElementById('brgNv').textContent=this.value;doBridge()">
+      <span class="ctrl-val" id="brgNv">80</span>
+    </div>
+    <div class="chart-2col">
+      <div>
+        <div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--muted);margin-bottom:6px">LLN — 10 paths converging to μ</div>
+        <canvas id="brgLLN" height="200"></canvas>
+      </div>
+      <div>
+        <div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--muted);margin-bottom:6px">CLT — distribution of X̄ₙ (2000 simulated)</div>
+        <canvas id="brgCLT" height="200"></canvas>
+      </div>
+    </div>
+    <div class="readout">
+      <span class="ro-lab">True μ: </span><span class="ro-t" id="brgMu">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">True σ: </span><span class="ro-t" id="brgSig">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">Predicted SE: </span><span class="ro-val" id="brgSE">—</span>&nbsp;&nbsp;
+      <span class="ro-lab">Observed SE: </span><span class="ro-val" id="brgObs">—</span>
+    </div>
+  </div>
+
+  <hr class="hr">
+  <h3>Quick Concept Check</h3>
+
+  <div class="qz-card">
+    <div class="qz-q">Q1 — The LLN guarantees X̄ₙ → μ. What additional information does the CLT provide?</div>
+    <ul class="qz-opts">
+      <li><input type="radio" name="q1" id="q1a" value="w"><label for="q1a">It proves the LLN with greater rigour.</label></li>
+      <li><input type="radio" name="q1" id="q1b" value="c"><label for="q1b">It tells us the shape of the fluctuations around μ — they're approximately normal.</label></li>
+      <li><input type="radio" name="q1" id="q1c" value="w"><label for="q1c">It shows X̄ₙ converges faster than the LLN states.</label></li>
+      <li><input type="radio" name="q1" id="q1d" value="w"><label for="q1d">It works for all distributions, including infinite-variance ones.</label></li>
+    </ul>
+    <button class="qz-btn" onclick="chkQ('q1','r1')">Check Answer</button>
+    <div class="qz-res" id="r1"></div>
+  </div>
+
+  <div class="qz-card">
+    <div class="qz-q">Q2 — After flipping 10 tails in a row, your friend says "heads is overdue." This is...</div>
+    <ul class="qz-opts">
+      <li><input type="radio" name="q2" id="q2a" value="c"><label for="q2a">The Gambler's Fallacy. Each flip is 50/50 regardless of history.</label></li>
+      <li><input type="radio" name="q2" id="q2b" value="w"><label for="q2b">Correct — LLN requires the average to return to 0.5, so tails must be "due."</label></li>
+      <li><input type="radio" name="q2" id="q2c" value="w"><label for="q2c">True for small n but not for large n.</label></li>
+      <li><input type="radio" name="q2" id="q2d" value="w"><label for="q2d">Described by the CLT, not the LLN.</label></li>
+    </ul>
+    <button class="qz-btn" onclick="chkQ('q2','r2')">Check Answer</button>
+    <div class="qz-res" id="r2"></div>
+  </div>
+
+  <div class="qz-card">
+    <div class="qz-q">Q3 — You apply CLT to stock returns assuming i.i.d. But returns have AR(1) autocorrelation ρ=0.2. The practical consequence is:</div>
+    <ul class="qz-opts">
+      <li><input type="radio" name="q3" id="q3a" value="w"><label for="q3a">No consequence — finite variance is all CLT needs.</label></li>
+      <li><input type="radio" name="q3" id="q3b" value="c"><label for="q3b">Your confidence intervals are too narrow — you're overconfident in your estimates.</label></li>
+      <li><input type="radio" name="q3" id="q3c" value="w"><label for="q3c">Correlation makes CLT converge faster.</label></li>
+      <li><input type="radio" name="q3" id="q3d" value="w"><label for="q3d">CLT cannot be applied at all to financial data.</label></li>
+    </ul>
+    <button class="qz-btn" onclick="chkQ('q3','r3')">Check Answer</button>
+    <div class="qz-res" id="r3"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 4 — QUANT APPLICATIONS
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-quant" class="tab-panel">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">Real-World Finance</div>
+  <h2>Quant <em>Applications</em></h2>
+  <p class="lead">LLN and CLT aren't just elegant theory — they're the invisible engines running every major tool in quantitative finance.</p>
+
+  <h3>1 · Monte Carlo Simulation</h3>
+  <p>Monte Carlo methods estimate complex expectations by simulating many scenarios and averaging results. The LLN guarantees this average converges to the true expectation. The CLT gives the error rate.</p>
+  <div class="formula-box">
+    <span class="formula-tag">Monte Carlo Estimator</span>
+    <div class="fml">E[f(X)] ≈ (1/N) Σᵢ f(Xᵢ) &nbsp;→&nbsp; E[f(X)]&nbsp;&nbsp;by LLN</div>
+    <div class="fml" style="margin-top:8px">Error ~ N(0, Var(f(X))/N)&nbsp;&nbsp;by CLT</div>
+    <div class="fml-note">To halve the MC error: quadruple simulations. Used for path-dependent options, CVA, risk simulations — anywhere closed-form formulas don't exist.</div>
+  </div>
+
+  <h3>2 · Value at Risk (VaR) and CVaR</h3>
+  <p>For a portfolio of n i.i.d. positions, the total P&amp;L S = ΣXᵢ ~ N(nμ, nσ²) by CLT. VaR at confidence level α is then the α-th percentile of this normal distribution.</p>
+  <div class="formula-box">
+    <span class="formula-tag">1-Day 99% VaR (CLT-based)</span>
+    <div class="fml">VaR₉₉ = −(nμ + z₀.₀₁ · σ√n) &nbsp;where&nbsp; z₀.₀₁ = −2.326</div>
+    <div class="fml-note">CVaR (Expected Shortfall) = E[Loss | Loss &gt; VaR] — literally a conditional expectation, computable analytically once CLT gives the normal approximation. Fat tails require EVT instead.</div>
+  </div>
+
+  <h3>3 · Backtesting &amp; the t-Statistic</h3>
+  <p>A quant backtests a strategy on n days, observes X̄. Is it skill or luck? The CLT provides the test statistic:</p>
+  <div class="formula-box">
+    <span class="formula-tag">Backtesting t-Statistic</span>
+    <div class="fml">t = X̄ · √n / s &nbsp;~&nbsp; N(0,1)&nbsp;&nbsp;under H₀: μ=0</div>
+    <div class="fml-note">Industry rule: |t| &gt; 2.0 for "significant," |t| &gt; 3.0 to account for data-snooping and multiple testing. With 252 trading days and 1% daily vol, you need true μ ≈ 0.13%/day to get t &gt; 2 — that's an extraordinary Sharpe ratio.</div>
+  </div>
+
+  <h3>4 · Option Pricing — Black-Scholes via CLT</h3>
+  <p>Under risk-neutral measure, log-returns are i.i.d. over each small interval. By CLT, the sum of log-returns over T days is normal — making the stock price log-normal. The option price is then a conditional expectation computable in closed form.</p>
+
+  <div class="svg-wrap">
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <rect width="700" height="240" fill="#f7f3ec" rx="10"/>
+      <text x="350" y="26" text-anchor="middle" font-family="DM Serif Display,serif" font-size="14" fill="#2c3e50">From Daily Returns to Black-Scholes — The CLT Chain</text>
+
+      <rect x="14" y="45" width="120" height="65" rx="7" fill="#fff" stroke="#c2522b" stroke-width="1.5"/>
+      <text x="74" y="70" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" font-weight="500" fill="#c2522b">Daily Returns</text>
+      <text x="74" y="86" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">Xᵢ i.i.d.</text>
+      <text x="74" y="101" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">any distribution</text>
+
+      <path d="M134,77 L172,77" stroke="#c09a2e" stroke-width="1.5" marker-end="url(#ba1)"/>
+      <text x="153" y="71" text-anchor="middle" font-family="Fira Code,monospace" font-size="9" fill="#c09a2e">CLT</text>
+
+      <rect x="172" y="45" width="130" height="65" rx="7" fill="#fff" stroke="#3d5166" stroke-width="1.5"/>
+      <text x="237" y="68" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" font-weight="500" fill="#3d5166">Log Return</text>
+      <text x="237" y="84" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">Σ Xᵢ ~ N(Tμ, Tσ²)</text>
+      <text x="237" y="99" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">over T days</text>
+
+      <path d="M302,77 L340,77" stroke="#c09a2e" stroke-width="1.5" marker-end="url(#ba2)"/>
+      <text x="321" y="71" text-anchor="middle" font-family="Fira Code,monospace" font-size="9" fill="#c09a2e">exp()</text>
+
+      <rect x="340" y="45" width="130" height="65" rx="7" fill="#fff" stroke="#4a7c59" stroke-width="1.5"/>
+      <text x="405" y="68" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" font-weight="500" fill="#4a7c59">Stock Price S_T</text>
+      <text x="405" y="84" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">Log-Normal</text>
+      <text x="405" y="99" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="#7a7060">CLT → LN theorem</text>
+
+      <path d="M470,77 L508,77" stroke="#c09a2e" stroke-width="1.5" marker-end="url(#ba3)"/>
+      <text x="489" y="69" text-anchor="middle" font-family="Fira Code,monospace" font-size="8" fill="#c09a2e">E[max(S-K,0)]</text>
+
+      <rect x="508" y="45" width="178" height="65" rx="7" fill="#2c3e50"/>
+      <text x="597" y="68" text-anchor="middle" font-family="DM Serif Display,serif" font-size="13" fill="#fff">Black-Scholes</text>
+      <text x="597" y="84" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="rgba(255,255,255,.7)">C = f(S,K,r,σ,T)</text>
+      <text x="597" y="99" text-anchor="middle" font-family="Fira Code,monospace" font-size="10" fill="rgba(255,255,255,.5)">closed-form price</text>
+
+      <!-- LLN below -->
+      <rect x="100" y="155" width="500" height="70" rx="8" fill="var(--terra-p,#fdf0eb)" stroke="#c2522b" stroke-width="1"/>
+      <text x="350" y="178" text-anchor="middle" font-family="DM Serif Display,serif" font-size="13" fill="#c2522b">LLN Role: Monte Carlo Pricing</text>
+      <text x="350" y="196" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" fill="#3d5166">Simulate N paths of S_T → average max(S_T−K, 0) → call price</text>
+      <text x="350" y="213" text-anchor="middle" font-family="Fira Code,monospace" font-size="11" fill="#c2522b">CLT: error ~ N(0, Var(payoff)/N) → confidence on the estimate</text>
+
+      <defs>
+        <marker id="ba1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c09a2e"/></marker>
+        <marker id="ba2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c09a2e"/></marker>
+        <marker id="ba3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c09a2e"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <hr class="hr">
+  <h3>🧪 Colab Experiment 3 — Monte Carlo Option Pricing</h3>
+  <div class="code-wrap">
+    <div class="code-bar">
+      <div class="code-dots"><span class="cr"></span><span class="cy"></span><span class="cg"></span></div>
+      <span class="code-name">colab_exp3_montecarlo.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open in Colab</a>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART A: European Call via Monte Carlo
+#   Uses LLN: average payoff → true expected payoff
+#   Uses CLT: error ~ N(0, Var(payoff)/N)
+# ═══════════════════════════════════════════════</span>
+S0, K, r, sigma, T = <span class="nm">100</span>, <span class="nm">105</span>, <span class="nm">0.05</span>, <span class="nm">0.20</span>, <span class="nm">1.0</span>
+
+<span class="cm"># Analytical Black-Scholes (our benchmark)</span>
+d1 = (np.<span class="fn">log</span>(S0/K) + (r + <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T) / (sigma*np.<span class="fn">sqrt</span>(T))
+d2 = d1 - sigma*np.<span class="fn">sqrt</span>(T)
+BS = S0*norm.<span class="fn">cdf</span>(d1) - K*np.<span class="fn">exp</span>(-r*T)*norm.<span class="fn">cdf</span>(d2)
+<span class="fn">print</span>(<span class="st">f"Black-Scholes price: ${BS:.4f}"</span>)
+
+<span class="cm"># Monte Carlo for varying N</span>
+N_list = [<span class="nm">50</span>, <span class="nm">200</span>, <span class="nm">1000</span>, <span class="nm">5000</span>, <span class="nm">20000</span>, <span class="nm">100000</span>]
+mc_prices, mc_errs = [], []
+
+<span class="kw">for</span> N <span class="kw">in</span> N_list:
+    Z = np.random.<span class="fn">randn</span>(N)
+    ST = S0 * np.<span class="fn">exp</span>((r - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T + sigma*np.<span class="fn">sqrt</span>(T)*Z)
+    payoff = np.<span class="fn">maximum</span>(ST - K, <span class="nm">0</span>)
+    price = np.<span class="fn">exp</span>(-r*T) * payoff.<span class="fn">mean</span>()         <span class="cm"># LLN</span>
+    se = payoff.<span class="fn">std</span>() * np.<span class="fn">exp</span>(-r*T) / np.<span class="fn">sqrt</span>(N) <span class="cm"># CLT</span>
+    mc_prices.<span class="fn">append</span>(price); mc_errs.<span class="fn">append</span>(<span class="nm">1.96</span>*se)
+    <span class="fn">print</span>(<span class="st">f"N={N:7d}: ${price:.4f} ± {1.96*se:.4f}  (BS=${BS:.4f})"</span>)
+
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">2</span>, figsize=(<span class="nm">13</span>, <span class="nm">5</span>))
+ax1.<span class="fn">semilogx</span>(N_list, mc_prices, <span class="st">"o-"</span>, color=<span class="st">"#c2522b"</span>, lw=<span class="nm">2</span>)
+ax1.<span class="fn">fill_between</span>(N_list, [p-e <span class="kw">for</span> p,e <span class="kw">in</span> <span class="fn">zip</span>(mc_prices,mc_errs)],
+                  [p+e <span class="kw">for</span> p,e <span class="kw">in</span> <span class="fn">zip</span>(mc_prices,mc_errs)], alpha=<span class="nm">0.25</span>, color=<span class="st">"#c2522b"</span>)
+ax1.<span class="fn">axhline</span>(BS, color=<span class="st">"#2c3e50"</span>, ls=<span class="st">"--"</span>, lw=<span class="nm">2</span>, label=<span class="st">f"BS = ${BS:.4f}"</span>)
+ax1.set_title(<span class="st">"MC Price Converges to BS (LLN)"</span>); ax1.<span class="fn">legend</span>()
+ax1.set_xlabel(<span class="st">"N simulations"</span>); ax1.set_ylabel(<span class="st">"Estimated Call Price"</span>)
+
+Narr = np.<span class="fn">array</span>(N_list)
+ax2.<span class="fn">loglog</span>(Narr, mc_errs, <span class="st">"o-"</span>, color=<span class="st">"#c09a2e"</span>, lw=<span class="nm">2</span>, label=<span class="st">"MC 95% error"</span>)
+ax2.<span class="fn">loglog</span>(Narr, mc_errs[<span class="nm">0</span>]*np.<span class="fn">sqrt</span>(N_list[<span class="nm">0</span>]/Narr), <span class="st">"--"</span>, color=<span class="st">"#4a7c59"</span>, lw=<span class="nm">2</span>, label=<span class="st">"∝ 1/√N (CLT)"</span>)
+ax2.set_title(<span class="st">"Error Shrinks at 1/√N Rate (CLT)"</span>)
+ax2.set_xlabel(<span class="st">"N"</span>); ax2.set_ylabel(<span class="st">"Error"</span>); ax2.<span class="fn">legend</span>()
+plt.tight_layout(); plt.<span class="fn">show</span>()
+
+<span class="cm"># ═══════════════════════════════════════════════
+# PART B: Strategy Significance Test
+# ═══════════════════════════════════════════════</span>
+<span class="fn">print</span>(<span class="st">"\n=== Backtesting Significance (CLT) ==="</span>)
+n_days, mu_true, sig = <span class="nm">252</span>, <span class="nm">0.0</span>, <span class="nm">0.01</span>  <span class="cm"># no-skill strategy</span>
+ret = np.random.<span class="fn">normal</span>(mu_true, sig, n_days)
+xbar, s = ret.<span class="fn">mean</span>(), ret.<span class="fn">std</span>()
+t = xbar / (s / np.<span class="fn">sqrt</span>(n_days))
+pval = <span class="nm">2</span>*(1 - norm.<span class="fn">cdf</span>(<span class="fn">abs</span>(t)))
+<span class="fn">print</span>(<span class="st">f"X̄ = {xbar:.4%}, t = {t:.3f}, p-value = {pval:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"95% CI: [{xbar-1.96*s/np.sqrt(n_days):.4%}, {xbar+1.96*s/np.sqrt(n_days):.4%}]"</span>)
+needed = ((<span class="nm">2</span>*sig) / (<span class="nm">0.0001</span>))**<span class="nm">2</span> / <span class="nm">252</span>
+<span class="fn">print</span>(<span class="st">f"Years needed to detect true μ=0.01%/day at t&gt;2: {needed:.1f} years!"</span>)</pre>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB 5 — RESOURCES
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-res" class="tab-panel">
+<div class="panel-wrap">
+  <div class="topic-eyebrow">Go Deeper</div>
+  <h2><em>Resources</em> &amp; Next Steps</h2>
+  <p class="lead">A curated collection of the best free materials — from visual intuition to rigorous proofs to quant finance applications.</p>
+
+  <h3>📚 Textbooks &amp; Lecture Notes</h3>
+  <div class="res-grid">
+    <a href="https://projects.iq.harvard.edu/stat110/home" target="_blank" class="res-card">
+      <span class="res-icon">🎓</span>
+      <h5>Harvard Stat 110 — Blitzstein</h5>
+      <p>The best free probability course online. Lectures 29–32 cover LLN and CLT with beautiful story proofs.</p>
+      <span class="res-url">projects.iq.harvard.edu/stat110</span>
+    </a>
+    <a href="https://www.probabilitycourse.com/chapter7/7_1_1_law_of_large_numbers.php" target="_blank" class="res-card">
+      <span class="res-icon">📖</span>
+      <h5>Intro to Probability (Free)</h5>
+      <p>Chapter 7 has a complete treatment of LLN and CLT with worked examples. Entirely free, very clear.</p>
+      <span class="res-url">probabilitycourse.com → Ch. 7</span>
+    </a>
+    <a href="https://ocw.mit.edu/courses/18-650-statistics-for-applications-fall-2016/" target="_blank" class="res-card">
+      <span class="res-icon">🏫</span>
+      <h5>MIT 18.650 — Statistics</h5>
+      <p>Full MIT OpenCourseWare. CLT applied to hypothesis testing and confidence intervals. Free lecture notes.</p>
+      <span class="res-url">ocw.mit.edu → 18-650</span>
+    </a>
+    <a href="https://www.amazon.com/Options-Futures-Other-Derivatives-10th/dp/013447208X" target="_blank" class="res-card">
+      <span class="res-icon">💹</span>
+      <h5>Hull — Options &amp; Derivatives</h5>
+      <p>Standard quant finance textbook. Shows how LLN and CLT underpin Monte Carlo, VaR, and Black-Scholes.</p>
+      <span class="res-url">amazon → John Hull</span>
+    </a>
+  </div>
+
+  <h3>🎬 Video Resources</h3>
+  <div class="res-grid">
+    <a href="https://www.youtube.com/watch?v=zeJD6dqJ5lo" target="_blank" class="res-card">
+      <span class="res-icon">▶️</span>
+      <h5>3Blue1Brown — CLT</h5>
+      <p>Stunning visual explanation of the Central Limit Theorem. Possibly the best mathematical video on YouTube. Watch this first.</p>
+      <span class="res-url">youtube.com/3blue1brown</span>
+    </a>
+    <a href="https://www.youtube.com/watch?v=otdaJfQLWcQ" target="_blank" class="res-card">
+      <span class="res-icon">🎥</span>
+      <h5>StatQuest — LLN</h5>
+      <p>Josh Starmer's gentle, clear walkthrough of the Law of Large Numbers. Perfect for building first intuition.</p>
+      <span class="res-url">youtube.com/@statquest</span>
+    </a>
+    <a href="https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo" target="_blank" class="res-card">
+      <span class="res-icon">📺</span>
+      <h5>Harvard Stat 110 Lectures</h5>
+      <p>Full Blitzstein lecture series on YouTube. Story proofs that build deep intuition, not just mechanical formula application.</p>
+      <span class="res-url">youtube → "Stat110 Harvard Blitzstein"</span>
+    </a>
+  </div>
+
+  <h3>💻 Interactive Visualizations</h3>
+  <div class="res-grid">
+    <a href="https://seeing-theory.brown.edu/frequentist-inference/index.html" target="_blank" class="res-card">
+      <span class="res-icon">👁️</span>
+      <h5>Seeing Theory — Brown Univ.</h5>
+      <p>Beautiful interactive probability visualizations. Chapter 4 is the best online CLT demo. Drag sliders and watch the bell curve form.</p>
+      <span class="res-url">seeing-theory.brown.edu</span>
+    </a>
+    <a href="https://onlinestatbook.com/stat_sim/sampling_dist/index.html" target="_blank" class="res-card">
+      <span class="res-icon">🔬</span>
+      <h5>Sampling Distribution Simulator</h5>
+      <p>Rice University applet: choose any population distribution, set n, click Animated to watch CLT happen in real time.</p>
+      <span class="res-url">onlinestatbook.com/stat_sim</span>
+    </a>
+    <a href="https://www.geogebra.org/m/T3cKkEzf" target="_blank" class="res-card">
+      <span class="res-icon">📐</span>
+      <h5>GeoGebra CLT Applet</h5>
+      <p>Interactive CLT visualization — drag the sample size slider and watch the histogram morph into a bell curve in real time.</p>
+      <span class="res-url">geogebra.org → search "CLT applet"</span>
+    </a>
+    <a href="https://distill.pub" target="_blank" class="res-card">
+      <span class="res-icon">✨</span>
+      <h5>Distill.pub</h5>
+      <p>Research-quality interactive machine learning articles. Beautiful explanations of probability and statistics with embedded demos.</p>
+      <span class="res-url">distill.pub</span>
+    </a>
+  </div>
+
+  <hr class="hr">
+  <h3>Your Learning Path Forward</h3>
+
+  <div class="path-item">
+    <div class="path-n">1</div>
+    <div><h5>Complete All Exercises</h5><p>Work through all 18 exercises (6 per topic). Run every Colab experiment. Make LLN and CLT feel intuitive, not just formulaic.</p></div>
+  </div>
+  <div class="path-item">
+    <div class="path-n">2</div>
+    <div><h5>Hypothesis Testing &amp; CIs</h5><p>Direct applications of CLT. Master z-tests, t-tests, p-values, and power analysis. These appear in every quant interview and research context.</p></div>
+  </div>
+  <div class="path-item">
+    <div class="path-n">3</div>
+    <div><h5>Delta Method</h5><p>Extends CLT to nonlinear functions: if X̄ ~ N(μ,σ²/n), then g(X̄) ~ N(g(μ), (g'(μ))²σ²/n). Used for Greeks, Sharpe ratio inference, and log-return distributions.</p></div>
+  </div>
+  <div class="path-item">
+    <div class="path-n">4</div>
+    <div><h5>CLT for Dependent Data</h5><p>Gordin's CLT, ergodic theorem, Newey-West standard errors. Essential for time-series financial data where i.i.d. fails.</p></div>
+  </div>
+  <div class="path-item">
+    <div class="path-n">5</div>
+    <div><h5>Extreme Value Theory</h5><p>When CLT fails (fat tails, infinite variance), EVT provides the Generalized Extreme Value and Generalized Pareto distributions. Critical for tail risk and stress testing.</p></div>
+  </div>
+  <div class="path-item">
+    <div class="path-n">6</div>
+    <div><h5>Stochastic Calculus</h5><p>The continuous-time limit of sums of i.i.d. random variables is Brownian motion — the CLT taken to its logical extreme. Leads to Itô's Lemma and the Black-Scholes PDE.</p></div>
+  </div>
+
+  <hr class="hr">
+  <div class="insight">
+    <p>The LLN says: <strong>you can trust averages</strong>. The CLT says: <strong>and here is precisely how much to trust them</strong>. Every confidence interval, every p-value, every VaR estimate, every Monte Carlo simulation you will ever run as a quant engineer rests on these two theorems. Master them not as formulas to apply, but as a complete framework for reasoning about uncertainty under randomness.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer>
+  <span>LLN &amp; CLT Study Guide</span> · Law of Large Numbers · Central Limit Theorem · Quant Engineering Series · 100 % Offline
+</footer>
+
+<!-- ══════════════════ JAVASCRIPT ══════════════════ -->
+<script>
+'use strict';
+
+/* ── TAB SWITCH ───────────────────────────── */
+function goTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── CHART HELPERS ───────────────────────── */
+const CH={};
+function mk(id,cfg){
+  if(CH[id]) CH[id].destroy();
+  const c=document.getElementById(id);
+  if(!c) return null;
+  CH[id]=new Chart(c.getContext('2d'),cfg);
+  return CH[id];
+}
+const PALETTE=['#c2522b','#2c3e50','#c09a2e','#4a7c59','#6b3fa0','#1a7a9e','#8b4513','#5a6472'];
+const BASE_OPT={
+  plugins:{legend:{labels:{color:'#7a7060',font:{family:"'Fira Code',monospace",size:11}}}},
+  scales:{
+    x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#a09080',maxTicksLimit:8}},
+    y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#a09080'}}
+  }
+};
+
+/* ── RANDOM UTILS ────────────────────────── */
+let seed=12345;
+function rng(){seed=(seed*1664525+1013904223)&0xffffffff;return((seed>>>0)/4294967296);}
+function randn_bm(){
+  let u=0,v=0;
+  while(!u)u=rng();while(!v)v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function normPDF(x,mu=0,sig=1){return Math.exp(-0.5*((x-mu)/sig)**2)/(sig*Math.sqrt(2*Math.PI));}
+
+function sample(dist,n){
+  const a=[];
+  for(let i=0;i<n;i++){
+    if(dist==='coin') a.push(rng()<.5?1:0);
+    else if(dist==='die') a.push(Math.ceil(rng()*6));
+    else if(dist==='exp') a.push(-Math.log(1-rng())); // Expo(1), mean=1
+    else if(dist==='unif') a.push(rng());
+    else if(dist==='bern') a.push(rng()<.3?1:0);
+    else if(dist==='bimod') a.push(rng()<.5?randn_bm()*0.5-3:randn_bm()*0.5+3);
+    else a.push(randn_bm());
+  }
+  return a;
+}
+
+const META={
+  coin:{mu:.5,sig:.5},die:{mu:3.5,sig:Math.sqrt(35/12)},
+  exp:{mu:1,sig:1},unif:{mu:.5,sig:Math.sqrt(1/12)},
+  bern:{mu:.3,sig:Math.sqrt(.21)},bimod:{mu:0,sig:Math.sqrt(9.25)},
+  norm:{mu:0,sig:1}
+};
+
+function cumMean(arr){
+  const r=[];let s=0;
+  arr.forEach((v,i)=>{s+=v;r.push(s/(i+1));});
+  return r;
+}
+
+/* ── PREREQUISITE CHARTS ─────────────────── */
+function buildPrereq(){
+  // Low variance
+  const lx=[],ly=[];
+  for(let x=3;x<=7;x+=0.05){lx.push(x.toFixed(2));ly.push(normPDF(x,5,0.5));}
+  mk('varLoChart',{type:'line',data:{labels:lx,datasets:[{data:ly,borderColor:'#c2522b',backgroundColor:'rgba(194,82,43,.12)',fill:true,pointRadius:0,tension:.4,label:'N(5, 0.25)'}]},options:BASE_OPT});
+  // High variance
+  const hx=[],hy=[];
+  for(let x=-3;x<=13;x+=0.1){hx.push(x.toFixed(1));hy.push(normPDF(x,5,2));}
+  mk('varHiChart',{type:'line',data:{labels:hx,datasets:[{data:hy,borderColor:'#2c3e50',backgroundColor:'rgba(44,62,80,.10)',fill:true,pointRadius:0,tension:.4,label:'N(5, 4)'}]},options:BASE_OPT});
+  // Sample means scatter
+  const sm=Array.from({length:20},()=>{
+    let s=0;for(let j=0;j<25;j++) s+=randn_bm();
+    return +(s/25).toFixed(3);
+  });
+  mk('smpMeansChart',{type:'bar',data:{
+    labels:Array.from({length:20},(_,i)=>'Trial '+(i+1)),
+    datasets:[{label:'X̄₂₅ value',data:sm,backgroundColor:PALETTE.map(c=>c+'88'),borderColor:PALETTE,borderWidth:2}]
+  },options:{...BASE_OPT,plugins:{legend:{display:false}},scales:{
+    x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#a09080',maxTicksLimit:10}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#a09080'},min:-.6,max:.6}
+  }}});
+}
+
+/* ── LLN STATIC CHARTS ───────────────────── */
+function buildLLN(){
+  const N=600,pts=Array.from({length:N},(_,i)=>i+1);
+  // Convergence chart
+  const ds=[];
+  for(let p=0;p<5;p++){
+    const cm=cumMean(sample('coin',N));
+    ds.push({label:`Path ${p+1}`,data:cm,borderColor:PALETTE[p],borderWidth:1.5,pointRadius:0,fill:false,tension:0});
+  }
+  ds.push({label:'True μ=0.5',data:Array(N).fill(.5),borderColor:'#1a1a1a',borderWidth:2.5,borderDash:[7,4],pointRadius:0,fill:false});
+  mk('llnCoinChart',{type:'line',data:{labels:pts,datasets:ds},options:{...BASE_OPT,animation:false}});
+  // Error chart
+  const eLab=[],eData=[];
+  for(let n=1;n<=N;n+=3){
+    const s=sample('coin',n);
+    const m=s.reduce((a,b)=>a+b,0)/n;
+    eLab.push(n);eData.push(Math.abs(m-.5));
+  }
+  const seUp=eLab.map(n=>1.96*.5/Math.sqrt(n));
+  mk('llnErrChart',{type:'line',data:{labels:eLab,datasets:[
+    {label:'|X̄ₙ − 0.5|',data:eData,borderColor:'#c2522b',borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'1.96·σ/√n',data:seUp,borderColor:'#c09a2e',borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false}
+  ]},options:{...BASE_OPT,animation:false}});
+}
+
+/* ── LLN SIMULATION ──────────────────────── */
+function doLLN(){
+  const dist=document.getElementById('llnDist').value;
+  const nMax=+document.getElementById('llnN').value;
+  const nP=+document.getElementById('llnP').value;
+  const {mu,sig}=META[dist];
+  document.getElementById('llnMu').textContent=mu.toFixed(3);
+  document.getElementById('llnNshow').textContent=nMax;
+
+  const pts=Math.min(nMax,400);
+  const step=nMax/pts;
+  const labels=Array.from({length:pts},(_,i)=>Math.round((i+1)*step));
+  const ds=[];
+  let firstFinal=null;
+  for(let p=0;p<nP;p++){
+    const cm=cumMean(sample(dist,nMax));
+    const sub=labels.map(l=>cm[l-1]);
+    if(p===0) firstFinal=cm[nMax-1];
+    ds.push({label:`Path ${p+1}`,data:sub,borderColor:PALETTE[p%8],borderWidth:1.5,pointRadius:0,fill:false,tension:0});
+  }
+  ds.push({label:`μ=${mu}`,data:Array(pts).fill(mu),borderColor:'#1a1a1a',borderWidth:2.5,borderDash:[7,4],pointRadius:0,fill:false});
+  mk('llnSim',{type:'line',data:{labels,datasets:ds},options:{...BASE_OPT,animation:false}});
+
+  if(firstFinal!==null){
+    document.getElementById('llnFinal').textContent=firstFinal.toFixed(4);
+    document.getElementById('llnErr').textContent=Math.abs(firstFinal-mu).toFixed(5);
+    document.getElementById('llnPredSE').textContent=(sig/Math.sqrt(nMax)).toFixed(5);
+  }
+}
+
+/* ── CLT STATIC CHARTS ───────────────────── */
+function buildCLT(){
+  const REPS=3000;
+  // Exponential convergence
+  const nvals=[1,5,30,100];
+  const colors2=['#c2522b','#c09a2e','#4a7c59','#2c3e50'];
+  function buildCLTStatic(canvasId,distFn,mu,sig){
+    const allDs=[];
+    let allMins=[],allMaxes=[];
+    for(let ni=0;ni<nvals.length;ni++){
+      const n=nvals[ni];
+      const means=[];
+      for(let r=0;r<REPS;r++){
+        const s=distFn(n);
+        means.push(s.reduce((a,b)=>a+b,0)/n);
+      }
+      means.sort((a,b)=>a-b);
+      allMins.push(means[0]);allMaxes.push(means[REPS-1]);
+    }
+    const mn=Math.min(...allMins), mx=Math.max(...allMaxes);
+    const BINS=50,bw=(mx-mn)/BINS;
+    for(let ni=0;ni<nvals.length;ni++){
+      const n=nvals[ni];
+      const means=[];
+      for(let r=0;r<REPS;r++){const s=distFn(n);means.push(s.reduce((a,b)=>a+b,0)/n);}
+      const hist=Array(BINS).fill(0);
+      means.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);hist[b]++;});
+      const total=means.length*bw;
+      allDs.push({label:`n=${nvals[ni]}`,data:hist.map(h=>h/total),backgroundColor:colors2[ni]+'66',borderColor:colors2[ni],borderWidth:1.5,type:'bar'});
+    }
+    const lb=Array.from({length:BINS},(_,i)=>(mn+i*bw+bw/2).toFixed(2));
+    mk(canvasId,{type:'bar',data:{labels:lb,datasets:allDs},options:{...BASE_OPT,animation:false,scales:{
+      x:{...BASE_OPT.scales.x,ticks:{maxTicksLimit:8,color:'#a09080'}},
+      y:{...BASE_OPT.scales.y}
+    }}});
+  }
+  buildCLTStatic('cltExpoChart',n=>Array.from({length:n},()=>-Math.log(1-rng())),1,1);
+  buildCLTStatic('cltBiChart',n=>Array.from({length:n},()=>rng()<.5?randn_bm()*.5-3:randn_bm()*.5+3),0,Math.sqrt(9.25));
+}
+
+/* ── CLT SIMULATION ──────────────────────── */
+function doCLT(){
+  const dist=document.getElementById('cltDist').value;
+  const n=+document.getElementById('cltN').value;
+  const REPS=+document.getElementById('cltR').value;
+  const {mu,sig}=META[dist];
+  document.getElementById('cltMu').textContent=mu.toFixed(3);
+  document.getElementById('cltSig').textContent=sig.toFixed(3);
+  const se=sig/Math.sqrt(n);
+  document.getElementById('cltSE').textContent=se.toFixed(4);
+
+  const means=[];
+  for(let r=0;r<REPS;r++){
+    const s=sample(dist,n);
+    means.push(s.reduce((a,b)=>a+b,0)/n);
+  }
+  const obsSE=Math.sqrt(means.reduce((a,b)=>a+(b-mu)**2,0)/means.length);
+  document.getElementById('cltObs').textContent=obsSE.toFixed(4);
+  const skew=means.reduce((a,b)=>a+((b-mu)/obsSE)**3,0)/means.length;
+  document.getElementById('cltNorm').textContent=Math.abs(skew)<0.3?'Yes ✓ (low skew)':'Not yet (increase n)';
+
+  const mn=Math.min(...means),mx=Math.max(...means);
+  const BINS=50,bw=(mx-mn)/BINS;
+  const hist=Array(BINS).fill(0);
+  means.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);hist[b]++;});
+  const lbs=Array.from({length:BINS},(_,i)=>(mn+i*bw+bw/2).toFixed(3));
+  const total=means.length*bw;
+  const bellY=lbs.map(l=>normPDF(+l,mu,se));
+  mk('cltSim',{type:'bar',data:{labels:lbs,datasets:[
+    {label:'Simulated X̄ₙ',data:hist.map(h=>h/total),backgroundColor:'rgba(194,82,43,.5)',borderColor:'#c2522b',borderWidth:1},
+    {label:'N(μ, σ²/n)',data:bellY,type:'line',borderColor:'#2c3e50',borderWidth:2.5,pointRadius:0,fill:false,tension:.4}
+  ]},options:{...BASE_OPT,animation:false,scales:{
+    x:{ticks:{maxTicksLimit:8,color:'#a09080'},grid:{color:'rgba(0,0,0,.04)'}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#a09080'}}
+  }}});
+}
+
+/* ── BRIDGE CHART ────────────────────────── */
+function buildBridgeChart(){
+  const N=500,pts=Array.from({length:N},(_,i)=>i+1);
+  const ds=[];
+  for(let p=0;p<5;p++){
+    const cm=cumMean(sample('exp',N));
+    ds.push({label:`Path ${p+1}`,data:cm,borderColor:PALETTE[p%8],borderWidth:1.2,pointRadius:0,fill:false,tension:0});
+  }
+  const upper=pts.map(n=>1+1.96/Math.sqrt(n));
+  const lower=pts.map(n=>1-1.96/Math.sqrt(n));
+  ds.push({label:'True μ=1',data:Array(N).fill(1),borderColor:'#1a1a1a',borderWidth:2.5,borderDash:[7,4],pointRadius:0,fill:false});
+  ds.push({label:'+1.96σ/√n',data:upper,borderColor:'#c09a2e',borderWidth:1.5,borderDash:[4,2],pointRadius:0,fill:false});
+  ds.push({label:'−1.96σ/√n',data:lower,borderColor:'#c09a2e',borderWidth:1.5,borderDash:[4,2],pointRadius:0,fill:'+2'});
+  mk('bridgeChart',{type:'line',data:{labels:pts,datasets:ds},options:{...BASE_OPT,animation:false}});
+}
+
+/* ── BRIDGE DEMO ─────────────────────────── */
+function doBridge(){
+  const dist=document.getElementById('brgDist').value;
+  const n=+document.getElementById('brgN').value;
+  const {mu,sig}=META[dist];
+  document.getElementById('brgMu').textContent=mu.toFixed(2);
+  document.getElementById('brgSig').textContent=sig.toFixed(2);
+  document.getElementById('brgSE').textContent=(sig/Math.sqrt(n)).toFixed(4);
+
+  const pts=Math.min(n,300);
+  const step=n/pts;
+  const labels=Array.from({length:pts},(_,i)=>Math.round((i+1)*step));
+  const ds=[];
+  for(let p=0;p<10;p++){
+    const cm=cumMean(sample(dist,n));
+    ds.push({label:p===0?'Path 1':undefined,data:labels.map(l=>cm[l-1]),borderColor:PALETTE[p%8],borderWidth:1.2,pointRadius:0,fill:false,tension:0});
+  }
+  ds.push({label:`μ=${mu}`,data:Array(pts).fill(mu),borderColor:'#1a1a1a',borderWidth:2.5,borderDash:[6,3],pointRadius:0,fill:false});
+  mk('brgLLN',{type:'line',data:{labels,datasets:ds},options:{...BASE_OPT,animation:false,plugins:{legend:{display:false}}}});
+
+  const REPS=2000,means=[];
+  for(let r=0;r<REPS;r++){const s=sample(dist,n);means.push(s.reduce((a,b)=>a+b,0)/n);}
+  const mn=Math.min(...means),mx=Math.max(...means),BINS=40,bw=(mx-mn)/BINS;
+  const hist=Array(BINS).fill(0);
+  means.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);hist[b]++;});
+  const lbs=Array.from({length:BINS},(_,i)=>(mn+i*bw+bw/2).toFixed(3));
+  const total=means.length*bw;
+  const se=sig/Math.sqrt(n);
+  mk('brgCLT',{type:'bar',data:{labels:lbs,datasets:[
+    {label:'X̄ₙ distribution',data:hist.map(h=>h/total),backgroundColor:'rgba(44,62,80,.45)',borderColor:'#2c3e50',borderWidth:1},
+    {label:'N(μ,σ²/n)',data:lbs.map(l=>normPDF(+l,mu,se)),type:'line',borderColor:'#c2522b',borderWidth:2,pointRadius:0,fill:false,tension:.4}
+  ]},options:{...BASE_OPT,animation:false,scales:{x:{ticks:{maxTicksLimit:6,color:'#a09080'},grid:{color:'rgba(0,0,0,.04)'}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#a09080'}}}}});
+
+  const obsSE=Math.sqrt(means.reduce((a,b)=>a+(b-mu)**2,0)/means.length);
+  document.getElementById('brgObs').textContent=obsSE.toFixed(4);
+}
+
+/* ── QUIZ ─────────────────────────────────── */
+const ANSWERS={
+  r1:{c:'✅ Correct! LLN gives the destination (μ). CLT gives the shape of the journey — normally distributed fluctuations around μ. Together they allow you to build confidence intervals, run hypothesis tests, and compute VaR.',w:"❌ Not quite. Think of LLN as GPS coordinates for the destination and CLT as the map of how the path looks. CLT adds the bell-curve shape of fluctuations — which is what makes confidence intervals and hypothesis tests possible."},
+  r2:{c:"✅ Correct! This is the Gambler's Fallacy. Each coin flip is independent — it has no memory. LLN works by adding millions of future observations that dilute early deviations, not by making the coin 'compensate' for past outcomes.",w:"❌ Not quite. The Gambler's Fallacy is the mistaken belief that past randomness affects future randomness. Each flip is always 50/50. LLN converges because future flips add up, not because the coin tries to balance out the past."},
+  r3:{c:'✅ Correct! With autocorrelation, the effective sample size is smaller than the actual n. The variance of X̄ₙ is no longer σ²/n but larger. Your CIs are too narrow — you appear more confident than you should be. Newey-West standard errors are the fix.',w:'❌ Not quite. Autocorrelation means consecutive observations carry similar information — you effectively have fewer independent data points. The CLT formula Var(X̄ₙ)=σ²/n assumes independence. Correlation inflates the true variance, making naive CIs dangerously overconfident.'}
+};
+function chkQ(name,resId){
+  const sel=document.querySelector(`input[name="${name}"]:checked`);
+  const el=document.getElementById(resId);
+  if(!sel){el.style.display='block';el.className='qz-res qz-no';el.textContent='Select an option first.';return;}
+  const qa=ANSWERS[resId];
+  el.style.display='block';
+  el.className='qz-res '+(sel.value==='c'?'qz-ok':'qz-no');
+  el.textContent=sel.value==='c'?qa.c:qa.w;
+}
+
+/* ── INIT ────────────────────────────────── */
+window.addEventListener('DOMContentLoaded',()=>{
+  buildPrereq();
+  buildLLN();
+  buildCLT();
+  buildBridgeChart();
+  doLLN();
+  doCLT();
+  doBridge();
+});
+</script>
+</body>
+</html>

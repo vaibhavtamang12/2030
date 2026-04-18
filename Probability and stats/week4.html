@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Study Guide — Joint Distributions & Conditional Expectation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.3/math.js"></script>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #faf7f2;
+    --cream: #f0ebe0;
+    --gold: #c8960c;
+    --gold-light: #e8b422;
+    --red: #c0392b;
+    --blue: #1a4a7a;
+    --blue-light: #2980b9;
+    --green: #1a6b3c;
+    --purple: #6c3483;
+    --tab-active: #0d0d0d;
+    --tab-inactive: #888;
+    --border: #c8b89a;
+    --shadow: rgba(0,0,0,0.12);
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --prereq: #fff8e7;
+    --prereq-border: #c8960c;
+    --exercise-easy: #e8f8f0;
+    --exercise-medium: #fef9e7;
+    --exercise-hard: #fdf2f2;
+    --note-bg: #eaf4fb;
+    --note-border: #2980b9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.75;
+    font-size: 17px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border: 60px solid var(--gold);
+    border-radius: 50%;
+    opacity: 0.12;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 40px;
+    width: 180px; height: 180px;
+    border: 40px solid var(--gold-light);
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    max-width: 800px;
+    margin-bottom: 16px;
+  }
+  header h1 em { color: var(--gold-light); font-style: normal; }
+  .header-sub {
+    font-size: 15px;
+    color: #aaa;
+    font-style: italic;
+    max-width: 600px;
+  }
+  .header-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .badge-gold { border-color: var(--gold); color: var(--gold); }
+  .badge-blue { border-color: #5a9fd4; color: #5a9fd4; }
+  .badge-green { border-color: #5daa7f; color: #5daa7f; }
+
+  /* ── TABS ── */
+  .tab-bar {
+    background: var(--ink);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 20px;
+    gap: 2px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    scrollbar-width: none;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 14px 18px;
+    border: none;
+    background: transparent;
+    color: var(--tab-inactive);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .tab-btn:hover { color: #ddd; }
+  .tab-btn.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold-light);
+  }
+
+  /* ── CONTENT PANELS ── */
+  .tab-panel { display: none; padding: 0; }
+  .tab-panel.active { display: block; }
+
+  .panel-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .section-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--gold);
+    display: block;
+    margin-bottom: 4px;
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 36px 0 12px;
+    color: var(--ink);
+    border-left: 4px solid var(--gold);
+    padding-left: 14px;
+  }
+  h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 24px 0 8px;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  p { margin-bottom: 16px; }
+  .lead {
+    font-size: 20px;
+    font-style: italic;
+    color: #444;
+    margin-bottom: 32px;
+    line-height: 1.6;
+    border-left: 3px solid var(--gold);
+    padding-left: 20px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── BOXES ── */
+  .prereq-box {
+    background: var(--prereq);
+    border: 1px solid var(--prereq-border);
+    border-left: 5px solid var(--gold);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 28px 0;
+  }
+  .prereq-box h4 {
+    color: var(--gold);
+    margin-top: 0;
+    font-size: 13px;
+  }
+
+  .note-box {
+    background: var(--note-bg);
+    border: 1px solid var(--note-border);
+    border-left: 5px solid var(--blue-light);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .note-box h4 {
+    color: var(--blue);
+    margin-top: 0;
+    font-size: 12px;
+  }
+
+  .insight-box {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-box::before {
+    content: '"';
+    position: absolute;
+    top: -20px; left: 20px;
+    font-size: 160px;
+    color: var(--gold);
+    opacity: 0.15;
+    font-family: 'Playfair Display', serif;
+    line-height: 1;
+  }
+  .insight-box p { color: #ddd; margin-bottom: 0; }
+  .insight-box strong { color: var(--gold-light); }
+
+  /* ── MATH FORMULA ── */
+  .formula-block {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    text-align: center;
+    position: relative;
+  }
+  .formula-block .formula-label {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: var(--gold);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .formula-note {
+    font-size: 13px;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .code-header {
+    background: #2a2a3e;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: block;
+  }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .code-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+  .colab-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold-light);
+    text-decoration: none;
+    border: 1px solid var(--gold);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  pre {
+    padding: 20px 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--code-text);
+  }
+  .kw { color: #cba6f7; }
+  .fn { color: #89b4fa; }
+  .st { color: #a6e3a1; }
+  .cm { color: #6c7086; font-style: italic; }
+  .nm { color: #fab387; }
+  .op { color: #89dceb; }
+
+  /* ── EXERCISES ── */
+  .exercises-grid {
+    display: grid;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .exercise-card {
+    border-radius: 10px;
+    padding: 22px 26px;
+    border: 1px solid;
+    position: relative;
+  }
+  .exercise-card.easy {
+    background: var(--exercise-easy);
+    border-color: #27ae60;
+  }
+  .exercise-card.medium {
+    background: var(--exercise-medium);
+    border-color: #f39c12;
+  }
+  .exercise-card.hard {
+    background: var(--exercise-hard);
+    border-color: var(--red);
+  }
+  .exercise-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+  .easy .exercise-tag { background: #27ae60; color: white; }
+  .medium .exercise-tag { background: #f39c12; color: white; }
+  .hard .exercise-tag { background: var(--red); color: white; }
+  .exercise-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+  .exercise-card h5 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .hint {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+  }
+  .hint strong { color: #444; font-style: normal; }
+
+  /* ── TABLES ── */
+  .prob-table-wrap { overflow-x: auto; margin: 24px 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    text-align: center;
+  }
+  td {
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    text-align: center;
+    background: white;
+  }
+  tr:hover td { background: var(--cream); }
+  .cell-highlight { background: #fff3cd !important; font-weight: 600; color: var(--gold); }
+  .cell-marginal { background: #d4efdf !important; font-weight: 600; color: var(--green); }
+  .cell-header { background: #e8f0fe !important; font-weight: 600; }
+
+  /* ── CANVAS CHARTS ── */
+  .chart-container {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+  .chart-container canvas { max-height: 320px; }
+  .chart-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--ink);
+    text-align: center;
+  }
+
+  /* ── INTERACTIVE DEMO ── */
+  .demo-box {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 28px 0;
+  }
+  .demo-box h4 {
+    color: var(--ink);
+    font-size: 15px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--cream);
+    padding-bottom: 12px;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .slider-row label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    min-width: 120px;
+    color: #555;
+  }
+  input[type=range] {
+    flex: 1;
+    min-width: 100px;
+    accent-color: var(--gold);
+  }
+  .slider-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 50px;
+    text-align: right;
+  }
+  .output-row {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    margin-top: 14px;
+    line-height: 1.8;
+  }
+  .output-row .label { color: #888; }
+  .output-row .val { color: var(--blue); font-weight: 600; }
+
+  /* ── RESOURCES ── */
+  .resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .resource-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    background: white;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .resource-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 16px var(--shadow);
+    transform: translateY(-2px);
+  }
+  .resource-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .resource-card h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--blue);
+  }
+  .resource-card p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .resource-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    margin-top: 8px;
+    display: block;
+    word-break: break-all;
+  }
+
+  /* ── STEP CARDS ── */
+  .steps {
+    counter-reset: steps;
+    list-style: none;
+    margin: 24px 0;
+  }
+  .steps li {
+    counter-increment: steps;
+    position: relative;
+    padding-left: 56px;
+    margin-bottom: 24px;
+  }
+  .steps li::before {
+    content: counter(steps);
+    position: absolute;
+    left: 0; top: 0;
+    width: 36px; height: 36px;
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .steps li h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── VISUAL DIAGRAM ── */
+  .diagram-svg-wrap {
+    text-align: center;
+    margin: 28px 0;
+    overflow-x: auto;
+  }
+  .diagram-svg-wrap svg {
+    max-width: 100%;
+  }
+
+  /* ── ANALOGY BOX ── */
+  .analogy-box {
+    background: linear-gradient(135deg, #f8f4ff 0%, #fff8e7 100%);
+    border: 1px solid #d4b8f0;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    position: relative;
+  }
+  .analogy-box::before {
+    content: '💡';
+    position: absolute;
+    top: -14px; left: 20px;
+    font-size: 22px;
+  }
+  .analogy-box h4 {
+    color: var(--purple);
+    margin-top: 0;
+  }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .quiz-question {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .quiz-options {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+  .quiz-options li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .quiz-options input[type=radio] {
+    margin-top: 4px;
+    accent-color: var(--gold);
+  }
+  .quiz-options label { cursor: pointer; font-size: 15px; }
+  .quiz-btn {
+    margin-top: 16px;
+    background: var(--ink);
+    color: var(--gold-light);
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  .quiz-btn:hover { background: #333; }
+  .quiz-result {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+  }
+  .quiz-result.correct { background: #d4efdf; color: #1a6b3c; }
+  .quiz-result.wrong { background: #fde8e8; color: #c0392b; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #888;
+  }
+  .progress-steps { display: flex; gap: 6px; }
+  .progress-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .progress-dot.done { background: var(--gold); }
+
+  /* ── DEFINITION LIST ── */
+  dl { margin: 16px 0; }
+  dt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-top: 16px;
+  }
+  dd {
+    margin-left: 20px;
+    font-size: 15px;
+    color: #444;
+    line-height: 1.6;
+    border-left: 2px solid var(--border);
+    padding-left: 12px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .panel-inner { padding: 28px 16px 60px; }
+    h2 { font-size: 28px; }
+    h3 { font-size: 20px; }
+    .formula { font-size: 14px; }
+    pre { font-size: 11px; }
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: #888;
+    text-align: center;
+    padding: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  footer span { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="header-label">Quantitative Engineering · Probability Theory</div>
+  <h1>Joint Distributions &<br><em>Conditional Expectation</em></h1>
+  <p class="header-sub">A complete self-study guide for first-time learners on the path to quantitative finance and engineering.</p>
+  <div class="header-badges">
+    <span class="badge badge-gold">Offline-Ready</span>
+    <span class="badge badge-blue">Interactive Demos</span>
+    <span class="badge badge-green">Google Colab Experiments</span>
+    <span class="badge badge-gold">3-Tier Exercises</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('prereq', this)">0 · Prerequisites</button>
+  <button class="tab-btn" onclick="switchTab('joint', this)">1 · Joint PMF/PDF</button>
+  <button class="tab-btn" onclick="switchTab('marginal', this)">2 · Marginal Distributions</button>
+  <button class="tab-btn" onclick="switchTab('conditional', this)">3 · Conditional Expectation</button>
+  <button class="tab-btn" onclick="switchTab('connections', this)">4 · Connections & Quant Use</button>
+  <button class="tab-btn" onclick="switchTab('resources', this)">5 · Resources & Tools</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 0: PREREQUISITES
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-prereq" class="tab-panel active">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">Start Here</div>
+  <h2>Prerequisites</h2>
+  <p class="lead">Before we dive in, make sure these building blocks feel familiar. We'll explain each one simply — even if they're brand new to you.</p>
+
+  <div class="prereq-box">
+    <h4>⚠️ What you need to know first</h4>
+    <p>These topics appear constantly in everything that follows. We'll give you a quick-start understanding of each — enough to confidently build on them.</p>
+  </div>
+
+  <h3>1. Random Variables</h3>
+  <p>A <strong>random variable</strong> is just a variable whose value is determined by a random experiment. Think of it as a rule that assigns a number to each outcome.</p>
+
+  <div class="analogy-box">
+    <h4>Real-World Analogy</h4>
+    <p>Roll a standard die. The outcome is random — you don't know if you'll get 1, 2, 3, 4, 5, or 6. But if you define X = "number shown on die", then X is a random variable. It's not random <em>after</em> you roll — it becomes a fixed number. Before rolling, it's a variable with possible values {1, 2, 3, 4, 5, 6}, each equally likely.</p>
+    <p style="margin-top:12px;margin-bottom:0"><strong>In quant finance:</strong> Tomorrow's stock price is a random variable. You don't know it yet, but you can reason about its probability distribution.</p>
+  </div>
+
+  <dl>
+    <dt>Discrete Random Variable</dt>
+    <dd>Takes countable, distinct values. Examples: number of heads in 10 coin flips, number of trades in an hour.</dd>
+    <dt>Continuous Random Variable</dt>
+    <dd>Can take any value in a range. Examples: the exact return on a stock today, a person's exact height.</dd>
+  </dl>
+
+  <div class="divider"></div>
+
+  <h3>2. Probability Mass Function (PMF) — for Discrete</h3>
+  <p>The PMF of a discrete random variable X tells you: <strong>"What is the probability that X equals exactly this value?"</strong></p>
+
+  <div class="formula-block">
+    <span class="formula-label">PMF Definition</span>
+    <div class="formula">P(X = x) = p(x)</div>
+    <div class="formula-note">Must satisfy: p(x) ≥ 0 for all x, and Σ p(x) = 1 (all probabilities sum to 1)</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Think of PMF as a histogram of a die</h4>
+    <p>For a fair die: P(X=1) = P(X=2) = ... = P(X=6) = 1/6. Each bar in a histogram has height 1/6. They all add up to 1. That's a PMF.</p>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">PMF of a Fair Die (X ∈ {1,2,3,4,5,6})</div>
+    <canvas id="pmfDieChart"></canvas>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>3. Probability Density Function (PDF) — for Continuous</h3>
+  <p>For continuous variables, P(X = x) = 0 for any exact value. Instead we use a PDF. The PDF f(x) gives the <strong>density</strong> of probability, and we find probabilities by computing <strong>areas under the curve</strong>.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">PDF Key Property</span>
+    <div class="formula">P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx</div>
+    <div class="formula-note">Total area = 1: ∫₋∞^∞ f(x) dx = 1. Density f(x) ≥ 0 everywhere.</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Think of PDF as a density map</h4>
+    <p>Imagine spreading 1 kg of sand over a table. The "density" at each point tells you how much sand is there per unit area. The total sand is 1 kg. Probability is like sand — it's spread out, and to get how much falls in a range, you "collect" (integrate) the density over that range.</p>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">PDF of Standard Normal N(0,1) — the famous bell curve</div>
+    <canvas id="pdfNormalChart"></canvas>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>4. Expected Value E[X]</h3>
+  <p>The expected value (or mean) is the <strong>long-run average</strong> value of a random variable if you repeated the experiment many times.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Expected Value</span>
+    <div class="formula">E[X] = Σ x · P(X=x) &nbsp;&nbsp; (discrete)</div>
+    <div class="formula" style="margin-top:10px">E[X] = ∫ x · f(x) dx &nbsp;&nbsp; (continuous)</div>
+    <div class="formula-note">Weight each value by how likely it is, then sum everything up.</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Weighted Average Example</h4>
+    <p>Fair die: E[X] = 1·(1/6) + 2·(1/6) + 3·(1/6) + 4·(1/6) + 5·(1/6) + 6·(1/6) = 21/6 = <strong>3.5</strong></p>
+    <p style="margin-top:8px;margin-bottom:0">You'll never actually roll a 3.5, but if you roll millions of times, the average of all outcomes converges to 3.5. This is the Law of Large Numbers.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>5. Independence</h3>
+  <p>Two events A and B are <strong>independent</strong> if knowing one happened tells you nothing about whether the other happened.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Independence</span>
+    <div class="formula">P(A and B) = P(A) · P(B)</div>
+    <div class="formula-note">For random variables: X and Y are independent if P(X=x, Y=y) = P(X=x)·P(Y=y) for all x,y</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Coin Flip Independence</h4>
+    <p>Flipping two fair coins: the first coin landing heads does NOT affect the second coin. P(H₁ and H₂) = ½ × ½ = ¼. But stock returns on two related stocks are NOT independent — a market crash affects both.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="insight-box">
+    <p>✅ <strong>You're ready to proceed!</strong> With these five concepts — random variables, PMF, PDF, expected value, and independence — you have everything you need to master Joint Distributions and Conditional Expectation. Let's go!</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 1: JOINT PMF/PDF
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-joint" class="tab-panel">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">Topic 1 of 3</div>
+  <h2>Joint PMF / PDF</h2>
+  <p class="lead">What happens when we study two (or more) random variables at the same time? That's exactly what joint distributions answer.</p>
+
+  <div class="note-box">
+    <h4>🎯 Why Quants Need This</h4>
+    <p>In finance, assets don't live in isolation. A bond's yield and a stock's return are studied simultaneously. Options pricing depends on the <em>joint</em> behavior of underlying assets. Risk management requires understanding how multiple risks co-move.</p>
+  </div>
+
+  <h3>The Core Idea — Two Variables at Once</h3>
+  <p>When you have a single random variable X, you describe it with a PMF or PDF. When you have <strong>two</strong> random variables X and Y — both depending on the same random experiment — you need a <strong>joint distribution</strong> that describes them <em>together</em>.</p>
+
+  <div class="analogy-box">
+    <h4>The Weather Example</h4>
+    <p>Imagine a weather station that records two things each day: <strong>X</strong> = temperature (High/Low) and <strong>Y</strong> = whether it rains (Yes/No). These aren't independent — rainy days tend to be cooler. To capture their relationship, you need a joint distribution over all four combinations: (High, Rain), (High, No Rain), (Low, Rain), (Low, No Rain).</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Joint PMF — Discrete Case</h3>
+  <p>For two discrete random variables X and Y, the <strong>Joint PMF</strong> is a function that gives the probability for every combination of values:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Joint PMF</span>
+    <div class="formula">p(x, y) = P(X = x, Y = y)</div>
+    <div class="formula-note">Read as: "The probability that X equals x AND Y equals y simultaneously."</div>
+  </div>
+
+  <h4>The Three Requirements of a Valid Joint PMF</h4>
+  <ol class="steps">
+    <li>
+      <h5>Non-negativity</h5>
+      <p>p(x, y) ≥ 0 for all (x, y). Probabilities can't be negative.</p>
+    </li>
+    <li>
+      <h5>Normalization</h5>
+      <p>Σₓ Σᵧ p(x, y) = 1. All probabilities summed over every possible combination equal exactly 1.</p>
+    </li>
+    <li>
+      <h5>Completeness</h5>
+      <p>p(x, y) is defined for every possible pair (x, y) in the sample space.</p>
+    </li>
+  </ol>
+
+  <h4>Concrete Example — Dice Roll</h4>
+  <p>Roll two fair dice. Let X = value on die 1, Y = value on die 2. Since the dice are independent, P(X=x, Y=y) = (1/6)(1/6) = 1/36 for all pairs. But let's try something more interesting.</p>
+
+  <p><strong>New example:</strong> Let X = number of heads in 2 fair coin flips, Y = number of tails in those same 2 flips. Note: Y = 2 − X always!</p>
+
+  <div class="prob-table-wrap">
+    <table>
+      <tr>
+        <th>p(x,y)</th><th>Y=0</th><th>Y=1</th><th>Y=2</th>
+      </tr>
+      <tr>
+        <td class="cell-header">X=0</td>
+        <td>0</td><td>0</td><td class="cell-highlight">1/4</td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=1</td>
+        <td>0</td><td class="cell-highlight">2/4</td><td>0</td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=2</td>
+        <td class="cell-highlight">1/4</td><td>0</td><td>0</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="note-box">
+    <h4>📌 Notice: X and Y are NOT independent here!</h4>
+    <p>If X=2 (both heads), then Y must be 0. Knowing X completely determines Y. Their joint distribution is highly structured, not just a product of marginals.</p>
+  </div>
+
+  <h4>A Richer Example — Bivariate Distribution</h4>
+  <p>Let X = number of software bugs found in module A, Y = bugs found in module B. After historical analysis, the joint PMF is:</p>
+
+  <div class="prob-table-wrap">
+    <table>
+      <tr>
+        <th>p(x,y)</th><th>Y=0</th><th>Y=1</th><th>Y=2</th><th style="background:#1a6b3c">Row Sum</th>
+      </tr>
+      <tr>
+        <td class="cell-header">X=0</td>
+        <td>0.10</td><td>0.15</td><td>0.05</td><td class="cell-marginal">0.30</td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=1</td>
+        <td>0.20</td><td>0.25</td><td>0.05</td><td class="cell-marginal">0.50</td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=2</td>
+        <td>0.05</td><td>0.10</td><td>0.05</td><td class="cell-marginal">0.20</td>
+      </tr>
+      <tr>
+        <td style="background:#1a6b3c; color:white; font-weight:600">Col Sum</td>
+        <td class="cell-marginal">0.35</td><td class="cell-marginal">0.50</td><td class="cell-marginal">0.15</td><td class="cell-marginal">1.00 ✓</td>
+      </tr>
+    </table>
+  </div>
+
+  <p>The <span style="color:var(--green);font-weight:600">green values</span> are the <strong>marginal distributions</strong> — a preview of our next topic! Everything must sum to 1 (bottom-right corner).</p>
+
+  <div class="divider"></div>
+
+  <h3>Joint PDF — Continuous Case</h3>
+  <p>When X and Y are both continuous, we have a <strong>Joint PDF</strong> f(x, y) — a surface over the (x,y) plane where the height represents the density of probability.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Joint PDF Key Property</span>
+    <div class="formula">P(a ≤ X ≤ b, c ≤ Y ≤ d) = ∫ₐᵇ ∫꜀ᵈ f(x,y) dy dx</div>
+    <div class="formula-note">Normalization: ∫∫ f(x,y) dy dx = 1 over the entire plane. f(x,y) ≥ 0 everywhere.</div>
+  </div>
+
+  <h4>Famous Example: Bivariate Normal Distribution</h4>
+  <p>In finance, stock returns are often modeled as jointly normal. The joint PDF of two correlated normal random variables is a 3D bell-shaped surface (an "elliptical hill").</p>
+
+  <div class="diagram-svg-wrap">
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="max-width:700px; width:100%;">
+      <!-- Background -->
+      <rect width="700" height="320" fill="#faf7f2" rx="12"/>
+      
+      <!-- Title -->
+      <text x="350" y="30" text-anchor="middle" font-family="Playfair Display, serif" font-size="16" font-weight="700" fill="#0d0d0d">Bivariate Normal PDF — the 3D Probability Surface</text>
+      
+      <!-- Axes for 3D perspective sketch -->
+      <!-- Ground plane (perspective box) -->
+      <g transform="translate(50,60)">
+        <!-- Back rectangle (perspective) -->
+        <polygon points="150,40 450,40 550,150 250,150" fill="#e8f0fe" stroke="#aac" stroke-width="1.5" opacity="0.7"/>
+        <!-- Left face -->
+        <polygon points="50,160 150,40 250,150 150,270" fill="#d0e4ff" stroke="#aac" stroke-width="1.5" opacity="0.6"/>
+        <!-- Front rectangle -->
+        <polygon points="50,160 350,160 550,150 250,150 150,270 50,160" fill="#c8deff" stroke="#aac" stroke-width="1.5" opacity="0.3"/>
+        
+        <!-- Grid lines on base -->
+        <g opacity="0.4" stroke="#8899cc" stroke-width="0.8">
+          <line x1="113" y1="72" x2="213" y2="182"/>
+          <line x1="176" y1="67" x2="276" y2="177"/>
+          <line x1="239" y1="62" x2="339" y2="172"/>
+          <line x1="302" y1="57" x2="402" y2="167"/>
+          <line x1="365" y1="52" x2="465" y2="162"/>
+          
+          <line x1="113" y1="72" x2="513" y2="62"/>
+          <line x1="117" y1="103" x2="517" y2="93"/>
+          <line x1="121" y1="133" x2="521" y2="123"/>
+          <line x1="125" y1="163" x2="525" y2="153"/>
+          <line x1="129" y1="193" x2="529" y2="183"/>
+          <line x1="133" y1="223" x2="533" y2="213"/>
+        </g>
+        
+        <!-- Bell curve surface — contour ellipses as a 3D effect -->
+        <!-- Outermost ellipse (base level) -->
+        <ellipse cx="300" cy="110" rx="220" ry="80" fill="none" stroke="#4a7fd4" stroke-width="1.5" opacity="0.5" transform="rotate(-10,300,110)"/>
+        <!-- Mid ellipse -->
+        <ellipse cx="300" cy="95" rx="140" ry="50" fill="rgba(74,127,212,0.15)" stroke="#4a7fd4" stroke-width="2" opacity="0.7" transform="rotate(-10,300,95)"/>
+        <!-- Inner ellipse -->
+        <ellipse cx="300" cy="80" rx="70" ry="25" fill="rgba(74,127,212,0.3)" stroke="#4a7fd4" stroke-width="2" opacity="0.8" transform="rotate(-10,300,80)"/>
+        <!-- Peak -->
+        <ellipse cx="300" cy="65" rx="20" ry="8" fill="rgba(200,150,12,0.7)" stroke="#c8960c" stroke-width="2" transform="rotate(-10,300,65)"/>
+        
+        <!-- Peak vertical line -->
+        <line x1="300" y1="65" x2="300" y2="150" stroke="#c8960c" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+        
+        <!-- Labels -->
+        <text x="560" y="140" font-family="JetBrains Mono, monospace" font-size="12" fill="#555">X axis</text>
+        <text x="10" y="240" font-family="JetBrains Mono, monospace" font-size="12" fill="#555">Y axis</text>
+        <text x="285" y="40" font-family="JetBrains Mono, monospace" font-size="12" fill="#c8960c">Peak = f(μₓ,μᵧ)</text>
+        
+        <!-- Contour label -->
+        <text x="430" y="82" font-family="JetBrains Mono, monospace" font-size="10" fill="#4a7fd4">Contour lines</text>
+        <text x="430" y="94" font-family="JetBrains Mono, monospace" font-size="10" fill="#4a7fd4">(equal density)</text>
+        
+        <!-- Correlation annotation -->
+        <text x="100" y="250" font-family="Source Serif 4, serif" font-size="13" fill="#444" font-style="italic">Ellipse tilt reflects</text>
+        <text x="100" y="266" font-family="Source Serif 4, serif" font-size="13" fill="#444" font-style="italic">correlation ρ between X and Y</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Contour Lines = Same Density Level</h4>
+    <p>The elliptical contour lines on the base of the 3D surface are like topographic map lines — each loop represents points with the same probability density. The more circular the ellipses, the lower the correlation. Tilted/elongated ellipses signal strong correlation.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Key Relationships to Remember</h3>
+
+  <div class="diagram-svg-wrap">
+    <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%;">
+      <rect width="680" height="200" fill="#faf7f2" rx="10"/>
+      
+      <!-- Box: Joint -->
+      <rect x="260" y="30" width="160" height="60" rx="8" fill="#0d0d0d" stroke="none"/>
+      <text x="340" y="56" text-anchor="middle" font-family="Playfair Display,serif" font-size="14" font-weight="700" fill="#e8b422">Joint</text>
+      <text x="340" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#ddd">f(x,y) or p(x,y)</text>
+      
+      <!-- Arrow left: Marginal X -->
+      <path d="M260,60 L140,60" stroke="#c8960c" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="198" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c8960c">Sum/integrate</text>
+      <text x="198" y="63" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c8960c">over Y</text>
+      
+      <!-- Box: Marginal X -->
+      <rect x="20" y="30" width="120" height="60" rx="8" fill="#1a4a7a" stroke="none"/>
+      <text x="80" y="56" text-anchor="middle" font-family="Playfair Display,serif" font-size="13" font-weight="700" fill="white">Marginal</text>
+      <text x="80" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#9ec5f0">f_X(x)</text>
+      
+      <!-- Arrow right: Marginal Y -->
+      <path d="M420,60 L540,60" stroke="#c8960c" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="480" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c8960c">Sum/integrate</text>
+      <text x="480" y="63" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c8960c">over X</text>
+      
+      <!-- Box: Marginal Y -->
+      <rect x="540" y="30" width="120" height="60" rx="8" fill="#1a6b3c" stroke="none"/>
+      <text x="600" y="56" text-anchor="middle" font-family="Playfair Display,serif" font-size="13" font-weight="700" fill="white">Marginal</text>
+      <text x="600" y="72" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#7dcea0">f_Y(y)</text>
+      
+      <!-- Arrow down: Conditional -->
+      <path d="M340,90 L340,130" stroke="#6c3483" stroke-width="2" marker-end="url(#arrow2)"/>
+      <text x="345" y="115" font-family="JetBrains Mono,monospace" font-size="10" fill="#6c3483">divide by</text>
+      <text x="345" y="126" font-family="JetBrains Mono,monospace" font-size="10" fill="#6c3483">marginal</text>
+      
+      <!-- Box: Conditional -->
+      <rect x="245" y="130" width="190" height="55" rx="8" fill="#6c3483" stroke="none"/>
+      <text x="340" y="153" text-anchor="middle" font-family="Playfair Display,serif" font-size="13" font-weight="700" fill="white">Conditional</text>
+      <text x="340" y="170" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#d7b3f0">f(x|y) = f(x,y)/f_Y(y)</text>
+      
+      <!-- Arrow from conditional to E[X|Y] -->
+      <path d="M435,157 L580,157" stroke="#c0392b" stroke-width="2" marker-end="url(#arrow3)"/>
+      <text x="508" y="150" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c0392b">integrate</text>
+      <text x="508" y="162" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#c0392b">x·f(x|y)</text>
+      
+      <!-- Box: E[X|Y] -->
+      <rect x="580" y="130" width="80" height="55" rx="8" fill="#c0392b" stroke="none"/>
+      <text x="620" y="153" text-anchor="middle" font-family="Playfair Display,serif" font-size="13" font-weight="700" fill="white">E[X|Y]</text>
+      <text x="620" y="170" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f5b7b1">Topic 3</text>
+      
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#c8960c"/>
+        </marker>
+        <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#6c3483"/>
+        </marker>
+        <marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#c0392b"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <p style="text-align:center;font-size:13px;color:#888;font-style:italic;margin-top:-12px">Everything connects: Joint → Marginals → Conditional → Conditional Expectation</p>
+
+  <div class="divider"></div>
+
+  <h3>🧪 Colab Experiment 1: Visualizing Joint Distributions</h3>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+      <span class="code-title">experiment_1_joint_pmf.py · Google Colab</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="cm"># ═══════════════════════════════════════════════════════
+# Experiment 1: Visualize Joint PMF/PDF
+# Copy this into a Google Colab cell and run it!
+# ═══════════════════════════════════════════════════════</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> multivariate_normal
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+
+<span class="cm"># ── Part A: Discrete Joint PMF (Bug Example) ──</span>
+joint_pmf = np.array([
+    [<span class="nm">0.10</span>, <span class="nm">0.15</span>, <span class="nm">0.05</span>],  <span class="cm"># X=0</span>
+    [<span class="nm">0.20</span>, <span class="nm">0.25</span>, <span class="nm">0.05</span>],  <span class="cm"># X=1</span>
+    [<span class="nm">0.05</span>, <span class="nm">0.10</span>, <span class="nm">0.05</span>],  <span class="cm"># X=2</span>
+])
+
+fig, axes = plt.subplots(<span class="nm">1</span>, <span class="nm">2</span>, figsize=(<span class="nm">14</span>, <span class="nm">5</span>))
+fig.suptitle(<span class="st">'Joint PMF Visualization'</span>, fontsize=<span class="nm">14</span>, fontweight=<span class="st">'bold'</span>)
+
+<span class="cm"># Heatmap</span>
+sns.<span class="fn">heatmap</span>(joint_pmf, annot=<span class="kw">True</span>, fmt=<span class="st">'.2f'</span>, ax=axes[<span class="nm">0</span>],
+            xticklabels=[<span class="st">'Y=0'</span>,<span class="st">'Y=1'</span>,<span class="st">'Y=2'</span>],
+            yticklabels=[<span class="st">'X=0'</span>,<span class="st">'X=1'</span>,<span class="st">'X=2'</span>],
+            cmap=<span class="st">'YlOrBr'</span>, cbar_kws={<span class="st">'label'</span>: <span class="st">'Probability'</span>})
+axes[<span class="nm">0</span>].set_title(<span class="st">'Joint PMF as Heatmap\np(x,y) = P(X=x, Y=y)'</span>)
+axes[<span class="nm">0</span>].set_xlabel(<span class="st">'Y (bugs in module B)'</span>)
+axes[<span class="nm">0</span>].set_ylabel(<span class="st">'X (bugs in module A)'</span>)
+
+<span class="cm"># 3D bar chart</span>
+ax3d = fig.add_subplot(<span class="nm">122</span>, projection=<span class="st">'3d'</span>)
+x_pos, y_pos = np.<span class="fn">meshgrid</span>(np.<span class="fn">arange</span>(<span class="nm">3</span>), np.<span class="fn">arange</span>(<span class="nm">3</span>))
+x_flat, y_flat = x_pos.<span class="fn">ravel</span>(), y_pos.<span class="fn">ravel</span>()
+z_flat = joint_pmf.<span class="fn">ravel</span>()
+colors = plt.cm.<span class="fn">YlOrBr</span>(z_flat / z_flat.<span class="fn">max</span>())
+ax3d.<span class="fn">bar3d</span>(x_flat, y_flat, <span class="nm">0</span>, <span class="nm">0.7</span>, <span class="nm">0.7</span>, z_flat, color=colors)
+ax3d.set_title(<span class="st">'Joint PMF as 3D Bars'</span>)
+ax3d.set_xlabel(<span class="st">'X'</span>); ax3d.set_ylabel(<span class="st">'Y'</span>); ax3d.set_zlabel(<span class="st">'p(x,y)'</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># ── Part B: Continuous Bivariate Normal PDF ──</span>
+x, y = np.<span class="fn">mgrid</span>[-<span class="nm">3</span>:<span class="nm">3</span>:<span class="nm">0.1</span>, -<span class="nm">3</span>:<span class="nm">3</span>:<span class="nm">0.1</span>]
+pos = np.<span class="fn">dstack</span>((x, y))
+
+<span class="cm"># Try different correlations!</span>
+<span class="kw">for</span> rho <span class="kw">in</span> [<span class="nm">0.0</span>, <span class="nm">0.5</span>, <span class="nm">0.9</span>]:
+    cov = [[<span class="nm">1</span>, rho], [rho, <span class="nm">1</span>]]
+    rv = multivariate_normal([<span class="nm">0</span>, <span class="nm">0</span>], cov)
+    z = rv.<span class="fn">pdf</span>(pos)
+    
+    fig, ax = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">1</span>, figsize=(<span class="nm">6</span>, <span class="nm">5</span>))
+    cp = ax.<span class="fn">contourf</span>(x, y, z, levels=<span class="nm">15</span>, cmap=<span class="st">'Blues'</span>)
+    ax.<span class="fn">contour</span>(x, y, z, levels=<span class="nm">8</span>, colors=<span class="st">'navy'</span>, linewidths=<span class="nm">0.5</span>, alpha=<span class="nm">0.6</span>)
+    plt.<span class="fn">colorbar</span>(cp, label=<span class="st">'f(x,y) density'</span>)
+    ax.set_title(<span class="st">f'Bivariate Normal: ρ = {rho}\n(correlation between X and Y)'</span>)
+    ax.set_xlabel(<span class="st">'X'</span>); ax.set_ylabel(<span class="st">'Y'</span>)
+    plt.<span class="fn">tight_layout</span>()
+    plt.<span class="fn">show</span>()
+    <span class="fn">print</span>(<span class="st">f"When ρ={rho}: ellipse is {'circular (no correlation)' if rho==0 else 'slightly tilted' if rho==0.5 else 'very elongated (strong correlation)'}"</span>)</pre>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>✏️ Practice Exercises — Joint PMF/PDF</h3>
+
+  <div class="exercises-grid">
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 1.1</div>
+      <h5>Verify It's a Valid Joint PMF</h5>
+      <p>A joint PMF is given by p(x,y) = c·(x+y) for x ∈ {1,2} and y ∈ {1,2}. Find the constant c that makes this a valid PMF (all probabilities sum to 1).</p>
+      <div class="hint"><strong>Hint:</strong> Set Σₓ Σᵧ c·(x+y) = 1 and solve for c. Enumerate all four (x,y) pairs.</div>
+    </div>
+
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 1.2</div>
+      <h5>Read a Joint PMF Table</h5>
+      <p>Using the bug-count joint PMF table in this section, find: (a) P(X=1, Y=1), (b) P(X≤1, Y=0), and (c) P(X=Y).</p>
+      <div class="hint"><strong>Hint:</strong> For (c), list the cases where x equals y: (0,0), (1,1), (2,2) and sum those probabilities.</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 1.3</div>
+      <h5>Construct a Joint PMF</h5>
+      <p>A fair coin is flipped twice. Define X = 1 if first flip is Heads, 0 otherwise. Define Y = 1 if second flip is Heads, 0 otherwise. Construct the full 2×2 joint PMF table. Are X and Y independent? Verify algebraically.</p>
+      <div class="hint"><strong>Hint:</strong> Check if p(x,y) = P(X=x)·P(Y=y) holds for all four pairs. If yes, independent.</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 1.4</div>
+      <h5>Continuous Joint PDF Verification</h5>
+      <p>Show that f(x,y) = 6x for 0 ≤ x ≤ 1, 0 ≤ y ≤ x is a valid joint PDF. Then find P(X &gt; 0.5).</p>
+      <div class="hint"><strong>Hint:</strong> The region is a triangle. For the double integral, integrate y from 0 to x first, then x from 0 to 1.</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 1.5</div>
+      <h5>Finance Application — Copulas Preview</h5>
+      <p>Stock A and Stock B have daily returns X~N(0.001, 0.01²) and Y~N(0.001, 0.015²) with correlation ρ = 0.6. Using the bivariate normal joint PDF formula, write (but don't simplify) the expression for P(-0.02 ≤ X ≤ 0.02, -0.02 ≤ Y ≤ 0.02). Then describe qualitatively: how does higher ρ change the joint distribution shape?</p>
+      <div class="hint"><strong>Hint:</strong> The bivariate normal PDF involves the covariance matrix Σ = [[σₓ², ρσₓσᵧ],[ρσₓσᵧ, σᵧ²]]. Higher ρ elongates the probability mass along the diagonal.</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 1.6 — Colab Challenge</div>
+      <h5>Simulate and Estimate a Joint PMF</h5>
+      <p>In Python/Colab: (1) Simulate 100,000 rolls of two dice, (2) Estimate the joint PMF empirically by counting, (3) Define Z = X + Y and construct the PMF of Z, (4) Plot the PMF of Z and verify it's a triangular distribution on {2,...,12}.</p>
+      <div class="hint"><strong>Hint:</strong> Use <code>np.random.randint(1,7, size=(100000,2))</code> and <code>np.unique</code> with <code>return_counts=True</code>.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 2: MARGINAL DISTRIBUTIONS
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-marginal" class="tab-panel">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">Topic 2 of 3</div>
+  <h2>Marginal Distributions</h2>
+  <p class="lead">If you know the joint behavior of X and Y, how do you "zoom out" and ask only about X — ignoring Y entirely? That's exactly what marginal distributions do.</p>
+
+  <div class="note-box">
+    <h4>🔗 Connection to Joint Distribution</h4>
+    <p>Marginal distributions are <em>derived from</em> the joint distribution. You cannot have a marginal without first having a joint. This is why we studied joint distributions first.</p>
+  </div>
+
+  <h3>The Core Idea — Collapsing One Dimension</h3>
+  <p>Imagine your joint distribution as a spreadsheet with X values as rows and Y values as columns. Each cell has a probability p(x,y). The <strong>row totals</strong> give you the marginal distribution of X. The <strong>column totals</strong> give you the marginal distribution of Y.</p>
+
+  <div class="analogy-box">
+    <h4>The Spreadsheet Marginals Analogy</h4>
+    <p>In Excel, if column A is "product" and column B is "region" and the cells contain "revenue", then the <strong>row sum</strong> tells you total revenue per product (ignoring region). That's the marginal distribution of "product." You've <em>marginalized out</em> the region variable.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Marginal PMF — Discrete Case</h3>
+
+  <div class="formula-block">
+    <span class="formula-label">Marginal PMF Formulas</span>
+    <div class="formula">p_X(x) = Σᵧ p(x, y)&nbsp;&nbsp;&nbsp;&nbsp; (sum over all Y values)</div>
+    <div class="formula" style="margin-top:10px">p_Y(y) = Σₓ p(x, y)&nbsp;&nbsp;&nbsp;&nbsp; (sum over all X values)</div>
+    <div class="formula-note">You "sum out" the variable you don't care about. The remaining function is the marginal.</div>
+  </div>
+
+  <h4>Step-by-Step: Computing Marginals from the Bug Example</h4>
+
+  <p>We return to our software bug example. Let's compute both marginals explicitly:</p>
+
+  <div class="prob-table-wrap">
+    <table>
+      <tr>
+        <th>p(x,y)</th><th>Y=0</th><th>Y=1</th><th>Y=2</th><th style="background:#1a6b3c">p_X(x)</th>
+      </tr>
+      <tr>
+        <td class="cell-header">X=0</td>
+        <td>0.10</td><td>0.15</td><td>0.05</td>
+        <td class="cell-marginal">0.10+0.15+0.05 = <strong>0.30</strong></td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=1</td>
+        <td>0.20</td><td>0.25</td><td>0.05</td>
+        <td class="cell-marginal">0.20+0.25+0.05 = <strong>0.50</strong></td>
+      </tr>
+      <tr>
+        <td class="cell-header">X=2</td>
+        <td>0.05</td><td>0.10</td><td>0.05</td>
+        <td class="cell-marginal">0.05+0.10+0.05 = <strong>0.20</strong></td>
+      </tr>
+      <tr>
+        <td style="background:#1a6b3c;color:white;font-weight:600">p_Y(y)</td>
+        <td class="cell-marginal"><strong>0.35</strong></td>
+        <td class="cell-marginal"><strong>0.50</strong></td>
+        <td class="cell-marginal"><strong>0.15</strong></td>
+        <td class="cell-marginal"><strong>1.00 ✓</strong></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="note-box">
+    <h4>📌 Interpretation</h4>
+    <p><strong>p_X(x):</strong> If you only care about module A (ignoring module B), there's a 30% chance of 0 bugs, 50% chance of 1 bug, 20% chance of 2 bugs.</p>
+    <p><strong>p_Y(y):</strong> If you only care about module B, there's a 35% chance of 0 bugs, 50% chance of 1 bug, 15% chance of 2 bugs.</p>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">Marginal Distributions vs Joint Distribution</div>
+    <canvas id="marginalChart"></canvas>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Marginal PDF — Continuous Case</h3>
+  <p>For continuous random variables, "summing out" becomes "integrating out":</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Marginal PDF Formulas</span>
+    <div class="formula">f_X(x) = ∫₋∞^∞ f(x,y) dy</div>
+    <div class="formula" style="margin-top:10px">f_Y(y) = ∫₋∞^∞ f(x,y) dx</div>
+    <div class="formula-note">Integrate (sum continuously) over the variable you want to eliminate.</div>
+  </div>
+
+  <h4>Example — Uniform over a Triangle</h4>
+  <p>Let f(x,y) = 2 for 0 ≤ x ≤ 1, 0 ≤ y ≤ x (a triangle region). Let's find the marginal of X:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Finding f_X(x)</span>
+    <div class="formula">f_X(x) = ∫₀ˣ 2 dy = 2x&nbsp;&nbsp;&nbsp; for 0 ≤ x ≤ 1</div>
+    <div class="formula-note">We integrated over y from 0 to x (the valid range of y given x). Result: f_X(x) = 2x.</div>
+  </div>
+
+  <div class="diagram-svg-wrap">
+    <svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%;">
+      <rect width="680" height="260" fill="#faf7f2" rx="10"/>
+      <text x="340" y="25" text-anchor="middle" font-family="Playfair Display,serif" font-size="15" font-weight="700" fill="#0d0d0d">Marginalizing Out Y: Integrating a Slice of f(x,y)</text>
+      
+      <!-- Left panel: 2D region -->
+      <g transform="translate(30, 40)">
+        <text x="140" y="15" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#555">Joint PDF f(x,y)=2 on triangle</text>
+        
+        <!-- Axes -->
+        <line x1="30" y1="180" x2="270" y2="180" stroke="#333" stroke-width="1.5" marker-end="url(#ax1)"/>
+        <line x1="30" y1="180" x2="30" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#ax2)"/>
+        <text x="275" y="184" font-family="JetBrains Mono,monospace" font-size="11" fill="#333">x</text>
+        <text x="22" y="16" font-family="JetBrains Mono,monospace" font-size="11" fill="#333">y</text>
+        
+        <!-- Triangle region -->
+        <polygon points="30,180 250,180 250,180" fill="none"/>
+        <polygon points="30,180 250,180 250,50" fill="rgba(200,150,12,0.25)" stroke="#c8960c" stroke-width="2"/>
+        <text x="180" y="140" font-family="Source Serif 4,serif" font-size="13" fill="#c8960c" font-style="italic">f(x,y) = 2</text>
+        <text x="180" y="155" font-family="JetBrains Mono,monospace" font-size="10" fill="#888">(triangle region)</text>
+        
+        <!-- A vertical slice at x=x₀ -->
+        <line x1="170" y1="180" x2="170" y2="100" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="5,3"/>
+        <text x="175" y="120" font-family="JetBrains Mono,monospace" font-size="10" fill="#c0392b">integrate</text>
+        <text x="175" y="132" font-family="JetBrains Mono,monospace" font-size="10" fill="#c0392b">y: 0 to x₀</text>
+        
+        <!-- y=x line -->
+        <line x1="30" y1="180" x2="250" y2="50" stroke="#1a4a7a" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="155" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#1a4a7a">y = x</text>
+        
+        <!-- Tick marks -->
+        <line x1="250" y1="180" x2="250" y2="185" stroke="#333" stroke-width="1"/>
+        <text x="248" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#333">1</text>
+        <line x1="30" y1="50" x2="25" y2="50" stroke="#333" stroke-width="1"/>
+        <text x="18" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#333">1</text>
+      </g>
+      
+      <!-- Right panel: resulting marginal -->
+      <g transform="translate(360,40)">
+        <text x="140" y="15" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#555">Marginal f_X(x) = 2x</text>
+        
+        <line x1="30" y1="180" x2="280" y2="180" stroke="#333" stroke-width="1.5" marker-end="url(#ax3)"/>
+        <line x1="30" y1="180" x2="30" y2="20" stroke="#333" stroke-width="1.5" marker-end="url(#ax4)"/>
+        <text x="285" y="184" font-family="JetBrains Mono,monospace" font-size="11" fill="#333">x</text>
+        <text x="15" y="16" font-family="JetBrains Mono,monospace" font-size="11" fill="#333">f_X</text>
+        
+        <!-- f_X(x) = 2x line -->
+        <polygon points="30,180 250,20 250,180" fill="rgba(26,74,122,0.2)" stroke="none"/>
+        <line x1="30" y1="180" x2="250" y2="20" stroke="#1a4a7a" stroke-width="2.5"/>
+        
+        <text x="140" y="130" font-family="Source Serif 4,serif" font-size="15" fill="#1a4a7a" font-style="italic">f_X(x) = 2x</text>
+        
+        <line x1="250" y1="180" x2="250" y2="185" stroke="#333" stroke-width="1"/>
+        <text x="248" y="195" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#333">1</text>
+        <line x1="30" y1="20" x2="25" y2="20" stroke="#333" stroke-width="1"/>
+        <text x="18" y="23" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#333">2</text>
+      </g>
+      
+      <defs>
+        <marker id="ax1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#333"/></marker>
+        <marker id="ax2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#333"/></marker>
+        <marker id="ax3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#333"/></marker>
+        <marker id="ax4" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#333"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>🎛️ Interactive Demo — Marginals vs Correlation</h3>
+
+  <div class="demo-box">
+    <h4>🔬 Explore: How Does Correlation Affect Marginals?</h4>
+    <p style="font-size:14px;color:#555;margin-bottom:16px">Change the correlation ρ of a bivariate normal. Notice: the <strong>marginals stay fixed</strong> even as the joint distribution changes shape!</p>
+    
+    <div class="slider-row">
+      <label>Correlation ρ</label>
+      <input type="range" min="-95" max="95" value="0" id="rhoSlider" oninput="updateRhoDisplay(this.value)">
+      <span class="slider-val" id="rhoVal">0.00</span>
+    </div>
+
+    <div class="output-row">
+      <div><span class="label">Marginal X: </span><span class="val">X ~ N(0, 1) always</span></div>
+      <div><span class="label">Marginal Y: </span><span class="val">Y ~ N(0, 1) always</span></div>
+      <div><span class="label">Joint shape: </span><span class="val" id="jointShape">Circular contours (no linear relationship)</span></div>
+      <div><span class="label">Covariance: </span><span class="val" id="covVal">Cov(X,Y) = 0.00</span></div>
+    </div>
+
+    <div class="chart-container" style="margin-top:16px">
+      <canvas id="correlationDemo" height="200"></canvas>
+    </div>
+    
+    <p style="font-size:13px;color:#888;font-style:italic;margin-top:12px">💡 Key insight: Two different joint distributions can have the SAME marginals! The marginals alone don't tell you the full story of X and Y together.</p>
+  </div>
+
+  <div class="insight-box">
+    <p><strong>The Most Important Lesson About Marginals:</strong> Knowing the marginal distributions f_X(x) and f_Y(y) does NOT mean you know the joint distribution f(x,y). You also need to know <em>how</em> X and Y are related (their dependence structure, often captured by correlation or copulas). In quant finance, this is why copula models were so important (and why their misuse contributed to the 2008 financial crisis).</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Independence in Terms of Marginals</h3>
+  <p>Here's a beautiful and very useful result:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Independence ↔ Factorization</span>
+    <div class="formula">X ⊥ Y  ⟺  f(x,y) = f_X(x) · f_Y(y)</div>
+    <div class="formula-note">X and Y are independent if and only if the joint distribution FACTORS into the product of marginals.</div>
+  </div>
+
+  <p>This gives you a simple test for independence: compute the marginals, multiply them, and check if the product equals the joint distribution everywhere.</p>
+
+  <div class="divider"></div>
+
+  <h3>🧪 Colab Experiment 2: Computing and Plotting Marginals</h3>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+      <span class="code-title">experiment_2_marginal_distributions.py · Google Colab</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> multivariate_normal
+
+<span class="cm"># ── Discrete: Compute marginals from joint PMF ──</span>
+joint_pmf = np.array([
+    [<span class="nm">0.10</span>, <span class="nm">0.15</span>, <span class="nm">0.05</span>],
+    [<span class="nm">0.20</span>, <span class="nm">0.25</span>, <span class="nm">0.05</span>],
+    [<span class="nm">0.05</span>, <span class="nm">0.10</span>, <span class="nm">0.05</span>],
+])
+
+marginal_X = joint_pmf.<span class="fn">sum</span>(axis=<span class="nm">1</span>)  <span class="cm"># sum over columns (Y)</span>
+marginal_Y = joint_pmf.<span class="fn">sum</span>(axis=<span class="nm">0</span>)  <span class="cm"># sum over rows (X)</span>
+
+<span class="fn">print</span>(<span class="st">"Marginal PMF of X:"</span>, marginal_X)
+<span class="fn">print</span>(<span class="st">"Marginal PMF of Y:"</span>, marginal_Y)
+<span class="fn">print</span>(<span class="st">"Sum of X marginal:"</span>, marginal_X.<span class="fn">sum</span>(), <span class="st">"(must be 1)"</span>)
+
+<span class="cm"># ── Test for Independence ──</span>
+product = np.<span class="fn">outer</span>(marginal_X, marginal_Y)
+<span class="fn">print</span>(<span class="st">"\nProduct of Marginals:"</span>)
+<span class="fn">print</span>(product.<span class="fn">round</span>(<span class="nm">4</span>))
+<span class="fn">print</span>(<span class="st">"\nJoint PMF:"</span>)
+<span class="fn">print</span>(joint_pmf)
+<span class="fn">print</span>(<span class="st">"\nAre they equal? (Independence test)"</span>)
+<span class="fn">print</span>(np.<span class="fn">allclose</span>(joint_pmf, product))  <span class="cm"># False → NOT independent</span>
+
+<span class="cm"># ── Visualization: Joint + Marginals in one plot ──</span>
+fig = plt.<span class="fn">figure</span>(figsize=(<span class="nm">10</span>, <span class="nm">8</span>))
+gs = fig.add_gridspec(<span class="nm">2</span>, <span class="nm">2</span>, hspace=<span class="nm">0.05</span>, wspace=<span class="nm">0.05</span>,
+                      width_ratios=[<span class="nm">4</span>, <span class="nm">1</span>], height_ratios=[<span class="nm">1</span>, <span class="nm">4</span>])
+
+ax_joint = fig.add_subplot(gs[<span class="nm">1</span>, <span class="nm">0</span>])
+ax_marg_x = fig.add_subplot(gs[<span class="nm">0</span>, <span class="nm">0</span>], sharex=ax_joint)
+ax_marg_y = fig.add_subplot(gs[<span class="nm">1</span>, <span class="nm">1</span>], sharey=ax_joint)
+
+<span class="cm"># Continuous bivariate normal for a nicer plot</span>
+<span class="kw">for</span> rho, title <span class="kw">in</span> [(<span class="nm">0.0</span>, <span class="st">'Independent (ρ=0)'</span>), (<span class="nm">0.8</span>, <span class="st">'Correlated (ρ=0.8)'</span>)]:
+    x_range = np.<span class="fn">linspace</span>(-<span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">200</span>)
+    y_range = np.<span class="fn">linspace</span>(-<span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">200</span>)
+    X, Y = np.<span class="fn">meshgrid</span>(x_range, y_range)
+    pos = np.<span class="fn">dstack</span>((X, Y))
+    
+    rv = multivariate_normal([<span class="nm">0</span>, <span class="nm">0</span>], [[<span class="nm">1</span>, rho],[rho, <span class="nm">1</span>]])
+    Z = rv.<span class="fn">pdf</span>(pos)
+    
+    fig2, axes2 = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">3</span>, figsize=(<span class="nm">15</span>, <span class="nm">4</span>))
+    
+    <span class="cm"># Joint</span>
+    axes2[<span class="nm">0</span>].<span class="fn">contourf</span>(X, Y, Z, levels=<span class="nm">15</span>, cmap=<span class="st">'Blues'</span>)
+    axes2[<span class="nm">0</span>].set_title(<span class="st">f'Joint f(x,y): {title}'</span>)
+    
+    <span class="cm"># Marginal X — integrate over y (same for both!)</span>
+    from scipy.stats <span class="kw">import</span> norm
+    x_vals = np.<span class="fn">linspace</span>(-<span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">200</span>)
+    axes2[<span class="nm">1</span>].<span class="fn">plot</span>(x_vals, norm.<span class="fn">pdf</span>(x_vals), <span class="st">'b-'</span>, linewidth=<span class="nm">2</span>)
+    axes2[<span class="nm">1</span>].set_title(<span class="st">f'Marginal f_X(x) — same regardless of ρ!'</span>)
+    axes2[<span class="nm">1</span>].fill_between(x_vals, norm.<span class="fn">pdf</span>(x_vals), alpha=<span class="nm">0.3</span>)
+    
+    <span class="cm"># Marginal Y</span>
+    axes2[<span class="nm">2</span>].<span class="fn">plot</span>(x_vals, norm.<span class="fn">pdf</span>(x_vals), <span class="st">'g-'</span>, linewidth=<span class="nm">2</span>)
+    axes2[<span class="nm">2</span>].set_title(<span class="st">f'Marginal f_Y(y) — also same!'</span>)
+    axes2[<span class="nm">2</span>].fill_between(x_vals, norm.<span class="fn">pdf</span>(x_vals), alpha=<span class="nm">0.3</span>, color=<span class="st">'green'</span>)
+    
+    plt.<span class="fn">suptitle</span>(title, fontsize=<span class="nm">14</span>, fontweight=<span class="st">'bold'</span>)
+    plt.<span class="fn">tight_layout</span>()
+    plt.<span class="fn">show</span>()
+    <span class="fn">print</span>(<span class="st">f"\n{title}: Joint changes with rho, but BOTH marginals stay N(0,1)!"</span>)</pre>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>✏️ Practice Exercises — Marginal Distributions</h3>
+
+  <div class="exercises-grid">
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 2.1</div>
+      <h5>Reading Marginals Off a Table</h5>
+      <p>Given joint PMF: p(1,1)=0.2, p(1,2)=0.3, p(2,1)=0.1, p(2,2)=0.4. Find p_X(x) and p_Y(y) for all values.</p>
+      <div class="hint"><strong>Hint:</strong> p_X(1) = p(1,1) + p(1,2). Sum across each row for X's marginal.</div>
+    </div>
+
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 2.2</div>
+      <h5>Quick Independence Check</h5>
+      <p>Using Exercise 2.1's joint PMF, check if X and Y are independent. Is p(x,y) = p_X(x) · p_Y(y) for all pairs?</p>
+      <div class="hint"><strong>Hint:</strong> Compute p_X(1)·p_Y(1) and compare to p(1,1). If they match, test all four pairs.</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 2.3</div>
+      <h5>Continuous Marginal Computation</h5>
+      <p>Given f(x,y) = x + y for 0 ≤ x ≤ 1, 0 ≤ y ≤ 1 (zero elsewhere). First verify this is a valid PDF. Then compute f_X(x) and f_Y(y). Are X and Y independent?</p>
+      <div class="hint"><strong>Hint:</strong> f_X(x) = ∫₀¹ (x+y)dy = x + 1/2. Check if f_X(x)·f_Y(y) = f(x,y).</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 2.4</div>
+      <h5>Expected Value from Marginal</h5>
+      <p>Using the marginals from the bug example (X: p_X(0)=0.30, p_X(1)=0.50, p_X(2)=0.20), compute E[X] and Var(X). Interpret: on average, how many bugs are in module A?</p>
+      <div class="hint"><strong>Hint:</strong> E[X] = Σ x·p_X(x). Var(X) = E[X²] - (E[X])². Compute E[X²] = Σ x²·p_X(x).</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 2.5</div>
+      <h5>Same Marginals, Different Joints</h5>
+      <p>Construct two different joint PMFs over X ∈ {0,1} and Y ∈ {0,1} such that both have the same marginals (p_X(0)=0.5, p_X(1)=0.5, p_Y(0)=0.5, p_Y(1)=0.5), but X and Y are independent in one and dependent in the other. This proves marginals don't uniquely determine the joint distribution.</p>
+      <div class="hint"><strong>Hint:</strong> The independent case: p(x,y)=0.25 everywhere. For dependent: try p(0,0)=0.3, p(1,1)=0.3, p(0,1)=0.2, p(1,0)=0.2 and verify marginals still sum to 0.5 each.</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 2.6 — Finance Application</div>
+      <h5>Portfolio Risk via Marginals</h5>
+      <p>Two assets have joint return distribution where X~N(μ₁,σ₁²) and Y~N(μ₂,σ₂²) with correlation ρ. (a) Show the marginals are individually normal. (b) Show that the portfolio return R = 0.5X + 0.5Y is also normal and find its mean and variance. (c) Prove that even when ρ=0, this doesn't mean X and Y are jointly independent (they could have a non-normal joint).</p>
+      <div class="hint"><strong>Hint:</strong> Use Var(aX+bY)=a²Var(X)+b²Var(Y)+2ab·Cov(X,Y). For (c), recall that zero correlation ≠ independence in general.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 3: CONDITIONAL EXPECTATION
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-conditional" class="tab-panel">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">Topic 3 of 3</div>
+  <h2>Conditional Expectation E[X | Y]</h2>
+  <p class="lead">You've learned what X looks like on average. But what if you already know Y? Conditional expectation answers: <em>"Given what I know about Y, what's my best guess for X?"</em></p>
+
+  <div class="note-box">
+    <h4>🔗 Builds On Everything Before This</h4>
+    <p>Conditional expectation requires: (1) a joint distribution to define conditioning, (2) marginal distributions to normalize, and (3) conditional distributions as an intermediate step. This is why we covered those topics first.</p>
+  </div>
+
+  <h3>Step 0: Conditional Distributions</h3>
+  <p>Before defining E[X|Y], we first need to understand the <strong>conditional distribution</strong> — the distribution of X given that Y has taken a specific value.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Conditional PMF</span>
+    <div class="formula">p(x | y) = P(X=x | Y=y) = p(x,y) / p_Y(y)</div>
+    <div class="formula-note">Read: "The probability X=x, GIVEN that we know Y=y." We divide by p_Y(y) to re-normalize.</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>The "Slicing" Analogy</h4>
+    <p>Imagine the joint PMF table as a spreadsheet. <strong>Conditioning on Y=1</strong> means: zoom in to just the column where Y=1. Extract only those values, then rescale them so they sum to 1. That rescaled column is your conditional distribution P(X | Y=1).</p>
+    <p style="margin-top:10px;margin-bottom:0">For the continuous case: conditioning on Y=y is like taking a <strong>vertical slice</strong> through the 3D surface f(x,y) at height y, then normalizing the slice so its area equals 1.</p>
+  </div>
+
+  <h4>Computing P(X | Y=1) from Bug Example</h4>
+
+  <p>From our table, the Y=1 column is: p(0,1)=0.15, p(1,1)=0.25, p(2,1)=0.10. Marginal p_Y(1)=0.50.</p>
+
+  <div class="prob-table-wrap">
+    <table>
+      <tr><th>x</th><th>p(x,1)</th><th>p_Y(1)</th><th>P(X=x | Y=1)</th></tr>
+      <tr><td>0</td><td>0.15</td><td>0.50</td><td class="cell-highlight">0.15/0.50 = <strong>0.30</strong></td></tr>
+      <tr><td>1</td><td>0.25</td><td>0.50</td><td class="cell-highlight">0.25/0.50 = <strong>0.50</strong></td></tr>
+      <tr><td>2</td><td>0.10</td><td>0.50</td><td class="cell-highlight">0.10/0.50 = <strong>0.20</strong></td></tr>
+      <tr><td colspan="3" style="text-align:right;font-weight:600;padding-right:20px">Sum =</td><td class="cell-marginal"><strong>1.00 ✓</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Now: Conditional Expectation E[X | Y = y]</h3>
+  <p>Once you have the conditional distribution, computing E[X | Y=y] is exactly like computing a regular expected value — but using the <em>conditional</em> distribution instead of the marginal.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Conditional Expectation — Discrete</span>
+    <div class="formula">E[X | Y=y] = Σₓ x · P(X=x | Y=y) = Σₓ x · p(x,y) / p_Y(y)</div>
+  </div>
+
+  <div class="formula-block">
+    <span class="formula-label">Conditional Expectation — Continuous</span>
+    <div class="formula">E[X | Y=y] = ∫ x · f(x|y) dx = ∫ x · f(x,y)/f_Y(y) dx</div>
+  </div>
+
+  <h4>Computing E[X | Y=1] for Bug Example</h4>
+
+  <div class="formula-block">
+    <span class="formula-label">Step-by-Step Calculation</span>
+    <div class="formula">E[X | Y=1] = 0×0.30 + 1×0.50 + 2×0.20 = 0 + 0.50 + 0.40 = <strong>0.90</strong></div>
+    <div class="formula-note">Compare to unconditional mean: E[X] = 0×0.30 + 1×0.50 + 2×0.20 = 0.90. (In this case similar; they'd differ more in strongly dependent distributions.)</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>E[X|Y] as a Random Variable — The Key Insight</h3>
+
+  <p>Here's what trips up most first-time learners: <strong>E[X|Y=y]</strong> is a number (for a fixed y). But <strong>E[X|Y]</strong> — without fixing Y — is a <em>random variable</em> that is a function of Y.</p>
+
+  <div class="analogy-box">
+    <h4>The Forecasting Analogy</h4>
+    <p>A weather forecaster says: <em>"If it rained yesterday (Y=1), the expected high temperature today is 18°C. If it didn't rain (Y=0), expected high is 24°C."</em></p>
+    <p style="margin-top:10px">This defines a function: g(Y) = E[Temp | Y]. Before you know yesterday's rain, g(Y) is random (you don't know which value it will take). After you know it rained, g(1) = 18°C is just a number. Both interpretations are correct — they're just at different stages of observation.</p>
+    <p style="margin-top:10px;margin-bottom:0">In quant finance: E[Stock Return | Market Return = r] is your prediction of a stock's return given a specific market return. It varies as r varies — it's a function (called the <strong>regression function</strong>).</p>
+  </div>
+
+  <div class="chart-container">
+    <div class="chart-title">E[X|Y=y] as a Function of y — Conditional Expectation Curve</div>
+    <canvas id="conditionalExpChart"></canvas>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>The Tower Property (Law of Total Expectation)</h3>
+  <p>This is one of the most powerful and frequently used results in probability theory and quantitative finance:</p>
+
+  <div class="formula-block">
+    <span class="formula-label">Tower Property / Law of Total Expectation</span>
+    <div class="formula">E[X] = E[ E[X|Y] ]</div>
+    <div class="formula-note">The expectation of the conditional expectation equals the unconditional expectation. You can "average out" the conditioning variable.</div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Salary Example</h4>
+    <p>E[Salary] = E[E[Salary | Department]]</p>
+    <p style="margin-top:8px">Step 1: Compute average salary within each department (that's E[Salary | Dept = d] for each d). Step 2: Take a weighted average across departments (weighted by how many employees are in each). That grand average equals the overall mean salary. The tower property guarantees this always works.</p>
+  </div>
+
+  <h4>Tower Property — Proof Sketch (Discrete)</h4>
+
+  <div class="formula-block">
+    <span class="formula-label">Proof Sketch</span>
+    <div class="formula" style="font-size:15px;text-align:left;padding-left:20px">
+      E[E[X|Y]] = Σᵧ E[X|Y=y] · P(Y=y)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= Σᵧ [Σₓ x · P(X=x|Y=y)] · P(Y=y)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= Σᵧ Σₓ x · P(X=x,Y=y)<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= Σₓ x · [Σᵧ P(X=x,Y=y)]<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= Σₓ x · P(X=x) = E[X] ✓
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>The Geometric Interpretation</h3>
+  <p>For a bivariate normal, E[X|Y=y] traces out a <strong>straight line</strong> — this is literally the linear regression line! That's no coincidence.</p>
+
+  <div class="formula-block">
+    <span class="formula-label">For Bivariate Normal: Conditional Expectation</span>
+    <div class="formula">E[X | Y=y] = μ_X + ρ · (σ_X/σ_Y) · (y − μ_Y)</div>
+    <div class="formula-note">This is the regression line of X on Y! The slope is ρ·(σ_X/σ_Y). When ρ=0: E[X|Y]=μ_X (knowing Y tells you nothing new about X).</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: E[X|Y=y] for Bivariate Normal</h4>
+    <div class="slider-row">
+      <label>Correlation ρ</label>
+      <input type="range" min="-90" max="90" value="60" id="rhoSlider2" oninput="updateCondExp(this.value)">
+      <span class="slider-val" id="rhoVal2">0.60</span>
+    </div>
+    <div class="slider-row">
+      <label>Observed Y = y</label>
+      <input type="range" min="-300" max="300" value="100" id="ySlider" oninput="updateCondExp(null, this.value)">
+      <span class="slider-val" id="yVal">1.00</span>
+    </div>
+    <div class="output-row">
+      <div><span class="label">E[X | Y=y] = </span><span class="val" id="condExpVal">0.60</span></div>
+      <div><span class="label">Interpretation: </span><span class="val" id="condInterpret">Given Y is 1.0 std deviations above its mean, X is expected to be 0.60 std deviations above its mean.</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>E[X|Y] and the Best Predictor</h3>
+
+  <div class="insight-box">
+    <p><strong>Fundamental Theorem:</strong> Among <em>all possible functions</em> g(Y) you could use to predict X from Y, the one that minimizes the Mean Squared Error E[(X − g(Y))²] is <strong>g(Y) = E[X|Y]</strong>. Conditional expectation is the optimal predictor.</p>
+    <p style="margin-top:12px">This is why linear regression works: if X and Y are bivariate normal, the best predictor is linear — and it's exactly the regression line. For non-normal distributions, the best predictor may be non-linear, and E[X|Y] captures that.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>🧪 Colab Experiment 3: Conditional Expectation in Action</h3>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="dot-red"></span><span class="dot-yellow"></span><span class="dot-green"></span></div>
+      <span class="code-title">experiment_3_conditional_expectation.py · Google Colab</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> multivariate_normal
+
+<span class="cm"># ══════════════════════════════════════════════════
+# Part A: Discrete Conditional Expectation
+# ══════════════════════════════════════════════════</span>
+joint_pmf = np.array([
+    [<span class="nm">0.10</span>, <span class="nm">0.15</span>, <span class="nm">0.05</span>],
+    [<span class="nm">0.20</span>, <span class="nm">0.25</span>, <span class="nm">0.05</span>],
+    [<span class="nm">0.05</span>, <span class="nm">0.10</span>, <span class="nm">0.05</span>],
+])
+
+marginal_Y = joint_pmf.<span class="fn">sum</span>(axis=<span class="nm">0</span>)
+x_vals = np.<span class="fn">array</span>([<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">2</span>])
+
+<span class="fn">print</span>(<span class="st">"=== Conditional Distributions P(X | Y=y) ==="</span>)
+cond_expectations = []
+<span class="kw">for</span> y <span class="kw">in</span> [<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">2</span>]:
+    cond_pmf = joint_pmf[:, y] / marginal_Y[y]
+    e_x_given_y = (x_vals * cond_pmf).<span class="fn">sum</span>()
+    cond_expectations.<span class="fn">append</span>(e_x_given_y)
+    <span class="fn">print</span>(<span class="st">f"\nP(X | Y={y}): {cond_pmf.round(3)}"</span>)
+    <span class="fn">print</span>(<span class="st">f"E[X | Y={y}] = {e_x_given_y:.4f}"</span>)
+
+<span class="cm"># Verify Tower Property</span>
+unconditional_E_X = (x_vals * joint_pmf.<span class="fn">sum</span>(axis=<span class="nm">1</span>)).<span class="fn">sum</span>()
+tower = (np.<span class="fn">array</span>(cond_expectations) * marginal_Y).<span class="fn">sum</span>()
+<span class="fn">print</span>(<span class="st">f"\n=== Tower Property Verification ==="</span>)
+<span class="fn">print</span>(<span class="st">f"E[X] directly = {unconditional_E_X:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"E[E[X|Y]] = {tower:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Equal? {np.isclose(unconditional_E_X, tower)}"</span>)
+
+<span class="cm"># ══════════════════════════════════════════════════
+# Part B: Continuous — Bivariate Normal
+# Visualize E[X|Y=y] as regression line
+# ══════════════════════════════════════════════════</span>
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+rho = <span class="nm">0.75</span>
+cov = [[<span class="nm">1</span>, rho], [rho, <span class="nm">1</span>]]
+samples = np.random.multivariate_normal([<span class="nm">0</span>, <span class="nm">0</span>], cov, size=<span class="nm">2000</span>)
+X_sim, Y_sim = samples[:, <span class="nm">0</span>], samples[:, <span class="nm">1</span>]
+
+<span class="cm"># Theoretical E[X|Y=y] = rho * y (since μ=0, σ=1)</span>
+y_line = np.<span class="fn">linspace</span>(-<span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">100</span>)
+cond_exp_line = rho * y_line
+
+<span class="cm"># Empirical: bin Y values and compute mean X in each bin</span>
+bins = np.<span class="fn">linspace</span>(-<span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">20</span>)
+bin_centers, empirical_means = [], []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(bins)-<span class="nm">1</span>):
+    mask = (Y_sim >= bins[i]) & (Y_sim < bins[i+<span class="nm">1</span>])
+    <span class="kw">if</span> mask.<span class="fn">sum</span>() > <span class="nm">10</span>:
+        bin_centers.<span class="fn">append</span>((bins[i] + bins[i+<span class="nm">1</span>])/<span class="nm">2</span>)
+        empirical_means.<span class="fn">append</span>(X_sim[mask].<span class="fn">mean</span>())
+
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">9</span>, <span class="nm">6</span>))
+ax.<span class="fn">scatter</span>(Y_sim, X_sim, alpha=<span class="nm">0.05</span>, s=<span class="nm">8</span>, color=<span class="st">'steelblue'</span>, label=<span class="st">'Simulated (X,Y) pairs'</span>)
+ax.<span class="fn">plot</span>(y_line, cond_exp_line, <span class="st">'r-'</span>, linewidth=<span class="nm">2.5</span>,
+        label=<span class="st">f'Theoretical E[X|Y=y] = {rho}·y'</span>)
+ax.<span class="fn">scatter</span>(bin_centers, empirical_means, color=<span class="st">'orange'</span>, s=<span class="nm">50</span>, zorder=<span class="nm">5</span>,
+           label=<span class="st">'Empirical E[X|Y≈y] (bin means)'</span>)
+ax.set_xlabel(<span class="st">'Y'</span>); ax.set_ylabel(<span class="st">'X'</span>)
+ax.set_title(<span class="st">f'Conditional Expectation E[X|Y] = Regression Line (ρ={rho})'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">axhline</span>(<span class="nm">0</span>, color=<span class="st">'gray'</span>, linewidth=<span class="nm">0.8</span>)
+ax.<span class="fn">axvline</span>(<span class="nm">0</span>, color=<span class="st">'gray'</span>, linewidth=<span class="nm">0.8</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>✏️ Practice Exercises — Conditional Expectation</h3>
+
+  <div class="exercises-grid">
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 3.1</div>
+      <h5>Compute a Conditional Expectation</h5>
+      <p>From the bug example, compute E[X | Y=0]. Use the joint PMF table and marginal p_Y(0)=0.35.</p>
+      <div class="hint"><strong>Hint:</strong> P(X=x|Y=0) = p(x,0)/0.35 for each x. Then E[X|Y=0] = Σ x·P(X=x|Y=0).</div>
+    </div>
+
+    <div class="exercise-card easy">
+      <span class="exercise-tag">Easy</span>
+      <div class="exercise-num">Exercise 3.2</div>
+      <h5>Tower Property Check</h5>
+      <p>You know: E[X|Y=0]=0.857, E[X|Y=1]=0.90, E[X|Y=2]=1.333, and marginals p_Y(0)=0.35, p_Y(1)=0.50, p_Y(2)=0.15. Verify the tower property by computing E[E[X|Y]] and comparing to E[X]=0.90.</p>
+      <div class="hint"><strong>Hint:</strong> E[E[X|Y]] = 0.857×0.35 + 0.90×0.50 + 1.333×0.15.</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 3.3</div>
+      <h5>Continuous Conditional Expectation</h5>
+      <p>For f(x,y) = 2 on 0 ≤ y ≤ x ≤ 1, we found f_X(x) = 2x. Now find f_Y(y) = 2(1-y). Then compute f(x|y) and E[X|Y=y].</p>
+      <div class="hint"><strong>Hint:</strong> f(x|y) = f(x,y)/f_Y(y) = 2/[2(1-y)] = 1/(1-y) for y ≤ x ≤ 1. Then E[X|Y=y] = ∫ᵧ¹ x/(1-y) dx.</div>
+    </div>
+
+    <div class="exercise-card medium">
+      <span class="exercise-tag">Medium</span>
+      <div class="exercise-num">Exercise 3.4</div>
+      <h5>Conditional Expectation as Best Predictor</h5>
+      <p>Suppose you want to predict X using a linear function aY+b. Find the a and b that minimize E[(X - aY - b)²] when X~N(2,4), Y~N(3,9), Cov(X,Y)=3. Compare your answer to E[X|Y=y] for bivariate normal.</p>
+      <div class="hint"><strong>Hint:</strong> The optimal linear predictor has slope a = Cov(X,Y)/Var(Y) and intercept b = E[X] - a·E[Y]. This equals E[X|Y=y] for bivariate normal.</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 3.5</div>
+      <h5>Adam's Law + Eve's Law</h5>
+      <p>(a) State and prove the Law of Total Variance: Var(X) = E[Var(X|Y)] + Var(E[X|Y]). This is called "Adam's Law + Eve's Law" in some textbooks. (b) Using the bug example data, compute the within-group variance E[Var(X|Y)] and between-group variance Var(E[X|Y]) separately, and verify they add up to Var(X).</p>
+      <div class="hint"><strong>Hint:</strong> Compute Var(X|Y=y) for each y first (variance of the conditional distribution). Then E[Var(X|Y)] is a weighted average of these. Var(E[X|Y]) uses the values E[X|Y=0], E[X|Y=1], E[X|Y=2] as a random variable.</div>
+    </div>
+
+    <div class="exercise-card hard">
+      <span class="exercise-tag">Hard</span>
+      <div class="exercise-num">Exercise 3.6 — Quant Finance Challenge</div>
+      <h5>Option Pricing via Conditional Expectation</h5>
+      <p>A European call option pays max(S_T - K, 0) at expiry. Under risk-neutral measure, its price is C = e^(-rT) · E[max(S_T - K, 0)]. Given S_T = S_0 · e^(μT + σ√T · Z) where Z~N(0,1): (a) Write the price as E[...] of a function of Z. (b) Split the expectation using the indicator 1_{S_T > K}. (c) Show this leads to the Black-Scholes formula structure N(d₁)S₀ - N(d₂)Ke^(-rT) by computing each part of the conditional expectation.</p>
+      <div class="hint"><strong>Hint:</strong> S_T &gt; K iff Z &gt; (ln(K/S_0) - μT)/(σ√T). Use E[e^(σ√T·Z) · 1_{Z&gt;z₀}] = e^(σ²T/2)·N(-z₀+σ√T) for normal Z.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 4: CONNECTIONS
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-connections" class="tab-panel">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">The Big Picture</div>
+  <h2>How Everything Connects</h2>
+  <p class="lead">Let's step back and see how joint distributions, marginals, and conditional expectations form a complete, powerful framework — and why every quant needs them.</p>
+
+  <h3>The Unified Roadmap</h3>
+
+  <div class="diagram-svg-wrap">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+      <rect width="700" height="420" fill="#0d0d0d" rx="12"/>
+      
+      <!-- Title -->
+      <text x="350" y="30" text-anchor="middle" font-family="Playfair Display,serif" font-size="16" font-weight="700" fill="#e8b422">From Experiment to Optimal Prediction</text>
+      
+      <!-- Node: Random Experiment -->
+      <rect x="275" y="45" width="150" height="45" rx="8" fill="#1a4a7a"/>
+      <text x="350" y="67" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600" fill="white">Random Experiment</text>
+      <text x="350" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7eb6e0">e.g. stock market day</text>
+      
+      <!-- Arrow down -->
+      <path d="M350,90 L350,115" stroke="#c8960c" stroke-width="1.5" marker-end="url(#garrow)"/>
+      
+      <!-- Node: Joint Distribution -->
+      <rect x="235" y="115" width="230" height="50" rx="8" fill="#c8960c"/>
+      <text x="350" y="137" text-anchor="middle" font-family="Playfair Display,serif" font-size="14" font-weight="700" fill="white">Joint Distribution f(x,y)</text>
+      <text x="350" y="153" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#fff8e7">Full picture: X and Y together</text>
+      
+      <!-- Arrow left -->
+      <path d="M235,140 L135,140" stroke="#888" stroke-width="1.5" marker-end="url(#garrow2)"/>
+      <text x="183" y="133" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#aaa">Sum/Integrate over Y</text>
+      
+      <!-- Arrow right -->
+      <path d="M465,140 L560,140" stroke="#888" stroke-width="1.5" marker-end="url(#garrow3)"/>
+      <text x="510" y="133" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#aaa">Sum/Integrate over X</text>
+      
+      <!-- Node: Marginal X -->
+      <rect x="30" y="115" width="105" height="50" rx="8" fill="#1a6b3c"/>
+      <text x="82" y="137" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600" fill="white">Marginal f_X(x)</text>
+      <text x="82" y="152" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#aaffcc">X alone</text>
+      
+      <!-- Node: Marginal Y -->
+      <rect x="565" y="115" width="105" height="50" rx="8" fill="#1a6b3c"/>
+      <text x="618" y="137" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600" fill="white">Marginal f_Y(y)</text>
+      <text x="618" y="152" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#aaffcc">Y alone</text>
+      
+      <!-- Arrow down from joint -->
+      <path d="M350,165 L350,195" stroke="#6c3483" stroke-width="1.5" marker-end="url(#garrow4)"/>
+      <text x="355" y="185" font-family="JetBrains Mono,monospace" font-size="9" fill="#d7b3f0">÷ marginal</text>
+      
+      <!-- Node: Conditional Dist -->
+      <rect x="220" y="195" width="260" height="50" rx="8" fill="#6c3483"/>
+      <text x="350" y="217" text-anchor="middle" font-family="Playfair Display,serif" font-size="13" font-weight="700" fill="white">Conditional Distribution f(x|y)</text>
+      <text x="350" y="233" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#e8ccff">f(x,y)/f_Y(y)</text>
+      
+      <!-- Arrow down -->
+      <path d="M350,245 L350,275" stroke="#c0392b" stroke-width="1.5" marker-end="url(#garrow5)"/>
+      <text x="355" y="265" font-family="JetBrains Mono,monospace" font-size="9" fill="#f5b7b1">∫ x·f(x|y)dx</text>
+      
+      <!-- Node: Conditional Expectation -->
+      <rect x="215" y="275" width="270" height="55" rx="8" fill="#c0392b"/>
+      <text x="350" y="297" text-anchor="middle" font-family="Playfair Display,serif" font-size="15" font-weight="700" fill="white">Conditional Expectation</text>
+      <text x="350" y="315" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#fde8e8">E[X | Y=y]</text>
+      
+      <!-- Arrow left from E[X|Y] to Tower -->
+      <path d="M215,302 L120,302" stroke="#888" stroke-width="1.5" marker-end="url(#garrow6)"/>
+      <rect x="30" y="280" width="90" height="44" rx="6" fill="#333"/>
+      <text x="75" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#e8b422">Tower</text>
+      <text x="75" y="312" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#aaa">E[E[X|Y]]=E[X]</text>
+      
+      <!-- Arrow right: Best Predictor -->
+      <path d="M485,302 L570,302" stroke="#888" stroke-width="1.5" marker-end="url(#garrow7)"/>
+      <rect x="570" y="280" width="100" height="44" rx="6" fill="#333"/>
+      <text x="620" y="299" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#e8b422">Best Predictor</text>
+      <text x="620" y="312" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#aaa">min MSE</text>
+      
+      <!-- Arrow down to applications -->
+      <path d="M350,330 L350,360" stroke="#c8960c" stroke-width="1.5" marker-end="url(#garrow8)"/>
+      
+      <rect x="140" y="360" width="420" height="48" rx="8" fill="#1a1a2e" stroke="#c8960c" stroke-width="1"/>
+      <text x="350" y="381" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#c8960c">QUANT APPLICATIONS</text>
+      <text x="350" y="397" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#888">Options Pricing · Portfolio Risk · ML · Signal Processing</text>
+      
+      <defs>
+        <marker id="garrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c8960c"/></marker>
+        <marker id="garrow2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#888"/></marker>
+        <marker id="garrow3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#888"/></marker>
+        <marker id="garrow4" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6c3483"/></marker>
+        <marker id="garrow5" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c0392b"/></marker>
+        <marker id="garrow6" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#888"/></marker>
+        <marker id="garrow7" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#888"/></marker>
+        <marker id="garrow8" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c8960c"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Quant Finance Applications</h3>
+
+  <div class="resources-grid">
+    <div class="resource-card" style="border-color:#1a4a7a;">
+      <span class="resource-icon">📈</span>
+      <h5>Options Pricing (Black-Scholes)</h5>
+      <p>Call option price = e^(-rT)·E[max(S_T-K, 0)]. This is a conditional expectation of the payoff under the risk-neutral measure. Computing it requires the joint distribution of paths.</p>
+    </div>
+    <div class="resource-card" style="border-color:#1a6b3c;">
+      <span class="resource-icon">⚖️</span>
+      <h5>Portfolio Risk (VaR, CVaR)</h5>
+      <p>Value at Risk and Conditional VaR require the joint distribution of asset returns. CVaR = E[Loss | Loss > VaR] — literally a conditional expectation!</p>
+    </div>
+    <div class="resource-card" style="border-color:#6c3483;">
+      <span class="resource-icon">🔗</span>
+      <h5>Copulas & Tail Dependence</h5>
+      <p>Copulas are joint distributions that separate marginals from dependence structure. They're used to model default correlation in CDOs and structured credit products.</p>
+    </div>
+    <div class="resource-card" style="border-color:#c8960c;">
+      <span class="resource-icon">📊</span>
+      <h5>Factor Models (CAPM, APT)</h5>
+      <p>CAPM states E[R_i | R_M] = α + β·R_M. This is the conditional expectation of asset return given the market return — the systematic risk component.</p>
+    </div>
+    <div class="resource-card" style="border-color:#c0392b;">
+      <span class="resource-icon">🤖</span>
+      <h5>Machine Learning</h5>
+      <p>Every regression model estimates E[Y|X=x]. Bayesian inference updates joint → conditional. Neural networks implicitly estimate conditional expectations.</p>
+    </div>
+    <div class="resource-card" style="border-color:#333;">
+      <span class="resource-icon">🎲</span>
+      <h5>Monte Carlo Pricing</h5>
+      <p>MC methods estimate E[f(X,Y)] by simulating from the joint distribution and averaging. Variance reduction techniques use conditional expectations to reduce sampling noise.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Summary of Key Formulas</h3>
+
+  <div class="prob-table-wrap">
+    <table>
+      <tr><th>Concept</th><th>Discrete</th><th>Continuous</th></tr>
+      <tr><td class="cell-header">Joint</td><td>p(x,y) = P(X=x, Y=y)</td><td>f(x,y) — density surface</td></tr>
+      <tr><td class="cell-header">Marginal X</td><td>p_X(x) = Σᵧ p(x,y)</td><td>f_X(x) = ∫ f(x,y) dy</td></tr>
+      <tr><td class="cell-header">Marginal Y</td><td>p_Y(y) = Σₓ p(x,y)</td><td>f_Y(y) = ∫ f(x,y) dx</td></tr>
+      <tr><td class="cell-header">Conditional</td><td>p(x|y) = p(x,y)/p_Y(y)</td><td>f(x|y) = f(x,y)/f_Y(y)</td></tr>
+      <tr><td class="cell-header">Cond. Expectation</td><td>E[X|Y=y] = Σₓ x·p(x|y)</td><td>E[X|Y=y] = ∫ x·f(x|y) dx</td></tr>
+      <tr><td class="cell-header">Tower Property</td><td colspan="2" style="text-align:center">E[X] = E[E[X|Y]] = Σᵧ E[X|Y=y]·P(Y=y)</td></tr>
+      <tr><td class="cell-header">Independence</td><td colspan="2" style="text-align:center">p(x,y) = p_X(x)·p_Y(y) ⟺ X ⊥ Y</td></tr>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Quick Concept Check — Quiz</h3>
+
+  <div class="quiz-card">
+    <div class="quiz-question">Q1: You know f_X(x) and f_Y(y). Can you always reconstruct f(x,y)?</div>
+    <ul class="quiz-options">
+      <li><input type="radio" name="q1" id="q1a" value="wrong"><label for="q1a">Yes — the joint is always the product of marginals.</label></li>
+      <li><input type="radio" name="q1" id="q1b" value="correct"><label for="q1b">No — you also need to know the dependence structure (copula, correlation, etc.).</label></li>
+      <li><input type="radio" name="q1" id="q1c" value="wrong"><label for="q1c">Only if both X and Y are normal.</label></li>
+      <li><input type="radio" name="q1" id="q1d" value="wrong"><label for="q1d">Yes — you just need to multiply them together.</label></li>
+    </ul>
+    <button class="quiz-btn" onclick="checkQuiz('q1','q1res')">Check Answer</button>
+    <div class="quiz-result" id="q1res"></div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-question">Q2: E[X|Y] is...</div>
+    <ul class="quiz-options">
+      <li><input type="radio" name="q2" id="q2a" value="wrong"><label for="q2a">Always a constant number, regardless of Y.</label></li>
+      <li><input type="radio" name="q2" id="q2b" value="wrong"><label for="q2b">Equal to E[X] when X and Y are correlated.</label></li>
+      <li><input type="radio" name="q2" id="q2c" value="correct"><label for="q2c">A random variable that is a function of Y.</label></li>
+      <li><input type="radio" name="q2" id="q2d" value="wrong"><label for="q2d">Only defined for discrete random variables.</label></li>
+    </ul>
+    <button class="quiz-btn" onclick="checkQuiz('q2','q2res')">Check Answer</button>
+    <div class="quiz-result" id="q2res"></div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-question">Q3: For bivariate normal (X,Y), E[X|Y=y] equals...</div>
+    <ul class="quiz-options">
+      <li><input type="radio" name="q3" id="q3a" value="wrong"><label for="q3a">μ_X for all values of y (conditioning doesn't help).</label></li>
+      <li><input type="radio" name="q3" id="q3b" value="correct"><label for="q3b">μ_X + ρ·(σ_X/σ_Y)·(y − μ_Y) — a linear function of y.</label></li>
+      <li><input type="radio" name="q3" id="q3c" value="wrong"><label for="q3c">A nonlinear (quadratic) function of y.</label></li>
+      <li><input type="radio" name="q3" id="q3d" value="wrong"><label for="q3d">y itself, regardless of parameters.</label></li>
+    </ul>
+    <button class="quiz-btn" onclick="checkQuiz('q3','q3res')">Check Answer</button>
+    <div class="quiz-result" id="q3res"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TAB 5: RESOURCES
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tab-resources" class="tab-panel">
+<div class="panel-inner">
+
+  <div class="section-eyebrow">Go Deeper</div>
+  <h2>Resources, Tools & Next Steps</h2>
+  <p class="lead">Your curated collection of the best free resources to master probability theory for quantitative engineering.</p>
+
+  <h3>📚 Textbooks & Lecture Notes</h3>
+  <div class="resources-grid">
+    <a href="https://projects.iq.harvard.edu/stat110/home" target="_blank" class="resource-card">
+      <span class="resource-icon">🎓</span>
+      <h5>Stat 110 — Harvard (Blitzstein)</h5>
+      <p>Best probability course available free online. Beautiful intuition-first teaching. Covers all these topics with excellent story proofs.</p>
+      <span class="resource-url">projects.iq.harvard.edu/stat110</span>
+    </a>
+    <a href="https://www.probabilitycourse.com" target="_blank" class="resource-card">
+      <span class="resource-icon">📖</span>
+      <h5>Introduction to Probability (free)</h5>
+      <p>Complete free online textbook covering joint distributions, marginals, and conditional expectation with worked examples.</p>
+      <span class="resource-url">probabilitycourse.com</span>
+    </a>
+    <a href="https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/" target="_blank" class="resource-card">
+      <span class="resource-icon">🏫</span>
+      <h5>MIT 6.041 — Probabilistic Systems</h5>
+      <p>MIT OpenCourseWare. Full lecture videos, problem sets and solutions. Rigorous treatment of joint distributions.</p>
+      <span class="resource-url">ocw.mit.edu → 6-041</span>
+    </a>
+    <a href="https://www.amazon.com/Introduction-Probability-Statistics-Econometrics-Goldberger/dp/0674462254" target="_blank" class="resource-card">
+      <span class="resource-icon">💹</span>
+      <h5>Probability for Finance (Hull)</h5>
+      <p>John Hull's "Options, Futures, and Other Derivatives" contains the applied probability theory every quant must know, in context.</p>
+      <span class="resource-url">amazon.com → search John Hull</span>
+    </a>
+  </div>
+
+  <h3>🎬 Video Resources</h3>
+  <div class="resources-grid">
+    <a href="https://www.youtube.com/watch?v=72KxW-YnmQo" target="_blank" class="resource-card">
+      <span class="resource-icon">▶️</span>
+      <h5>3Blue1Brown — But what IS a probability distribution?</h5>
+      <p>Stunning visual intuition for probability distributions. Watch this before anything else.</p>
+      <span class="resource-url">youtube.com/3blue1brown</span>
+    </a>
+    <a href="https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo" target="_blank" class="resource-card">
+      <span class="resource-icon">🎥</span>
+      <h5>Harvard Stat 110 Lectures (YouTube)</h5>
+      <p>Joe Blitzstein's full lecture series. Lectures 10-16 cover joint distributions, marginals, and conditional expectation.</p>
+      <span class="resource-url">youtube.com → search "Stat 110 Harvard"</span>
+    </a>
+    <a href="https://www.youtube.com/c/joshstarmer" target="_blank" class="resource-card">
+      <span class="resource-icon">📊</span>
+      <h5>StatQuest with Josh Starmer</h5>
+      <p>Gentle, clear explanations of probability and statistics concepts with great visuals. Excellent for first-time learners.</p>
+      <span class="resource-url">youtube.com/@statquest</span>
+    </a>
+  </div>
+
+  <h3>💻 Interactive Visualization Tools</h3>
+  <div class="resources-grid">
+    <a href="https://seeing-theory.brown.edu/probability-distributions/index.html" target="_blank" class="resource-card">
+      <span class="resource-icon">👁️</span>
+      <h5>Seeing Theory (Brown University)</h5>
+      <p>Beautiful visual introduction to probability theory. Interactive joint distributions, conditional probability visualizer.</p>
+      <span class="resource-url">seeing-theory.brown.edu</span>
+    </a>
+    <a href="https://www.geogebra.org/m/Bh83NCEB" target="_blank" class="resource-card">
+      <span class="resource-icon">📐</span>
+      <h5>GeoGebra — Bivariate Normal</h5>
+      <p>Interactive 3D bivariate normal distribution. Drag correlation slider and watch the joint PDF surface change in real time.</p>
+      <span class="resource-url">geogebra.org → search bivariate normal</span>
+    </a>
+    <a href="https://shiny.rstudio.com/gallery/" target="_blank" class="resource-card">
+      <span class="resource-icon">🔬</span>
+      <h5>Shiny App Gallery</h5>
+      <p>R Shiny interactive probability apps. Search for "conditional expectation" and "joint distribution" for visual demos.</p>
+      <span class="resource-url">shiny.rstudio.com/gallery</span>
+    </a>
+    <a href="https://distill.pub" target="_blank" class="resource-card">
+      <span class="resource-icon">✨</span>
+      <h5>Distill.pub</h5>
+      <p>Research articles with exceptional interactive visualizations of machine learning and probability concepts.</p>
+      <span class="resource-url">distill.pub</span>
+    </a>
+  </div>
+
+  <h3>🧑‍💻 Python & Colab Tools</h3>
+  <div class="resources-grid">
+    <a href="https://colab.research.google.com/new" target="_blank" class="resource-card">
+      <span class="resource-icon">🔗</span>
+      <h5>Google Colab (Free GPU)</h5>
+      <p>Run all experiments from this guide. No installation needed. Paste any code block and press Shift+Enter.</p>
+      <span class="resource-url">colab.research.google.com</span>
+    </a>
+    <a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank" class="resource-card">
+      <span class="resource-icon">🐍</span>
+      <h5>SciPy Stats Documentation</h5>
+      <p>scipy.stats has multivariate_normal, rv_continuous, and many other distributions. Essential for computing joint PDFs.</p>
+      <span class="resource-url">docs.scipy.org/doc/scipy/reference/stats.html</span>
+    </a>
+    <a href="https://seaborn.pydata.org/tutorial/distributions.html" target="_blank" class="resource-card">
+      <span class="resource-icon">🎨</span>
+      <h5>Seaborn — Joint Plot Tutorial</h5>
+      <p>seaborn.jointplot() plots joint + marginal distributions together in one beautiful figure. Perfect for visualization.</p>
+      <span class="resource-url">seaborn.pydata.org</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>🗺️ Your Learning Path from Here</h3>
+
+  <ol class="steps">
+    <li>
+      <h5>Strengthen Foundations</h5>
+      <p>Complete all exercises in this guide (Tier 1 first). Make sure the Tower Property feels natural. Work through Harvard Stat 110 lectures 7-10.</p>
+    </li>
+    <li>
+      <h5>Move to Multivariate Distributions</h5>
+      <p>Generalize to 3+ variables. Study the multivariate normal distribution in detail — it's the workhorse of quantitative finance. Learn about covariance matrices.</p>
+    </li>
+    <li>
+      <h5>Study Copulas</h5>
+      <p>Learn Sklar's Theorem: any joint distribution can be decomposed into marginals + copula. Gaussian copula, t-copula, Archimedean copulas. Critical for credit risk modeling.</p>
+    </li>
+    <li>
+      <h5>Stochastic Processes</h5>
+      <p>Conditional expectation is the foundation of martingales. Study Brownian motion, Itô's Lemma, and the Feynman-Kac formula. All require deep understanding of E[X|Y].</p>
+    </li>
+    <li>
+      <h5>Bayesian Statistics</h5>
+      <p>Bayesian inference is fundamentally about computing conditional distributions. Bayes' theorem: P(θ|data) = P(data|θ)·P(θ)/P(data) — a conditional distribution over parameters.</p>
+    </li>
+    <li>
+      <h5>Quantitative Finance Applications</h5>
+      <p>Apply everything to Black-Scholes derivation, risk-neutral pricing, VaR/CVaR computation, and portfolio optimization. Read Hull's "Options, Futures, and Other Derivatives."</p>
+    </li>
+  </ol>
+
+  <div class="insight-box">
+    <p><strong>Final Thought:</strong> Every sophisticated model in quantitative finance — from options pricing to portfolio optimization to machine learning — sits on the foundation you've built here. Joint distributions capture how the world's randomness is woven together. Marginals let you focus on what matters. Conditional expectations let you update your beliefs with new information, and make the <strong>best possible decisions given what you know.</strong> Master these, and you've mastered the language of uncertainty.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <span>Quant Engineer Study Guide</span> · Joint PMF/PDF · Marginal Distributions · Conditional Expectation · Built for First-Time Learners
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ SCRIPTS -->
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── QUIZ ───────────────────────────────────────────────────────────────
+const quizAnswers = {
+  q1res: { correct: '✅ Correct! Marginals alone cannot reconstruct the joint distribution. You need to know the dependence structure (copula, correlation matrix, etc.). This is one of the most important insights in multivariate probability.', wrong: '❌ Not quite. Remember: the joint distribution factors into marginals ONLY when X and Y are independent. In general, knowing marginals is not enough.' },
+  q2res: { correct: '✅ Correct! E[X|Y] is a function of Y, so it inherits Y\'s randomness. Before you observe Y, E[X|Y] is itself a random variable. After observing Y=y, it becomes the number E[X|Y=y].', wrong: '❌ Not quite. E[X|Y] is a random variable — a function of Y. Only after fixing Y=y does it become a specific number.' },
+  q3res: { correct: '✅ Correct! For bivariate normal, the conditional expectation is always linear in y. This linearity is what makes bivariate normal so tractable — and why the CAPM model (which assumes normality) has a linear beta structure.', wrong: '❌ Not quite. For bivariate normal specifically, E[X|Y=y] is LINEAR in y: it equals μ_X + ρ·(σ_X/σ_Y)·(y−μ_Y). This is the regression line.' }
+};
+
+function checkQuiz(qName, resId) {
+  const selected = document.querySelector(`input[name="${qName}"]:checked`);
+  const el = document.getElementById(resId);
+  if (!selected) { el.style.display='block'; el.className='quiz-result wrong'; el.textContent='Please select an answer first.'; return; }
+  const ans = quizAnswers[resId];
+  el.style.display = 'block';
+  if (selected.value === 'correct') {
+    el.className = 'quiz-result correct';
+    el.textContent = ans.correct;
+  } else {
+    el.className = 'quiz-result wrong';
+    el.textContent = ans.wrong;
+  }
+}
+
+// ── INTERACTIVE DEMO: Correlation ─────────────────────────────────────
+let rhoState = 0.0, yState = 1.0;
+
+function updateRhoDisplay(val) {
+  const rho = val / 100;
+  rhoState = rho;
+  document.getElementById('rhoVal').textContent = rho.toFixed(2);
+  document.getElementById('covVal').textContent = `Cov(X,Y) = ${rho.toFixed(2)}`;
+  let shape;
+  if (Math.abs(rho) < 0.1) shape = 'Circular contours (no linear relationship)';
+  else if (Math.abs(rho) < 0.5) shape = 'Slightly elliptical (' + (rho>0?'positive':'negative') + ' tilt)';
+  else if (Math.abs(rho) < 0.8) shape = 'Noticeably elongated ellipses';
+  else shape = 'Very elongated — strong ' + (rho>0?'positive':'negative') + ' correlation';
+  document.getElementById('jointShape').textContent = shape;
+  drawCorrelationDemo(rho);
+}
+
+function updateCondExp(rhoVal, yVal) {
+  if (rhoVal !== null) { rhoState = rhoVal / 100; document.getElementById('rhoVal2').textContent = rhoState.toFixed(2); }
+  if (yVal !== null) { yState = yVal / 100; document.getElementById('yVal').textContent = yState.toFixed(2); }
+  const condExp = rhoState * yState;
+  document.getElementById('condExpVal').textContent = condExp.toFixed(4);
+  const dir = yState >= 0 ? 'above' : 'below';
+  const edir = condExp >= 0 ? 'above' : 'below';
+  document.getElementById('condInterpret').textContent = 
+    `Given Y is ${Math.abs(yState).toFixed(2)} std deviations ${dir} its mean, X is expected to be ${Math.abs(condExp).toFixed(2)} std deviations ${edir} its mean.`;
+}
+
+function drawCorrelationDemo(rho) {
+  const canvas = document.getElementById('correlationDemo');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  
+  const cx = W/2, cy = H/2, scale = Math.min(W,H)/6;
+  
+  // Draw contour ellipses
+  const levels = [0.5, 1.0, 1.5, 2.0, 2.5];
+  levels.forEach((r, i) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    const angle = -Math.asin(rho)/2;
+    ctx.rotate(angle);
+    const a = r * scale * Math.sqrt(1 + Math.abs(rho));
+    const b = r * scale * Math.sqrt(1 - Math.abs(rho) + 0.02);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, a, b, 0, 0, 2*Math.PI);
+    const alpha = 0.7 - i*0.1;
+    ctx.strokeStyle = `rgba(26, 74, 122, ${alpha})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  });
+  
+  // Axes
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(20, cy); ctx.lineTo(W-20, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, 10); ctx.lineTo(cx, H-10); ctx.stroke();
+  
+  ctx.fillStyle = '#333';
+  ctx.font = '12px JetBrains Mono, monospace';
+  ctx.fillText('X', W-18, cy-6);
+  ctx.fillText('Y', cx+6, 20);
+}
+
+// ── CHART: Conditional Expectation ───────────────────────────────────
+function drawConditionalExpChart() {
+  const canvas = document.getElementById('conditionalExpChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  const yVals = [-3, -2, -1, 0, 1, 2, 3];
+  const rhoVals = [0.8, 0.5, 0.2, 0.0];
+  const colors = ['#c0392b', '#c8960c', '#1a4a7a', '#888'];
+  const labels = ['ρ=0.8 (strong)', 'ρ=0.5 (moderate)', 'ρ=0.2 (weak)', 'ρ=0.0 (none)'];
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: yVals,
+      datasets: rhoVals.map((rho, i) => ({
+        label: labels[i],
+        data: yVals.map(y => rho * y),
+        borderColor: colors[i],
+        borderWidth: 2.5,
+        pointRadius: 4,
+        fill: false,
+        tension: 0.1
+      }))
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: ctx => `E[X|Y=${ctx.parsed.x.toFixed(1)}] = ${ctx.parsed.y.toFixed(2)}`
+          }
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Observed value of Y' } },
+        y: { title: { display: true, text: 'E[X|Y=y]' }, grid: { color: '#eee' } }
+      }
+    }
+  });
+}
+
+// ── CHART: PMF of Die ─────────────────────────────────────────────────
+function drawPmfDie() {
+  const canvas = document.getElementById('pmfDieChart');
+  if (!canvas) return;
+  new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['1','2','3','4','5','6'],
+      datasets: [{
+        label: 'P(X = x)',
+        data: [1/6, 1/6, 1/6, 1/6, 1/6, 1/6],
+        backgroundColor: 'rgba(200, 150, 12, 0.7)',
+        borderColor: 'rgba(200, 150, 12, 1)',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { min: 0, max: 0.3, title: { display: true, text: 'Probability P(X=x)' } },
+        x: { title: { display: true, text: 'Die value x' } }
+      }
+    }
+  });
+}
+
+// ── CHART: Normal PDF ─────────────────────────────────────────────────
+function drawNormalPdf() {
+  const canvas = document.getElementById('pdfNormalChart');
+  if (!canvas) return;
+  const x = [], y = [];
+  for (let xi = -4; xi <= 4; xi += 0.05) {
+    x.push(xi.toFixed(2));
+    y.push((1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*xi*xi));
+  }
+  new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: x,
+      datasets: [{
+        label: 'f(x) = N(0,1)',
+        data: y,
+        borderColor: 'rgba(26, 74, 122, 1)',
+        backgroundColor: 'rgba(26, 74, 122, 0.1)',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'x' }, ticks: { maxTicksLimit: 9 } },
+        y: { title: { display: true, text: 'f(x) — density' } }
+      }
+    }
+  });
+}
+
+// ── CHART: Marginals ─────────────────────────────────────────────────
+function drawMarginalChart() {
+  const canvas = document.getElementById('marginalChart');
+  if (!canvas) return;
+  new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['0', '1', '2'],
+      datasets: [
+        {
+          label: 'Marginal p_X(x)',
+          data: [0.30, 0.50, 0.20],
+          backgroundColor: 'rgba(26, 74, 122, 0.7)',
+          borderColor: 'rgba(26, 74, 122, 1)',
+          borderWidth: 2
+        },
+        {
+          label: 'Marginal p_Y(y)',
+          data: [0.35, 0.50, 0.15],
+          backgroundColor: 'rgba(26, 107, 60, 0.7)',
+          borderColor: 'rgba(26, 107, 60, 1)',
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { title: { display: true, text: 'Value' } },
+        y: { min: 0, max: 0.6, title: { display: true, text: 'Probability' } }
+      }
+    }
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  drawPmfDie();
+  drawNormalPdf();
+  drawMarginalChart();
+  drawConditionalExpChart();
+  drawCorrelationDemo(0);
+  updateCondExp(null, null);
+});
+</script>
+</body>
+</html>

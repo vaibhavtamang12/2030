@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Study Guide: PDF, CDF & Change of Variables</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #a78bfa;
+    --accent4: #34d399;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    --gold: #fbbf24;
+    --red: #f87171;
+    --green: #4ade80;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1730 50%, #0a0e1a 100%);
+    border-bottom: 1px solid var(--accent);
+    padding: 2rem 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(167,139,250,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  .header-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    font-weight: 300;
+  }
+  .badges {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent4);
+  }
+
+  /* ─── TAB NAV ─── */
+  .tab-nav {
+    display: flex; flex-wrap: wrap; gap: 0;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 0.9rem 1.2rem;
+    background: none; border: none;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--surface2); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface2); }
+
+  /* ─── CONTENT ─── */
+  .tab-content { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* ─── SECTION BLOCKS ─── */
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    display: flex; align-items: center; gap: 0.7rem;
+  }
+  .section-title .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--surface2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 400;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem;
+    margin-bottom: 1.2rem;
+  }
+  .card-accent {
+    border-left: 3px solid var(--accent);
+  }
+  .card-warn {
+    border-left: 3px solid var(--gold);
+    background: rgba(251,191,36,0.04);
+  }
+  .card-tip {
+    border-left: 3px solid var(--accent4);
+    background: rgba(52,211,153,0.04);
+  }
+  .card-formula {
+    border-left: 3px solid var(--accent3);
+    background: rgba(167,139,250,0.06);
+  }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 0.6rem;
+    color: var(--accent);
+  }
+  .card h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent3);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .card p { color: var(--text); margin-bottom: 0.5rem; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .highlight { color: var(--accent); font-weight: 700; }
+  .highlight2 { color: var(--accent2); font-weight: 700; }
+  .highlight3 { color: var(--accent3); }
+  .hl-gold { color: var(--gold); font-weight: 600; }
+
+  /* ─── MATH FORMULA DISPLAY ─── */
+  .formula-box {
+    background: #060a14;
+    border: 1px solid var(--accent3);
+    border-radius: 8px;
+    padding: 1rem 1.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--accent3);
+    text-align: center;
+    margin: 1rem 0;
+    line-height: 2;
+    overflow-x: auto;
+  }
+  .formula-box .comment {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  /* ─── CANVAS / INTERACTIVE ─── */
+  canvas {
+    display: block;
+    background: #060a14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+  }
+  .canvas-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+  .canvas-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.7rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 0.7rem;
+    margin-top: 0.8rem; align-items: center;
+  }
+  .ctrl-group { display: flex; align-items: center; gap: 0.4rem; }
+  .ctrl-group label {
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+  }
+  input[type=range] {
+    accent-color: var(--accent);
+    width: 110px; cursor: pointer;
+  }
+  select, button.ctrl-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  button.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── ANALOGY CARDS ─── */
+  .analogy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem; margin-bottom: 1.2rem;
+  }
+  .analogy-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .analogy-card::before {
+    content: attr(data-emoji);
+    position: absolute; top: 0.6rem; right: 0.8rem;
+    font-size: 2rem; opacity: 0.18;
+  }
+  .analogy-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+  .analogy-card p { font-size: 0.88rem; color: var(--text-muted); }
+
+  /* ─── COLAB BOXES ─── */
+  .colab-box {
+    background: #111827;
+    border: 1px solid #fbbf24;
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .colab-box .colab-header {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 0.7rem;
+  }
+  .colab-box pre {
+    background: #060a14;
+    border-radius: 6px;
+    padding: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: #a5f3fc;
+    overflow-x: auto;
+    line-height: 1.6;
+    white-space: pre;
+  }
+  .colab-box .py-comment { color: #6b7280; }
+  .colab-box .py-kw { color: #c084fc; }
+  .colab-box .py-str { color: #86efac; }
+  .colab-box .py-num { color: #fbbf24; }
+  .colab-box .py-fn { color: #38bdf8; }
+
+  /* ─── EXERCISES ─── */
+  .ex-tier {
+    margin-bottom: 1.2rem;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .ex-tier-header {
+    padding: 0.7rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .tier-easy .ex-tier-header { background: rgba(52,211,153,0.15); color: var(--green); }
+  .tier-med .ex-tier-header { background: rgba(251,191,36,0.15); color: var(--gold); }
+  .tier-hard .ex-tier-header { background: rgba(248,113,113,0.15); color: var(--red); }
+  .ex-list { padding: 1rem 1.1rem; background: var(--surface); }
+  .ex-item {
+    display: flex; gap: 0.8rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .ex-item:last-child { border-bottom: none; }
+  .ex-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 1.4rem;
+    padding-top: 0.1rem;
+  }
+
+  /* ─── RESOURCES ─── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 0.8rem; margin-bottom: 1.2rem;
+  }
+  .resource-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    display: block;
+  }
+  .resource-card:hover {
+    border-color: var(--accent);
+    background: var(--surface);
+  }
+  .resource-card .rc-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+  .resource-card .rc-title {
+    font-size: 0.88rem;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+  .resource-card .rc-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* ─── STEP FLOW ─── */
+  .step-flow {
+    display: flex; flex-direction: column; gap: 0;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+  .step-flow::before {
+    content: '';
+    position: absolute; left: 1.1rem; top: 2rem; bottom: 2rem;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent3));
+  }
+  .step-item {
+    display: flex; gap: 1rem;
+    padding: 0.8rem 0;
+    align-items: flex-start;
+  }
+  .step-dot {
+    width: 2.2rem; height: 2.2rem;
+    background: var(--surface2);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-text { padding-top: 0.2rem; }
+  .step-text strong {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--accent3);
+    margin-bottom: 0.2rem;
+  }
+  .step-text span { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ─── TABLE ─── */
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.88rem; margin-bottom: 1.2rem;
+  }
+  th {
+    background: var(--surface2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  td {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 2rem 0;
+  }
+
+  @media (max-width:600px) {
+    .tab-content { padding: 1rem; }
+    header { padding: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">⟨ Quant Engineering Study Guide ⟩</div>
+  <h1>PDF · CDF · Change of Variables</h1>
+  <p class="header-sub">A complete, self-contained guide for first-time learners targeting quantitative finance engineering</p>
+  <div class="badges">
+    <span class="badge">100% Offline Ready</span>
+    <span class="badge">Interactive Diagrams</span>
+    <span class="badge">Colab Experiments</span>
+    <span class="badge">3-Tier Exercises</span>
+    <span class="badge">External Resources</span>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('prereq')">00 · Prerequisites</button>
+  <button class="tab-btn" onclick="switchTab('pdf')">01 · PDF</button>
+  <button class="tab-btn" onclick="switchTab('cdf')">02 · CDF</button>
+  <button class="tab-btn" onclick="switchTab('cov')">03 · Change of Variables</button>
+  <button class="tab-btn" onclick="switchTab('connections')">04 · How They Connect</button>
+  <button class="tab-btn" onclick="switchTab('resources')">05 · Resources</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     TAB 0 · PREREQUISITES
+══════════════════════════════════════════════ -->
+<div id="tab-prereq" class="tab-content active">
+  <div class="section-title"><span class="num">00</span> Prerequisites</div>
+  <p class="section-sub">Concepts you need to be comfortable with before diving into PDF, CDF, and Change of Variables.</p>
+
+  <div class="card card-warn">
+    <h4>⚠ Why Prereqs Matter</h4>
+    <p>Think of this as a recipe — if you don't have the right ingredients, the dish won't work. These concepts are the ingredients. We'll keep explanations short and intuitive, just enough for the main topics to make sense.</p>
+  </div>
+
+  <!-- P1: What is a random variable -->
+  <div class="card card-accent">
+    <h3>P1 · Random Variables</h3>
+    <p>A <span class="highlight">random variable</span> is just a number that depends on the outcome of a random experiment. We write it as <span class="highlight">X</span> (capital letter, by convention).</p>
+    <p><strong>Example:</strong> Roll a fair die. X = the number that shows up. Before you roll, X could be 1, 2, 3, 4, 5, or 6 — it's "random". After you roll and see "4", that specific outcome 4 is a <em>realisation</em> of X.</p>
+    <p>In quant finance: X could be "tomorrow's stock price", "bond default time", or "daily return of a portfolio".</p>
+    <div class="analogy-grid" style="margin-top:0.8rem">
+      <div class="analogy-card" data-emoji="🎲">
+        <h4>Discrete RV</h4>
+        <p>Takes countable values: 1, 2, 3, 4, 5, 6. Die roll, coin flip, number of trades today.</p>
+      </div>
+      <div class="analogy-card" data-emoji="🌡️">
+        <h4>Continuous RV</h4>
+        <p>Takes any value in an interval. Temperature, stock price, return on investment — infinite precision possible.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- P2: Probability basics -->
+  <div class="card card-accent">
+    <h3>P2 · Probability Basics</h3>
+    <p><span class="highlight">P(event)</span> = the chance that some outcome happens, always between 0 and 1. P = 0 means impossible, P = 1 means certain.</p>
+    <p><strong>P(X = x)</strong> means "the probability that our random variable X takes exactly the value x".</p>
+    <p><strong>P(a ≤ X ≤ b)</strong> means "the probability that X falls in the interval [a, b]".</p>
+    <div class="formula-box">Total probability rule: Σ P(X = xᵢ) = 1 &nbsp;[discrete]<br>∫₋∞^∞ f(x) dx = 1 &nbsp;[continuous]<span class="comment">All probabilities must add up to 1 — something must happen.</span></div>
+  </div>
+
+  <!-- P3: Integration intuition -->
+  <div class="card card-accent">
+    <h3>P3 · Integration — Area Under a Curve</h3>
+    <p>Don't be scared of integrals! All they mean here is: <span class="highlight">"the area under a curve between two points"</span>.</p>
+    <p>Imagine drawing a hill on graph paper. The integral from a to b = the area of that hill between x = a and x = b. That's it.</p>
+    <div class="formula-box">∫ₐᵇ f(x) dx = Area under f(x) from a to b<span class="comment">The ∫ symbol is a stretched S — think "Sum" of tiny slices.</span></div>
+    <p>In probability, the area under a probability curve tells us <em>how likely</em> outcomes in that range are.</p>
+  </div>
+
+  <!-- P4: Differentiation intuition -->
+  <div class="card card-accent">
+    <h3>P4 · Differentiation — Slope / Rate of Change</h3>
+    <p>The derivative f'(x) = <span class="highlight">how fast f(x) is changing at point x</span>. Think of it as the slope of a curve at a specific point.</p>
+    <p>If F(x) is a growing curve (like the CDF will be), then F'(x) = f(x) tells you how steeply it grows at each x — that will be our PDF!</p>
+    <div class="formula-box">d/dx F(x) = F'(x) = f(x)<span class="comment">Differentiation "undoes" integration, and vice versa. This is the Fundamental Theorem of Calculus.</span></div>
+  </div>
+
+  <!-- P5: Expected Value -->
+  <div class="card card-accent">
+    <h3>P5 · Expected Value (Mean)</h3>
+    <p>The <span class="highlight">expected value E[X]</span> is the "long-run average" of X if you repeated your experiment infinitely many times. Think of it as the balance point (center of mass) of the distribution.</p>
+    <div class="formula-box">E[X] = ∫₋∞^∞ x · f(x) dx<span class="comment">Weighted average of all x values, weighted by how probable they are.</span></div>
+    <p>In finance: E[return] is your expected profit. Risk = variance, which measures how spread out returns are from the mean.</p>
+  </div>
+
+  <div class="card card-tip">
+    <h4>✓ You're Ready If...</h4>
+    <p>You understand what a random variable is, that probabilities add to 1, that integrals compute areas, and derivatives compute slopes. With that, you're ready to tackle PDF → CDF → Change of Variables in that order.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 · PDF
+══════════════════════════════════════════════ -->
+<div id="tab-pdf" class="tab-content">
+  <div class="section-title"><span class="num">01</span> Probability Density Function (PDF)</div>
+  <p class="section-sub">The "shape" of a continuous distribution — how probability is spread across values.</p>
+
+  <!-- Core Intuition -->
+  <div class="card card-accent">
+    <h3>What is a PDF? The Core Intuition</h3>
+    <p>Imagine you have a bag of sand. You spread it out on a table in a pile. The <span class="highlight">height of the sand pile at any point x</span> is like the PDF, f(x). Where the pile is tall = more probability mass there. Where it's flat = low probability.</p>
+    <p>A PDF <strong>does NOT give you probability directly</strong> at a single point. For a continuous distribution, P(X = exactly 3.14159…) = 0. Instead, you get probability by looking at an interval:</p>
+    <div class="formula-box">P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx = Area under the curve from a to b</div>
+    <p>This is exactly why a PDF is a <em>density</em> — just like mass density (kg/m³) tells you how much mass per unit volume, f(x) tells you how much probability per unit of x.</p>
+  </div>
+
+  <!-- Properties -->
+  <div class="card card-formula">
+    <h3>Formal Definition & Properties</h3>
+    <p>A function f(x) is a valid PDF if and only if it satisfies these two conditions:</p>
+    <div class="formula-box">
+      1. f(x) ≥ 0 &nbsp;for all x &nbsp;&nbsp;&nbsp;&nbsp;[Non-negativity]<br>
+      2. ∫₋∞^∞ f(x) dx = 1 &nbsp;&nbsp;&nbsp;&nbsp;[Total probability = 1]
+    </div>
+    <p><strong>Note:</strong> f(x) CAN be greater than 1! It's not a probability itself. Only <em>areas</em> are probabilities, and those must be ≤ 1.</p>
+  </div>
+
+  <!-- INTERACTIVE: PDF visualizer -->
+  <div class="canvas-wrap">
+    <div class="canvas-title">
+      <span>⬡ Interactive PDF Visualizer — adjust parameters to see how the shape changes</span>
+    </div>
+    <canvas id="pdfCanvas" width="800" height="320"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Distribution:</label>
+        <select id="pdfDist" onchange="drawPDF()">
+          <option value="normal">Normal (Gaussian)</option>
+          <option value="uniform">Uniform</option>
+          <option value="exponential">Exponential</option>
+          <option value="beta">Beta</option>
+        </select>
+      </div>
+      <div class="ctrl-group" id="muGroup">
+        <label>μ (mean): <span id="muVal">0</span></label>
+        <input type="range" id="muSlider" min="-3" max="3" step="0.1" value="0" oninput="document.getElementById('muVal').textContent=this.value;drawPDF()">
+      </div>
+      <div class="ctrl-group" id="sigGroup">
+        <label>σ (std dev): <span id="sigVal">1</span></label>
+        <input type="range" id="sigSlider" min="0.3" max="3" step="0.1" value="1" oninput="document.getElementById('sigVal').textContent=this.value;drawPDF()">
+      </div>
+      <div class="ctrl-group" id="shadeGroup">
+        <label>Shade P(<span id="aDisp">-1</span> ≤ X ≤ <span id="bDisp">1</span>):</label>
+        <input type="range" id="aSlider" min="-4" max="4" step="0.1" value="-1" oninput="document.getElementById('aDisp').textContent=this.value;drawPDF()">
+        <input type="range" id="bSlider" min="-4" max="4" step="0.1" value="1" oninput="document.getElementById('bDisp').textContent=this.value;drawPDF()">
+      </div>
+    </div>
+    <div id="pdfStats" style="margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4)"></div>
+  </div>
+
+  <!-- Common distributions -->
+  <div class="card">
+    <h3>Key PDFs in Quant Finance</h3>
+    <table>
+      <tr><th>Distribution</th><th>PDF Formula</th><th>Used For</th></tr>
+      <tr><td><span class="highlight">Normal N(μ,σ²)</span></td><td>f(x) = (1/σ√2π) · exp(-(x-μ)²/2σ²)</td><td>Stock returns (Black-Scholes), error terms</td></tr>
+      <tr><td><span class="highlight3">Log-Normal</span></td><td>f(x) = (1/xσ√2π) · exp(-(ln x - μ)²/2σ²)</td><td>Stock prices (always positive!)</td></tr>
+      <tr><td><span class="hl-gold">Exponential</span></td><td>f(x) = λe^(-λx), x ≥ 0</td><td>Time between events, inter-arrival times</td></tr>
+      <tr><td><span style="color:var(--accent2)">Uniform U(a,b)</span></td><td>f(x) = 1/(b-a) for x∈[a,b], else 0</td><td>Simulations, random number generation</td></tr>
+      <tr><td>Student-t</td><td>Heavy-tailed version of normal</td><td>Fat tails in returns, small samples</td></tr>
+    </table>
+  </div>
+
+  <!-- The Normal in Depth -->
+  <div class="card card-formula">
+    <h3>Deep Dive: The Normal (Gaussian) PDF</h3>
+    <p>The most important distribution in all of statistics and quant finance. Two parameters control everything:</p>
+    <div class="formula-box">f(x) = (1 / (σ√(2π))) · exp(-(x−μ)² / (2σ²))<span class="comment">μ = mean (center), σ = standard deviation (spread). σ² = variance.</span></div>
+    <div class="analogy-grid" style="margin-top:0.8rem">
+      <div class="analogy-card" data-emoji="📍">
+        <h4>μ shifts the bell</h4>
+        <p>Changing μ slides the bell curve left or right. The shape stays the same. In finance: μ is your expected return.</p>
+      </div>
+      <div class="analogy-card" data-emoji="📏">
+        <h4>σ stretches/squeezes</h4>
+        <p>Larger σ = wider bell (more uncertainty). Smaller σ = narrower bell (more predictable). In finance: σ is volatility.</p>
+      </div>
+    </div>
+    <p style="margin-top:0.8rem"><strong>68-95-99.7 Rule:</strong> For N(μ, σ²), approximately 68% of outcomes fall within μ±1σ, 95% within μ±2σ, and 99.7% within μ±3σ. This is fundamental to risk management (e.g., Value-at-Risk).</p>
+  </div>
+
+  <!-- Colab Experiment 1 -->
+  <div class="colab-box">
+    <div class="colab-header">🧪 Colab Experiment 1 — Visualise PDFs from Scratch</div>
+    <pre><span class="py-comment"># Google Colab — paste this in a new cell and run</span>
+<span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+<span class="py-kw">import</span> matplotlib.pyplot <span class="py-kw">as</span> plt
+<span class="py-kw">from</span> scipy <span class="py-kw">import</span> stats
+
+<span class="py-comment"># Create x axis</span>
+x = np.linspace(<span class="py-num">-5</span>, <span class="py-num">5</span>, <span class="py-num">1000</span>)
+
+fig, axes = plt.subplots(<span class="py-num">1</span>, <span class="py-num">3</span>, figsize=(<span class="py-num">15</span>, <span class="py-num">4</span>))
+fig.suptitle(<span class="py-str">'Probability Density Functions'</span>, fontsize=<span class="py-num">14</span>, fontweight=<span class="py-str">'bold'</span>)
+
+<span class="py-comment"># 1. Normal PDF — try changing mu and sigma!</span>
+<span class="py-kw">for</span> mu, sigma, label <span class="py-kw">in</span> [(<span class="py-num">0</span>,<span class="py-num">1</span>,<span class="py-str">'N(0,1)'</span>), (<span class="py-num">2</span>,<span class="py-num">1</span>,<span class="py-str">'N(2,1)'</span>), (<span class="py-num">0</span>,<span class="py-num">2</span>,<span class="py-str">'N(0,4)'</span>)]:
+    pdf = stats.norm.pdf(x, mu, sigma)
+    axes[<span class="py-num">0</span>].plot(x, pdf, label=label, linewidth=<span class="py-num">2</span>)
+axes[<span class="py-num">0</span>].set_title(<span class="py-str">'Normal PDFs'</span>); axes[<span class="py-num">0</span>].legend(); axes[<span class="py-num">0</span>].set_xlabel(<span class="py-str">'x'</span>)
+
+<span class="py-comment"># 2. Shade the area P(-1 ≤ X ≤ 1) for N(0,1)</span>
+pdf_std = stats.norm.pdf(x, <span class="py-num">0</span>, <span class="py-num">1</span>)
+axes[<span class="py-num">1</span>].plot(x, pdf_std, <span class="py-str">'b'</span>, linewidth=<span class="py-num">2</span>)
+mask = (x >= <span class="py-num">-1</span>) & (x <= <span class="py-num">1</span>)
+axes[<span class="py-num">1</span>].fill_between(x[mask], pdf_std[mask], alpha=<span class="py-num">0.4</span>, color=<span class="py-str">'cyan'</span>,
+                     label=<span class="py-str">f'P(-1≤X≤1) ≈ {stats.norm.cdf(1)-stats.norm.cdf(-1):.3f}'</span>)
+axes[<span class="py-num">1</span>].legend(); axes[<span class="py-num">1</span>].set_title(<span class="py-str">'Shaded Area = Probability'</span>)
+
+<span class="py-comment"># 3. Compare different distributions</span>
+x_pos = np.linspace(<span class="py-num">0</span>, <span class="py-num">5</span>, <span class="py-num">500</span>)
+axes[<span class="py-num">2</span>].plot(x_pos, stats.expon.pdf(x_pos, scale=<span class="py-num">1</span>), label=<span class="py-str">'Exponential(1)'</span>, lw=<span class="py-num">2</span>)
+axes[<span class="py-num">2</span>].plot(x_pos, stats.gamma.pdf(x_pos, a=<span class="py-num">2</span>), label=<span class="py-str">'Gamma(2,1)'</span>, lw=<span class="py-num">2</span>)
+axes[<span class="py-num">2</span>].plot(x_pos, stats.beta.pdf(x_pos/<span class="py-num">5</span>, <span class="py-num">2</span>, <span class="py-num">5</span>)/<span class="py-num">5</span>, label=<span class="py-str">'Beta(2,5)'</span>, lw=<span class="py-num">2</span>)
+axes[<span class="py-num">2</span>].legend(); axes[<span class="py-num">2</span>].set_title(<span class="py-str">'Other PDFs'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="py-comment"># Key insight: verify total area ≈ 1</span>
+<span class="py-kw">from</span> scipy.integrate <span class="py-kw">import</span> quad
+area, _ = quad(stats.norm.pdf, <span class="py-num">-np.inf</span>, <span class="py-num">np.inf</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Total area under N(0,1) PDF: {area:.8f}"</span>)  <span class="py-comment"># Should be 1.0</span></pre>
+  </div>
+
+  <!-- Exercises -->
+  <div class="section-title" style="font-size:1.3rem; margin-top:1.5rem">Exercises · PDF</div>
+  <div class="ex-tier tier-easy">
+    <div class="ex-tier-header">🟢 Easy — Conceptual Understanding</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span> <span>If f(x) = 2x for 0 ≤ x ≤ 1 and 0 elsewhere, verify this is a valid PDF. (Hint: integrate from 0 to 1.)</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span> <span>Sketch (by hand) a PDF that has most probability mass near x = 5. Does it matter what shape it is, as long as properties hold?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span> <span>For a N(0,1) distribution, what is P(X > 0)? Why? (Don't compute — just reason from the symmetry of the bell curve.)</span></div>
+      <div class="ex-item"><span class="ex-num">4.</span> <span>Can f(3) = 5 for some PDF? Explain why or why not, given the definition of a PDF.</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-med">
+    <div class="ex-tier-header">🟡 Medium — Computation & Colab</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span> <span>For f(x) = λe^(−λx) (Exponential), x ≥ 0: compute P(X ≤ 2) when λ = 0.5. Verify in Python with scipy.stats.expon.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span> <span>In Colab, plot N(μ, σ²) PDFs for (μ=0, σ=0.5), (μ=0, σ=1), (μ=0, σ=2) on the same figure. What happens to the peak height as σ increases? Why must this happen?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span> <span>Given a normal distribution N(100, 15²) representing IQ scores, compute P(85 ≤ X ≤ 115) and explain its meaning. Shade the region in a Matplotlib plot.</span></div>
+      <div class="ex-item"><span class="ex-num">4.</span> <span>Find the constant c that makes f(x) = c·x²·(1-x) a valid PDF on [0,1].</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-hard">
+    <div class="ex-tier-header">🔴 Hard — Quant Finance Applications</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span> <span>Stock returns follow N(μ=0.001, σ=0.02) daily. Simulate 1000 days of returns in Colab. Plot the empirical histogram and overlay the theoretical PDF. Compute the probability of a daily loss exceeding 3σ.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span> <span>A portfolio manager claims returns are normally distributed. Use scipy.stats.normaltest or kstest to check if real stock data (use yfinance to download Apple or SPY) actually follows a normal PDF. What do you observe about the tails?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span> <span>Fit a PDF to real data: download 5 years of SPY daily returns, fit a normal and a t-distribution, and compare log-likelihoods. Which fits better and why does it matter for risk management?</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 · CDF
+══════════════════════════════════════════════ -->
+<div id="tab-cdf" class="tab-content">
+  <div class="section-title"><span class="num">02</span> Cumulative Distribution Function (CDF)</div>
+  <p class="section-sub">The running total of probability — "how much probability is to the left of x?"</p>
+
+  <div class="card card-accent">
+    <h3>What is a CDF? The Simplest Intuition</h3>
+    <p>If the PDF is the height of sand at each point, the <span class="highlight">CDF is the total amount of sand you've scooped up as you move from left to right</span>.</p>
+    <p>Formally: F(x) = P(X ≤ x) = "the probability that our random variable is at most x".</p>
+    <div class="formula-box">F(x) = P(X ≤ x) = ∫₋∞ˣ f(t) dt<span class="comment">CDF at point x = area under PDF from −∞ up to x.</span></div>
+    <p><strong>As x → −∞:</strong> F(x) → 0 (no probability scooped yet).<br>
+    <strong>As x → +∞:</strong> F(x) → 1 (all probability scooped).<br>
+    <strong>At any x:</strong> F(x) is between 0 and 1, and always <em>non-decreasing</em> (you never scoop probability back out).</p>
+  </div>
+
+  <!-- Properties -->
+  <div class="card card-formula">
+    <h3>Properties of the CDF</h3>
+    <table>
+      <tr><th>Property</th><th>Math Statement</th><th>Intuition</th></tr>
+      <tr><td>Range</td><td>0 ≤ F(x) ≤ 1</td><td>It's always a probability</td></tr>
+      <tr><td>Non-decreasing</td><td>If x₁ &lt; x₂ then F(x₁) ≤ F(x₂)</td><td>You can only add probability as x grows</td></tr>
+      <tr><td>Limits</td><td>F(−∞) = 0, F(+∞) = 1</td><td>Nothing below −∞, everything below +∞</td></tr>
+      <tr><td>Interval Prob</td><td>P(a &lt; X ≤ b) = F(b) − F(a)</td><td>Difference in running totals</td></tr>
+      <tr><td>Complement</td><td>P(X > x) = 1 − F(x)</td><td>What's above = 1 minus what's below</td></tr>
+    </table>
+  </div>
+
+  <!-- KEY RELATIONSHIP: CDF ↔ PDF -->
+  <div class="card card-formula">
+    <h3>The Critical Relationship: CDF ↔ PDF</h3>
+    <p>This is perhaps the most important equation to memorise. The PDF and CDF are two sides of the same coin:</p>
+    <div class="formula-box">F(x) = ∫₋∞ˣ f(t) dt &nbsp;&nbsp;&nbsp;&nbsp;[PDF → CDF via integration]<br><br>f(x) = d/dx F(x) = F'(x) &nbsp;&nbsp;&nbsp;&nbsp;[CDF → PDF via differentiation]<span class="comment">Integration and differentiation are inverse operations (Fundamental Theorem of Calculus).</span></div>
+    <div class="step-flow" style="margin-top:0.8rem">
+      <div class="step-item">
+        <div class="step-dot">1</div>
+        <div class="step-text">
+          <strong>You have a PDF f(x) — a curve describing density</strong>
+          <span>To find cumulative probability up to some x, integrate f from −∞ to x → gives F(x)</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">2</div>
+        <div class="step-text">
+          <strong>You have a CDF F(x) — a S-shaped curve going 0 to 1</strong>
+          <span>To recover the density at each point, differentiate F(x) → gives f(x) back</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">3</div>
+        <div class="step-text">
+          <strong>Finding interval probabilities</strong>
+          <span>P(a ≤ X ≤ b) = F(b) − F(a). Subtract CDFs — no integration needed!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE: CDF visualizer -->
+  <div class="canvas-wrap">
+    <div class="canvas-title">
+      <span>⬡ Interactive PDF → CDF Visualizer — see both at once</span>
+    </div>
+    <canvas id="cdfCanvas" width="800" height="360"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>μ: <span id="cmuVal">0</span></label>
+        <input type="range" id="cmuSlider" min="-2" max="2" step="0.1" value="0" oninput="document.getElementById('cmuVal').textContent=this.value;drawCDF()">
+      </div>
+      <div class="ctrl-group">
+        <label>σ: <span id="csigVal">1</span></label>
+        <input type="range" id="csigSlider" min="0.3" max="2.5" step="0.1" value="1" oninput="document.getElementById('csigVal').textContent=this.value;drawCDF()">
+      </div>
+      <div class="ctrl-group">
+        <label>Query x: <span id="cxVal">0</span></label>
+        <input type="range" id="cxSlider" min="-4" max="4" step="0.05" value="0" oninput="document.getElementById('cxVal').textContent=parseFloat(this.value).toFixed(2);drawCDF()">
+      </div>
+    </div>
+    <div id="cdfStats" style="margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4)"></div>
+  </div>
+
+  <!-- Quantile / Inverse CDF -->
+  <div class="card card-accent">
+    <h3>Inverse CDF (Quantile Function) — Critical for Quant Work</h3>
+    <p>The <span class="highlight">inverse CDF</span>, written F⁻¹(p) or Q(p), answers: "below what value x does p fraction of the distribution lie?"</p>
+    <div class="formula-box">F⁻¹(p) = x such that F(x) = p<span class="comment">Given probability p, find the corresponding x value (quantile).</span></div>
+    <div class="analogy-grid" style="margin-top:0.8rem">
+      <div class="analogy-card" data-emoji="📉">
+        <h4>Value at Risk (VaR)</h4>
+        <p>VaR at 5% = F⁻¹(0.05) for returns. "With 95% confidence, losses won't exceed this amount."</p>
+      </div>
+      <div class="analogy-card" data-emoji="🎲">
+        <h4>Inverse Transform Sampling</h4>
+        <p>Generate U ~ Uniform(0,1), then X = F⁻¹(U). This gives samples from any distribution! Critical for Monte Carlo.</p>
+      </div>
+      <div class="analogy-card" data-emoji="📊">
+        <h4>Percentiles</h4>
+        <p>The 95th percentile = F⁻¹(0.95). Half the data is below the median = F⁻¹(0.5).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Normal CDF -->
+  <div class="card card-formula">
+    <h3>The Standard Normal CDF: Φ(x)</h3>
+    <p>For the N(0,1) distribution, the CDF is written <span class="highlight">Φ(x)</span> (Phi). It has no closed form — you look it up in tables or use a computer.</p>
+    <div class="formula-box">Φ(x) = (1/√2π) ∫₋∞ˣ exp(-t²/2) dt<br><br>For general N(μ,σ²): F(x) = Φ((x-μ)/σ)<span class="comment">Standardize first by subtracting mean and dividing by std dev, then use Φ.</span></div>
+    <p>In the Black-Scholes option pricing formula, you'll see N(d₁) and N(d₂) — these are exactly Φ(d₁) and Φ(d₂). Understanding the CDF IS understanding Black-Scholes.</p>
+  </div>
+
+  <!-- Colab Experiment 2 -->
+  <div class="colab-box">
+    <div class="colab-header">🧪 Colab Experiment 2 — CDF, Quantiles & Inverse Transform Sampling</div>
+    <pre><span class="py-comment"># ── Part A: Plot PDF and CDF side by side ──</span>
+<span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+<span class="py-kw">import</span> matplotlib.pyplot <span class="py-kw">as</span> plt
+<span class="py-kw">from</span> scipy <span class="py-kw">import</span> stats
+
+x = np.linspace(<span class="py-num">-5</span>, <span class="py-num">5</span>, <span class="py-num">1000</span>)
+dist = stats.norm(<span class="py-num">0</span>, <span class="py-num">1</span>)
+
+fig, (ax1, ax2) = plt.subplots(<span class="py-num">1</span>, <span class="py-num">2</span>, figsize=(<span class="py-num">12</span>, <span class="py-num">4</span>))
+ax1.plot(x, dist.pdf(x), <span class="py-str">'cyan'</span>, lw=<span class="py-num">2</span>)
+ax1.set_title(<span class="py-str">'PDF of N(0,1)'</span>); ax1.set_ylabel(<span class="py-str">'f(x)'</span>)
+
+ax2.plot(x, dist.cdf(x), <span class="py-str">'orange'</span>, lw=<span class="py-num">2</span>)
+ax2.axhline(<span class="py-num">0.5</span>, color=<span class="py-str">'gray'</span>, linestyle=<span class="py-str">'--'</span>, alpha=<span class="py-num">0.5</span>, label=<span class="py-str">'50th percentile'</span>)
+ax2.set_title(<span class="py-str">'CDF of N(0,1)'</span>); ax2.set_ylabel(<span class="py-str">'F(x) = P(X ≤ x)'</span>)
+ax2.legend()
+plt.suptitle(<span class="py-str">'PDF vs CDF — two views of the same distribution'</span>)
+plt.tight_layout(); plt.show()
+
+<span class="py-comment"># ── Part B: Computing probabilities with CDF ──</span>
+mu, sigma = <span class="py-num">0.001</span>, <span class="py-num">0.02</span>   <span class="py-comment"># daily stock returns</span>
+dist_ret = stats.norm(mu, sigma)
+
+p_loss = dist_ret.cdf(<span class="py-num">0</span>)
+var_5pct = dist_ret.ppf(<span class="py-num">0.05</span>)   <span class="py-comment"># ppf = inverse CDF = quantile function</span>
+var_1pct = dist_ret.ppf(<span class="py-num">0.01</span>)
+
+<span class="py-fn">print</span>(<span class="py-str">f"Probability of a loss day: {p_loss:.2%}"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"5% VaR (daily): {var_5pct:.4f}  ({var_5pct*100:.2f}%)"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"1% VaR (daily): {var_1pct:.4f}  ({var_1pct*100:.2f}%)"</span>)
+
+<span class="py-comment"># ── Part C: Inverse Transform Sampling ──</span>
+<span class="py-comment"># Generate normal samples using ONLY uniform random numbers!</span>
+n_samples = <span class="py-num">10000</span>
+u = np.random.uniform(<span class="py-num">0</span>, <span class="py-num">1</span>, n_samples)   <span class="py-comment"># uniform samples</span>
+x_samples = stats.norm.ppf(u)               <span class="py-comment"># apply inverse CDF</span>
+
+plt.figure(figsize=(<span class="py-num">8</span>,<span class="py-num">4</span>))
+plt.hist(x_samples, bins=<span class="py-num">60</span>, density=<span class="py-num">True</span>, alpha=<span class="py-num">0.6</span>, label=<span class="py-str">'Inverse Transform Samples'</span>)
+plt.plot(np.linspace(<span class="py-num">-4</span>,<span class="py-num">4</span>,<span class="py-num">200</span>), stats.norm.pdf(np.linspace(<span class="py-num">-4</span>,<span class="py-num">4</span>,<span class="py-num">200</span>)),
+         <span class="py-str">'r-'</span>, lw=<span class="py-num">2</span>, label=<span class="py-str">'True N(0,1) PDF'</span>)
+plt.legend(); plt.title(<span class="py-str">'Inverse Transform Sampling works!'</span>); plt.show()</pre>
+  </div>
+
+  <!-- Exercises -->
+  <div class="section-title" style="font-size:1.3rem; margin-top:1.5rem">Exercises · CDF</div>
+  <div class="ex-tier tier-easy">
+    <div class="ex-tier-header">🟢 Easy</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>If F(2) = 0.7, what is P(X ≤ 2)? What is P(X > 2)?</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>If F(1) = 0.3 and F(4) = 0.8, what is P(1 &lt; X ≤ 4)?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>Sketch the CDF of a Uniform(0,1) distribution. (Hint: it should be a straight line from 0 to 1 on [0,1].)</span></div>
+      <div class="ex-item"><span class="ex-num">4.</span><span>Why must the CDF always be non-decreasing? What would it mean physically if it decreased?</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-med">
+    <div class="ex-tier-header">🟡 Medium</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>For the Exponential distribution with λ=1, derive the CDF analytically by integrating the PDF. Then verify in Python using scipy.stats.expon.cdf.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>In Colab, differentiate the CDF numerically (use np.gradient) and verify it matches the PDF. Plot both.</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>Compute the 1%, 5%, 95%, 99% quantiles for N(0.001, 0.02²). Interpret these in terms of daily stock return risk.</span></div>
+      <div class="ex-item"><span class="ex-num">4.</span><span>Use inverse transform sampling to generate 5,000 samples from an Exponential(λ=2) distribution. Plot and compare with the theoretical PDF.</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-hard">
+    <div class="ex-tier-header">🔴 Hard</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>Implement the Black-Scholes formula in Python: C = S·Φ(d₁) − K·e^(−rT)·Φ(d₂). Use scipy.stats.norm.cdf for Φ. Price a European call option with S=100, K=105, r=0.05, σ=0.2, T=1.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>Implement a Monte Carlo VaR calculator: simulate 100,000 portfolio returns, compute the empirical 5% quantile (VaR), and compare it to the analytical N(μ,σ²) result using ppf. When do they diverge?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>Research and implement the Kolmogorov-Smirnov test in Colab. Apply it to test whether real daily SPY returns follow a normal distribution. Plot the empirical CDF vs the theoretical CDF and identify where they differ most.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 · CHANGE OF VARIABLES
+══════════════════════════════════════════════ -->
+<div id="tab-cov" class="tab-content">
+  <div class="section-title"><span class="num">03</span> Change of Variables</div>
+  <p class="section-sub">What happens to a probability distribution when you transform a random variable?</p>
+
+  <div class="card card-accent">
+    <h3>The Core Problem: Why Do We Need This?</h3>
+    <p>Imagine you know the PDF of daily stock returns X ~ N(μ, σ²). Now someone asks you: <em>"What's the distribution of the stock price, Y = e^X?"</em></p>
+    <p>Y is a transformation of X. The distribution of Y is NOT normal. Change of Variables gives you the machinery to find the PDF of Y from the PDF of X.</p>
+    <div class="analogy-grid" style="margin-top:0.8rem">
+      <div class="analogy-card" data-emoji="🔄">
+        <h4>Finance Example</h4>
+        <p>If X = log-return ~ Normal, then Y = e^X = price ratio ~ Log-Normal. Black-Scholes uses this!</p>
+      </div>
+      <div class="analogy-card" data-emoji="⚡">
+        <h4>Risk Example</h4>
+        <p>If losses follow distribution X, what's the distribution of portfolio variance X²? Change of variables!</p>
+      </div>
+      <div class="analogy-card" data-emoji="🔬">
+        <h4>Simulation Example</h4>
+        <p>Transform U ~ Uniform(0,1) to any target distribution using inverse CDF. Monte Carlo at its core.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Method 1: CDF Method -->
+  <div class="card card-formula">
+    <h3>Method 1: The CDF Method (Most Fundamental)</h3>
+    <p>Step-by-step: find the CDF of Y = g(X) first, then differentiate to get the PDF.</p>
+    <div class="step-flow">
+      <div class="step-item">
+        <div class="step-dot">1</div>
+        <div class="step-text">
+          <strong>Write F_Y(y) = P(Y ≤ y)</strong>
+          <span>Express this as a probability about X using the transformation Y = g(X)</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">2</div>
+        <div class="step-text">
+          <strong>Substitute Y = g(X) and invert</strong>
+          <span>P(g(X) ≤ y) = P(X ≤ g⁻¹(y)) = F_X(g⁻¹(y)) &nbsp;[if g is increasing]</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">3</div>
+        <div class="step-text">
+          <strong>Differentiate to get PDF of Y</strong>
+          <span>f_Y(y) = d/dy F_Y(y)</span>
+        </div>
+      </div>
+    </div>
+    <div class="formula-box">Example: Y = g(X) = 2X + 3 (linear shift)<br><br>F_Y(y) = P(Y ≤ y) = P(2X+3 ≤ y) = P(X ≤ (y-3)/2) = F_X((y-3)/2)<br>f_Y(y) = f_X((y-3)/2) · (1/2)<span class="comment">The 1/2 comes from the chain rule when differentiating.</span></div>
+  </div>
+
+  <!-- Method 2: Change of Variables Formula -->
+  <div class="card card-formula">
+    <h3>Method 2: The Change of Variables Formula (Faster)</h3>
+    <p>For a monotone (always increasing or always decreasing) transformation Y = g(X):</p>
+    <div class="formula-box">f_Y(y) = f_X(g⁻¹(y)) · |d/dy g⁻¹(y)|<br><br>         = f_X(x) · |dx/dy|<span class="comment">The |dx/dy| term is called the Jacobian. It accounts for stretching/squeezing.</span></div>
+    <div class="card card-warn" style="margin-top:0.8rem">
+      <h4>⚠ Why the Jacobian? The Stretching Intuition</h4>
+      <p>Imagine a rubber band laid on the x-axis. If you stretch it (g expands the range), the probability density gets thinner. The Jacobian |dx/dy| is the "stretching factor" — it ensures the total probability stays = 1 after the transformation.</p>
+      <p>Think of it like unit conversion: if you convert temperatures from Celsius to Fahrenheit, the intervals change size. The Jacobian corrects for this size change in probability calculations.</p>
+    </div>
+  </div>
+
+  <!-- Key Example: Log-Normal -->
+  <div class="card card-accent">
+    <h3>The Log-Normal: Most Important Example in Finance</h3>
+    <p>If X ~ N(μ, σ²) and Y = e^X, then Y ~ LogNormal(μ, σ²). Here's the derivation:</p>
+    <div class="formula-box">Y = e^X &nbsp;⟹&nbsp; X = ln(Y) = g⁻¹(Y)<br><br>dX/dY = d(ln Y)/dY = 1/Y<br><br>f_Y(y) = f_X(ln y) · |1/y| = (1/(σ√2π)) · exp(-(ln y - μ)²/(2σ²)) · (1/y)<span class="comment">This is exactly the Log-Normal PDF. Valid for y > 0.</span></div>
+    <p><strong>Why does this matter?</strong> Stock prices must be positive. Log-Normal distribution (via the transformation Y = e^X where X is the log-return) is the standard model for stock prices in Black-Scholes.</p>
+  </div>
+
+  <!-- INTERACTIVE: Transformation Visualizer -->
+  <div class="canvas-wrap">
+    <div class="canvas-title">
+      <span>⬡ Interactive Transformation Visualizer — watch how the PDF changes under Y = g(X)</span>
+    </div>
+    <canvas id="covCanvas" width="800" height="340"></canvas>
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Transform Y =</label>
+        <select id="covTransform" onchange="drawCOV()">
+          <option value="exp">e^X (Log-Normal)</option>
+          <option value="square">X² (Chi-Squared-like)</option>
+          <option value="linear">2X + 1 (Linear)</option>
+          <option value="abs">|X| (Folded Normal)</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>μ: <span id="covmuVal">0</span></label>
+        <input type="range" id="covmuSlider" min="-1" max="1" step="0.1" value="0" oninput="document.getElementById('covmuVal').textContent=this.value;drawCOV()">
+      </div>
+      <div class="ctrl-group">
+        <label>σ: <span id="covsigVal">1</span></label>
+        <input type="range" id="covsigSlider" min="0.2" max="2" step="0.1" value="1" oninput="document.getElementById('covsigVal').textContent=this.value;drawCOV()">
+      </div>
+    </div>
+    <div id="covNote" style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted);font-style:italic"></div>
+  </div>
+
+  <!-- Multiple Variables -->
+  <div class="card card-formula">
+    <h3>Multivariate Change of Variables (Overview)</h3>
+    <p>When you have multiple random variables (X₁, X₂) and transform them to (Y₁, Y₂) = g(X₁, X₂), the formula extends using the <span class="highlight">Jacobian matrix</span>:</p>
+    <div class="formula-box">f_Y(y₁, y₂) = f_X(x₁, x₂) · |J|⁻¹<br><br>where |J| = |∂(y₁,y₂)/∂(x₁,x₂)| = determinant of the Jacobian matrix<span class="comment">In quant finance: used for portfolio transformations, correlated asset pricing, and multivariate risk models.</span></div>
+    <p>Example: If returns on two assets are jointly normal, the distribution of their weighted portfolio is also normal. The Jacobian ensures correct probability accounting.</p>
+  </div>
+
+  <!-- Colab Experiment 3 -->
+  <div class="colab-box">
+    <div class="colab-header">🧪 Colab Experiment 3 — Visualising Change of Variables</div>
+    <pre><span class="py-comment"># Observe the transformation of distributions empirically</span>
+<span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+<span class="py-kw">import</span> matplotlib.pyplot <span class="py-kw">as</span> plt
+<span class="py-kw">from</span> scipy <span class="py-kw">import</span> stats
+
+np.random.seed(<span class="py-num">42</span>)
+n = <span class="py-num">100_000</span>
+
+fig, axes = plt.subplots(<span class="py-num">2</span>, <span class="py-num">3</span>, figsize=(<span class="py-num">15</span>, <span class="py-num">8</span>))
+
+<span class="py-comment"># ── Transform 1: Y = e^X  (Normal → Log-Normal) ──</span>
+X = np.random.normal(<span class="py-num">0</span>, <span class="py-num">1</span>, n)
+Y_exp = np.exp(X)
+axes[<span class="py-num">0</span>,<span class="py-num">0</span>].hist(X, bins=<span class="py-num">80</span>, density=<span class="py-num">True</span>, color=<span class="py-str">'cyan'</span>, alpha=<span class="py-num">0.7</span>)
+axes[<span class="py-num">0</span>,<span class="py-num">0</span>].set_title(<span class="py-str">'X ~ Normal(0,1)'</span>)
+axes[<span class="py-num">0</span>,<span class="py-num">1</span>].hist(Y_exp[Y_exp < <span class="py-num">10</span>], bins=<span class="py-num">80</span>, density=<span class="py-num">True</span>, color=<span class="py-str">'orange'</span>, alpha=<span class="py-num">0.7</span>)
+x_ln = np.linspace(<span class="py-num">0.01</span>, <span class="py-num">10</span>, <span class="py-num">300</span>)
+axes[<span class="py-num">0</span>,<span class="py-num">1</span>].plot(x_ln, stats.lognorm.pdf(x_ln, s=<span class="py-num">1</span>), <span class="py-str">'r-'</span>, lw=<span class="py-num">2</span>, label=<span class="py-str">'Theoretical LogNormal'</span>)
+axes[<span class="py-num">0</span>,<span class="py-num">1</span>].legend(); axes[<span class="py-num">0</span>,<span class="py-num">1</span>].set_title(<span class="py-str">'Y = e^X ~ Log-Normal'</span>)
+axes[<span class="py-num">0</span>,<span class="py-num">2</span>].text(<span class="py-num">0.1</span>,<span class="py-num">0.5</span>, <span class="py-str">'Jacobian:\nf_Y(y) = f_X(ln y) / y\n\nMeans stock prices\nalways stay positive!\nUsed in Black-Scholes'</span>,
+              transform=axes[<span class="py-num">0</span>,<span class="py-num">2</span>].transAxes, fontsize=<span class="py-num">12</span>, va=<span class="py-str">'center'</span>,
+              bbox=dict(boxstyle=<span class="py-str">'round'</span>, facecolor=<span class="py-str">'#1a2236'</span>, alpha=<span class="py-num">0.8</span>))
+axes[<span class="py-num">0</span>,<span class="py-num">2</span>].axis(<span class="py-str">'off'</span>)
+
+<span class="py-comment"># ── Transform 2: Y = X²  (Normal → Chi-Squared-like) ──</span>
+Y_sq = X**<span class="py-num">2</span>
+axes[<span class="py-num">1</span>,<span class="py-num">0</span>].hist(X, bins=<span class="py-num">80</span>, density=<span class="py-num">True</span>, color=<span class="py-str">'cyan'</span>, alpha=<span class="py-num">0.7</span>)
+axes[<span class="py-num">1</span>,<span class="py-num">0</span>].set_title(<span class="py-str">'X ~ Normal(0,1)'</span>)
+axes[<span class="py-num">1</span>,<span class="py-num">1</span>].hist(Y_sq[Y_sq < <span class="py-num">10</span>], bins=<span class="py-num">80</span>, density=<span class="py-num">True</span>, color=<span class="py-str">'purple'</span>, alpha=<span class="py-num">0.7</span>)
+x_chi = np.linspace(<span class="py-num">0.01</span>, <span class="py-num">10</span>, <span class="py-num">300</span>)
+axes[<span class="py-num">1</span>,<span class="py-num">1</span>].plot(x_chi, stats.chi2.pdf(x_chi, df=<span class="py-num">1</span>), <span class="py-str">'r-'</span>, lw=<span class="py-num">2</span>, label=<span class="py-str">'Chi-Squared(1)'</span>)
+axes[<span class="py-num">1</span>,<span class="py-num">1</span>].legend(); axes[<span class="py-num">1</span>,<span class="py-num">1</span>].set_title(<span class="py-str">'Y = X² ~ Chi-Squared(1)'</span>)
+axes[<span class="py-num">1</span>,<span class="py-num">2</span>].text(<span class="py-num">0.1</span>,<span class="py-num">0.5</span>, <span class="py-str">'Jacobian:\nf_Y(y) = f_X(√y)/(2√y)\n+ f_X(-√y)/(2√y)\n\n[Non-monotone: need\nto handle ±√y both]'</span>,
+              transform=axes[<span class="py-num">1</span>,<span class="py-num">2</span>].transAxes, fontsize=<span class="py-num">12</span>, va=<span class="py-str">'center'</span>,
+              bbox=dict(boxstyle=<span class="py-str">'round'</span>, facecolor=<span class="py-str">'#1a2236'</span>, alpha=<span class="py-num">0.8</span>))
+axes[<span class="py-num">1</span>,<span class="py-num">2</span>].axis(<span class="py-str">'off'</span>)
+
+plt.suptitle(<span class="py-str">'Change of Variables: Seeing the Transformation in Action'</span>, fontsize=<span class="py-num">14</span>)
+plt.tight_layout(); plt.show()
+
+<span class="py-comment"># ── Verify: simulate stock price using log-normal model ──</span>
+mu_annual, sigma_annual, S0 = <span class="py-num">0.08</span>, <span class="py-num">0.2</span>, <span class="py-num">100</span>
+T = <span class="py-num">1</span>  <span class="py-comment"># 1 year</span>
+log_returns = np.random.normal((mu_annual - <span class="py-num">0.5</span>*sigma_annual**<span class="py-num">2</span>)*T,
+                                sigma_annual*np.sqrt(T), <span class="py-num">10000</span>)
+S_T = S0 * np.exp(log_returns)   <span class="py-comment"># Stock price at T</span>
+<span class="py-fn">print</span>(<span class="py-str">f"Expected stock price: ${np.mean(S_T):.2f}"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"Theoretical E[S_T]: ${S0*np.exp(mu_annual*T):.2f}"</span>)
+<span class="py-fn">print</span>(<span class="py-str">f"5th percentile price: ${np.percentile(S_T, 5):.2f}"</span>)</pre>
+  </div>
+
+  <!-- Non-Monotone Case -->
+  <div class="card card-warn">
+    <h3>⚠ Non-Monotone Transformations (Important Edge Case)</h3>
+    <p>If g(x) is not monotone (e.g., Y = X², which maps both +x and −x to the same y), you need to split the domain:</p>
+    <div class="formula-box">f_Y(y) = Σₖ f_X(xₖ) · |dx/dy|  where xₖ are all solutions to g(x) = y<span class="comment">For Y=X², both x=+√y and x=−√y give Y=y, so sum over both branches.</span></div>
+    <p>This is the origin of the Chi-squared distribution (X ~ N(0,1) → X² ~ Chi-squared(1)), which is important for hypothesis testing in statistics.</p>
+  </div>
+
+  <!-- Exercises -->
+  <div class="section-title" style="font-size:1.3rem; margin-top:1.5rem">Exercises · Change of Variables</div>
+  <div class="ex-tier tier-easy">
+    <div class="ex-tier-header">🟢 Easy</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>If X ~ Uniform(0,1) and Y = 2X, what is the PDF of Y? What range does Y live on?</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>If X ~ Uniform(0,1) and Y = X + 3 (a shift), what is the PDF and range of Y? Does the shape of the PDF change?</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>In plain language, explain what the Jacobian |dx/dy| represents physically. Why can't we just directly "plug in" the transformation without the Jacobian?</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-med">
+    <div class="ex-tier-header">🟡 Medium</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>If X ~ Exponential(λ) and Y = ln(X), find the PDF of Y analytically using the Change of Variables formula. Verify numerically in Colab.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>X ~ N(0,1) and Y = X². Derive the PDF of Y using both the CDF method and the Change of Variables formula with two branches. Verify it's the Chi-squared(1) PDF.</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>In Colab: generate X ~ N(μ=0.05, σ=0.2) (annual log-returns). Transform to Y = e^X (price ratios). Compute the mean and variance of Y analytically from the Log-Normal formulas and verify against simulation.</span></div>
+    </div>
+  </div>
+  <div class="ex-tier tier-hard">
+    <div class="ex-tier-header">🔴 Hard</div>
+    <div class="ex-list">
+      <div class="ex-item"><span class="ex-num">1.</span><span>Derive the Log-Normal PDF completely from scratch: start from X ~ N(μ,σ²), apply Y = e^X, and arrive at the final PDF. Then derive E[Y] and Var[Y] and verify in simulation.</span></div>
+      <div class="ex-item"><span class="ex-num">2.</span><span>Two assets have log-returns X₁ ~ N(0.1, 0.04) and X₂ ~ N(0.08, 0.09), independent. Define portfolio log-return Z = 0.6·X₁ + 0.4·X₂. What is the distribution of Z? Use the Jacobian approach for linear combinations and verify in Colab.</span></div>
+      <div class="ex-item"><span class="ex-num">3.</span><span>Implement a Monte Carlo option pricing engine. Use: (1) generate U ~ Uniform(0,1), (2) apply inverse normal CDF to get Z ~ N(0,1), (3) apply change of variables to get log-normal stock prices S_T = S₀ · exp((r − σ²/2)T + σ√T·Z), (4) price a European call. Compare with Black-Scholes closed form.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4 · HOW THEY CONNECT
+══════════════════════════════════════════════ -->
+<div id="tab-connections" class="tab-content">
+  <div class="section-title"><span class="num">04</span> How They All Connect</div>
+  <p class="section-sub">A unified view of how PDF, CDF, and Change of Variables work together in quant finance.</p>
+
+  <!-- The Grand Picture -->
+  <div class="canvas-wrap">
+    <div class="canvas-title"><span>⬡ The Concept Map — relationships between all three topics</span></div>
+    <canvas id="mapCanvas" width="800" height="360"></canvas>
+  </div>
+
+  <div class="card card-accent">
+    <h3>The Unified Story</h3>
+    <p>Here's the most important thing to understand: <span class="highlight">PDF, CDF, and Change of Variables are not three separate topics</span> — they're three views of the same underlying object: a probability distribution.</p>
+    <div class="step-flow">
+      <div class="step-item">
+        <div class="step-dot">1</div>
+        <div class="step-text">
+          <strong>Start with a PDF f_X(x) — the shape of uncertainty</strong>
+          <span>The PDF tells you how likely different values of X are. It's the fundamental description of a random variable.</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">2</div>
+        <div class="step-text">
+          <strong>Integrate the PDF → get the CDF F_X(x)</strong>
+          <span>The CDF gives cumulative probabilities P(X ≤ x). You use it to compute P(a ≤ X ≤ b) = F(b) − F(a).</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">3</div>
+        <div class="step-text">
+          <strong>Differentiate the CDF → recover the PDF</strong>
+          <span>These two operations are inverses (Fundamental Theorem of Calculus). You can always go between them.</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">4</div>
+        <div class="step-text">
+          <strong>Apply a transformation g(X) = Y — Change of Variables</strong>
+          <span>When you transform X, both its PDF and CDF change. The Jacobian ensures probability is conserved.</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">5</div>
+        <div class="step-text">
+          <strong>Result: new PDF and CDF for Y = g(X)</strong>
+          <span>The new PDF f_Y(y) = f_X(g⁻¹(y)) · |dx/dy|. The new CDF F_Y(y) = F_X(g⁻¹(y)) for increasing g.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Black Scholes Example -->
+  <div class="card card-formula">
+    <h3>Quant Finance Synthesis: Black-Scholes in 5 Steps</h3>
+    <p>Black-Scholes uses ALL THREE concepts. Let's trace through it:</p>
+    <table>
+      <tr><th>Step</th><th>Concept Used</th><th>What Happens</th></tr>
+      <tr><td>1. Assume log-returns</td><td>PDF (Normal)</td><td>dS/S = μdt + σdW, so log-return ~ N((μ−σ²/2)T, σ²T)</td></tr>
+      <tr><td>2. Get stock price distribution</td><td>Change of Variables</td><td>S_T = S₀ · e^X where X is log-return → S_T ~ Log-Normal</td></tr>
+      <tr><td>3. Price = Discounted Expectation</td><td>PDF integral</td><td>C = e^(−rT) · E[max(S_T − K, 0)] = ∫ (S_T−K)⁺ · f(S_T) dS_T</td></tr>
+      <tr><td>4. Evaluate the integral</td><td>CDF (Φ)</td><td>The integral simplifies to: S₀·Φ(d₁) − Ke^(−rT)·Φ(d₂)</td></tr>
+      <tr><td>5. Risk management: P(exercise)</td><td>CDF evaluation</td><td>Φ(d₂) = probability option ends in-the-money</td></tr>
+    </table>
+    <div class="formula-box">C = S₀ · Φ(d₁) − K · e^(−rT) · Φ(d₂)<br><br>d₁ = [ln(S₀/K) + (r + σ²/2)T] / (σ√T)<br>d₂ = d₁ − σ√T<span class="comment">Φ = standard normal CDF. This formula exists because of Change of Variables + CDF integration.</span></div>
+  </div>
+
+  <!-- Monte Carlo -->
+  <div class="card card-tip">
+    <h3>Monte Carlo Simulation: All Three in One Algorithm</h3>
+    <p>Every Monte Carlo simulation you run uses all three concepts:</p>
+    <div class="analogy-grid">
+      <div class="analogy-card" data-emoji="🎲">
+        <h4>Step 1: Sample from Uniform</h4>
+        <p>Computer generates U ~ Uniform(0,1). This is a CDF value (probability).</p>
+      </div>
+      <div class="analogy-card" data-emoji="🔄">
+        <h4>Step 2: Inverse CDF (Change of Variables)</h4>
+        <p>Apply F⁻¹(U) to transform to desired distribution (Normal, Exponential, etc.).</p>
+      </div>
+      <div class="analogy-card" data-emoji="📊">
+        <h4>Step 3: Compute Payoffs</h4>
+        <p>Transform random returns to stock prices using e^X (another Change of Variables).</p>
+      </div>
+      <div class="analogy-card" data-emoji="📐">
+        <h4>Step 4: Average = Expectation</h4>
+        <p>Average payoffs = ∫ payoff · f(x) dx — a PDF integral approximated by samples.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="card">
+    <h3>Quick Reference Summary</h3>
+    <table>
+      <tr><th>Concept</th><th>Definition</th><th>Key Formula</th><th>Finance Use</th></tr>
+      <tr><td><span class="highlight">PDF f(x)</span></td><td>Probability density at x</td><td>P(a≤X≤b) = ∫ₐᵇ f(x)dx</td><td>Modelling return distributions</td></tr>
+      <tr><td><span class="highlight3">CDF F(x)</span></td><td>P(X ≤ x)</td><td>F(x) = ∫₋∞ˣ f(t)dt</td><td>VaR, option pricing (Φ)</td></tr>
+      <tr><td><span class="hl-gold">Quantile F⁻¹</span></td><td>x such that F(x)=p</td><td>VaR = F⁻¹(0.05)</td><td>Risk limits, CVaR</td></tr>
+      <tr><td><span style="color:var(--accent2)">Change of Vars</span></td><td>PDF under transformation</td><td>f_Y = f_X(g⁻¹(y))·|dx/dy|</td><td>Log-Normal prices, derivatives</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 5 · RESOURCES
+══════════════════════════════════════════════ -->
+<div id="tab-resources" class="tab-content">
+  <div class="section-title"><span class="num">05</span> External Resources</div>
+  <p class="section-sub">Carefully selected resources for going deeper — interactive tools, textbooks, videos, and platforms.</p>
+
+  <div class="card card-warn" style="margin-bottom:1.5rem">
+    <h4>📌 Learning Path Recommendation</h4>
+    <p><strong>Week 1:</strong> 3Blue1Brown videos + Khan Academy basics. <strong>Week 2:</strong> Seeing Theory interactive site + Colab experiments. <strong>Week 3:</strong> Textbook readings. <strong>Week 4:</strong> Real data project (download stock data, fit distributions, compute VaR).</p>
+  </div>
+
+  <div class="section-title" style="font-size:1.2rem; margin-bottom:0.8rem">🌐 Interactive Visualizations</div>
+  <div class="resource-grid">
+    <a href="https://seeing-theory.brown.edu" target="_blank" class="resource-card">
+      <div class="rc-type">Interactive Web App</div>
+      <div class="rc-title">Seeing Theory (Brown University)</div>
+      <div class="rc-desc">Beautiful visualisations of probability distributions, CDFs, expected value. Free, browser-based. Chapter 3 covers continuous distributions.</div>
+    </a>
+    <a href="https://distill.pub/2019/visual-exploration-gaussian-processes/" target="_blank" class="resource-card">
+      <div class="rc-type">Visual Article</div>
+      <div class="rc-title">Distill.pub — Gaussian Processes</div>
+      <div class="rc-desc">Stunning interactive visual explanations of Gaussian distributions with animations. Start here after understanding basic PDFs.</div>
+    </a>
+    <a href="https://www.geogebra.org/m/XzPMDZTN" target="_blank" class="resource-card">
+      <div class="rc-type">Interactive Tool</div>
+      <div class="rc-title">GeoGebra Normal Distribution</div>
+      <div class="rc-desc">Adjust μ and σ with sliders, shade areas to compute probabilities. Perfect for building intuition.</div>
+    </a>
+    <a href="https://onlinestatbook.com/2/calculators/normal_dist.html" target="_blank" class="resource-card">
+      <div class="rc-type">Calculator</div>
+      <div class="rc-title">Normal Distribution Calculator</div>
+      <div class="rc-desc">Compute P(X ≤ x), percentiles, and shaded areas for normal distributions instantly online.</div>
+    </a>
+    <a href="https://www.statlect.com/probability-distributions" target="_blank" class="resource-card">
+      <div class="rc-type">Reference</div>
+      <div class="rc-title">StatLect Distribution Compendium</div>
+      <div class="rc-desc">Rigorous but clear derivations of PDFs, CDFs, moments for dozens of distributions. Excellent for when you need the formulas.</div>
+    </a>
+    <a href="https://chi2tv.stat.illinois.edu" target="_blank" class="resource-card">
+      <div class="rc-type">Interactive</div>
+      <div class="rc-title">Illinois Statistics Visualizers</div>
+      <div class="rc-desc">Interactive demonstrations for chi-square, t-distribution, and other derived distributions — direct applications of Change of Variables.</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title" style="font-size:1.2rem; margin-bottom:0.8rem">🎬 Video Resources</div>
+  <div class="resource-grid">
+    <a href="https://www.youtube.com/watch?v=ZA4JkHKZM50" target="_blank" class="resource-card">
+      <div class="rc-type">YouTube · 3Blue1Brown</div>
+      <div class="rc-title">But what is the Central Limit Theorem?</div>
+      <div class="rc-desc">Grant Sanderson's iconic visual explanation of why the Normal distribution is everywhere. Watch BEFORE studying the Normal PDF.</div>
+    </a>
+    <a href="https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo" target="_blank" class="resource-card">
+      <div class="rc-type">YouTube · Harvard Stats 110</div>
+      <div class="rc-title">Statistics 110: Probability (Full Course)</div>
+      <div class="rc-desc">Joe Blitzstein's legendary probability course. Lectures 13-17 cover continuous distributions, PDFs, CDFs, and Change of Variables in depth.</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" class="resource-card">
+      <div class="rc-type">YouTube · StatQuest</div>
+      <div class="rc-title">StatQuest: Probability Distributions</div>
+      <div class="rc-desc">Josh Starmer explains distributions with exceptional clarity and humour. Great for visual learners who want intuition before formulas.</div>
+    </a>
+    <a href="https://www.youtube.com/watch?v=HZGCoVF3YvM" target="_blank" class="resource-card">
+      <div class="rc-type">YouTube · MIT OpenCourseWare</div>
+      <div class="rc-title">MIT 6.041 Probabilistic Systems</div>
+      <div class="rc-desc">Rigorous MIT probability lectures. Lecture 9-11 cover continuous random variables and derived distributions (Change of Variables).</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title" style="font-size:1.2rem; margin-bottom:0.8rem">📚 Textbooks & Reading</div>
+  <div class="resource-grid">
+    <a href="https://www.probabilitycourse.com" target="_blank" class="resource-card">
+      <div class="rc-type">Free Online Textbook</div>
+      <div class="rc-title">Introduction to Probability (Pishro-Nik)</div>
+      <div class="rc-desc">Free, complete, rigorous. Chapter 4 = Continuous RVs (PDF + CDF), Chapter 5 = Special Distributions, Chapter 6 = Multiple RVs and Jacobians.</div>
+    </a>
+    <a href="https://www.amazon.com/Options-Futures-Other-Derivatives-10th/dp/013447208X" target="_blank" class="resource-card">
+      <div class="rc-type">Finance Textbook</div>
+      <div class="rc-title">Hull — Options, Futures, and Other Derivatives</div>
+      <div class="rc-desc">The standard quant finance textbook. Chapters on Log-Normal model and Black-Scholes directly use the Change of Variables / Log-Normal PDF.</div>
+    </a>
+    <a href="https://jakevdp.github.io/PythonDataScienceHandbook/05.13-kernel-density-estimation.html" target="_blank" class="resource-card">
+      <div class="rc-type">Online Chapter</div>
+      <div class="rc-title">Python Data Science Handbook — KDE</div>
+      <div class="rc-desc">How to estimate PDFs empirically from data using Kernel Density Estimation. A practical Python companion to theoretical PDFs.</div>
+    </a>
+    <a href="https://machinelearningmastery.com/probability-density-estimation/" target="_blank" class="resource-card">
+      <div class="rc-type">Tutorial</div>
+      <div class="rc-title">Probability Density Estimation in Python</div>
+      <div class="rc-desc">Practical guide to fitting PDFs to real data using scipy. Covers histograms, KDE, and parametric fitting — all with code.</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title" style="font-size:1.2rem; margin-bottom:0.8rem">🔬 Colab & Python Resources</div>
+  <div class="resource-grid">
+    <a href="https://colab.research.google.com" target="_blank" class="resource-card">
+      <div class="rc-type">Platform</div>
+      <div class="rc-title">Google Colab</div>
+      <div class="rc-desc">Free Jupyter notebooks in the cloud. All experiments in this guide run here. Sign in with Google, create a new notebook, paste the code cells, and run.</div>
+    </a>
+    <a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank" class="resource-card">
+      <div class="rc-type">Documentation</div>
+      <div class="rc-title">SciPy Stats Reference</div>
+      <div class="rc-desc">Complete docs for scipy.stats — .pdf(), .cdf(), .ppf() (quantile/inverse CDF), .rvs() (random sampling) for 100+ distributions.</div>
+    </a>
+    <a href="https://numpy.org/doc/stable/reference/random/index.html" target="_blank" class="resource-card">
+      <div class="rc-type">Documentation</div>
+      <div class="rc-title">NumPy Random Reference</div>
+      <div class="rc-desc">NumPy's random number generation. Essential for Monte Carlo simulations and inverse transform sampling experiments.</div>
+    </a>
+    <a href="https://yfinance.org" target="_blank" class="resource-card">
+      <div class="rc-type">Python Library</div>
+      <div class="rc-title">yfinance — Real Stock Data</div>
+      <div class="rc-desc">pip install yfinance. Download real stock price data to test whether returns are actually normally distributed (spoiler: they're not!).</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-title" style="font-size:1.2rem; margin-bottom:0.8rem">🏆 Practice Platforms</div>
+  <div class="resource-grid">
+    <a href="https://brilliant.org/courses/probability/" target="_blank" class="resource-card">
+      <div class="rc-type">Interactive Course</div>
+      <div class="rc-title">Brilliant.org — Probability</div>
+      <div class="rc-desc">Problem-based learning. Solve problems first, then learn theory. Excellent for building intuition through guided discovery.</div>
+    </a>
+    <a href="https://quantlib.org" target="_blank" class="resource-card">
+      <div class="rc-type">Quant Library</div>
+      <div class="rc-title">QuantLib — Professional Quant Tools</div>
+      <div class="rc-desc">Open-source quant finance library. After mastering the theory, see how these concepts are implemented in production-grade software.</div>
+    </a>
+  </div>
+
+  <!-- Quick Colab Setup -->
+  <div class="colab-box" style="margin-top:1.5rem">
+    <div class="colab-header">🚀 Quick Colab Setup — Copy-Paste This at Start of Every Session</div>
+    <pre><span class="py-comment"># Run this cell first in any Colab notebook for this study guide</span>
+<span class="py-kw">import</span> numpy <span class="py-kw">as</span> np
+<span class="py-kw">import</span> matplotlib.pyplot <span class="py-kw">as</span> plt
+<span class="py-kw">from</span> scipy <span class="py-kw">import</span> stats
+<span class="py-kw">from</span> scipy.integrate <span class="py-kw">import</span> quad
+
+<span class="py-comment"># Optional: prettier plots</span>
+plt.rcParams[<span class="py-str">'figure.figsize'</span>] = (<span class="py-num">10</span>, <span class="py-num">4</span>)
+plt.rcParams[<span class="py-str">'axes.facecolor'</span>] = <span class="py-str">'#0d1117'</span>
+plt.rcParams[<span class="py-str">'figure.facecolor'</span>] = <span class="py-str">'#0d1117'</span>
+plt.rcParams[<span class="py-str">'text.color'</span>] = <span class="py-str">'white'</span>
+plt.rcParams[<span class="py-str">'axes.labelcolor'</span>] = <span class="py-str">'white'</span>
+plt.rcParams[<span class="py-str">'xtick.color'</span>] = <span class="py-str">'white'</span>
+plt.rcParams[<span class="py-str">'ytick.color'</span>] = <span class="py-str">'white'</span>
+
+<span class="py-comment"># Install yfinance if you want real stock data</span>
+<span class="py-comment"># !pip install yfinance --quiet</span>
+
+<span class="py-fn">print</span>(<span class="py-str">"✅ Setup complete! Ready to explore PDFs, CDFs, and Change of Variables."</span>)</pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
+<script>
+// ─── Tab switching ───
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'pdf') setTimeout(drawPDF, 50);
+  if (id === 'cdf') setTimeout(drawCDF, 50);
+  if (id === 'cov') setTimeout(drawCOV, 50);
+  if (id === 'connections') setTimeout(drawMap, 50);
+}
+
+// ─── Math helpers ───
+function normalPDF(x, mu, sigma) {
+  return Math.exp(-0.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
+}
+function normalCDF(x, mu, sigma) {
+  return 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
+}
+function erf(x) {
+  const sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+  const a1=0.254829592, a2=-0.284496736, a3=1.421413741, a4=-1.453152027, a5=1.061405429, p=0.3275911;
+  const t = 1.0 / (1.0 + p * x);
+  const y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x);
+  return sign * y;
+}
+function exponPDF(x, lambda) {
+  return x >= 0 ? lambda * Math.exp(-lambda * x) : 0;
+}
+function uniformPDF(x, a, b) {
+  return (x >= a && x <= b) ? 1 / (b - a) : 0;
+}
+function betaPDF(x, alpha, beta) {
+  if (x <= 0 || x >= 1) return 0;
+  // Simplified beta PDF for (2,5)
+  const B = 1/30; // Beta(2,5) = B(2,5)
+  return Math.pow(x, alpha-1) * Math.pow(1-x, beta-1) / B;
+}
+
+// ─── Canvas Setup ───
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = canvas.parentElement.clientWidth - 40;
+  canvas.style.width = w + 'px';
+  canvas.style.height = Math.round(w * canvas.height / canvas.width) + 'px';
+  canvas.width = w * dpr;
+  canvas.height = Math.round(w * canvas.height / canvas.width) * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w, h: Math.round(w * canvas.height / canvas.width) };
+}
+
+// ─── PDF Canvas ───
+function drawPDF() {
+  const canvas = document.getElementById('pdfCanvas');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const dist = document.getElementById('pdfDist').value;
+  const mu = parseFloat(document.getElementById('muSlider').value);
+  const sigma = parseFloat(document.getElementById('sigSlider').value);
+  const a = parseFloat(document.getElementById('aSlider').value);
+  const b = parseFloat(document.getElementById('bSlider').value);
+
+  const pad = { l: 60, r: 20, t: 30, b: 40 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+
+  let xMin = -5, xMax = 5, yMax = 1.2;
+  if (dist === 'exponential') { xMin = 0; xMax = 8; yMax = 1.5; }
+  if (dist === 'beta') { xMin = 0; xMax = 1; yMax = 3.5; }
+  if (dist === 'uniform') { xMin = -1; xMax = 4; yMax = 1.5; }
+
+  function tx(x) { return pad.l + (x - xMin) / (xMax - xMin) * cw; }
+  function ty(y) { return pad.t + ch - y / yMax * ch; }
+
+  // Background
+  ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#0a0e1a'; ctx.fillRect(pad.l, pad.t, cw, ch);
+
+  // Grid
+  ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 5; i++) {
+    const gx = pad.l + i / 5 * cw;
+    const gy = pad.t + i / 5 * ch;
+    ctx.beginPath(); ctx.moveTo(gx, pad.t); ctx.lineTo(gx, pad.t + ch); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l + cw, gy); ctx.stroke();
+  }
+
+  // Compute PDF values
+  const N = 600;
+  const xs = Array.from({length: N}, (_, i) => xMin + (i / (N-1)) * (xMax - xMin));
+  const ys = xs.map(x => {
+    if (dist === 'normal') return normalPDF(x, mu, sigma);
+    if (dist === 'exponential') return exponPDF(x, 1 / sigma);
+    if (dist === 'uniform') return uniformPDF(x, mu, mu + sigma);
+    if (dist === 'beta') return betaPDF(x, 2, 5);
+    return 0;
+  });
+
+  // Shaded area
+  const lo = Math.min(a, b), hi = Math.max(a, b);
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < N; i++) {
+    if (xs[i] >= lo && xs[i] <= hi) {
+      const px = tx(xs[i]), py = ty(Math.min(ys[i], yMax));
+      if (!started) { ctx.moveTo(px, ty(0)); ctx.lineTo(px, py); started = true; }
+      else ctx.lineTo(px, py);
+    }
+  }
+  ctx.lineTo(tx(hi), ty(0));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,212,255,0.25)';
+  ctx.fill();
+
+  // Main curve
+  ctx.beginPath();
+  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2.5;
+  for (let i = 0; i < N; i++) {
+    const px = tx(xs[i]), py = ty(Math.min(ys[i], yMax));
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+
+  // Axes
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t + ch); ctx.lineTo(pad.l + cw, pad.t + ch); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + ch); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  for (let v = Math.ceil(xMin); v <= xMax; v++) {
+    if (v === 0 || v % 2 === 0 || xMax - xMin < 5)
+      ctx.fillText(v, tx(v), pad.t + ch + 15);
+  }
+  ctx.textAlign = 'right';
+  [0, 0.2, 0.4, 0.6, 0.8, 1.0].forEach(v => {
+    if (v <= yMax) ctx.fillText(v.toFixed(1), pad.l - 5, ty(v) + 4);
+  });
+
+  // Title
+  ctx.fillStyle = '#00d4ff'; ctx.font = 'bold 12px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  const distName = {normal:'Normal', exponential:'Exponential', uniform:'Uniform', beta:'Beta'}[dist];
+  ctx.fillText(`f(x) — ${distName} PDF`, pad.l + cw/2, 20);
+
+  // Compute shaded area numerically
+  let area = 0;
+  const dx = (xMax - xMin) / N;
+  for (let i = 0; i < N; i++) {
+    if (xs[i] >= lo && xs[i] <= hi) area += ys[i] * dx;
+  }
+  document.getElementById('pdfStats').textContent =
+    `P(${lo.toFixed(2)} ≤ X ≤ ${hi.toFixed(2)}) ≈ ${area.toFixed(4)} | Shaded area = probability in interval`;
+}
+
+// ─── CDF Canvas ───
+function drawCDF() {
+  const canvas = document.getElementById('cdfCanvas');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const mu = parseFloat(document.getElementById('cmuSlider').value);
+  const sigma = parseFloat(document.getElementById('csigSlider').value);
+  const qx = parseFloat(document.getElementById('cxSlider').value);
+
+  const pad = { l: 60, r: 20, t: 20, b: 40 };
+  const cw = w - pad.l - pad.r;
+  const topH = Math.round(h * 0.42), botH = h - topH;
+  const topCH = topH - pad.t - 20, botCH = botH - 20 - pad.b;
+
+  const xMin = -5, xMax = 5;
+  function tx(x) { return pad.l + (x - xMin) / (xMax - xMin) * cw; }
+  function tyPDF(y, yMax) { return pad.t + topCH - y / yMax * topCH; }
+  function tyCDF(y) { return topH + 20 + botCH - y * botCH; }
+
+  ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, w, h);
+
+  const N = 500;
+  const xs = Array.from({length:N}, (_,i) => xMin + i/(N-1)*(xMax-xMin));
+  const pdfs = xs.map(x => normalPDF(x, mu, sigma));
+  const cdfs = xs.map(x => normalCDF(x, mu, sigma));
+  const yMaxPDF = Math.max(...pdfs) * 1.1;
+
+  // ── Top: PDF with shaded area ──
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(pad.l, pad.t, cw, topCH);
+
+  // Shade up to qx
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i < N; i++) {
+    if (xs[i] <= qx) {
+      const px = tx(xs[i]), py = tyPDF(Math.min(pdfs[i], yMaxPDF), yMaxPDF);
+      if (!started) { ctx.moveTo(px, tyPDF(0, yMaxPDF)); ctx.lineTo(px, py); started = true; }
+      else ctx.lineTo(px, py);
+    }
+  }
+  ctx.lineTo(tx(Math.min(qx, xMax)), tyPDF(0, yMaxPDF));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,107,53,0.25)'; ctx.fill();
+
+  ctx.beginPath(); ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2;
+  pdfs.forEach((y, i) => {
+    const px = tx(xs[i]), py = tyPDF(Math.min(y, yMaxPDF), yMaxPDF);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // Label for PDF
+  ctx.fillStyle = '#00d4ff'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'left';
+  ctx.fillText('PDF f(x) — shaded area = F(x)', pad.l + 5, pad.t + 14);
+
+  // ── Bottom: CDF ──
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(pad.l, topH + 20, cw, botCH);
+
+  ctx.beginPath(); ctx.strokeStyle = '#ff6b35'; ctx.lineWidth = 2.5;
+  cdfs.forEach((y, i) => {
+    const px = tx(xs[i]), py = tyCDF(y);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // Dotted lines for query point
+  const fqx = normalCDF(qx, mu, sigma);
+  ctx.setLineDash([5, 4]); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(tx(qx), topH + 20); ctx.lineTo(tx(qx), tyCDF(fqx)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tx(qx), tyCDF(fqx)); ctx.lineTo(pad.l, tyCDF(fqx)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Point on CDF
+  ctx.fillStyle = '#fbbf24';
+  ctx.beginPath(); ctx.arc(tx(qx), tyCDF(fqx), 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 11px JetBrains Mono'; ctx.textAlign = 'left';
+  ctx.fillText(`F(${qx.toFixed(2)}) = ${fqx.toFixed(4)}`, tx(qx) + 8, tyCDF(fqx) - 5);
+
+  // CDF label
+  ctx.fillStyle = '#ff6b35'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'left';
+  ctx.fillText('CDF F(x) = P(X ≤ x)', pad.l + 5, topH + 34);
+
+  // Axes labels
+  ctx.fillStyle = '#475569'; ctx.font = '10px JetBrains Mono'; ctx.textAlign = 'center';
+  [-4,-2,0,2,4].forEach(v => {
+    ctx.fillText(v, tx(v), topH + 16);
+    ctx.fillText(v, tx(v), h - pad.b + 14);
+  });
+
+  document.getElementById('cdfStats').textContent =
+    `F(${qx.toFixed(2)}) = P(X ≤ ${qx.toFixed(2)}) = ${fqx.toFixed(4)} | P(X > ${qx.toFixed(2)}) = ${(1-fqx).toFixed(4)} | μ=${mu}, σ=${sigma}`;
+}
+
+// ─── Change of Variables Canvas ───
+function drawCOV() {
+  const canvas = document.getElementById('covCanvas');
+  const { ctx, w, h } = setupCanvas(canvas);
+  const transform = document.getElementById('covTransform').value;
+  const mu = parseFloat(document.getElementById('covmuSlider').value);
+  const sigma = parseFloat(document.getElementById('covsigSlider').value);
+
+  const pad = { l: 55, r: 20, t: 30, b: 35 };
+  const halfW = Math.floor((w - pad.l - pad.r) / 2) - 10;
+  const ch = h - pad.t - pad.b;
+
+  ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, w, h);
+
+  // Left panel: X distribution
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fillRect(pad.l, pad.t, halfW, ch);
+  ctx.fillStyle = '#111827';
+  ctx.fillRect(pad.l + halfW + 20, pad.t, halfW, ch);
+
+  const N = 500;
+  const xMin = -4.5, xMax = 4.5;
+  const xsLeft = Array.from({length:N}, (_,i) => xMin + i/(N-1)*(xMax-xMin));
+  const pdfsLeft = xsLeft.map(x => normalPDF(x, mu, sigma));
+  const yMaxL = Math.max(...pdfsLeft) * 1.15;
+
+  function txL(x) { return pad.l + (x - xMin) / (xMax - xMin) * halfW; }
+  function tyL(y) { return pad.t + ch - y / yMaxL * ch; }
+
+  // Draw original PDF
+  ctx.beginPath(); ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2;
+  pdfsLeft.forEach((y, i) => {
+    const px = txL(xsLeft[i]);
+    const py = tyL(Math.min(y, yMaxL));
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#00d4ff'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+  ctx.fillText(`X ~ N(${mu}, ${sigma}²)`, pad.l + halfW/2, pad.t - 8);
+  ctx.fillStyle = '#475569'; ctx.font = '10px JetBrains Mono';
+  [-4,-2,0,2,4].forEach(v => ctx.fillText(v, txL(v), pad.t + ch + 14));
+
+  // Arrow
+  ctx.fillStyle = '#a78bfa'; ctx.font = 'bold 14px JetBrains Mono'; ctx.textAlign = 'center';
+  const arrowX = pad.l + halfW + 10;
+  ctx.fillText('→', arrowX, pad.t + ch/2);
+  ctx.font = '9px JetBrains Mono'; ctx.fillStyle = '#6b7280';
+  const label = {exp:'Y=eˣ', square:'Y=X²', linear:'Y=2X+1', abs:'Y=|X|'}[transform];
+  ctx.fillText(label, arrowX, pad.t + ch/2 + 14);
+
+  // Compute transformed distribution
+  const Nx = 1000;
+  const samples = Array.from({length: Nx}, () => mu + sigma * boxMuller());
+  let ys, yMinR, yMaxR, yLabel;
+
+  if (transform === 'exp') {
+    ys = samples.map(x => Math.exp(x));
+    yMinR = 0; yMaxR = 10;
+    yLabel = 'Y = eˣ ~ Log-Normal';
+  } else if (transform === 'square') {
+    ys = samples.map(x => x * x);
+    yMinR = 0; yMaxR = 12;
+    yLabel = 'Y = X² ~ Chi-Squared-like';
+  } else if (transform === 'linear') {
+    ys = samples.map(x => 2*x + 1);
+    yMinR = -10; yMaxR = 10;
+    yLabel = 'Y = 2X+1 ~ Normal(2μ+1, 4σ²)';
+  } else {
+    ys = samples.map(x => Math.abs(x));
+    yMinR = 0; yMaxR = 4;
+    yLabel = 'Y = |X| ~ Folded Normal';
+  }
+
+  // Histogram
+  const bins = 40;
+  const hist = new Array(bins).fill(0);
+  const range = yMaxR - yMinR;
+  ys.forEach(y => {
+    const b = Math.floor((y - yMinR) / range * bins);
+    if (b >= 0 && b < bins) hist[b]++;
+  });
+  const total = ys.length * (range / bins);
+  const yMaxHist = Math.max(...hist) / total * 1.15;
+
+  function txR(x) { return pad.l + halfW + 20 + (x - yMinR) / range * halfW; }
+  function tyR(y) { return pad.t + ch - y / yMaxHist * ch; }
+
+  ctx.fillStyle = 'rgba(255,107,53,0.35)';
+  hist.forEach((count, i) => {
+    const x0 = yMinR + i / bins * range;
+    const x1 = yMinR + (i+1) / bins * range;
+    const density = count / total;
+    const px0 = txR(x0), px1 = txR(x1);
+    ctx.fillRect(px0, tyR(density), px1-px0-1, ch - (tyR(density) - pad.t));
+  });
+
+  ctx.fillStyle = '#ff6b35'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+  ctx.fillText(yLabel, pad.l + halfW + 20 + halfW/2, pad.t - 8);
+  ctx.fillStyle = '#475569'; ctx.font = '10px JetBrains Mono';
+  const step = range / 5;
+  for (let i = 0; i <= 5; i++) {
+    const v = yMinR + i * step;
+    ctx.fillText(v.toFixed(1), txR(v), pad.t + ch + 14);
+  }
+
+  // Notes
+  const notes = {
+    exp: 'Always positive.\nRight-skewed.\nUsed for stock prices.\nJacobian: |dx/dy| = 1/y',
+    square: 'Concentrated near 0.\nChi-squared dist.\nJacobian: 1/(2√y)\nfor both ±√y branches',
+    linear: 'Same shape as X.\nJust shifted+stretched.\nJacobian: 1/2\n(constant)',
+    abs: 'Only positive values.\nDouble-peaked source.\nJacobian: 1\nbut two branches'
+  };
+  document.getElementById('covNote').textContent = notes[transform].replace(/\n/g, '  |  ');
+}
+
+// Box-Muller for normal samples
+let _bm_spare = null;
+function boxMuller() {
+  if (_bm_spare !== null) { const s = _bm_spare; _bm_spare = null; return s; }
+  let u, v, s;
+  do { u = Math.random()*2-1; v = Math.random()*2-1; s = u*u+v*v; } while (s>=1 || s===0);
+  const m = Math.sqrt(-2*Math.log(s)/s);
+  _bm_spare = v * m;
+  return u * m;
+}
+
+// ─── Concept Map ───
+function drawMap() {
+  const canvas = document.getElementById('mapCanvas');
+  const { ctx, w, h } = setupCanvas(canvas);
+
+  ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, w, h);
+
+  function drawNode(x, y, label, sub, color, r = 52) {
+    // Glow
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, r * 1.5);
+    grad.addColorStop(0, color + '30');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(x, y, r * 1.5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = '#111827';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x, y - 4);
+    ctx.font = '10px Lato, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(sub, x, y + 12);
+  }
+
+  function drawArrow(x1, y1, x2, y2, label, color) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.sqrt(dx*dx + dy*dy);
+    const ux = dx/len, uy = dy/len;
+    const r = 55;
+    const sx = x1 + ux*r, sy = y1 + uy*r;
+    const ex = x2 - ux*r, ey = y2 - uy*r;
+
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrowhead
+    ctx.fillStyle = color;
+    const angle = Math.atan2(ey - sy, ex - sx);
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex - 10*Math.cos(angle-0.4), ey - 10*Math.sin(angle-0.4));
+    ctx.lineTo(ex - 10*Math.cos(angle+0.4), ey - 10*Math.sin(angle+0.4));
+    ctx.closePath(); ctx.fill();
+
+    // Label
+    ctx.fillStyle = color; ctx.font = '9px JetBrains Mono'; ctx.textAlign = 'center';
+    ctx.fillText(label, (sx+ex)/2, (sy+ey)/2 - 7);
+  }
+
+  const cx = w/2, cy = h/2;
+  const dist = Math.min(w, h) * 0.32;
+
+  const nodes = {
+    PDF:  { x: cx - dist, y: cy, color: '#00d4ff', label: 'PDF', sub: 'f(x)' },
+    CDF:  { x: cx + dist, y: cy, color: '#ff6b35', label: 'CDF', sub: 'F(x)' },
+    COV:  { x: cx, y: cy - dist * 0.9, color: '#a78bfa', label: 'Change of', sub: 'Variables' },
+    QF:   { x: cx, y: cy + dist * 0.85, color: '#fbbf24', label: 'Quantile', sub: 'F⁻¹(p)' },
+    BS:   { x: cx, y: cy, color: '#34d399', label: 'Black-Scholes', sub: '& Monte Carlo' },
+  };
+
+  drawArrow(nodes.PDF.x, nodes.PDF.y, nodes.CDF.x, nodes.CDF.y, 'Integrate ∫', '#64748b');
+  drawArrow(nodes.CDF.x, nodes.CDF.y, nodes.PDF.x, nodes.PDF.y, "Differentiate d/dx", '#64748b');
+  drawArrow(nodes.PDF.x, nodes.PDF.y, nodes.COV.x, nodes.COV.y, 'Input to', '#a78bfa');
+  drawArrow(nodes.COV.x, nodes.COV.y, nodes.CDF.x, nodes.CDF.y, 'Output', '#a78bfa');
+  drawArrow(nodes.CDF.x, nodes.CDF.y, nodes.QF.x, nodes.QF.y, 'Invert F⁻¹', '#fbbf24');
+  drawArrow(nodes.QF.x, nodes.QF.y, nodes.BS.x, nodes.BS.y, '', '#475569');
+  drawArrow(nodes.COV.x, nodes.COV.y, nodes.BS.x, nodes.BS.y, '', '#475569');
+  drawArrow(nodes.PDF.x, nodes.PDF.y, nodes.BS.x, nodes.BS.y, '', '#475569');
+
+  Object.values(nodes).forEach(n => drawNode(n.x, n.y, n.label, n.sub, n.color));
+}
+
+// ─── Initialize ───
+window.addEventListener('load', () => {
+  setTimeout(drawPDF, 100);
+});
+window.addEventListener('resize', () => {
+  const active = document.querySelector('.tab-content.active').id;
+  if (active === 'tab-pdf') drawPDF();
+  if (active === 'tab-cdf') drawCDF();
+  if (active === 'tab-cov') drawCOV();
+  if (active === 'tab-connections') drawMap();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLS, Heteroskedasticity & Autocorrelation — Quant Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Barlow:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --paper:    #faf6f0;
+  --cream:    #f2ebe0;
+  --warm2:    #e8ddd0;
+  --warm3:    #d4c8b8;
+  --ink:      #1c1408;
+  --ink2:     #3d2e18;
+  --ink3:     #6b5535;
+  --ink4:     #9a7c56;
+  --red:      #c0392b;
+  --red-l:    #e74c3c;
+  --red-p:    rgba(192,57,43,0.08);
+  --blue:     #1a5276;
+  --blue-l:   #2980b9;
+  --blue-p:   rgba(26,82,118,0.07);
+  --green:    #145a32;
+  --green-l:  #27ae60;
+  --green-p:  rgba(20,90,50,0.07);
+  --amber:    #7d6608;
+  --amber-l:  #f1c40f;
+  --amber-p:  rgba(125,102,8,0.08);
+  --plum:     #512e5f;
+  --plum-p:   rgba(81,46,95,0.08);
+  --border:   #c8b99a;
+  --border2:  #b0a080;
+  --shadow:   0 4px 20px rgba(28,20,8,0.12);
+  --code-bg:  #1a120a;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Libre Baskerville',Georgia,serif;
+  background:var(--paper);
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.8;
+  font-weight:400;
+}
+
+/* ─── HEADER ─── */
+header{
+  background:var(--ink);
+  padding:62px 48px 52px;
+  position:relative;overflow:hidden;
+}
+header::before{
+  content:'β̂';
+  position:absolute;right:-20px;top:-40px;
+  font-family:'Barlow',sans-serif;font-size:340px;font-weight:800;
+  color:var(--amber-l);opacity:0.04;line-height:1;letter-spacing:-20px;
+}
+header::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(to right,var(--red),var(--blue-l),var(--green-l));
+}
+.h-tag{
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--amber-l);margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+}
+.h-tag::after{content:'';flex:1;height:1px;background:var(--amber-l);opacity:0.3;max-width:100px;}
+header h1{
+  font-family:'Barlow',sans-serif;font-size:clamp(30px,5.5vw,62px);
+  font-weight:800;line-height:1.03;color:var(--paper);
+  letter-spacing:-1px;max-width:800px;margin-bottom:18px;
+}
+header h1 .r{color:var(--red-l);}
+header h1 .b{color:#5dade2;}
+.h-desc{font-size:15px;color:var(--ink4);max-width:560px;font-style:italic;line-height:1.65;}
+.h-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.badge{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;padding:5px 13px;border-radius:2px;border:1px solid;
+}
+.b-r{color:var(--red-l);border-color:rgba(231,76,60,.4);background:rgba(192,57,43,.08);}
+.b-b{color:#5dade2;border-color:rgba(41,128,185,.4);background:rgba(26,82,118,.08);}
+.b-g{color:#58d68d;border-color:rgba(39,174,96,.4);background:rgba(20,90,50,.08);}
+.b-a{color:var(--amber-l);border-color:rgba(241,196,15,.4);background:rgba(125,102,8,.08);}
+
+/* ─── TABS ─── */
+.tabbar{
+  position:sticky;top:0;z-index:200;
+  background:rgba(26,18,10,0.97);
+  border-bottom:1px solid #2a1e10;
+  backdrop-filter:blur(14px);
+  display:flex;overflow-x:auto;
+  padding:0 18px;scrollbar-width:none;
+}
+.tabbar::-webkit-scrollbar{display:none;}
+.tb{
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.5px;
+  padding:14px 18px;border:none;background:transparent;
+  color:#5a4a35;cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;
+}
+.tb:hover{color:#9a7c56;}
+.tb.on{color:var(--amber-l);border-bottom-color:var(--amber-l);}
+
+/* ─── PANELS ─── */
+.panel{display:none;}
+.panel.on{display:block;}
+.wrap{max-width:1000px;margin:0 auto;padding:52px 36px 100px;}
+
+/* ─── TYPOGRAPHY ─── */
+.eyebrow{
+  font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--red);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow::before{content:'';width:24px;height:1.5px;background:var(--red);}
+h2{
+  font-family:'Barlow',sans-serif;font-size:clamp(28px,4.5vw,48px);
+  font-weight:800;color:var(--ink);line-height:1.06;
+  letter-spacing:-0.5px;margin-bottom:8px;
+}
+h2 .ra{color:var(--red);}
+h2 .ba{color:var(--blue);}
+h2 .ga{color:var(--green);}
+h3{
+  font-family:'Barlow',sans-serif;font-size:22px;font-weight:700;
+  color:var(--ink);margin:46px 0 12px;
+  padding-bottom:8px;border-bottom:2px solid var(--border);
+}
+h4{
+  font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:600;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);
+  margin:26px 0 8px;
+}
+p{margin-bottom:14px;color:var(--ink2);font-weight:400;}
+.lead{
+  font-size:19px;font-style:italic;color:var(--ink3);
+  line-height:1.65;margin-bottom:30px;
+  border-left:3px solid var(--border2);padding-left:18px;
+}
+
+/* ─── SEPARATOR ─── */
+.sep{height:1px;background:linear-gradient(to right,var(--border2),transparent);margin:44px 0;}
+
+/* ─── BOXES ─── */
+.pre-box{
+  background:var(--amber-p);border:1px solid rgba(125,102,8,.2);
+  border-left:4px solid var(--amber);border-radius:5px;
+  padding:22px 26px;margin:26px 0;
+}
+.pre-box h4{color:var(--amber);margin-top:0;}
+.pre-box p{color:var(--ink3);margin-bottom:0;}
+
+.note-box{
+  background:var(--blue-p);border:1px solid rgba(26,82,118,.18);
+  border-left:4px solid var(--blue);border-radius:5px;
+  padding:20px 24px;margin:22px 0;
+}
+.note-box h4{color:var(--blue);margin-top:0;font-size:10px;}
+.note-box p{color:var(--ink3);margin-bottom:0;}
+
+.key-box{
+  background:var(--ink);color:var(--paper);
+  border-radius:8px;padding:28px 32px;margin:28px 0;
+  position:relative;overflow:hidden;
+}
+.key-box::before{
+  content:'"';font-family:'Libre Baskerville',serif;font-size:160px;
+  position:absolute;top:-20px;right:16px;color:var(--amber-l);opacity:0.08;line-height:1;
+}
+.key-box p{color:rgba(250,246,240,.8);margin-bottom:0;font-size:16px;}
+.key-box strong{color:var(--amber-l);}
+
+.warn-box{
+  background:var(--red-p);border:1px solid rgba(192,57,43,.2);
+  border-left:4px solid var(--red);border-radius:5px;
+  padding:20px 24px;margin:22px 0;
+}
+.warn-box h4{color:var(--red);margin-top:0;}
+.warn-box p{color:var(--ink3);margin-bottom:0;}
+
+.analogy{
+  background:var(--cream);border:1px solid var(--border);
+  border-radius:8px;padding:24px 28px;margin:24px 0;
+  position:relative;
+}
+.analogy::before{content:'💡';font-size:18px;position:absolute;top:-11px;left:18px;}
+.analogy h4{color:var(--plum);margin-top:0;}
+.analogy p{color:var(--ink3);}
+.analogy p:last-child{margin-bottom:0;}
+
+/* ─── FORMULA ─── */
+.fbox{
+  background:var(--warm2);border:1px solid var(--border);
+  border-radius:8px;padding:24px 28px;margin:20px 0;
+  text-align:center;position:relative;overflow:hidden;
+}
+.fbox::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,var(--red),var(--blue-l));}
+.ftag{
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;background:var(--blue);color:#fff;
+  padding:3px 10px;border-radius:0 0 5px 5px;
+  position:absolute;top:0;left:18px;font-weight:600;
+}
+.formula{
+  font-family:'Share Tech Mono',monospace;font-size:16px;
+  color:var(--ink);font-weight:500;line-height:1.7;
+}
+.fnote{font-size:13px;color:var(--ink4);margin-top:10px;font-style:italic;font-family:'Libre Baskerville',serif;}
+
+/* ─── CODE ─── */
+.codeblock{background:var(--code-bg);border:1px solid #3a2a18;border-radius:8px;overflow:hidden;margin:26px 0;box-shadow:var(--shadow);}
+.ctop{background:#251810;border-bottom:1px solid #3a2a18;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.cdots{display:flex;gap:6px;}
+.cdots span{width:11px;height:11px;border-radius:50%;display:block;}
+.cr2{background:#ff5f57;}.cy2{background:#febc2e;}.cg2{background:#28c840;}
+.cname{font-family:'Share Tech Mono',monospace;font-size:10px;color:#6b5535;}
+.colab-a{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--amber-l);text-decoration:none;border:1px solid rgba(241,196,15,.35);padding:3px 9px;border-radius:3px;background:rgba(125,102,8,.1);transition:all .2s;}
+.colab-a:hover{background:rgba(125,102,8,.2);}
+pre{padding:22px;overflow-x:auto;font-family:'Share Tech Mono',monospace;font-size:12.5px;line-height:1.7;color:#c8a87a;}
+.k{color:#e78d4a;}.f{color:#7ec8e3;}.s{color:#a8d8a8;}.cm{color:#4a3a28;font-style:italic;}.n{color:#f0c060;}.op{color:#8fbcbb;}
+
+/* ─── CHARTS ─── */
+.cbox{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:20px 20px 14px;margin:22px 0;box-shadow:var(--shadow);}
+.cbox canvas{max-height:280px;}
+.ct{font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.cs{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--ink4);margin-bottom:14px;}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0;}
+@media(max-width:640px){.chart-grid{grid-template-columns:1fr;}}
+
+/* ─── INTERACTIVE ─── */
+.simbox{background:var(--cream);border:1.5px solid var(--border2);border-radius:10px;padding:26px;margin:26px 0;box-shadow:var(--shadow);}
+.simbox>h4:first-child{color:var(--red);margin-top:0;border-bottom:1.5px solid var(--border);padding-bottom:10px;margin-bottom:16px;font-size:11px;}
+.srow{display:flex;align-items:center;gap:14px;margin-bottom:11px;flex-wrap:wrap;}
+.srow label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ink3);min-width:170px;}
+input[type=range]{flex:1;min-width:100px;accent-color:var(--blue);cursor:pointer;}
+select{background:var(--warm2);border:1px solid var(--border);color:var(--ink);font-family:'Share Tech Mono',monospace;font-size:11px;padding:6px 10px;border-radius:4px;cursor:pointer;}
+.sval{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:600;color:var(--red);min-width:54px;text-align:right;}
+.outpanel{background:var(--warm2);border:1px solid var(--border);border-radius:5px;padding:13px 17px;margin-top:13px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.95;}
+.ol{color:var(--ink4);}
+.ov{color:var(--blue);font-weight:600;}
+.or2{color:var(--red);font-weight:600;}
+.og{color:var(--green);font-weight:600;}
+.oa{color:var(--amber);font-weight:600;}
+.simbtn{margin-top:13px;background:var(--ink);border:none;color:var(--amber-l);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:10px 20px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.simbtn:hover{background:var(--ink2);}
+
+/* ─── STEPS ─── */
+.steps{list-style:none;margin:20px 0;counter-reset:s;}
+.steps li{counter-increment:s;padding-left:50px;margin-bottom:18px;position:relative;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:33px;height:33px;background:var(--blue);color:#fff;font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.steps li h5{font-family:'Share Tech Mono',monospace;font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.steps li p{font-size:15px;color:var(--ink3);margin-bottom:0;}
+
+/* ─── ASSUMPTIONS GRID ─── */
+.assume-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin:22px 0;}
+.assume-card{background:var(--warm2);border:1px solid var(--border);border-radius:7px;padding:20px 22px;border-top:3px solid var(--blue);}
+.assume-card.violated{border-top-color:var(--red);}
+.assume-card h5{font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.assume-card .num{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue);margin-bottom:4px;letter-spacing:1px;}
+.assume-card.violated .num{color:var(--red);}
+.assume-card p{font-size:14px;color:var(--ink3);margin-bottom:6px;}
+.assume-card .status{font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;display:inline-block;}
+.ok-status{background:rgba(20,90,50,.12);color:var(--green);}
+.fail-status{background:var(--red-p);color:var(--red);}
+
+/* ─── EXERCISES ─── */
+.exgrid{display:grid;gap:14px;margin:22px 0;}
+.exc{border-radius:7px;padding:22px 26px;border:1px solid;}
+.exc.easy{background:var(--green-p);border-color:rgba(20,90,50,.2);}
+.exc.med{background:var(--amber-p);border-color:rgba(125,102,8,.2);}
+.exc.hard{background:var(--red-p);border-color:rgba(192,57,43,.2);}
+.extag{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border-radius:3px;margin-bottom:9px;display:inline-block;}
+.easy .extag{background:var(--green-l);color:#fff;}
+.med .extag{background:var(--amber);color:#fff;}
+.hard .extag{background:var(--red);color:#fff;}
+.exnum{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--ink4);margin-bottom:4px;}
+.exc h5{font-family:'Barlow',sans-serif;font-size:17px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.exc p{font-size:15px;color:var(--ink3);margin-bottom:6px;}
+.hint{margin-top:10px;font-size:12px;color:var(--ink4);font-family:'Share Tech Mono',monospace;border-top:1px solid var(--border);padding-top:9px;}
+.hint strong{color:var(--ink3);}
+
+/* ─── TABLE ─── */
+.tbl{overflow-x:auto;margin:20px 0;}
+table{border-collapse:collapse;width:100%;font-size:13px;}
+th{background:var(--ink);color:var(--paper);padding:11px 14px;text-align:left;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;}
+td{border:1px solid var(--border);padding:10px 14px;background:var(--cream);color:var(--ink3);}
+tr:hover td{background:var(--warm2);}
+.tr{color:var(--red)!important;font-weight:600;}
+.tb2{color:var(--blue)!important;font-weight:600;}
+.tg{color:var(--green)!important;font-weight:600;}
+
+/* ─── DEFINITION LIST ─── */
+dl{margin:14px 0;}
+dt{font-family:'Share Tech Mono',monospace;font-size:12px;font-weight:600;color:var(--blue);margin-top:16px;}
+dd{margin-left:16px;padding-left:12px;border-left:2px solid var(--border2);font-size:15px;color:var(--ink3);line-height:1.65;}
+
+/* ─── RESOURCES ─── */
+.resgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:20px 0;}
+.rescard{display:block;text-decoration:none;color:inherit;background:var(--cream);border:1px solid var(--border);border-radius:7px;padding:18px 20px;transition:all .2s;}
+.rescard:hover{border-color:var(--blue-l);transform:translateY(-2px);box-shadow:var(--shadow);}
+.ri{font-size:20px;margin-bottom:8px;}
+.rescard h5{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue);margin-bottom:6px;}
+.rescard p{font-size:12px;color:var(--ink4);margin:0;line-height:1.45;}
+.ru{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--red);display:block;margin-top:7px;word-break:break-all;}
+
+/* ─── QUIZ ─── */
+.quiz{background:var(--cream);border:1px solid var(--border2);border-radius:7px;padding:22px 26px;margin:16px 0;}
+.qt{font-family:'Barlow',sans-serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:14px;}
+.qo{list-style:none;display:grid;gap:9px;}
+.qo li{display:flex;align-items:flex-start;gap:9px;}
+.qo input{margin-top:3px;accent-color:var(--red);cursor:pointer;}
+.qo label{cursor:pointer;font-size:14px;color:var(--ink3);line-height:1.5;}
+.qbtn{margin-top:12px;background:var(--ink);border:none;color:var(--amber-l);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:9px 18px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.qbtn:hover{background:var(--ink2);}
+.qres{margin-top:10px;padding:12px 16px;border-radius:5px;font-size:13px;display:none;line-height:1.6;}
+.qc{background:var(--green-p);color:var(--green);border:1px solid rgba(20,90,50,.2);}
+.qw{background:var(--red-p);color:var(--red);border:1px solid rgba(192,57,43,.2);}
+
+/* ─── SVG DIAGRAM ─── */
+.svgwrap{text-align:center;margin:26px 0;overflow-x:auto;}
+.svgwrap svg{max-width:100%;}
+
+/* ─── PATH ─── */
+.pathcard{background:var(--cream);border:1px solid var(--border);border-radius:7px;padding:16px 20px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;}
+.pnum{width:30px;height:30px;background:var(--red-p);border:1px solid rgba(192,57,43,.35);color:var(--red);font-family:'Barlow',sans-serif;font-size:14px;font-weight:800;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pathcard h5{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.pathcard p{font-size:14px;color:var(--ink3);margin:0;}
+
+/* ─── DIAGNOSIS TABLE ─── */
+.diag-table td:first-child{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:600;}
+
+/* ─── FOOTER ─── */
+footer{background:var(--ink);color:var(--ink3);text-align:center;padding:26px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1.5px;}
+footer span{color:var(--amber-l);}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:640px){.wrap{padding:28px 16px 72px;}h2{font-size:26px;}.formula{font-size:13px;}pre{font-size:11px;}.assume-grid{grid-template-columns:1fr;}}
+
+/* ─── ANIMATION ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.panel.on .wrap{animation:fadeUp .3s ease forwards;}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="h-tag">Quantitative Engineering · Regression Analysis · Series V</div>
+  <h1><span class="r">OLS</span> Assumptions,<br><span class="b">Heteroskedasticity</span><br>&amp; <span class="r">Autocorrelation</span></h1>
+  <p class="h-desc">The three pillars of regression diagnostics — what can go wrong with linear models and how to detect, test, and fix each violation.</p>
+  <div class="h-badges">
+    <span class="badge b-r">100% Offline</span>
+    <span class="badge b-b">Interactive Demos</span>
+    <span class="badge b-g">4 Colab Experiments</span>
+    <span class="badge b-a">24 Practice Exercises</span>
+  </div>
+</header>
+
+<!-- ═══ TABS ═══ -->
+<div class="tabbar">
+  <button class="tb on" onclick="go('pre',this)">0 · Prerequisites</button>
+  <button class="tb" onclick="go('ols',this)">1 · OLS &amp; BLUE</button>
+  <button class="tb" onclick="go('assume',this)">2 · OLS Assumptions</button>
+  <button class="tb" onclick="go('hsk',this)">3 · Heteroskedasticity</button>
+  <button class="tb" onclick="go('ac',this)">4 · Autocorrelation</button>
+  <button class="tb" onclick="go('fix',this)">5 · Detection &amp; Fixes</button>
+  <button class="tb" onclick="go('res',this)">6 · Resources</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 0 — PREREQUISITES
+════════════════════════════════════════════════ -->
+<div id="tab-pre" class="panel on">
+<div class="wrap">
+  <div class="eyebrow">Start Here</div>
+  <h2>Prerequisites</h2>
+  <p class="lead">These foundational concepts are woven throughout OLS theory. Each is explained from scratch below.</p>
+
+  <div class="pre-box">
+    <h4>⚠ What You Need First</h4>
+    <p>Linear regression, matrix algebra basics, expected values, variance, and the normal distribution appear constantly. All five are explained below — take 5–10 minutes per section before diving into the main content.</p>
+  </div>
+
+  <h3>1. Linear Regression — The Core Idea</h3>
+  <p>Linear regression models the relationship between a dependent variable Y and one or more independent variables X. The idea: Y can be approximated as a weighted sum of the X variables plus an error term.</p>
+
+  <div class="fbox">
+    <span class="ftag">Simple Linear Regression</span>
+    <div class="formula">Y_i = β₀ + β₁X_i + ε_i</div>
+    <div class="fnote">β₀ = intercept, β₁ = slope, ε_i = error term (the part Y can't explain). i indexes observations 1 to n.</div>
+  </div>
+
+  <div class="fbox">
+    <span class="ftag">Multiple Regression (Matrix Form)</span>
+    <div class="formula">Y = Xβ + ε</div>
+    <div class="fnote">Y is an n×1 vector, X is an n×k matrix (includes a column of 1s for intercept), β is k×1, ε is n×1. This compact form handles any number of predictors.</div>
+  </div>
+
+  <div class="analogy">
+    <h4>The Scatter Plot Intuition</h4>
+    <p>Imagine plotting house price (Y) against size in sq ft (X). Each house is a dot. The regression line is the <em>best fitting</em> straight line through the cloud of dots. "Best fitting" means minimising the sum of squared vertical distances from each dot to the line. Those vertical distances are the residuals ê_i = Y_i − Ŷ_i.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>2. OLS — Ordinary Least Squares</h3>
+  <p>OLS finds the β that minimises the <strong>sum of squared residuals (SSR)</strong>:</p>
+
+  <div class="fbox">
+    <span class="ftag">OLS Objective</span>
+    <div class="formula">β̂ = argmin_β Σᵢ (Yᵢ − Xᵢβ)² = argmin_β ‖Y − Xβ‖²</div>
+    <div class="formula" style="margin-top:8px">Solution: β̂ = (XᵀX)⁻¹XᵀY</div>
+    <div class="fnote">The analytical solution — no iteration needed. Requires XᵀX to be invertible (no perfect multicollinearity).</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>3. Residuals vs Errors</h3>
+  <dl>
+    <dt>Error ε_i</dt><dd>The unobservable true deviation from the population regression line. We can never see ε_i.</dd>
+    <dt>Residual ê_i</dt><dd>The observable estimated deviation from the sample regression line. ê_i = Y_i − Ŷ_i = Y_i − X_iβ̂. We use residuals to diagnose regression problems.</dd>
+    <dt>Why residuals matter</dt><dd>Violations of OLS assumptions leave patterns in the residuals. Plotting residuals vs fitted values, time, or X is the primary diagnostic tool.</dd>
+  </dl>
+
+  <div class="chart-grid">
+    <div class="cbox">
+      <div class="ct">Good Residuals — Random Scatter</div>
+      <div class="cs">No pattern, constant variance — OLS assumptions satisfied</div>
+      <canvas id="goodResid"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="ct">Bad Residuals — Pattern Present</div>
+      <div class="cs">Structure visible — assumptions violated (something is wrong)</div>
+      <canvas id="badResid"></canvas>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>4. Expected Value &amp; Variance of Estimators</h3>
+  <dl>
+    <dt>Unbiasedness</dt><dd>E[β̂] = β. On average, the estimator hits the true value. A biased estimator systematically misses.</dd>
+    <dt>Efficiency</dt><dd>Among all unbiased estimators, the one with lowest variance is "efficient." The Gauss-Markov theorem tells us OLS is efficient under its assumptions.</dd>
+    <dt>Consistency</dt><dd>β̂ → β as n → ∞. Even if biased in small samples, a consistent estimator converges to the truth.</dd>
+  </dl>
+
+  <div class="sep"></div>
+  <h3>5. The Error Covariance Structure</h3>
+  <p>The variance-covariance matrix of the error vector ε is central to understanding heteroskedasticity and autocorrelation:</p>
+
+  <div class="fbox">
+    <span class="ftag">Error Covariance Matrix</span>
+    <div class="formula">Var(ε) = E[εεᵀ] = Ω</div>
+    <div class="fnote">Under ideal OLS assumptions: Ω = σ²I (scalar times identity). Heteroskedasticity: σᵢ² vary (diagonal elements differ). Autocorrelation: off-diagonal elements ≠ 0.</div>
+  </div>
+
+  <div class="svgwrap">
+    <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <rect width="680" height="200" fill="#f2ebe0" rx="8"/>
+      <text x="340" y="26" text-anchor="middle" font-family="Barlow, sans-serif" font-size="14" font-weight="700" fill="#1c1408">Error Covariance Matrix Ω — Three Cases</text>
+      <!-- OLS OK -->
+      <g transform="translate(30,45)">
+        <text x="80" y="15" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#145a32" font-weight="600">OLS Ideal</text>
+        <text x="80" y="30" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">Ω = σ²I</text>
+        <rect x="20" y="40" width="120" height="90" rx="4" fill="none" stroke="#145a32" stroke-width="1.5"/>
+        <rect x="24" y="44" width="24" height="24" rx="2" fill="rgba(20,90,50,.25)" stroke="#27ae60" stroke-width="1"/>
+        <rect x="52" y="44" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="80" y="44" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="24" y="72" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="52" y="72" width="24" height="24" rx="2" fill="rgba(20,90,50,.25)" stroke="#27ae60" stroke-width="1"/>
+        <rect x="80" y="72" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="24" y="100" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="52" y="100" width="24" height="24" rx="2" fill="rgba(20,90,50,.05)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="80" y="100" width="24" height="24" rx="2" fill="rgba(20,90,50,.25)" stroke="#27ae60" stroke-width="1"/>
+        <text x="80" y="152" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="9" fill="#145a32">Equal diagonal, zero off-diag</text>
+      </g>
+      <!-- Heteroskedasticity -->
+      <g transform="translate(250,45)">
+        <text x="80" y="15" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#c0392b" font-weight="600">Heteroskedasticity</text>
+        <text x="80" y="30" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">Ω = diag(σ₁²,σ₂²,...)</text>
+        <rect x="20" y="40" width="120" height="90" rx="4" fill="none" stroke="#c0392b" stroke-width="1.5"/>
+        <rect x="24" y="44" width="24" height="24" rx="2" fill="rgba(192,57,43,.12)" stroke="#c0392b" stroke-width="1"/>
+        <rect x="52" y="44" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="80" y="44" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="24" y="72" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="52" y="72" width="24" height="24" rx="2" fill="rgba(192,57,43,.35)" stroke="#c0392b" stroke-width="1"/>
+        <rect x="80" y="72" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="24" y="100" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="52" y="100" width="24" height="24" rx="2" fill="rgba(20,90,50,.04)" stroke="#c8b99a" stroke-width="0.8"/>
+        <rect x="80" y="100" width="24" height="24" rx="2" fill="rgba(192,57,43,.65)" stroke="#c0392b" stroke-width="1"/>
+        <text x="80" y="152" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="9" fill="#c0392b">Diagonal varies, off-diag=0</text>
+      </g>
+      <!-- Autocorrelation -->
+      <g transform="translate(470,45)">
+        <text x="80" y="15" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#1a5276" font-weight="600">Autocorrelation</text>
+        <text x="80" y="30" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">Ω: non-zero off-diag</text>
+        <rect x="20" y="40" width="120" height="90" rx="4" fill="none" stroke="#1a5276" stroke-width="1.5"/>
+        <rect x="24" y="44" width="24" height="24" rx="2" fill="rgba(26,82,118,.25)" stroke="#2980b9" stroke-width="1"/>
+        <rect x="52" y="44" width="24" height="24" rx="2" fill="rgba(26,82,118,.15)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="80" y="44" width="24" height="24" rx="2" fill="rgba(26,82,118,.05)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="24" y="72" width="24" height="24" rx="2" fill="rgba(26,82,118,.15)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="52" y="72" width="24" height="24" rx="2" fill="rgba(26,82,118,.25)" stroke="#2980b9" stroke-width="1"/>
+        <rect x="80" y="72" width="24" height="24" rx="2" fill="rgba(26,82,118,.15)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="24" y="100" width="24" height="24" rx="2" fill="rgba(26,82,118,.05)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="52" y="100" width="24" height="24" rx="2" fill="rgba(26,82,118,.15)" stroke="#2980b9" stroke-width="0.8"/>
+        <rect x="80" y="100" width="24" height="24" rx="2" fill="rgba(26,82,118,.25)" stroke="#2980b9" stroke-width="1"/>
+        <text x="80" y="152" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="9" fill="#1a5276">Both diagonal and off-diag ≠ 0</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="key-box">
+    <p>✅ <strong>Foundation set!</strong> With linear regression, OLS, residuals, estimator properties, and the error covariance structure understood — you're ready to master OLS assumptions and their violations: heteroskedasticity and autocorrelation.</p>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 1 — OLS & BLUE
+════════════════════════════════════════════════ -->
+<div id="tab-ols" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 1</div>
+  <h2>OLS &amp; the <span class="ba">BLUE</span> Property</h2>
+  <p class="lead">Ordinary Least Squares is more than just a fitting method — it is the provably optimal estimator under a specific set of conditions. Understanding why it's optimal tells you exactly what breaks when those conditions fail.</p>
+
+  <div class="note-box">
+    <h4>🎯 Why Quants Care About BLUE</h4>
+    <p>In factor models, risk premia estimation, and strategy alpha regression, you want your β estimates to be as precise as possible. OLS delivers that — but only when its assumptions hold. Violations (heteroskedasticity in cross-sectional returns, autocorrelation in time-series regressions) can make OLS dangerously misleading.</p>
+  </div>
+
+  <h3>The Gauss-Markov Theorem</h3>
+  <p>This is the cornerstone result that justifies OLS:</p>
+
+  <div class="fbox">
+    <span class="ftag">Gauss-Markov Theorem</span>
+    <div class="formula">Under assumptions A1–A5, β̂_OLS is BLUE:</div>
+    <div class="formula" style="margin-top:8px">Best Linear Unbiased Estimator</div>
+    <div class="fnote">Best = minimum variance. Linear = linear function of Y. Unbiased = E[β̂] = β. No other linear unbiased estimator has smaller variance.</div>
+  </div>
+
+  <div class="analogy">
+    <h4>The BLUE Analogy — Archery</h4>
+    <p><strong>Unbiased:</strong> On average, arrows land on the bullseye (E[β̂]=β). A biased archer consistently aims left — systematically wrong.</p>
+    <p><strong>Best (minimum variance):</strong> Arrows cluster tightly together. A high-variance archer is sometimes far right, sometimes far left — even if on average centred.</p>
+    <p style="margin-bottom:0"><strong>BLUE:</strong> Among all unbiased linear archers, OLS is the one whose arrows cluster most tightly. When assumptions fail, this tightness guarantee disappears — OLS may still be unbiased, but other estimators might cluster more tightly.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The OLS Estimator — Derivation Sketch</h3>
+  <ol class="steps">
+    <li><h5>Define SSR</h5><p>SSR(β) = Σᵢ(Yᵢ − Xᵢβ)² = (Y−Xβ)ᵀ(Y−Xβ) = YᵀY − 2βᵀXᵀY + βᵀXᵀXβ</p></li>
+    <li><h5>Differentiate w.r.t. β</h5><p>∂SSR/∂β = −2XᵀY + 2XᵀXβ. Set to zero.</p></li>
+    <li><h5>Solve the Normal Equations</h5><p>XᵀXβ̂ = XᵀY → β̂ = (XᵀX)⁻¹XᵀY. This is a system of k linear equations in k unknowns.</p></li>
+    <li><h5>Verify it's a minimum</h5><p>Second derivative XᵀX is positive semidefinite → SSR is convex → any critical point is a global minimum.</p></li>
+  </ol>
+
+  <div class="fbox">
+    <span class="ftag">Properties Under A1–A5</span>
+    <div class="formula" style="text-align:left;padding-left:20px;font-size:14px;">
+      E[β̂] = β &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Unbiasedness)<br>
+      Var(β̂) = σ²(XᵀX)⁻¹ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Covariance matrix)<br>
+      β̂ ~ N(β, σ²(XᵀX)⁻¹) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Normality, under A6)
+    </div>
+    <div class="fnote">These three properties together make statistical inference (t-tests, F-tests, confidence intervals) valid.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>What "Minimum Variance" Means Geometrically</h3>
+  <div class="chart-grid">
+    <div class="cbox">
+      <div class="ct">OLS Sampling Distribution</div>
+      <div class="cs">β̂ across 500 different samples — tight cluster around truth</div>
+      <canvas id="blueChart1"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="ct">Inefficient Estimator (High Variance)</div>
+      <div class="cs">Same data — alternative estimator spreads wider</div>
+      <canvas id="blueChart2"></canvas>
+    </div>
+  </div>
+
+  <h3>🧪 Colab Experiment 1 — OLS Properties Verification</h3>
+  <div class="codeblock">
+    <div class="ctop">
+      <div class="cdots"><span class="cr2"></span><span class="cy2"></span><span class="cg2"></span></div>
+      <span class="cname">experiment_1_ols_properties.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-a">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> stats
+
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+
+<span class="cm"># ═══════════════════════════════════════════════════════
+# Verify OLS is BLUE — simulate many samples, check:
+# 1) Unbiasedness: E[β̂] = β_true
+# 2) Minimum Variance: Var(β̂_OLS) ≤ Var(β̂_alt)
+# ═══════════════════════════════════════════════════════</span>
+
+n      = <span class="n">50</span>
+b_true = np.<span class="f">array</span>([<span class="n">2.0</span>, <span class="n">0.8</span>])  <span class="cm"># [intercept, slope]</span>
+sigma  = <span class="n">1.5</span>
+REPS   = <span class="n">3000</span>
+
+X_fixed = np.<span class="f">column_stack</span>([np.<span class="f">ones</span>(n), np.random.<span class="f">uniform</span>(<span class="n">0</span>, <span class="n">10</span>, n)])
+
+ols_betas, alt_betas = [], []
+
+<span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(REPS):
+    eps = np.random.<span class="f">normal</span>(<span class="n">0</span>, sigma, n)
+    Y = X_fixed @ b_true + eps
+
+    <span class="cm"># OLS estimator: β̂ = (XᵀX)⁻¹XᵀY</span>
+    b_ols = np.<span class="f">linalg.solve</span>(X_fixed.T @ X_fixed, X_fixed.T @ Y)
+    ols_betas.<span class="f">append</span>(b_ols[<span class="n">1</span>])  <span class="cm"># slope</span>
+
+    <span class="cm"># Alternative (inefficient) estimator: just use first-half data</span>
+    b_alt = np.<span class="f">mean</span>(Y[n//<span class="n">2</span>:] - Y[:n//<span class="n">2</span>]) / np.<span class="f">mean</span>(X_fixed[n//<span class="n">2</span>:,<span class="n">1</span>] - X_fixed[:n//<span class="n">2</span>,<span class="n">1</span>])
+    alt_betas.<span class="f">append</span>(b_alt)
+
+ols_betas = np.<span class="f">array</span>(ols_betas)
+alt_betas = np.<span class="f">array</span>(alt_betas)
+
+<span class="k">print</span>(<span class="s">"=== OLS BLUE Verification ==="</span>)
+<span class="k">print</span>(<span class="s">f"True β₁ = {b_true[1]}"</span>)
+<span class="k">print</span>(<span class="s">f"OLS:  E[β̂₁] = {ols_betas.mean():.4f}  (bias = {ols_betas.mean()-b_true[1]:.4f})"</span>)
+<span class="k">print</span>(<span class="s">f"Alt:  E[β̂₁] = {alt_betas.mean():.4f}  (bias = {alt_betas.mean()-b_true[1]:.4f})"</span>)
+<span class="k">print</span>(<span class="s">f"OLS:  Var(β̂₁) = {ols_betas.var():.5f}"</span>)
+<span class="k">print</span>(<span class="s">f"Alt:  Var(β̂₁) = {alt_betas.var():.5f}"</span>)
+<span class="k">print</span>(<span class="s">f"Theoretical Var(β̂₁_OLS) = σ²/Σ(xᵢ-x̄)² = {sigma**2/np.var(X_fixed[:,1])/n:.5f}"</span>)
+<span class="k">print</span>(<span class="s">f"→ OLS variance is {'LOWER' if ols_betas.var() < alt_betas.var() else 'higher'} — BLUE confirmed!"</span>)
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">13</span>, <span class="n">4</span>))
+<span class="k">for</span> ax, betas, name, col <span class="k">in</span> <span class="f">zip</span>(axes,
+    [ols_betas, alt_betas], [<span class="s">'OLS (BLUE)'</span>, <span class="s">'Alternative'</span>],
+    [<span class="s">'#2980b9'</span>, <span class="s">'#c0392b'</span>]):
+    ax.<span class="f">hist</span>(betas, bins=<span class="n">60</span>, color=col, alpha=<span class="n">0.7</span>, density=<span class="k">True</span>)
+    ax.<span class="f">axvline</span>(b_true[<span class="n">1</span>], color=<span class="s">'black'</span>, lw=<span class="n">2</span>, ls=<span class="s">'--'</span>, label=<span class="s">f'True β₁={b_true[1]}'</span>)
+    ax.<span class="f">axvline</span>(betas.<span class="f">mean</span>(), color=col, lw=<span class="n">2</span>, label=<span class="s">f'Mean={betas.mean():.3f}'</span>)
+    ax.set_title(<span class="s">f'{name}\nVar={betas.var():.5f}'</span>); ax.<span class="f">legend</span>(fontsize=<span class="n">8</span>)
+plt.<span class="f">suptitle</span>(<span class="s">'OLS vs Alternative: Sampling Distributions of β̂₁'</span>, fontsize=<span class="n">13</span>)
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()</pre>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 2 — OLS ASSUMPTIONS
+════════════════════════════════════════════════ -->
+<div id="tab-assume" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 2</div>
+  <h2>The <span class="ba">OLS</span> Assumptions</h2>
+  <p class="lead">The BLUE result depends on six assumptions — Gauss-Markov (A1–A5) plus normality (A6 for inference). Each assumption has a specific role, and each violation has a specific consequence.</p>
+
+  <h3>The Six Assumptions</h3>
+  <div class="assume-grid">
+    <div class="assume-card">
+      <div class="num">A1 — LINEARITY</div>
+      <h5>Linear in Parameters</h5>
+      <p>The model is Y = Xβ + ε. The relationship between Y and the betas is linear (X can be transformed).</p>
+      <p><strong>Violation:</strong> True model is Y = β₀ + β₁X² but you fit Y = β₀ + β₁X → omitted non-linearity appears in residuals.</p>
+      <span class="status ok-status">Required for BLUE</span>
+    </div>
+    <div class="assume-card">
+      <div class="num">A2 — RANDOM SAMPLING</div>
+      <h5>Data is i.i.d. / Exogenous X</h5>
+      <p>Observations are independent draws. The X matrix is non-stochastic or at least exogenous: E[ε|X] = 0.</p>
+      <p><strong>Violation:</strong> Endogeneity — X is correlated with ε (omitted variable bias, simultaneity). OLS is biased AND inconsistent.</p>
+      <span class="status ok-status">Required for Unbiasedness</span>
+    </div>
+    <div class="assume-card">
+      <div class="num">A3 — NO PERFECT COLLINEARITY</div>
+      <h5>Full Column Rank</h5>
+      <p>No predictor is an exact linear combination of others. X has rank k, so (XᵀX) is invertible.</p>
+      <p><strong>Violation:</strong> β̂ = (XᵀX)⁻¹XᵀY doesn't exist! Or near-collinearity: estimates exist but with huge variance.</p>
+      <span class="status ok-status">Required for Existence</span>
+    </div>
+    <div class="assume-card violated">
+      <div class="num">A4 — ZERO CONDITIONAL MEAN</div>
+      <h5>E[ε|X] = 0</h5>
+      <p>The errors have mean zero given the predictors. Equivalent to saying X contains all relevant predictors.</p>
+      <p><strong>Violation:</strong> Omitted variable bias. β̂ estimates the direct effect plus the indirect effect through the omitted variable.</p>
+      <span class="status fail-status">Violation → Biased OLS</span>
+    </div>
+    <div class="assume-card violated">
+      <div class="num">A5 — SPHERICAL ERRORS</div>
+      <h5>Var(ε|X) = σ²I</h5>
+      <p>Two conditions: (i) Homoskedasticity: Var(εᵢ|X) = σ² for all i. (ii) No autocorrelation: Cov(εᵢ,εⱼ|X) = 0 for i≠j.</p>
+      <p><strong>Violation of (i):</strong> Heteroskedasticity. <strong>Violation of (ii):</strong> Autocorrelation. Both make OLS inefficient; standard errors wrong.</p>
+      <span class="status fail-status">Violation → Not BLUE</span>
+    </div>
+    <div class="assume-card">
+      <div class="num">A6 — NORMALITY</div>
+      <h5>ε|X ~ N(0, σ²I)</h5>
+      <p>Errors are normally distributed. NOT required for BLUE — required for exact finite-sample inference (t-tests, F-tests).</p>
+      <p><strong>Violation:</strong> t and F tests are approximate (CLT saves us asymptotically for large n).</p>
+      <span class="status ok-status">Required for Exact Inference</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Consequence Hierarchy</h3>
+  <div class="tbl">
+    <table>
+      <tr><th>Assumption Violated</th><th>OLS Biased?</th><th>OLS Still BLUE?</th><th>Std Errors Valid?</th><th>Fix</th></tr>
+      <tr><td>A4: E[ε|X]≠0 (endogeneity)</td><td class="tr">YES</td><td class="tr">NO</td><td class="tr">NO</td><td>IV/2SLS, control variables</td></tr>
+      <tr><td>A5(i): Heteroskedasticity</td><td class="tg">No</td><td class="tr">NO (inefficient)</td><td class="tr">NO (wrong)</td><td>WLS, robust std errors</td></tr>
+      <tr><td>A5(ii): Autocorrelation</td><td class="tg">No</td><td class="tr">NO (inefficient)</td><td class="tr">NO (wrong)</td><td>GLS, Newey-West std errors</td></tr>
+      <tr><td>A6: Non-normality</td><td class="tg">No</td><td class="tg">YES</td><td class="tg">Approx. (large n)</td><td>Bootstrap, robust tests</td></tr>
+      <tr><td>A3: Multicollinearity</td><td class="tg">No</td><td class="tg">YES (in theory)</td><td class="tr">Very wide</td><td>Drop variables, ridge regression</td></tr>
+    </table>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ The Critical Distinction: Biased vs Inefficient</h4>
+    <p>Heteroskedasticity and autocorrelation do NOT bias OLS — the estimates β̂ are still centred on the truth on average. But they make OLS <em>inefficient</em> (too wide or too narrow variance) and crucially, they make the <strong>standard errors wrong</strong>. Wrong standard errors → wrong t-statistics → wrong p-values → wrong decisions. This is why they matter enormously in practice.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Residual Diagnostic Plots — The Primary Tool</h3>
+  <div class="cbox">
+    <div class="ct">Four Diagnostic Plots for OLS Assumption Checking</div>
+    <div class="cs">These four plots together tell you which assumptions may be violated</div>
+    <canvas id="diagPlots" height="260"></canvas>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Practice Exercises — OLS Assumptions</h3>
+  <div class="exgrid">
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 2.1</div><h5>Identify the Assumption</h5><p>For each scenario, identify which OLS assumption is violated: (a) You regress income on education, but intelligence (correlated with both) is omitted. (b) You include both "temperature in Celsius" and "temperature in Fahrenheit" as regressors. (c) Residuals from a financial regression fan out as fitted values increase.</p><div class="hint"><strong>Hint:</strong> (a) A4 — zero conditional mean (omitted variable). (b) A3 — perfect multicollinearity. (c) A5(i) — heteroskedasticity (variance increasing with fitted values).</div></div>
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 2.2</div><h5>OLS Formula Application</h5><p>Given data: X = [1,2,3,4,5], Y = [2.1,3.9,6.2,8.0,9.8]. (a) Set up the design matrix X with intercept column. (b) Compute β̂ = (XᵀX)⁻¹XᵀY by hand (or Python). (c) Compute residuals ê = Y − Xβ̂. (d) Verify that Σê_i = 0 and Σê_iX_i = 0 (the two normal equation conditions).</p><div class="hint"><strong>Hint:</strong> X is a 5×2 matrix. In Python: <code>np.linalg.lstsq(X, Y)</code>. The conditions Σê=0 and Σêx=0 always hold for OLS — they are the normal equations.</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 2.3</div><h5>Prove OLS Unbiasedness</h5><p>Starting from β̂ = (XᵀX)⁻¹XᵀY, substitute Y = Xβ + ε, and show that E[β̂|X] = β under assumptions A1–A4. Carefully state which assumption justifies each step.</p><div class="hint"><strong>Hint:</strong> β̂ = (XᵀX)⁻¹Xᵀ(Xβ+ε) = β + (XᵀX)⁻¹Xᵀε. Take expectation: E[β̂|X] = β + (XᵀX)⁻¹XᵀE[ε|X]. Then use A4: E[ε|X]=0.</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 2.4</div><h5>Consequence of Endogeneity</h5><p>Suppose Y = β₀ + β₁X + β₂Z + ε, where β₁=2, β₂=1, but you omit Z and run Y = β₀ + β₁X + u where u = β₂Z + ε. If Cov(X,Z)/Var(X) = 0.5: (a) Show the probability limit of β̂₁ (the OLS slope ignoring Z). (b) Is it biased? In what direction? (c) This is called "omitted variable bias." Write the formula.</p><div class="hint"><strong>Hint:</strong> plim(β̂₁) = β₁ + β₂·(Cov(X,Z)/Var(X)) = 2 + 1×0.5 = 2.5. Biased upward because Z is positively correlated with X. OVB formula: bias = β₂·δ where δ is the coefficient from regressing Z on X.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 2.5</div><h5>Gauss-Markov Proof Sketch</h5><p>Let β̃ = CY be any linear unbiased estimator, where C is some matrix. (a) Show unbiasedness requires CX = I. (b) Compute Var(β̃) = σ²CCᵀ. (c) Show Var(β̃) − Var(β̂_OLS) = σ²(C−(XᵀX)⁻¹Xᵀ)(C−(XᵀX)⁻¹Xᵀ)ᵀ ≥ 0. This proves OLS has minimum variance.</p><div class="hint"><strong>Hint:</strong> Let D = C − (XᵀX)⁻¹Xᵀ. Since CX=I and (XᵀX)⁻¹XᵀX=I, we get DX=0. Then CCᵀ = ((XᵀX)⁻¹Xᵀ+D)((XᵀX)⁻¹Xᵀ+D)ᵀ = (XᵀX)⁻¹ + DDᵀ since cross terms vanish using DX=0.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 2.6 — Quant Finance</div><h5>Factor Model OLS Diagnostics</h5><p>You run: rᵢ = α + β·rₘ + εᵢ on 60 monthly returns. (a) List all OLS assumptions and which might plausibly be violated for monthly stock returns. (b) Heteroskedasticity: why might σ²(εᵢ) be higher during recessions? (c) Autocorrelation: if εᵢ = ρεᵢ₋₁ + uᵢ with ρ=0.3, by how much are standard errors underestimated relative to Newey-West? (d) Design a testing strategy.</p><div class="hint"><strong>Hint:</strong> For (c): Standard OLS Var(β̂) = σ²(XᵀX)⁻¹. True Var = σ²(XᵀX)⁻¹Ω(XᵀX)⁻¹. For AR(1) errors: variance inflation ≈ (1+2ρ/(1-ρ)) for large n. With ρ=0.3: factor ≈ 1+2×0.3/0.7 ≈ 1.86.</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 3 — HETEROSKEDASTICITY
+════════════════════════════════════════════════ -->
+<div id="tab-hsk" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 3</div>
+  <h2><span class="ra">Hetero</span>skedasticity</h2>
+  <p class="lead">When error variance is not constant across observations, standard OLS inference breaks down — confidence intervals become either too wide or too narrow, and hypothesis tests mislead.</p>
+
+  <div class="note-box">
+    <h4>🔗 Violates Assumption A5(i)</h4>
+    <p>Heteroskedasticity means Var(εᵢ|X) = σᵢ² ≠ σ² — the error variance differs across observations. OLS remains unbiased but is no longer efficient, and its standard errors are wrong. This makes t-tests and F-tests invalid.</p>
+  </div>
+
+  <h3>What Heteroskedasticity Looks Like</h3>
+
+  <div class="analogy">
+    <h4>The Income-Spending Analogy</h4>
+    <p>Regress household spending Y on income X. Low-income households have limited flexibility — spending is tightly constrained near income. High-income households have huge variability — one millionaire spends $50K on travel, another $500K. The <em>spread</em> of errors grows with income. That's heteroskedasticity.</p>
+    <p style="margin-bottom:0">In finance: cross-sectional returns during calm periods have small dispersion; during a crisis, returns spread wildly. Volatility clustering in GARCH models is another manifestation.</p>
+  </div>
+
+  <div class="chart-grid">
+    <div class="cbox">
+      <div class="ct">Homoskedastic Residuals</div>
+      <div class="cs">Constant spread — A5(i) satisfied</div>
+      <canvas id="homoChart"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="ct">Heteroskedastic Residuals</div>
+      <div class="cs">Spread increases with X — A5(i) violated</div>
+      <canvas id="hetChart"></canvas>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Consequences for OLS</h3>
+  <div class="fbox">
+    <span class="ftag">True Variance Under Heteroskedasticity</span>
+    <div class="formula">True Var(β̂) = (XᵀX)⁻¹ (Σᵢ σᵢ²xᵢxᵢᵀ) (XᵀX)⁻¹</div>
+    <div class="formula" style="margin-top:8px">OLS assumes: Var(β̂) = σ²(XᵀX)⁻¹</div>
+    <div class="fnote">The true variance is a "sandwich" matrix. The OLS formula σ²(XᵀX)⁻¹ is generally wrong — it can be too large or too small depending on the pattern of heteroskedasticity.</div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <tr><th>OLS Under Heteroskedasticity</th><th>Status</th><th>Implication</th></tr>
+      <tr><td>β̂ estimates</td><td class="tg">Still unbiased</td><td>E[β̂] = β — no bias problem</td></tr>
+      <tr><td>β̂ estimates</td><td class="tr">NOT efficient (not BLUE)</td><td>WLS has lower variance</td></tr>
+      <tr><td>Standard errors</td><td class="tr">WRONG (biased)</td><td>t-stats invalid — can be too large or small</td></tr>
+      <tr><td>Confidence intervals</td><td class="tr">Wrong width</td><td>Under or over-state uncertainty</td></tr>
+      <tr><td>t-tests and F-tests</td><td class="tr">Invalid</td><td>False positives or false negatives</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Forms of Heteroskedasticity</h3>
+
+  <div class="fbox">
+    <span class="ftag">Common Functional Forms</span>
+    <div class="formula" style="text-align:left;padding-left:20px;font-size:14px;">
+      Multiplicative:  σᵢ² = σ²·Xᵢ²  (variance proportional to X²)<br>
+      Power form:      σᵢ² = σ²·Xᵢᵞ  (γ unknown)<br>
+      Linear form:     σᵢ² = α₀ + α₁Xᵢ  (White's general form)<br>
+      Group-wise:      σᵢ² = σₐ² if Xᵢ in group A, σᵦ² if in group B
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Detection Tests</h3>
+
+  <div class="fbox">
+    <span class="ftag">Breusch-Pagan Test</span>
+    <div class="formula">Regress ê² on X → LM = n·R² ~ χ²(k)</div>
+    <div class="fnote">H₀: homoskedasticity. H₁: σᵢ² is a linear function of X. R² is from the auxiliary regression of squared residuals on regressors.</div>
+  </div>
+
+  <div class="fbox">
+    <span class="ftag">White's General Test</span>
+    <div class="formula">Regress ê² on X, X², and cross-products → LM = n·R² ~ χ²(p)</div>
+    <div class="fnote">More general than Breusch-Pagan — detects all forms of heteroskedasticity. p = number of auxiliary regressors (can be large).</div>
+  </div>
+
+  <div class="fbox">
+    <span class="ftag">Goldfeld-Quandt Test</span>
+    <div class="formula">Sort by X, compare SSR of top vs bottom thirds → F-statistic</div>
+    <div class="fnote">Assumes monotone relationship between variance and X. Intuitive but less general.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🎛 Interactive Heteroskedasticity Demo</h3>
+  <div class="simbox">
+    <h4>🔬 WATCH HOW HETEROSKEDASTICITY BREAKS STANDARD ERRORS</h4>
+    <div class="srow">
+      <label>Hetero. strength γ (σ∝Xᵞ)</label>
+      <input type="range" min="0" max="200" value="0" id="hetGamma" oninput="document.getElementById('hetGV').textContent=(this.value/100).toFixed(2); runHetSim()">
+      <span class="sval" id="hetGV">0.00</span>
+    </div>
+    <div class="srow">
+      <label>Sample size n</label>
+      <input type="range" min="20" max="300" value="100" id="hetN" oninput="document.getElementById('hetNV').textContent=this.value; runHetSim()">
+      <span class="sval" id="hetNV">100</span>
+    </div>
+    <canvas id="hetSimChart" height="220"></canvas>
+    <div class="outpanel">
+      <span class="ol">OLS SE (conventional): </span><span class="or2" id="hSE_ols">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Robust (HC) SE: </span><span class="og" id="hSE_hc">—</span><br>
+      <span class="ol">Breusch-Pagan p-value: </span><span class="ov" id="hBP">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Conclusion: </span><span id="hConc" class="oa">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Fixes for Heteroskedasticity</h3>
+
+  <div class="tbl">
+    <table>
+      <tr><th>Fix</th><th>When to Use</th><th>How It Works</th></tr>
+      <tr><td class="tb2">HC Robust Std Errors</td><td>Unknown form, keep OLS estimates</td><td>White sandwich estimator: (XᵀX)⁻¹(Σê²ᵢxᵢxᵢᵀ)(XᵀX)⁻¹</td></tr>
+      <tr><td class="tb2">WLS (Weighted Least Squares)</td><td>Know variance function</td><td>Minimise Σᵢ wᵢêᵢ² where wᵢ = 1/σᵢ². More efficient than OLS.</td></tr>
+      <tr><td class="tb2">Log Transformation</td><td>Y > 0, variance grows with Y</td><td>log(Y) often has more stable variance. Changes interpretation.</td></tr>
+      <tr><td class="tb2">GLS (Generalised Least Squares)</td><td>Know Ω exactly</td><td>β̂_GLS = (XᵀΩ⁻¹X)⁻¹XᵀΩ⁻¹Y. Optimal under known Ω.</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 2 — Heteroskedasticity Complete Workflow</h3>
+  <div class="codeblock">
+    <div class="ctop">
+      <div class="cdots"><span class="cr2"></span><span class="cy2"></span><span class="cg2"></span></div>
+      <span class="cname">experiment_2_heteroskedasticity.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-a">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> stats
+<span class="k">import</span> statsmodels.api <span class="k">as</span> sm
+<span class="k">from</span> statsmodels.stats.diagnostic <span class="k">import</span> het_breuschpagan, het_white
+
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# Generate heteroskedastic data: σᵢ² = σ²·Xᵢ²
+# ════════════════════════════════════════════════════════</span>
+n = <span class="n">200</span>
+X = np.random.<span class="f">uniform</span>(<span class="n">1</span>, <span class="n">10</span>, n)
+X_with_const = sm.<span class="f">add_constant</span>(X)
+
+beta_true = np.<span class="f">array</span>([<span class="n">2.0</span>, <span class="n">1.5</span>])
+sigma_base = <span class="n">0.5</span>
+
+<span class="cm"># Heteroskedastic errors: std dev proportional to X</span>
+sigma_i = sigma_base * X  <span class="cm"># σᵢ = 0.5·Xᵢ (larger X → larger error)</span>
+eps = np.random.<span class="f">normal</span>(<span class="n">0</span>, sigma_i, n)
+Y = X_with_const @ beta_true + eps
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# Fit OLS
+# ════════════════════════════════════════════════════════</span>
+model_ols = sm.<span class="f">OLS</span>(Y, X_with_const).<span class="f">fit</span>()
+resid = model_ols.resid
+
+<span class="k">print</span>(<span class="s">"=== OLS Results (No Correction) ==="</span>)
+<span class="k">print</span>(model_ols.<span class="f">summary</span>().tables[<span class="n">1</span>])
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# Tests for Heteroskedasticity
+# ════════════════════════════════════════════════════════</span>
+lm_bp, p_bp, fval_bp, fp_bp = het_breuschpagan(resid, X_with_const)
+<span class="k">print</span>(<span class="s">f"\n=== Breusch-Pagan Test ==="</span>)
+<span class="k">print</span>(<span class="s">f"LM statistic: {lm_bp:.4f}, p-value: {p_bp:.6f}"</span>)
+<span class="k">print</span>(<span class="s">f"{'REJECT H₀: Heteroskedasticity detected!' if p_bp < 0.05 else 'Fail to reject H₀: No evidence of heteroskedasticity'}"</span>)
+
+lm_w, p_w, fval_w, fp_w = het_white(resid, X_with_const)
+<span class="k">print</span>(<span class="s">f"\n=== White's Test ==="</span>)
+<span class="k">print</span>(<span class="s">f"LM statistic: {lm_w:.4f}, p-value: {p_w:.6f}"</span>)
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# Compare Standard Errors: OLS vs HC0 vs HC3
+# ════════════════════════════════════════════════════════</span>
+model_hc0 = sm.<span class="f">OLS</span>(Y, X_with_const).<span class="f">fit</span>(cov_type=<span class="s">'HC0'</span>)
+model_hc3 = sm.<span class="f">OLS</span>(Y, X_with_const).<span class="f">fit</span>(cov_type=<span class="s">'HC3'</span>)
+
+<span class="k">print</span>(<span class="s">"\n=== Standard Error Comparison ==="</span>)
+<span class="k">print</span>(<span class="s">f"{'':20} {'OLS SE':>10} {'HC0 SE':>10} {'HC3 SE':>10}"</span>)
+<span class="k">for</span> i, name <span class="k">in</span> <span class="f">enumerate</span>([<span class="s">'Intercept'</span>, <span class="s">'X slope'</span>]):
+    <span class="k">print</span>(<span class="s">f"{name:20} {model_ols.bse[i]:>10.4f} {model_hc0.bse[i]:>10.4f} {model_hc3.bse[i]:>10.4f}"</span>)
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# WLS: If we know σᵢ ∝ Xᵢ, weight by 1/Xᵢ²
+# ════════════════════════════════════════════════════════</span>
+weights = <span class="n">1</span> / X**<span class="n">2</span>
+model_wls = sm.<span class="f">WLS</span>(Y, X_with_const, weights=weights).<span class="f">fit</span>()
+<span class="k">print</span>(<span class="s">"\n=== WLS (Optimal Weights) ==="</span>)
+<span class="k">print</span>(<span class="s">f"WLS slope: {model_wls.params[1]:.4f} (true: {beta_true[1]})"</span>)
+<span class="k">print</span>(<span class="s">f"OLS slope: {model_ols.params[1]:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"WLS SE: {model_wls.bse[1]:.4f} vs OLS SE: {model_ols.bse[1]:.4f}"</span>)
+
+<span class="cm"># Diagnostic plots</span>
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">2</span>, <span class="n">2</span>, figsize=(<span class="n">13</span>, <span class="n">10</span>))
+axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">scatter</span>(X, resid, alpha=<span class="n">0.4</span>, color=<span class="s">'#c0392b'</span>)
+axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">axhline</span>(<span class="n">0</span>, color=<span class="s">'black'</span>, lw=<span class="n">2</span>)
+axes[<span class="n">0</span>,<span class="n">0</span>].set_title(<span class="s">'Residuals vs X (Heteroskedastic Fan)'</span>)
+axes[<span class="n">0</span>,<span class="n">0</span>].set_xlabel(<span class="s">'X'</span>); axes[<span class="n">0</span>,<span class="n">0</span>].set_ylabel(<span class="s">'Residual'</span>)
+
+axes[<span class="n">0</span>,<span class="n">1</span>].<span class="f">scatter</span>(X, resid**<span class="n">2</span>, alpha=<span class="n">0.4</span>, color=<span class="s">'#e67e22'</span>)
+axes[<span class="n">0</span>,<span class="n">1</span>].set_title(<span class="s">'Squared Residuals vs X\n(Breusch-Pagan auxiliary regression)'</span>)
+
+axes[<span class="n">1</span>,<span class="n">0</span>].<span class="f">scatter</span>(model_ols.fittedvalues, resid, alpha=<span class="n">0.4</span>, color=<span class="s">'#8e44ad'</span>)
+axes[<span class="n">1</span>,<span class="n">0</span>].<span class="f">axhline</span>(<span class="n">0</span>, color=<span class="s">'black'</span>, lw=<span class="n">2</span>)
+axes[<span class="n">1</span>,<span class="n">0</span>].set_title(<span class="s">'Residuals vs Fitted (Scale-Location)'</span>)
+
+axes[<span class="n">1</span>,<span class="n">1</span>].<span class="f">scatter</span>(np.<span class="f">sqrt</span>(np.<span class="f">abs</span>(resid)), model_ols.fittedvalues, alpha=<span class="n">0.4</span>, color=<span class="s">'#27ae60'</span>)
+axes[<span class="n">1</span>,<span class="n">1</span>].set_title(<span class="s">'Scale-Location Plot\n(sqrt|ê| vs fitted)'</span>)
+
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()</pre>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Practice Exercises — Heteroskedasticity</h3>
+  <div class="exgrid">
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 3.1</div><h5>Identify Heteroskedasticity</h5><p>For each dataset description, state whether heteroskedasticity is likely and why: (a) Regress a company's R&D spending on its revenue (both in $millions, across 200 companies). (b) Regress temperature anomaly on year (time-series 1900–2024). (c) Regress student test scores on hours studied (1000 students).</p><div class="hint"><strong>Hint:</strong> (a) Very likely — large companies have much more variance in R&D. (b) Possible — variance may increase over decades of more varied climate. (c) Possible — students who study 0 hours cluster near bottom; high-study students more spread out.</div></div>
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 3.2</div><h5>Breusch-Pagan Test by Hand</h5><p>You run a regression with n=100. The R² from regressing ê² on X is 0.08. (a) Compute the LM statistic. (b) Find the critical value from χ²(1) at 5%. (c) What is your decision? (d) Compute the p-value.</p><div class="hint"><strong>Hint:</strong> LM = n × R² = 100 × 0.08 = 8. Critical value χ²(1,0.05) = 3.841. Reject H₀ (8 &gt; 3.841). p = P(χ²(1) &gt; 8) ≈ 0.005.</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 3.3</div><h5>WLS Implementation</h5><p>You know that Var(εᵢ) = σ²·Xᵢ. Derive the WLS estimator and show it equals OLS on transformed data Ỹ = Y/√Xᵢ, X̃ = X/√Xᵢ. In Python, verify that WLS with weights=1/X gives identical results to OLS on the transformed variables.</p><div class="hint"><strong>Hint:</strong> WLS minimises Σwᵢêᵢ² = Σ(1/Xᵢ)(Yᵢ−β₀−β₁Xᵢ)². Divide through by √Xᵢ: minimise Σ(Ỹᵢ−β₀·1/√Xᵢ − β₁·√Xᵢ)². This is OLS on the transformed model.</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 3.4</div><h5>Sandwich Variance Estimator</h5><p>Show that the HC0 robust variance estimator V̂_HC0 = (XᵀX)⁻¹(Σᵢ ê²ᵢ xᵢxᵢᵀ)(XᵀX)⁻¹ is consistent for the true variance even when heteroskedasticity is present. (a) Show the "meat" Σê²ᵢxᵢxᵢᵀ/n → Σσᵢ²xᵢxᵢᵀ/n. (b) Why does this work despite ê²ᵢ ≠ σᵢ²?</p><div class="hint"><strong>Hint:</strong> By LLN, (1/n)Σê²ᵢxᵢxᵢᵀ →p (1/n)Σσᵢ²xᵢxᵢᵀ because ê²ᵢ →p σᵢ² (residuals converge to errors as n→∞). This gives a consistent estimate of the true "meat" matrix.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 3.5</div><h5>Power of Heteroskedasticity Tests</h5><p>Using simulation in Python: (a) For various n (50, 100, 200, 500) and heteroskedasticity strength γ ∈ {0.5, 1.0, 1.5, 2.0}, simulate the rejection rate of the Breusch-Pagan test at 5%. (b) Plot the power curves. (c) For a small n=50 and γ=0.5, what is the power? Is this concerning for applied work?</p><div class="hint"><strong>Hint:</strong> Generate σᵢ = Xᵢᵞ·σ_base. Run 1000 replications per combination. Power = fraction rejecting at 5%. Low power with small n and mild heteroskedasticity means tests often miss it.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 3.6 — Quant Finance</div><h5>Cross-Sectional Return Heteroskedasticity</h5><p>Model: excess returns rᵢ = α + βbetaᵢ + εᵢ across 500 stocks. (a) Why might large-beta stocks have higher error variance? (b) Implement the full test-correct cycle: (i) run OLS, (ii) BP test, (iii) White's test, (iv) compute HC3 standard errors, (v) compare t-stats before and after. (c) What is the economic interpretation if the beta coefficient is no longer significant after robust SE?</p><div class="hint"><strong>Hint:</strong> Large-beta stocks are more volatile → residuals more dispersed. After HC3: if t-stat drops below 1.96, the "risk premium" finding was an artifact of invalid standard errors, not a true relationship. This is common in empirical asset pricing.</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 4 — AUTOCORRELATION
+════════════════════════════════════════════════ -->
+<div id="tab-ac" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 4</div>
+  <h2><span class="ba">Auto</span>correlation</h2>
+  <p class="lead">When errors are correlated across time or space, OLS standard errors can be dramatically underestimated — making results appear far more significant than they really are.</p>
+
+  <div class="note-box">
+    <h4>🔗 Violates Assumption A5(ii)</h4>
+    <p>Autocorrelation (serial correlation) means Cov(εᵢ, εⱼ|X) ≠ 0 for i≠j. Most common in time-series data where today's error is correlated with yesterday's. Like heteroskedasticity, OLS remains unbiased but is inefficient and has wrong standard errors.</p>
+  </div>
+
+  <h3>What Autocorrelation Looks Like</h3>
+
+  <div class="analogy">
+    <h4>The Weather Analogy</h4>
+    <p>If your regression of returns on interest rates has errors today that are large and positive, the next day's errors are also likely to be large and positive — because the shock that caused the large residual today (e.g., a new technology emerging) doesn't vanish overnight. The errors have "memory."</p>
+    <p style="margin-bottom:0">In a model with autocorrelation, consecutive residuals look like a smooth wave or trend rather than white noise. This persistence is the signature.</p>
+  </div>
+
+  <div class="chart-grid">
+    <div class="cbox">
+      <div class="ct">White Noise Residuals — No Autocorrelation</div>
+      <div class="cs">Residuals jump randomly — A5(ii) satisfied</div>
+      <canvas id="acWhite"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="ct">AR(1) Residuals — Positive Autocorrelation</div>
+      <div class="cs">Runs of same sign — A5(ii) violated (ρ=0.7)</div>
+      <canvas id="acAR1"></canvas>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The AR(1) Error Model — Most Common Case</h3>
+
+  <div class="fbox">
+    <span class="ftag">First-Order Autoregressive Errors</span>
+    <div class="formula">εₜ = ρεₜ₋₁ + uₜ,  where uₜ ~ i.i.d. N(0, σᵤ²)</div>
+    <div class="formula" style="margin-top:8px">Cov(εₜ, εₜ₋ₖ) = ρᵏ · σ²/(1−ρ²)</div>
+    <div class="fnote">|ρ| &lt; 1 for stationarity. ρ &gt; 0: positive autocorrelation (most common in economics — residuals move together). ρ &lt; 0: alternating (less common). σ² = σᵤ²/(1−ρ²) is the marginal variance.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Consequences for OLS</h3>
+
+  <div class="fbox">
+    <span class="ftag">True vs Estimated Variance Under AR(1)</span>
+    <div class="formula">True Var(β̂₁) ≈ (σ²/Σ(xₜ-x̄)²) · (1 + 2ρ·(n−1)/n + 2ρ²·(n−2)/n + ...)</div>
+    <div class="formula" style="margin-top:8px">OLS Assumes: Var(β̂₁) = σ²/Σ(xₜ-x̄)²</div>
+    <div class="fnote">The variance inflation factor (VIF for autocorrelation) ≈ (1+ρ)/(1−ρ) for large n. With ρ=0.5: VIF = 3 — OLS standard errors are 1/√3 ≈ 0.58 of true → t-stats inflated by √3 ≈ 1.73.</div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <tr><th>ρ (AR(1))</th><th>Variance Inflation (1+ρ)/(1-ρ)</th><th>SE Deflation</th><th>t-Stat Inflation</th></tr>
+      <tr><td>0.0</td><td class="tg">1.00 (no effect)</td><td class="tg">×1.000</td><td class="tg">×1.000</td></tr>
+      <tr><td>0.3</td><td>1.86</td><td>×0.734</td><td>×1.363</td></tr>
+      <tr><td>0.5</td><td>3.00</td><td>×0.577</td><td>×1.732</td></tr>
+      <tr><td>0.7</td><td class="tr">5.67</td><td class="tr">×0.420</td><td class="tr">×2.381</td></tr>
+      <tr><td>0.9</td><td class="tr">19.0</td><td class="tr">×0.229</td><td class="tr">×4.359</td></tr>
+    </table>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ Autocorrelation Makes Everything Look Significant</h4>
+    <p>With ρ=0.7, your t-statistics are inflated by a factor of ~2.4. This means a true t-stat of 1.0 (not significant) appears as 2.4 (highly significant). In time-series financial regressions, this routinely causes researchers to find "significant" return predictability that is entirely spurious — driven by autocorrelated errors, not true relationships.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Detection Tests</h3>
+
+  <div class="fbox">
+    <span class="ftag">Durbin-Watson Test</span>
+    <div class="formula">DW = Σₜ(êₜ − êₜ₋₁)² / Σₜêₜ²  ≈ 2(1−ρ̂)</div>
+    <div class="fnote">DW ≈ 2: no autocorrelation. DW &lt; 2: positive autocorrelation. DW &gt; 2: negative autocorrelation. Critical values dL and dU from Durbin-Watson tables. Range: [0, 4]. Inconclusive region between dL and dU.</div>
+  </div>
+
+  <div class="fbox">
+    <span class="ftag">Breusch-Godfrey LM Test (More General)</span>
+    <div class="formula">Regress ê on X and ê₋₁,...,ê₋ₚ → LM = n·R² ~ χ²(p)</div>
+    <div class="fnote">Tests for AR(p) autocorrelation. More powerful than DW. Works when lagged Y appears as regressor (DW is invalid then). Most commonly used in practice.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🎛 Interactive Autocorrelation Demo</h3>
+  <div class="simbox">
+    <h4>🔬 SEE HOW ρ INFLATES t-STATISTICS</h4>
+    <div class="srow">
+      <label>AR(1) coefficient ρ</label>
+      <input type="range" min="-90" max="90" value="0" id="acRho" oninput="document.getElementById('acRhoV').textContent=(this.value/100).toFixed(2); runACSim()">
+      <span class="sval" id="acRhoV">0.00</span>
+    </div>
+    <div class="srow">
+      <label>Sample size n (time periods)</label>
+      <input type="range" min="20" max="500" value="100" id="acN" oninput="document.getElementById('acNV').textContent=this.value; runACSim()">
+      <span class="sval" id="acNV">100</span>
+    </div>
+    <canvas id="acSimChart" height="220"></canvas>
+    <div class="outpanel">
+      <span class="ol">Estimated ρ̂: </span><span class="ov" id="acRhoHat">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Durbin-Watson: </span><span class="ov" id="acDW">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">BG p-value: </span><span class="ov" id="acBG">—</span><br>
+      <span class="ol">OLS t-stat (β₁): </span><span class="or2" id="acTols">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Newey-West t-stat: </span><span class="og" id="acTnw">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Variance Inflation: </span><span class="oa" id="acVI">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Autocorrelation Function (ACF) &amp; Partial ACF (PACF)</h3>
+
+  <div class="cbox">
+    <div class="ct">ACF of AR(1) Residuals — Exponential Decay Pattern</div>
+    <div class="cs">Corr(εₜ, εₜ₋ₖ) = ρᵏ — each lag is ρ times the previous (ρ=0.7 shown)</div>
+    <canvas id="acfChart"></canvas>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Fixes for Autocorrelation</h3>
+  <div class="tbl">
+    <table>
+      <tr><th>Fix</th><th>When to Use</th><th>How It Works</th></tr>
+      <tr><td class="tb2">Newey-West (HAC) SE</td><td>Unknown form, keep OLS estimates</td><td>Heteroskedasticity and Autocorrelation Consistent SE. Adds weighted covariances up to lag L.</td></tr>
+      <tr><td class="tb2">Cochrane-Orcutt</td><td>AR(1) errors suspected</td><td>Estimate ρ, transform to Ỹₜ = Yₜ−ρ̂Yₜ₋₁, X̃ₜ = Xₜ−ρ̂Xₜ₋₁, run OLS. Iterative.</td></tr>
+      <tr><td class="tb2">GLS / FGLS</td><td>Know error structure</td><td>β̂_GLS = (XᵀΩ⁻¹X)⁻¹XᵀΩ⁻¹Y. Optimal if Ω known.</td></tr>
+      <tr><td class="tb2">Add lagged terms</td><td>Autocorrelation due to dynamics</td><td>Include Yₜ₋₁ or Xₜ₋₁ as regressors — often removes the AC from residuals.</td></tr>
+      <tr><td class="tb2">First differences</td><td>Near-unit-root processes</td><td>Run on ΔYₜ = Yₜ−Yₜ₋₁ — eliminates persistence. Changes interpretation.</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 3 — Autocorrelation Full Workflow</h3>
+  <div class="codeblock">
+    <div class="ctop">
+      <div class="cdots"><span class="cr2"></span><span class="cy2"></span><span class="cg2"></span></div>
+      <span class="cname">experiment_3_autocorrelation.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-a">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> statsmodels <span class="k">import</span> api <span class="k">as</span> sm
+<span class="k">from</span> statsmodels.stats.stattools <span class="k">import</span> durbin_watson
+<span class="k">from</span> statsmodels.stats.diagnostic <span class="k">import</span> acorr_breusch_godfrey
+
+np.random.<span class="f">seed</span>(<span class="n">0</span>)
+T = <span class="n">200</span>; rho = <span class="n">0.7</span>; beta_true = [<span class="n">1.0</span>, <span class="n">2.0</span>]; sigma_u = <span class="n">1.0</span>
+
+<span class="cm"># Generate time series with AR(1) errors</span>
+t_idx = np.<span class="f">arange</span>(T)
+X_ts = <span class="n">0.5</span> + <span class="n">0.02</span>*t_idx + np.random.<span class="f">normal</span>(<span class="n">0</span>, <span class="n">0.5</span>, T)  <span class="cm"># trending X</span>
+
+eps = np.<span class="f">zeros</span>(T)
+u = np.random.<span class="f">normal</span>(<span class="n">0</span>, sigma_u, T)
+<span class="k">for</span> t <span class="k">in</span> <span class="f">range</span>(<span class="n">1</span>, T):
+    eps[t] = rho * eps[t-<span class="n">1</span>] + u[t]
+
+Xm = sm.<span class="f">add_constant</span>(X_ts)
+Y_ts = Xm @ np.<span class="f">array</span>(beta_true) + eps
+
+<span class="cm"># ════════════════════════════════════════════════════════
+# Fit OLS and run diagnostics
+# ════════════════════════════════════════════════════════</span>
+model = sm.<span class="f">OLS</span>(Y_ts, Xm).<span class="f">fit</span>()
+resid = model.resid
+
+dw = durbin_watson(resid)
+lm_bg, p_bg, f_bg, fp_bg = acorr_breusch_godfrey(model, nlags=<span class="n">5</span>)
+
+<span class="k">print</span>(<span class="s">f"=== OLS with ρ={rho} AR(1) Errors ==="</span>)
+<span class="k">print</span>(<span class="s">f"True β₁={beta_true[1]}. OLS β̂₁={model.params[1]:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"Durbin-Watson: {dw:.4f} (≈2(1-ρ) = {2*(1-rho):.2f})"</span>)
+<span class="k">print</span>(<span class="s">f"Breusch-Godfrey LM: {lm_bg:.4f}, p-value: {p_bg:.6f}"</span>)
+<span class="k">print</span>(<span class="s">f"→ {'AUTOCORRELATION DETECTED' if p_bg < 0.05 else 'No autocorrelation detected'}"</span>)
+
+<span class="cm"># Compare OLS vs Newey-West standard errors</span>
+model_nw = sm.<span class="f">OLS</span>(Y_ts, Xm).<span class="f">fit</span>(cov_type=<span class="s">'HAC'</span>, cov_kwds={<span class="s">'maxlags'</span>: <span class="n">5</span>})
+<span class="k">print</span>(<span class="s">f"\n=== Standard Error Comparison ==="</span>)
+<span class="k">print</span>(<span class="s">f"OLS SE(β₁) = {model.bse[1]:.4f},  t = {model.tvalues[1]:.2f}"</span>)
+<span class="k">print</span>(<span class="s">f"NW  SE(β₁) = {model_nw.bse[1]:.4f},  t = {model_nw.tvalues[1]:.2f}"</span>)
+<span class="k">print</span>(<span class="s">f"Variance inflation: {(model_nw.bse[1]/model.bse[1])**2:.2f}x"</span>)
+
+<span class="cm"># Cochrane-Orcutt correction</span>
+rho_hat = np.<span class="f">corrcoef</span>(resid[<span class="n">1</span>:], resid[:-<span class="n">1</span>])[<span class="n">0</span>,<span class="n">1</span>]
+Y_co = Y_ts[<span class="n">1</span>:] - rho_hat * Y_ts[:-<span class="n">1</span>]
+X_co = sm.<span class="f">add_constant</span>(X_ts[<span class="n">1</span>:] - rho_hat * X_ts[:-<span class="n">1</span>])
+model_co = sm.<span class="f">OLS</span>(Y_co, X_co).<span class="f">fit</span>()
+<span class="k">print</span>(<span class="s">f"\n=== Cochrane-Orcutt Correction ==="</span>)
+<span class="k">print</span>(<span class="s">f"Estimated ρ̂ = {rho_hat:.4f} (True ρ = {rho})"</span>)
+<span class="k">print</span>(<span class="s">f"CO β̂₁ = {model_co.params[1]:.4f}, SE = {model_co.bse[1]:.4f}"</span>)
+
+<span class="cm"># ACF Plot of Residuals</span>
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">2</span>, <span class="n">2</span>, figsize=(<span class="n">13</span>, <span class="n">8</span>))
+axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">plot</span>(t_idx, resid, color=<span class="s">'#c0392b'</span>, lw=<span class="n">1</span>)
+axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">axhline</span>(<span class="n">0</span>, color=<span class="s">'black'</span>, lw=<span class="n">1.5</span>)
+axes[<span class="n">0</span>,<span class="n">0</span>].set_title(<span class="s">'Residuals Over Time (AR(1) pattern visible)'</span>)
+
+sm.graphics.<span class="f">tsa.plot_acf</span>(resid, lags=<span class="n">25</span>, ax=axes[<span class="n">0</span>,<span class="n">1</span>])
+axes[<span class="n">0</span>,<span class="n">1</span>].set_title(<span class="s">'ACF of Residuals (exponential decay)'</span>)
+
+axes[<span class="n">1</span>,<span class="n">0</span>].<span class="f">scatter</span>(resid[:-<span class="n">1</span>], resid[<span class="n">1</span>:], alpha=<span class="n">0.4</span>, color=<span class="s">'#2980b9'</span>)
+axes[<span class="n">1</span>,<span class="n">0</span>].set_title(<span class="s">f'Residual(t) vs Residual(t-1): ρ̂={rho_hat:.3f}'</span>)
+
+sm.graphics.<span class="f">tsa.plot_acf</span>(model_co.resid, lags=<span class="n">25</span>, ax=axes[<span class="n">1</span>,<span class="n">1</span>])
+axes[<span class="n">1</span>,<span class="n">1</span>].set_title(<span class="s">'ACF After Cochrane-Orcutt (cleaned up)'</span>)
+
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()</pre>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Practice Exercises — Autocorrelation</h3>
+  <div class="exgrid">
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 4.1</div><h5>DW Statistic Interpretation</h5><p>For each DW statistic, interpret and estimate ρ: (a) DW = 1.2. (b) DW = 2.0. (c) DW = 2.8. (d) If DW = 0.6 with n=100 and one X variable, look up the critical values (dL ≈ 1.65, dU ≈ 1.69). What is the conclusion?</p><div class="hint"><strong>Hint:</strong> ρ̂ ≈ 1 − DW/2. (a) ρ̂≈0.4, positive AC. (b) ρ̂≈0, no AC. (c) ρ̂≈−0.4, negative AC. (d) DW=0.6 &lt; dL=1.65 → strong positive autocorrelation.</div></div>
+    <div class="exc easy"><span class="extag">Easy</span><div class="exnum">Exercise 4.2</div><h5>Variance Inflation Calculation</h5><p>For a time-series regression with AR(1) errors and ρ=0.6 and n=200: (a) Compute the approximate variance inflation factor (1+ρ)/(1-ρ). (b) By what factor are OLS standard errors understated? (c) If the OLS t-statistic for β₁ is 2.5, what is the true t-statistic approximately? Is β₁ still significant at 5%?</p><div class="hint"><strong>Hint:</strong> VIF = (1+0.6)/(1-0.6) = 4. SE deflation = 1/√4 = 0.5. True t ≈ 2.5 × 0.5 = 1.25. Not significant (1.25 &lt; 1.96). The "finding" was entirely spurious!</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 4.3</div><h5>Cochrane-Orcutt by Hand</h5><p>Data (T=5): Y=[5,7,8,10,11], X=[1,2,3,4,5], and estimated ρ̂=0.5. (a) Write the transformed model Ỹₜ and X̃ₜ for t=2,...,5. (b) Run OLS on the transformed data. (c) Compare to uncorrected OLS — how different are the standard errors?</p><div class="hint"><strong>Hint:</strong> Ỹₜ = Yₜ − 0.5Yₜ₋₁, X̃ₜ = Xₜ − 0.5Xₜ₋₁. For t=2: Ỹ₂=7−0.5×5=4.5, X̃₂=2−0.5×1=1.5. Constant term also transforms: 1−0.5×1=0.5.</div></div>
+    <div class="exc med"><span class="extag">Medium</span><div class="exnum">Exercise 4.4</div><h5>Newey-West Bandwidth Choice</h5><p>For Newey-West (HAC) standard errors, the lag truncation L matters. Rule of thumb: L ≈ floor(4(n/100)²/⁹). (a) Compute L for n=100, 200, 500, 1000. (b) In simulation (Python), show that for AR(1) with ρ=0.5, the NW estimator with optimal L has better coverage than with L=1 or L=20.</p><div class="hint"><strong>Hint:</strong> L≈4 for n=100, ≈5 for n=200, ≈6 for n=500. Too small L → doesn't fully correct AC. Too large L → introduces noise. Coverage = % of 95% CIs containing true β.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 4.5</div><h5>Spurious Regression</h5><p>Simulate two independent random walks: Yₜ = Yₜ₋₁ + uₜ, Xₜ = Xₜ₋₁ + vₜ (u,v i.i.d. N(0,1)). Run OLS of Y on X. (a) What is the true β₁? (b) Run 1000 simulations and count how often |t| &gt; 1.96. (c) Compare to the nominal 5%. (d) This is the "spurious regression" problem — explain why it happens and what ADF tests reveal.</p><div class="hint"><strong>Hint:</strong> True β₁=0 (independent). But OLS will reject H₀:β₁=0 far more than 5% — possibly 70-80%! Because random walks have strong autocorrelation, making standard errors tiny. ADF tests on residuals would show non-stationarity.</div></div>
+    <div class="exc hard"><span class="extag">Hard</span><div class="exnum">Exercise 4.6 — Quant Finance</div><h5>Time-Series Return Predictability</h5><p>You regress monthly stock returns rₜ on last month's dividend yield dₜ₋₁: rₜ = α + β·dₜ₋₁ + εₜ. Data shows OLS t-stat = 2.8 for β. (a) The dividend yield is highly persistent (AR(1) with ρ_d=0.97). Why does this cause "Stambaugh bias"? (b) Compute the bias in β̂ using formula: E[β̂]≈β+(-ρ_d·σ_ε·σ_u/σ_d²)/(1-ρ_d²). (c) After Newey-West correction with L=12, t drops to 1.4. What is your conclusion about return predictability?</p><div class="hint"><strong>Hint:</strong> Stambaugh bias arises because the predictor (dividend yield) is correlated with future innovations. With ρ_d≈1, the bias can be large and positive, making OLS β̂ overstate predictability. Newey-West t=1.4 &lt; 1.96 → fail to reject H₀ of no predictability.</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 5 — DETECTION & FIXES
+════════════════════════════════════════════════ -->
+<div id="tab-fix" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Complete Workflow</div>
+  <h2>Detection &amp; <span class="ra">Fixes</span></h2>
+  <p class="lead">A complete, structured workflow for diagnosing and correcting OLS assumption violations in practice.</p>
+
+  <h3>The Diagnostic Flowchart</h3>
+  <div class="svgwrap">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <rect width="700" height="420" fill="#f2ebe0" rx="8"/>
+
+      <!-- Start -->
+      <rect x="270" y="12" width="160" height="44" rx="22" fill="#1c1408" stroke="none"/>
+      <text x="350" y="33" text-anchor="middle" font-family="Barlow, sans-serif" font-size="13" font-weight="700" fill="#faf6f0">Run OLS Regression</text>
+      <text x="350" y="49" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#9a7c56">Step 1</text>
+
+      <line x1="350" y1="56" x2="350" y2="80" stroke="#6b5535" stroke-width="1.5" marker-end="url(#d1)"/>
+
+      <!-- Plot Residuals -->
+      <rect x="245" y="80" width="210" height="40" rx="6" fill="#e8ddd0" stroke="#b0a080" stroke-width="1.5"/>
+      <text x="350" y="97" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#1a5276" font-weight="600">Plot Residuals vs X &amp; Time</text>
+      <text x="350" y="111" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">Check ê vs Ŷ, ê vs t, ACF(ê)</text>
+
+      <!-- Branch: any pattern? -->
+      <line x1="350" y1="120" x2="350" y2="148" stroke="#6b5535" stroke-width="1.5" marker-end="url(#d2)"/>
+      <polygon points="350,148 430,172 350,196 270,172" fill="#f2ebe0" stroke="#6b5535" stroke-width="1.5"/>
+      <text x="350" y="168" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#1c1408" font-weight="600">Pattern in</text>
+      <text x="350" y="183" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#1c1408" font-weight="600">residuals?</text>
+
+      <!-- NO branch -->
+      <line x1="270" y1="172" x2="130" y2="172" stroke="#145a32" stroke-width="1.5" marker-end="url(#d3)"/>
+      <text x="200" y="165" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#145a32">NO</text>
+      <rect x="30" y="152" width="100" height="40" rx="6" fill="rgba(20,90,50,.15)" stroke="#145a32" stroke-width="1.5"/>
+      <text x="80" y="169" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#145a32" font-weight="600">OLS Assumptions</text>
+      <text x="80" y="183" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#145a32" font-weight="600">Likely Satisfied ✓</text>
+
+      <!-- YES branch down -->
+      <line x1="350" y1="196" x2="350" y2="218" stroke="#c0392b" stroke-width="1.5" marker-end="url(#d4)"/>
+      <text x="360" y="211" font-family="Share Tech Mono, monospace" font-size="10" fill="#c0392b">YES</text>
+
+      <!-- Two sub-branches -->
+      <!-- Fan pattern → Hetero -->
+      <line x1="350" y1="218" x2="180" y2="218" stroke="#6b5535" stroke-width="1.2"/>
+      <line x1="180" y1="218" x2="180" y2="246" stroke="#6b5535" stroke-width="1.2" marker-end="url(#d5)"/>
+      <text x="260" y="212" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#c0392b">Fan/funnel shape?</text>
+
+      <rect x="90" y="246" width="180" height="44" rx="6" fill="rgba(192,57,43,.1)" stroke="#c0392b" stroke-width="1.5"/>
+      <text x="180" y="264" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#c0392b" font-weight="600">Heteroskedasticity</text>
+      <text x="180" y="278" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">BP Test / White's Test</text>
+
+      <line x1="180" y1="290" x2="180" y2="318" stroke="#c0392b" stroke-width="1.2" marker-end="url(#d6)"/>
+      <rect x="80" y="318" width="200" height="50" rx="6" fill="rgba(192,57,43,.07)" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="180" y="336" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#c0392b">Fix: HC Robust SE</text>
+      <text x="180" y="349" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#c0392b">or WLS (if form known)</text>
+      <text x="180" y="362" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#c0392b">or Log transform</text>
+
+      <!-- Wavy/serial → Autocorrelation -->
+      <line x1="350" y1="218" x2="520" y2="218" stroke="#6b5535" stroke-width="1.2"/>
+      <line x1="520" y1="218" x2="520" y2="246" stroke="#6b5535" stroke-width="1.2" marker-end="url(#d7)"/>
+      <text x="440" y="212" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#1a5276">Serial/wave pattern?</text>
+
+      <rect x="430" y="246" width="180" height="44" rx="6" fill="rgba(26,82,118,.1)" stroke="#1a5276" stroke-width="1.5"/>
+      <text x="520" y="264" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="11" fill="#1a5276" font-weight="600">Autocorrelation</text>
+      <text x="520" y="278" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#6b5535">DW / BG Test / ACF plot</text>
+
+      <line x1="520" y1="290" x2="520" y2="318" stroke="#1a5276" stroke-width="1.2" marker-end="url(#d8)"/>
+      <rect x="420" y="318" width="200" height="50" rx="6" fill="rgba(26,82,118,.07)" stroke="#1a5276" stroke-width="1.2"/>
+      <text x="520" y="336" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#1a5276">Fix: Newey-West HAC SE</text>
+      <text x="520" y="349" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#1a5276">or Cochrane-Orcutt / GLS</text>
+      <text x="520" y="362" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#1a5276">or First Differences</text>
+
+      <!-- Verify -->
+      <line x1="180" y1="368" x2="180" y2="396" stroke="#6b5535" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="520" y1="368" x2="520" y2="396" stroke="#6b5535" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="180" y1="396" x2="520" y2="396" stroke="#6b5535" stroke-width="1"/>
+      <line x1="350" y1="396" x2="350" y2="408" stroke="#6b5535" stroke-width="1.5" marker-end="url(#d9)"/>
+      <text x="350" y="418" text-anchor="middle" font-family="Share Tech Mono, monospace" font-size="10" fill="#145a32">Re-check residuals → loop until clean</text>
+
+      <defs>
+        <marker id="d1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5535"/></marker>
+        <marker id="d2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5535"/></marker>
+        <marker id="d3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#145a32"/></marker>
+        <marker id="d4" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c0392b"/></marker>
+        <marker id="d5" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5535"/></marker>
+        <marker id="d6" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#c0392b"/></marker>
+        <marker id="d7" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5535"/></marker>
+        <marker id="d8" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#1a5276"/></marker>
+        <marker id="d9" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5535"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Quick Reference: Tests &amp; Fixes</h3>
+  <div class="tbl">
+    <table class="diag-table">
+      <tr><th>Problem</th><th>Primary Visual Sign</th><th>Formal Test</th><th>Quick Fix</th><th>Optimal Fix</th></tr>
+      <tr><td class="tr">Heteroskedasticity</td><td>Fan/funnel in ê vs X̂</td><td>Breusch-Pagan, White's</td><td>HC3 robust SE</td><td>WLS (if form known)</td></tr>
+      <tr><td class="tb2">Autocorrelation</td><td>ACF of ê decays slowly</td><td>Durbin-Watson, BG</td><td>Newey-West HAC SE</td><td>GLS / Cochrane-Orcutt</td></tr>
+      <tr><td>Both (HAC)</td><td>Fan + serial pattern</td><td>Both above</td><td>HAC robust SE</td><td>FGLS with full Ω</td></tr>
+      <tr><td>Non-linearity</td><td>Curve in ê vs X̂</td><td>RESET test</td><td>Add X², log(X)</td><td>Non-parametric regression</td></tr>
+      <tr><td>Endogeneity</td><td>Theory-based, no plot</td><td>Hausman test</td><td>None (OLS biased)</td><td>IV / 2SLS</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Concept-Check Quiz</h3>
+
+  <div class="quiz">
+    <div class="qt">Q1: A researcher runs OLS on stock returns and finds highly significant results. Residuals show clear positive autocorrelation (DW=0.8). What is the most likely explanation?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q1" id="q1a" value="w"><label for="q1a">OLS is biased, so the coefficient estimates are wrong.</label></li>
+      <li><input type="radio" name="q1" id="q1b" value="c"><label for="q1b">OLS standard errors are too small (underestimated), making t-statistics artificially large. The "significance" may be spurious.</label></li>
+      <li><input type="radio" name="q1" id="q1c" value="w"><label for="q1c">Autocorrelation increases standard errors, so results are more conservative than truth.</label></li>
+      <li><input type="radio" name="q1" id="q1d" value="w"><label for="q1d">Durbin-Watson = 0.8 indicates negative autocorrelation.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q1','r1')">Check Answer</button>
+    <div class="qres" id="r1"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="qt">Q2: After running the Breusch-Pagan test you get p=0.001. Your OLS coefficient is 2.3 with SE=0.4 (t=5.75). What should you do next?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q2" id="q2a" value="w"><label for="q2a">Re-run OLS with a different dependent variable — the current results are useless.</label></li>
+      <li><input type="radio" name="q2" id="q2b" value="c"><label for="q2b">Keep the OLS coefficient (still unbiased), but recompute standard errors using HC robust estimator (HC0, HC3), and re-evaluate significance with corrected t-stats.</label></li>
+      <li><input type="radio" name="q2" id="q2c" value="w"><label for="q2c">Nothing — Breusch-Pagan only detects multicollinearity, not heteroskedasticity.</label></li>
+      <li><input type="radio" name="q2" id="q2d" value="w"><label for="q2d">Accept the results — small p means stronger evidence of significance.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q2','r2')">Check Answer</button>
+    <div class="qres" id="r2"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="qt">Q3: A quant runs a return-predictability regression on 10 years of monthly data (n=120). The DW statistic is 1.2, and the variable looks significant (t=2.5). They apply Newey-West correction and get t=1.7. What should they conclude?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q3" id="q3a" value="w"><label for="q3a">The predictor is still significant at 10% — the relationship is real.</label></li>
+      <li><input type="radio" name="q3" id="q3b" value="c"><label for="q3b">The apparent significance was largely driven by autocorrelation inflating t-stats. After correction, the evidence is insufficient to claim predictability at conventional levels. Need more data or stronger theory.</label></li>
+      <li><input type="radio" name="q3" id="q3c" value="w"><label for="q3c">The Newey-West correction shows autocorrelation is not a problem since t is still close to 2.</label></li>
+      <li><input type="radio" name="q3" id="q3d" value="w"><label for="q3d">Re-run with OLS — Newey-West is only valid for large n.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q3','r3')">Check Answer</button>
+    <div class="qres" id="r3"></div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 4 — Combined Diagnostics</h3>
+  <div class="codeblock">
+    <div class="ctop">
+      <div class="cdots"><span class="cr2"></span><span class="cy2"></span><span class="cg2"></span></div>
+      <span class="cname">experiment_4_combined_diagnostics.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-a">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> pandas <span class="k">as</span> pd
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">import</span> statsmodels.api <span class="k">as</span> sm
+<span class="k">from</span> statsmodels.stats.diagnostic <span class="k">import</span> (
+    het_breuschpagan, het_white, acorr_breusch_godfrey)
+<span class="k">from</span> statsmodels.stats.stattools <span class="k">import</span> durbin_watson
+<span class="k">from</span> statsmodels.graphics.tsaplots <span class="k">import</span> plot_acf
+
+<span class="k">def</span> <span class="f">full_ols_diagnostics</span>(Y, X, title=<span class="s">"OLS Diagnostics"</span>):
+    <span class="s">"""Complete OLS diagnostic workflow"""</span>
+    Xc = sm.<span class="f">add_constant</span>(X)
+    model = sm.<span class="f">OLS</span>(Y, Xc).<span class="f">fit</span>()
+    resid = model.resid
+
+    <span class="k">print</span>(<span class="s">f"\n{'='*60}"</span>)
+    <span class="k">print</span>(<span class="s">f"{title}"</span>)
+    <span class="k">print</span>(<span class="s">f"{'='*60}"</span>)
+
+    <span class="cm"># 1. Heteroskedasticity tests</span>
+    lm_bp, p_bp, _, _ = het_breuschpagan(resid, Xc)
+    lm_w,  p_w,  _, _ = het_white(resid, Xc)
+    <span class="k">print</span>(<span class="s">f"\n📊 HETEROSKEDASTICITY:"</span>)
+    <span class="k">print</span>(<span class="s">f"  Breusch-Pagan: LM={lm_bp:.3f}, p={p_bp:.4f} → {'⚠ DETECTED' if p_bp<0.05 else '✓ OK'}"</span>)
+    <span class="k">print</span>(<span class="s">f"  White's Test:  LM={lm_w:.3f},  p={p_w:.4f} → {'⚠ DETECTED' if p_w<0.05 else '✓ OK'}"</span>)
+
+    <span class="cm"># 2. Autocorrelation tests</span>
+    dw = durbin_watson(resid)
+    lm_bg, p_bg, _, _ = acorr_breusch_godfrey(model, nlags=<span class="n">5</span>)
+    <span class="k">print</span>(<span class="s">f"\n📈 AUTOCORRELATION:"</span>)
+    <span class="k">print</span>(<span class="s">f"  Durbin-Watson: {dw:.4f} (2=none, <2=pos, >2=neg)"</span>)
+    <span class="k">print</span>(<span class="s">f"  Breusch-Godfrey: LM={lm_bg:.3f}, p={p_bg:.4f} → {'⚠ DETECTED' if p_bg<0.05 else '✓ OK'}"</span>)
+
+    <span class="cm"># 3. Compare standard errors</span>
+    m_hc3 = sm.<span class="f">OLS</span>(Y, Xc).<span class="f">fit</span>(cov_type=<span class="s">'HC3'</span>)
+    m_hac = sm.<span class="f">OLS</span>(Y, Xc).<span class="f">fit</span>(cov_type=<span class="s">'HAC'</span>, cov_kwds={<span class="s">'maxlags'</span>:<span class="n">5</span>})
+    <span class="k">print</span>(<span class="s">f"\n📐 STANDARD ERROR COMPARISON (slope):"</span>)
+    <span class="k">print</span>(<span class="s">f"  OLS SE = {model.bse[1]:.4f}, t = {model.tvalues[1]:.2f}"</span>)
+    <span class="k">print</span>(<span class="s">f"  HC3 SE = {m_hc3.bse[1]:.4f}, t = {m_hc3.tvalues[1]:.2f}"</span>)
+    <span class="k">print</span>(<span class="s">f"  HAC SE = {m_hac.bse[1]:.4f}, t = {m_hac.tvalues[1]:.2f}"</span>)
+
+    <span class="cm"># 4. Diagnostic plots</span>
+    fig, axes = plt.<span class="f">subplots</span>(<span class="n">2</span>, <span class="n">3</span>, figsize=(<span class="n">15</span>, <span class="n">8</span>))
+    fitted = model.fittedvalues
+
+    axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">scatter</span>(fitted, resid, alpha=<span class="n">0.4</span>); axes[<span class="n">0</span>,<span class="n">0</span>].<span class="f">axhline</span>(<span class="n">0</span>,c=<span class="s">'r'</span>)
+    axes[<span class="n">0</span>,<span class="n">0</span>].set_title(<span class="s">'Residuals vs Fitted'</span>)
+    axes[<span class="n">0</span>,<span class="n">1</span>].<span class="f">scatter</span>(fitted, np.<span class="f">sqrt</span>(np.<span class="f">abs</span>(resid)), alpha=<span class="n">0.4</span>)
+    axes[<span class="n">0</span>,<span class="n">1</span>].set_title(<span class="s">'Scale-Location'</span>)
+    sm.qqplot(resid, line=<span class="s">'45'</span>, ax=axes[<span class="n">0</span>,<span class="n">2</span>], alpha=<span class="n">0.4</span>); axes[<span class="n">0</span>,<span class="n">2</span>].set_title(<span class="s">'Q-Q Plot'</span>)
+    axes[<span class="n">1</span>,<span class="n">0</span>].<span class="f">plot</span>(resid, alpha=<span class="n">0.7</span>); axes[<span class="n">1</span>,<span class="n">0</span>].<span class="f">axhline</span>(<span class="n">0</span>,c=<span class="s">'r'</span>)
+    axes[<span class="n">1</span>,<span class="n">0</span>].set_title(<span class="s">'Residuals Over Time'</span>)
+    plot_acf(resid, lags=<span class="n">20</span>, ax=axes[<span class="n">1</span>,<span class="n">1</span>]); axes[<span class="n">1</span>,<span class="n">1</span>].set_title(<span class="s">'ACF of Residuals'</span>)
+    axes[<span class="n">1</span>,<span class="n">2</span>].<span class="f">scatter</span>(resid[:-<span class="n">1</span>], resid[<span class="n">1</span>:], alpha=<span class="n">0.4</span>); axes[<span class="n">1</span>,<span class="n">2</span>].set_title(<span class="s">'Lag-1 Residuals'</span>)
+
+    plt.<span class="f">suptitle</span>(title, fontsize=<span class="n">14</span>, fontweight=<span class="s">'bold'</span>)
+    plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()
+    <span class="k">return</span> model
+
+<span class="cm"># ════════ Run on three scenarios ════════</span>
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+n, T = <span class="n">150</span>, <span class="n">150</span>
+
+<span class="cm"># Scenario 1: Clean OLS</span>
+X1 = np.random.<span class="f">normal</span>(<span class="n">5</span>, <span class="n">2</span>, n)
+Y1 = <span class="n">2</span> + <span class="n">1.5</span>*X1 + np.random.<span class="f">normal</span>(<span class="n">0</span>, <span class="n">1</span>, n)
+<span class="f">full_ols_diagnostics</span>(Y1, X1, <span class="s">"Scenario 1: Clean OLS"</span>)
+
+<span class="cm"># Scenario 2: Heteroskedastic</span>
+X2 = np.random.<span class="f">uniform</span>(<span class="n">1</span>, <span class="n">10</span>, n)
+Y2 = <span class="n">2</span> + <span class="n">1.5</span>*X2 + np.random.<span class="f">normal</span>(<span class="n">0</span>, X2**<span class="n">0.8</span>, n)
+<span class="f">full_ols_diagnostics</span>(Y2, X2, <span class="s">"Scenario 2: Heteroskedastic Errors"</span>)
+
+<span class="cm"># Scenario 3: Autocorrelated</span>
+X3 = np.<span class="f">linspace</span>(<span class="n">1</span>, <span class="n">10</span>, T)
+eps3 = np.<span class="f">zeros</span>(T)
+<span class="k">for</span> t <span class="k">in</span> <span class="f">range</span>(<span class="n">1</span>,T): eps3[t] = <span class="n">0.75</span>*eps3[t-<span class="n">1</span>] + np.random.<span class="f">normal</span>(<span class="n">0</span>,<span class="n">1</span>)
+Y3 = <span class="n">2</span> + <span class="n">1.5</span>*X3 + eps3
+<span class="f">full_ols_diagnostics</span>(Y3, X3, <span class="s">"Scenario 3: AR(1) Autocorrelated Errors"</span>)</pre>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     TAB 6 — RESOURCES
+════════════════════════════════════════════════ -->
+<div id="tab-res" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Go Deeper</div>
+  <h2>Resources &amp; <span class="ba">Next Steps</span></h2>
+  <p class="lead">Curated resources from textbooks to interactive tools — everything you need to master regression diagnostics.</p>
+
+  <h3>📚 Textbooks &amp; Lecture Notes</h3>
+  <div class="resgrid">
+    <a href="https://www.econometricsbook.com" target="_blank" class="rescard">
+      <span class="ri">📗</span><h5>Econometrics — Hansen (Free)</h5>
+      <p>Bruce Hansen's complete econometrics textbook, free online. Chapters 4-8 cover OLS assumptions, heteroskedasticity, and autocorrelation rigorously.</p>
+      <span class="ru">econometricsbook.com</span>
+    </a>
+    <a href="https://ocw.mit.edu/courses/14-382-econometrics-spring-2017/" target="_blank" class="rescard">
+      <span class="ri">🏫</span><h5>MIT 14.382 — Econometrics</h5>
+      <p>MIT OpenCourseWare. Full treatment of OLS, GLS, heteroskedasticity and autocorrelation with problem sets and solutions.</p>
+      <span class="ru">ocw.mit.edu → 14-382</span>
+    </a>
+    <a href="https://www.statsmodels.org/stable/index.html" target="_blank" class="rescard">
+      <span class="ri">🐍</span><h5>Statsmodels Documentation</h5>
+      <p>Python library for all OLS diagnostics. Excellent tutorials on robust standard errors, GLS, and time-series regression.</p>
+      <span class="ru">statsmodels.org</span>
+    </a>
+    <a href="https://www.wooldridge.com" target="_blank" class="rescard">
+      <span class="ri">📘</span><h5>Wooldridge — Introductory Econometrics</h5>
+      <p>The most widely used undergraduate econometrics textbook. Chapters 8 (heteroskedasticity) and 12 (autocorrelation) are ideal for beginners.</p>
+      <span class="ru">wooldridge.com</span>
+    </a>
+  </div>
+
+  <h3>🎬 Video Resources</h3>
+  <div class="resgrid">
+    <a href="https://www.youtube.com/watch?v=bIkGhMgb3NE" target="_blank" class="rescard">
+      <span class="ri">▶️</span><h5>StatQuest — Linear Regression</h5>
+      <p>Josh Starmer's visual linear regression series. Start here for the foundation before diving into assumptions.</p>
+      <span class="ru">youtube.com/@statquest</span>
+    </a>
+    <a href="https://www.youtube.com/c/BenLambert" target="_blank" class="rescard">
+      <span class="ri">🎥</span><h5>Ben Lambert — Econometrics</h5>
+      <p>Hundreds of short econometrics videos covering every OLS assumption, GLS, heteroskedasticity and autocorrelation tests.</p>
+      <span class="ru">youtube.com/c/BenLambert</span>
+    </a>
+    <a href="https://www.youtube.com/playlist?list=PL8dPuuaLjXtPTrc_yg73RghJEOdobAplG" target="_blank" class="rescard">
+      <span class="ri">📺</span><h5>CrashCourse — Statistics</h5>
+      <p>Gentle introduction to regression and its assumptions. Good for building intuition before the more technical material.</p>
+      <span class="ru">youtube.com → CrashCourse Statistics</span>
+    </a>
+  </div>
+
+  <h3>💻 Interactive Tools</h3>
+  <div class="resgrid">
+    <a href="https://seeing-theory.brown.edu/regression-analysis/index.html" target="_blank" class="rescard">
+      <span class="ri">👁️</span><h5>Seeing Theory — Regression</h5>
+      <p>Beautiful interactive regression visualisation from Brown University. See how OLS line responds to outliers and assumption violations.</p>
+      <span class="ru">seeing-theory.brown.edu</span>
+    </a>
+    <a href="https://www.statmethods.net/stats/regression.html" target="_blank" class="rescard">
+      <span class="ri">📊</span><h5>Quick-R Regression Diagnostics</h5>
+      <p>R code for all standard diagnostic plots and tests. Excellent reference for understanding what each plot reveals.</p>
+      <span class="ru">statmethods.net/stats/regression</span>
+    </a>
+    <a href="https://gretl.sourceforge.net" target="_blank" class="rescard">
+      <span class="ri">🔬</span><h5>Gretl — Free Econometrics Software</h5>
+      <p>Free GUI econometrics software. Automated tests for heteroskedasticity and autocorrelation — great for hands-on practice without coding.</p>
+      <span class="ru">gretl.sourceforge.net</span>
+    </a>
+    <a href="https://colab.research.google.com/new" target="_blank" class="rescard">
+      <span class="ri">⚡</span><h5>Google Colab</h5>
+      <p>Run all 4 experiments from this guide instantly. Statsmodels has complete OLS diagnostics with one line of code.</p>
+      <span class="ru">colab.research.google.com</span>
+    </a>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🗺 Your Learning Path from Here</h3>
+  <div class="pathcard"><div class="pnum">1</div><div><h5>Solidify These Foundations</h5><p>Complete all 24 exercises. Run all 4 Colab experiments with your own data. Use the full_ols_diagnostics function as a template for every regression you run.</p></div></div>
+  <div class="pathcard"><div class="pnum">2</div><div><h5>GARCH Models — Volatility Clustering</h5><p>GARCH is the natural extension when heteroskedasticity follows a time-series pattern. Conditional variance σₜ² = α₀ + α₁εₜ₋₁² + β₁σₜ₋₁². Core model for options pricing and risk management.</p></div></div>
+  <div class="pathcard"><div class="pnum">3</div><div><h5>Panel Data — Fixed &amp; Random Effects</h5><p>When you have both cross-sectional and time-series data, fixed/random effects control for unit-specific heterogeneity that would otherwise cause omitted variable bias.</p></div></div>
+  <div class="pathcard"><div class="pnum">4</div><div><h5>Instrumental Variables (IV / 2SLS)</h5><p>When E[ε|X]≠0 (endogeneity), OLS is biased. IV estimates the causal effect using instruments z that affect X but not Y directly. The most important fix for the most serious assumption violation.</p></div></div>
+  <div class="pathcard"><div class="pnum">5</div><div><h5>Vector Autoregression (VAR)</h5><p>Extension of time-series regression to multiple interdependent variables. Granger causality, impulse response functions. Foundation of macroeconomic modelling and multi-asset return modelling.</p></div></div>
+  <div class="pathcard"><div class="pnum">6</div><div><h5>Machine Learning for Econometrics</h5><p>Lasso/ridge for variable selection, double ML for causal inference, gradient boosting for non-linear relationships. These methods relax many OLS assumptions while maintaining interpretability.</p></div></div>
+
+  <div class="sep"></div>
+  <div class="key-box">
+    <p><strong>The Core Lesson:</strong> OLS is a remarkably powerful tool — but it carries a contract. The BLUE guarantee comes with six conditions attached. Heteroskedasticity and autocorrelation don't invalidate your estimates, but they <strong>corrupt your uncertainty</strong>. In quantitative finance, wrong uncertainty estimates mean wrong position sizing, wrong risk limits, and wrong trading decisions. The diagnostic-and-correct workflow you've learned here is not optional housekeeping — it is the difference between statistical inference and statistical fiction.</p>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span>OLS Assumptions · Heteroskedasticity · Autocorrelation</span> — Quant Engineer Study Guide · 100% Offline
+</footer>
+
+<!-- ══════════════════════════ SCRIPTS ══════════════════════════ -->
+<script>
+'use strict';
+
+/* ── TAB SWITCHING ── */
+function go(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ── HELPERS ── */
+function randn() {
+  let u=0,v=0;
+  while(u===0)u=Math.random();
+  while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+const charts={};
+function mkChart(id,cfg){
+  if(charts[id])charts[id].destroy();
+  const el=document.getElementById(id);
+  if(!el)return null;
+  charts[id]=new Chart(el.getContext('2d'),cfg);
+  return charts[id];
+}
+const G='#c8b99a', T='#6b5535';
+const base={
+  plugins:{legend:{labels:{color:T,font:{family:"'Share Tech Mono',monospace",size:10},padding:8}}},
+  scales:{x:{grid:{color:'rgba(200,185,154,0.3)'},ticks:{color:T}},y:{grid:{color:'rgba(200,185,154,0.3)'},ticks:{color:T}}}
+};
+
+/* ── PREREQ CHARTS ── */
+function initGoodBadResid(){
+  // Good residuals
+  const n=60;
+  const xg=Array.from({length:n},(_,i)=>i/n*10);
+  const yg=xg.map(_=>randn()*1.2);
+  mkChart('goodResid',{type:'scatter',data:{datasets:[{label:'Residuals',data:xg.map((x,i)=>({x,y:yg[i]})),backgroundColor:'rgba(26,82,118,.6)',pointRadius:4}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,title:{display:true,text:'Fitted Values',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual',color:T}}},animation:false}});
+  // Bad residuals (fan shape)
+  const yb=xg.map((x,_)=>randn()*(0.2+x*0.25));
+  mkChart('badResid',{type:'scatter',data:{datasets:[{label:'Residuals',data:xg.map((x,i)=>({x,y:yb[i]})),backgroundColor:'rgba(192,57,43,.6)',pointRadius:4}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,title:{display:true,text:'Fitted Values',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual',color:T}}},animation:false}});
+}
+
+/* ── BLUE CHARTS ── */
+function initBLUE(){
+  const n=200;
+  const ols=[],alt=[];
+  for(let r=0;r<n;r++){
+    let s=0;
+    for(let i=0;i<50;i++) s+=randn()*1.5;
+    ols.push(0.8+s/750+randn()*0.04);
+    alt.push(0.8+randn()*0.12);
+  }
+  const bins=24;
+  function toHist(data,mn,mx){
+    const bw=(mx-mn)/bins,h=Array(bins).fill(0);
+    data.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),bins-1);h[b]++;});
+    return h;
+  }
+  const mn=Math.min(...ols,...alt)-0.02,mx=Math.max(...ols,...alt)+0.02;
+  const lbls=Array.from({length:bins},(_,i)=>(mn+(i+0.5)*(mx-mn)/bins).toFixed(3));
+  mkChart('blueChart1',{type:'bar',data:{labels:lbls,datasets:[{label:'OLS (BLUE)',data:toHist(ols,mn,mx),backgroundColor:'rgba(26,82,118,.6)',borderColor:'#1a5276',borderWidth:1}]},options:{...base,animation:false,scales:{x:{...base.scales.x,ticks:{maxTicksLimit:6,color:T}},y:{...base.scales.y}}}});
+  mkChart('blueChart2',{type:'bar',data:{labels:lbls,datasets:[{label:'Alternative',data:toHist(alt,mn,mx),backgroundColor:'rgba(192,57,43,.6)',borderColor:'#c0392b',borderWidth:1}]},options:{...base,animation:false,scales:{x:{...base.scales.x,ticks:{maxTicksLimit:6,color:T}},y:{...base.scales.y}}}});
+}
+
+/* ── DIAGNOSTIC PLOTS ── */
+function initDiagPlots(){
+  const n=80;
+  const x=Array.from({length:n},()=>Math.random()*10);
+  const y=x.map(xi=>2+1.5*xi+randn());
+  const fitted=x.map(xi=>2+1.5*xi);
+  const resid=y.map((yi,i)=>yi-fitted[i]);
+  // Residuals vs fitted
+  mkChart('diagPlots',{type:'scatter',data:{datasets:[{label:'ê vs Ŷ (good)',data:fitted.map((f,i)=>({x:f,y:resid[i]})),backgroundColor:'rgba(26,82,118,.5)',pointRadius:3}]},options:{...base,plugins:{legend:{labels:{color:T,font:{size:10}}}},scales:{x:{...base.scales.x,title:{display:true,text:'Fitted Ŷ',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual ê',color:T}}},animation:false}});
+}
+
+/* ── HETERO CHARTS ── */
+function initHeteroCharts(){
+  const n=80;
+  const x=Array.from({length:n},()=>Math.random()*10+0.5);
+  // Homo
+  const rHomo=x.map(()=>randn()*1.2);
+  mkChart('homoChart',{type:'scatter',data:{datasets:[{label:'Residuals',data:x.map((xi,i)=>({x:xi,y:rHomo[i]})),backgroundColor:'rgba(20,90,50,.55)',pointRadius:3}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,title:{display:true,text:'X',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual',color:T},min:-8,max:8}},animation:false}});
+  // Hetero fan
+  const rHet=x.map(xi=>randn()*xi*0.5);
+  mkChart('hetChart',{type:'scatter',data:{datasets:[{label:'Residuals',data:x.map((xi,i)=>({x:xi,y:rHet[i]})),backgroundColor:'rgba(192,57,43,.55)',pointRadius:3}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,title:{display:true,text:'X',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual',color:T},min:-8,max:8}},animation:false}});
+}
+
+/* ── HETERO SIM ── */
+function runHetSim(){
+  const gamma=+document.getElementById('hetGamma').value/100;
+  const n=+document.getElementById('hetN').value;
+  const x=Array.from({length:n},(_,i)=>(i+1)/n*10+0.5);
+  const eps=x.map(xi=>randn()*Math.pow(xi,gamma));
+  const y=x.map((xi,i)=>2+1.5*xi+eps[i]);
+  const sumX=x.reduce((a,b)=>a+b,0),meanX=sumX/n;
+  const sumXY=x.reduce((a,xi,i)=>a+xi*y[i],0);
+  const sumX2=x.reduce((a,xi)=>a+xi*xi,0);
+  const sxx=sumX2-n*meanX*meanX;
+  const b1=(sumXY-n*meanX*(y.reduce((a,b)=>a+b,0)/n))/sxx;
+  const b0=y.reduce((a,b)=>a+b,0)/n-b1*meanX;
+  const resid=y.map((yi,i)=>yi-b0-b1*x[i]);
+  const ssr=resid.reduce((a,r)=>a+r*r,0);
+  const s2=ssr/(n-2);
+  const seSE=Math.sqrt(s2/sxx);
+  // HC0 SE
+  const meatHC=x.reduce((a,xi,i)=>a+resid[i]*resid[i]*(xi-meanX)*(xi-meanX),0);
+  const hcSE=Math.sqrt(meatHC)/sxx;
+  // BP test (simple: regress e² on x)
+  const e2=resid.map(r=>r*r);
+  const me2=e2.reduce((a,b)=>a+b,0)/n;
+  const num=e2.reduce((a,ei2,i)=>a+(xi=>xi-meanX)(x[i])*(ei2-me2),0);
+  const beta_aux=num/sxx;
+  const beta0_aux=me2-beta_aux*meanX;
+  const yhat_aux=x.map(xi=>beta0_aux+beta_aux*xi);
+  const ssreg=yhat_aux.reduce((a,yh)=>a+(yh-me2)**2,0);
+  const sstot=e2.reduce((a,ei2)=>a+(ei2-me2)**2,0);
+  const r2_aux=sstot>0?ssreg/sstot:0;
+  const lm=n*r2_aux;
+  // Chi2 CDF approx
+  function chi2CDF1(x){return x>0?(1-Math.exp(-x/2))*Math.sign(x):0;}
+  const pBP=1-Math.min(0.9999,chi2CDF1(lm*1.8)*0.6+0.01);
+  document.getElementById('hSE_ols').textContent=seSE.toFixed(5);
+  document.getElementById('hSE_hc').textContent=hcSE.toFixed(5);
+  document.getElementById('hBP').textContent=pBP.toFixed(4);
+  const concEl=document.getElementById('hConc');
+  if(gamma===0){concEl.textContent='Homoskedastic — OLS SE valid';concEl.className='og';}
+  else if(pBP<0.05){concEl.textContent='Heteroskedasticity detected — use HC SE';concEl.className='or2';}
+  else{concEl.textContent='Mild — borderline';concEl.className='oa';}
+  // Plot
+  mkChart('hetSimChart',{type:'scatter',data:{datasets:[{label:'Residuals vs X',data:x.map((xi,i)=>({x:xi,y:resid[i]})),backgroundColor:gamma===0?'rgba(20,90,50,.5)':'rgba(192,57,43,.5)',pointRadius:3}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,title:{display:true,text:'X',color:T}},y:{...base.scales.y,title:{display:true,text:'Residual ê',color:T}}},animation:false}});
+}
+
+/* ── AC CHARTS ── */
+function initACCharts(){
+  const n=120;
+  const wn=Array.from({length:n},()=>randn());
+  const ar1=Array(n).fill(0);
+  for(let t=1;t<n;t++) ar1[t]=0.7*ar1[t-1]+randn();
+  const lbls=Array.from({length:n},(_,i)=>i);
+  mkChart('acWhite',{type:'line',data:{labels:lbls,datasets:[{label:'White Noise Residuals',data:wn,borderColor:'rgba(20,90,50,.7)',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{maxTicksLimit:8,color:T}},y:{...base.scales.y}},animation:false}});
+  mkChart('acAR1',{type:'line',data:{labels:lbls,datasets:[{label:'AR(1) ρ=0.7 Residuals',data:ar1,borderColor:'rgba(192,57,43,.7)',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{maxTicksLimit:8,color:T}},y:{...base.scales.y}},animation:false}});
+  // ACF chart
+  const lags=Array.from({length:15},(_,k)=>k);
+  const acf=lags.map(k=>Math.pow(0.7,k));
+  mkChart('acfChart',{type:'bar',data:{labels:lags,datasets:[{label:'ACF (theoretical, ρ=0.7)',data:acf,backgroundColor:lags.map(k=>Math.abs(acf[k])>1.96/Math.sqrt(120)?'rgba(192,57,43,.7)':'rgba(26,82,118,.5)'),borderColor:lags.map(k=>Math.abs(acf[k])>1.96/Math.sqrt(120)?'#c0392b':'#1a5276'),borderWidth:1}]},options:{...base,scales:{x:{...base.scales.x,title:{display:true,text:'Lag k',color:T}},y:{...base.scales.y,min:-0.1,max:1.05}},animation:false}});
+}
+
+/* ── AC SIM ── */
+function runACSim(){
+  const rho=+document.getElementById('acRho').value/100;
+  const n=+document.getElementById('acN').value;
+  const x=Array.from({length:n},(_,t)=>t/n*5+Math.random()*0.5);
+  const eps=Array(n).fill(0);
+  for(let t=1;t<n;t++) eps[t]=rho*eps[t-1]+randn();
+  const y=x.map((xi,t)=>1+0.8*xi+eps[t]);
+  // OLS
+  const meanX=x.reduce((a,b)=>a+b,0)/n;
+  const meanY=y.reduce((a,b)=>a+b,0)/n;
+  const sxx=x.reduce((a,xi)=>a+(xi-meanX)**2,0);
+  const sxy=x.reduce((a,xi,i)=>a+(xi-meanX)*(y[i]-meanY),0);
+  const b1=sxy/sxx;
+  const b0=meanY-b1*meanX;
+  const resid=y.map((yi,i)=>yi-b0-b1*x[i]);
+  const ssr=resid.reduce((a,r)=>a+r*r,0);
+  const s2=ssr/(n-2);
+  const olsSE=Math.sqrt(s2/sxx);
+  const olsT=(b1-0.8)/olsSE;
+  // Estimate rho
+  const rhoHat=n>1?resid.slice(1).reduce((a,r,i)=>a+r*resid[i],0)/resid.reduce((a,r)=>a+r*r,0):0;
+  const DW=resid.slice(1).reduce((a,r,i)=>a+(r-resid[i])**2,0)/Math.max(0.0001,resid.reduce((a,r)=>a+r*r,0));
+  // Newey-West SE (approx with 5 lags)
+  let meat=resid.reduce((a,r,i)=>a+r*r*(x[i]-meanX)**2,0);
+  for(let lag=1;lag<=Math.min(5,n-1);lag++){
+    const w=1-lag/6;
+    const cv=resid.slice(lag).reduce((a,r,i)=>a+r*resid[i]*(x[i+lag]-meanX)*(x[i]-meanX),0);
+    meat+=2*w*cv;
+  }
+  const nwSE=Math.sqrt(Math.max(0,meat))/(sxx);
+  const nwT=(b1-0.8)/Math.max(nwSE,0.0001);
+  const vi=sxx>0?(nwSE/olsSE)**2:1;
+  // BG approx
+  const lagRes=resid.slice(1);const prevRes=resid.slice(0,-1);
+  const rhoEst=lagRes.reduce((a,r,i)=>a+r*prevRes[i],0)/Math.max(0.001,prevRes.reduce((a,r)=>a+r*r,0));
+  const bgR2=rhoEst*rhoEst;const bgLM=n*bgR2;
+  const bgP=Math.max(0.001,Math.exp(-bgLM*0.5));
+  document.getElementById('acRhoHat').textContent=rhoHat.toFixed(3);
+  document.getElementById('acDW').textContent=DW.toFixed(3);
+  document.getElementById('acBG').textContent=bgP.toFixed(4);
+  const tOlsEl=document.getElementById('acTols');
+  tOlsEl.textContent=Math.abs(olsT).toFixed(2);
+  tOlsEl.className=Math.abs(olsT)>1.96?'or2':'og';
+  const tNwEl=document.getElementById('acTnw');
+  tNwEl.textContent=isFinite(nwT)?Math.abs(nwT).toFixed(2):'—';
+  tNwEl.className=isFinite(nwT)&&Math.abs(nwT)>1.96?'or2':'og';
+  document.getElementById('acVI').textContent=vi.toFixed(2)+'x';
+  // Plot residuals
+  const lbls=Array.from({length:n},(_,i)=>i);
+  mkChart('acSimChart',{type:'line',data:{labels:lbls,datasets:[{label:'Residuals over time',data:resid,borderColor:Math.abs(rho)>0.3?'rgba(192,57,43,.7)':'rgba(20,90,50,.7)',borderWidth:1.5,pointRadius:0,fill:false}]},options:{...base,plugins:{legend:{display:false}},scales:{x:{...base.scales.x,ticks:{maxTicksLimit:8,color:T}},y:{...base.scales.y}},animation:false}});
+}
+
+/* ── QUIZ ── */
+const QA={
+  r1:{c:'✅ Correct! Positive autocorrelation (DW &lt; 2) means residuals are correlated across time. This makes OLS standard errors too small — t-statistics are artificially inflated. A t-stat of 2.5 under autocorrelation might be only 1.0 after correction. The "significance" is often entirely spurious.',w:'❌ Not quite. Autocorrelation does NOT bias OLS estimates — β̂ is still centred on the truth. The problem is with standard errors: they are too small, making t-stats too large and results appear more significant than they really are.'},
+  r2:{c:'✅ Exactly right! With heteroskedasticity, OLS coefficient β̂ remains unbiased (E[β̂]=β), so the estimate 2.3 is still your best point estimate. But the SE=0.4 and t=5.75 are wrong. Use HC3 robust standard errors to get valid inference. The HC3 t-stat may still be significant, or not — you need to check.',w:'❌ Not quite. OLS with heteroskedasticity is still unbiased — the estimates are valid, but the standard errors are not. You should keep the OLS estimates but recompute SEs using HC-robust estimators.'},
+  r3:{c:'✅ Correct! DW=1.2 signals positive autocorrelation. The Newey-West correction properly accounts for this, and the t-stat drops from 2.5 to 1.7 — below the 5% critical value of 1.96. The apparent predictability was an artefact of autocorrelated errors inflating the t-statistic. This is extremely common in financial time series.',w:'❌ Not quite. After the Newey-West correction (t=1.7), the result is not significant at the 5% level. The correction accounts for autocorrelation in the error structure, and the finding evaporates. This is a common and important issue in time-series finance research.'}
+};
+function ck(name,resId){
+  const sel=document.querySelector(`input[name="${name}"]:checked`);
+  const el=document.getElementById(resId);
+  if(!sel){el.style.display='block';el.className='qres qw';el.textContent='Please select an answer.';return;}
+  el.style.display='block';
+  el.className='qres '+(sel.value==='c'?'qc':'qw');
+  el.textContent=sel.value==='c'?QA[resId].c:QA[resId].w;
+}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  initGoodBadResid();
+  initBLUE();
+  initDiagPlots();
+  initHeteroCharts();
+  runHetSim();
+  initACCharts();
+  runACSim();
+});
+</script>
+</body>
+</html>

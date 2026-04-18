@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Statistics — Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --accent4: #10b981;
+    --accent5: #f59e0b;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0d1b2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .header-badge::before {
+    content: '';
+    display: inline-block;
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+  .site-header h1 {
+    font-family: var(--display);
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .site-header h1 span { color: var(--accent); }
+  .header-sub {
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 560px;
+  }
+
+  /* ── NAV TABS ── */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 16px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-num {
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+  }
+  .tab-btn.active .tab-num {
+    background: rgba(0,212,255,0.15);
+    color: var(--accent);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 40px; max-width: 1100px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION STYLES ── */
+  .section-hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-hero::after {
+    content: attr(data-symbol);
+    position: absolute;
+    right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 72px;
+    color: rgba(255,255,255,0.03);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .section-hero h2 {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .section-hero p { color: var(--text-dim); max-width: 680px; }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+    margin: 32px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  h4 {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 20px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p { color: var(--text-dim); margin-bottom: 14px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card-accent-left {
+    border-left: 3px solid var(--accent);
+  }
+  .card-danger { border-left: 3px solid var(--danger); }
+  .card-success { border-left: 3px solid var(--success); }
+  .card-warning { border-left: 3px solid var(--warning); }
+  .card-purple { border-left: 3px solid var(--accent3); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+  }
+  .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .callout-body {}
+  .callout-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .callout-text { font-size: 14px; color: var(--text-dim); }
+  .callout.info { background: rgba(0,212,255,0.06); border: 1px solid rgba(0,212,255,0.2); }
+  .callout.info .callout-title { color: var(--accent); }
+  .callout.warn { background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2); }
+  .callout.warn .callout-title { color: var(--warning); }
+  .callout.danger { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); }
+  .callout.danger .callout-title { color: var(--danger); }
+  .callout.success { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); }
+  .callout.success .callout-title { color: var(--success); }
+
+  /* ── CODE ── */
+  pre {
+    background: #070b14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #a8d8ea;
+    margin: 16px 0;
+  }
+  code { font-family: var(--mono); }
+  .code-tag {
+    display: inline-block;
+    background: rgba(0,212,255,0.1);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .var { color: #eeffff; }
+
+  /* ── FORMULA BOX ── */
+  .formula-box {
+    background: #070b14;
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 16px;
+    color: #c792ea;
+    letter-spacing: 1px;
+  }
+  .formula-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ── SVG DIAGRAM ── */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .diagram-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  svg text { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── EXERCISE CARDS ── */
+  .exercise-tier {
+    border-radius: 12px;
+    border: 1px solid;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .exercise-tier.easy { border-color: rgba(16,185,129,0.3); }
+  .exercise-tier.medium { border-color: rgba(245,158,11,0.3); }
+  .exercise-tier.hard { border-color: rgba(239,68,68,0.3); }
+  .tier-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+  }
+  .easy .tier-header { background: rgba(16,185,129,0.08); color: var(--success); }
+  .medium .tier-header { background: rgba(245,158,11,0.08); color: var(--warning); }
+  .hard .tier-header { background: rgba(239,68,68,0.08); color: var(--danger); }
+  .tier-body {
+    padding: 20px;
+    background: var(--surface);
+  }
+  .exercise-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .exercise-item:last-child { border-bottom: none; }
+  .exercise-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  /* ── RESOURCE LINKS ── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .resource-link {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+  }
+  .resource-link:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .resource-type {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .resource-name {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .resource-desc { font-size: 12px; color: var(--text-muted); }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 16px 0;
+  }
+  th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.01); }
+
+  /* ── INTERACTIVE SIMULATOR ── */
+  .sim-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 24px 0;
+  }
+  .sim-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .sim-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .slider-label { font-family: var(--mono); font-size: 12px; color: var(--text-dim); min-width: 160px; }
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .slider-val {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    min-width: 60px;
+    text-align: right;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    background: #070b14;
+    border: 1px solid var(--border);
+  }
+  .output-stat {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 8px 8px 8px 0;
+  }
+  .output-stat span { color: var(--accent); font-weight: 600; }
+
+  .btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  /* ── PROGRESS ROADMAP ── */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    margin: 20px 0;
+  }
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 19px; top: 20px; bottom: 20px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent3));
+  }
+  .road-item {
+    display: flex;
+    gap: 20px;
+    padding: 12px 0;
+  }
+  .road-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .road-dot.prereq { background: var(--surface2); border: 2px solid var(--text-muted); color: var(--text-muted); }
+  .road-dot.active { background: rgba(0,212,255,0.15); border: 2px solid var(--accent); color: var(--accent); }
+  .road-content { padding-top: 8px; }
+  .road-content strong { display: block; font-family: var(--display); font-weight: 600; color: #fff; font-size: 14px; }
+  .road-content small { color: var(--text-muted); font-size: 12px; }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+  .tag-blue { background: rgba(0,212,255,0.1); color: var(--accent); }
+  .tag-orange { background: rgba(255,107,53,0.1); color: var(--accent2); }
+  .tag-green { background: rgba(16,185,129,0.1); color: var(--success); }
+  .tag-red { background: rgba(239,68,68,0.1); color: var(--danger); }
+  .tag-purple { background: rgba(124,58,237,0.1); color: var(--accent3); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    .main { padding: 20px; }
+    .site-header { padding: 24px 20px 18px; }
+    .tab-nav { padding: 0 12px; }
+    .section-hero { padding: 24px 20px; }
+    h3 { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-badge">Quant Engineer Track · Statistics Foundations</div>
+  <h1>Statistical Inference<br><span>Study Guide</span></h1>
+  <p class="header-sub">Hypothesis Testing · p-Values · Confidence Intervals · Type I &amp; II Errors — explained from scratch for aspiring quants.</p>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="showTab('prereq',this)"><span class="tab-num">00</span> Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('hypothesis',this)"><span class="tab-num">01</span> Hypotheses</button>
+  <button class="tab-btn" onclick="showTab('pvalue',this)"><span class="tab-num">02</span> p-Values</button>
+  <button class="tab-btn" onclick="showTab('ci',this)"><span class="tab-num">03</span> Confidence Intervals</button>
+  <button class="tab-btn" onclick="showTab('errors',this)"><span class="tab-num">04</span> Type I &amp; II Errors</button>
+  <button class="tab-btn" onclick="showTab('bigpicture',this)"><span class="tab-num">05</span> Big Picture</button>
+  <button class="tab-btn" onclick="showTab('colab',this)"><span class="tab-num">06</span> Colab Lab</button>
+  <button class="tab-btn" onclick="showTab('exercises',this)"><span class="tab-num">07</span> Exercises</button>
+</nav>
+
+<main class="main">
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 00 · PREREQUISITES
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel active" id="tab-prereq">
+
+  <div class="section-hero" data-symbol="μ σ">
+    <div class="hero-tag" style="color:var(--text-muted)">Start Here · Tab 00</div>
+    <h2>Before We Begin — Prerequisites</h2>
+    <p>These are the fundamental ideas that everything else is built on. Read them carefully — if any of these feel unfamiliar, spend time here before moving forward.</p>
+  </div>
+
+  <div class="roadmap">
+    <div class="road-item"><div class="road-dot prereq">P1</div><div class="road-content"><strong>Population vs Sample</strong><small>What are we measuring? All of it, or just some?</small></div></div>
+    <div class="road-item"><div class="road-dot prereq">P2</div><div class="road-content"><strong>Mean, Variance, Standard Deviation</strong><small>Where is the data? How spread is it?</small></div></div>
+    <div class="road-item"><div class="road-dot prereq">P3</div><div class="road-content"><strong>The Normal Distribution</strong><small>The bell curve — the star of statistics.</small></div></div>
+    <div class="road-item"><div class="road-dot prereq">P4</div><div class="road-content"><strong>Central Limit Theorem (CLT)</strong><small>Why the bell curve appears everywhere.</small></div></div>
+    <div class="road-item"><div class="road-dot active">01</div><div class="road-content"><strong>→ Null / Alternative Hypothesis</strong><small>Now we begin.</small></div></div>
+  </div>
+
+  <h3>P1 · Population vs Sample</h3>
+
+  <div class="card-grid">
+    <div class="card card-accent-left">
+      <h4>🌍 Population</h4>
+      <p>The <strong style="color:#fff">entire group</strong> you care about. Every single element. In quant finance, think: <em>all daily returns of a stock since it was listed.</em></p>
+      <p>You almost never have access to the full population. It's either too expensive, too large, or impossible to collect.</p>
+    </div>
+    <div class="card card-success">
+      <h4>🔬 Sample</h4>
+      <p>A <strong style="color:#fff">subset</strong> of the population that you actually observe. You use the sample to <em>infer</em> things about the population.</p>
+      <p>Example: 90 days of return data to understand how a strategy behaves.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Quant Finance Connection</div>
+      <div class="callout-text">When you backtest a strategy over 2 years, those 2 years are your <strong>sample</strong>. You're trying to infer how the strategy would perform across all possible market regimes — the <strong>population</strong>. This is why backtesting has limitations!</div>
+    </div>
+  </div>
+
+  <h3>P2 · Mean, Variance, Standard Deviation</h3>
+
+  <div class="card">
+    <h4>Mean (μ or x̄)</h4>
+    <p>The average. Sum all values, divide by count. The "center" or "expected value" of your data.</p>
+    <div class="formula-box">
+      <span class="formula-label">Population Mean</span>
+      μ = (1/N) · Σ xᵢ
+    </div>
+    <div class="formula-box">
+      <span class="formula-label">Sample Mean</span>
+      x̄ = (1/n) · Σ xᵢ
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Variance (σ² or s²)</h4>
+    <p>How far, on average, each data point deviates from the mean. <strong>Squared</strong> so negatives don't cancel out positives.</p>
+    <div class="formula-box">
+      <span class="formula-label">Sample Variance</span>
+      s² = (1/(n−1)) · Σ (xᵢ − x̄)²
+    </div>
+    <p style="font-size:13px;color:var(--text-muted)">Why (n−1) and not n? Called Bessel's correction — corrects for the fact that we're estimating from a sample, not the full population.</p>
+  </div>
+
+  <div class="card">
+    <h4>Standard Deviation (σ or s)</h4>
+    <p>Square root of variance. Same units as your data. In finance: <strong>volatility</strong> is just standard deviation of returns.</p>
+    <div class="formula-box">s = √s²</div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Standard Deviation Visualized</div>
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="barGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.2"/>
+        </linearGradient>
+      </defs>
+      <!-- data points -->
+      <g transform="translate(40,20)">
+        <!-- x axis -->
+        <line x1="0" y1="100" x2="620" y2="100" stroke="#1e2d45" stroke-width="1"/>
+        <!-- bars -->
+        <rect x="20" y="40" width="30" height="60" fill="url(#barGrad)" rx="3"/>
+        <rect x="70" y="55" width="30" height="45" fill="url(#barGrad)" rx="3"/>
+        <rect x="120" y="20" width="30" height="80" fill="url(#barGrad)" rx="3"/>
+        <rect x="170" y="10" width="30" height="90" fill="url(#barGrad)" rx="3"/>
+        <rect x="220" y="25" width="30" height="75" fill="url(#barGrad)" rx="3"/>
+        <rect x="270" y="50" width="30" height="50" fill="url(#barGrad)" rx="3"/>
+        <rect x="320" y="60" width="30" height="40" fill="url(#barGrad)" rx="3"/>
+        <rect x="370" y="30" width="30" height="70" fill="url(#barGrad)" rx="3"/>
+        <rect x="420" y="45" width="30" height="55" fill="url(#barGrad)" rx="3"/>
+        <rect x="470" y="55" width="30" height="45" fill="url(#barGrad)" rx="3"/>
+        <rect x="520" y="70" width="30" height="30" fill="url(#barGrad)" rx="3"/>
+        <!-- mean line -->
+        <line x1="0" y1="50" x2="620" y2="50" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4"/>
+        <text x="630" y="54" fill="#f59e0b" font-size="11">μ = mean</text>
+        <!-- sd arrows -->
+        <line x1="185" y1="50" x2="185" y2="10" stroke="#ef4444" stroke-width="1"/>
+        <line x1="175" y1="10" x2="195" y2="10" stroke="#ef4444" stroke-width="1"/>
+        <text x="198" y="30" fill="#ef4444" font-size="10">distance from mean</text>
+        <text x="198" y="42" fill="#64748b" font-size="10">= deviation</text>
+        <!-- label -->
+        <text x="0" y="130" fill="#64748b" font-size="11">σ = average of all these squared distances, then √ — it measures "spread"</text>
+      </g>
+    </svg>
+  </div>
+
+  <h3>P3 · The Normal Distribution</h3>
+
+  <p>The <strong style="color:#fff">bell curve</strong>. When you collect enough random data, it often follows this shape. Defined by just two numbers: mean (μ) and standard deviation (σ).</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Normal Distribution — The Bell Curve</div>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bellFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.03"/>
+        </linearGradient>
+      </defs>
+      <g transform="translate(0,10)">
+        <!-- bell curve path drawn via points -->
+        <path d="M50,180 C100,180 120,170 150,140 C170,118 185,90 200,65 C215,40 230,20 280,10 C310,4 330,4 350,4 C370,4 390,4 420,10 C470,20 485,40 500,65 C515,90 530,118 550,140 C580,170 600,180 650,180 Z"
+              fill="url(#bellFill)" stroke="#00d4ff" stroke-width="1.5"/>
+        <!-- x axis -->
+        <line x1="50" y1="180" x2="650" y2="180" stroke="#1e2d45" stroke-width="1"/>
+        <!-- center -->
+        <line x1="350" y1="5" x2="350" y2="180" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4"/>
+        <text x="350" y="196" text-anchor="middle" fill="#f59e0b" font-size="12">μ</text>
+        <!-- -1σ -->
+        <line x1="280" y1="10" x2="280" y2="180" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="280" y="196" text-anchor="middle" fill="#64748b" font-size="11">μ−σ</text>
+        <!-- +1σ -->
+        <line x1="420" y1="10" x2="420" y2="180" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="420" y="196" text-anchor="middle" fill="#64748b" font-size="11">μ+σ</text>
+        <!-- -2σ -->
+        <line x1="210" y1="65" x2="210" y2="180" stroke="#334155" stroke-width="1" stroke-dasharray="2,4"/>
+        <text x="210" y="196" text-anchor="middle" fill="#334155" font-size="10">μ−2σ</text>
+        <!-- +2σ -->
+        <line x1="490" y1="65" x2="490" y2="180" stroke="#334155" stroke-width="1" stroke-dasharray="2,4"/>
+        <text x="490" y="196" text-anchor="middle" fill="#334155" font-size="10">μ+2σ</text>
+        <!-- 68% bracket -->
+        <path d="M280,155 L350,155 L420,155" fill="none" stroke="#10b981" stroke-width="1.5"/>
+        <text x="350" y="148" text-anchor="middle" fill="#10b981" font-size="11">68%</text>
+        <!-- 95% bracket -->
+        <path d="M210,165 L350,165 L490,165" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="350" y="158" text-anchor="middle" fill="#f59e0b" font-size="10">95%</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>The 68-95-99.7 Rule</h4>
+      <p><span class="tag tag-green">68%</span> of data falls within <strong style="color:#fff">1σ</strong> of the mean</p>
+      <p><span class="tag tag-orange">95%</span> of data falls within <strong style="color:#fff">2σ</strong> of the mean</p>
+      <p><span class="tag tag-red">99.7%</span> of data falls within <strong style="color:#fff">3σ</strong> of the mean</p>
+    </div>
+    <div class="card">
+      <h4>Why It Matters for Quants</h4>
+      <p>Asset returns are often <em>approximately</em> normal (though not perfectly). Most statistical tests assume normality. Understanding the normal distribution is <strong style="color:#fff">non-negotiable</strong>.</p>
+    </div>
+  </div>
+
+  <h3>P4 · Central Limit Theorem (CLT)</h3>
+
+  <div class="callout success">
+    <div class="callout-icon">✨</div>
+    <div class="callout-body">
+      <div class="callout-title">The Most Important Theorem in Statistics</div>
+      <div class="callout-text"><strong>CLT says:</strong> If you take many samples from <em>any</em> distribution and calculate the mean of each sample, those sample means will follow a Normal distribution — regardless of what the original distribution looks like. This is why the normal distribution is everywhere.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>CLT In Plain English</h4>
+    <p>Imagine rolling a die 1000 times. Each roll is uniform (1–6, not normal). But if you take many groups of 30 rolls and average each group, those averages form a bell curve. This means our statistical tests work even when data isn't perfectly normal, <em>as long as we have enough samples</em>.</p>
+    <h4>Standard Error (SE)</h4>
+    <p>The CLT also tells us how spread out sample means are:</p>
+    <div class="formula-box">SE = σ / √n</div>
+    <p>Larger sample → smaller SE → more precise estimate. This is why more data = better inference.</p>
+  </div>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://seeing-theory.brown.edu/basic-probability/index.html" target="_blank">
+      <div class="resource-type">🌐 Interactive · Brown University</div>
+      <div class="resource-name">Seeing Theory: Basic Probability</div>
+      <div class="resource-desc">Visual introduction to probability and distributions</div>
+    </a>
+    <a class="resource-link" href="https://www.khanacademy.org/math/statistics-probability/sampling-distributions-library" target="_blank">
+      <div class="resource-type">📚 Video Series · Khan Academy</div>
+      <div class="resource-name">Sampling Distributions &amp; CLT</div>
+      <div class="resource-desc">Free beginner-friendly video explanations</div>
+    </a>
+    <a class="resource-link" href="https://onlinestatbook.com/stat_sim/sampling_dist/" target="_blank">
+      <div class="resource-type">🎮 Simulator · Online Stat Book</div>
+      <div class="resource-name">CLT Sampling Simulator</div>
+      <div class="resource-desc">Watch the bell curve form in real time as you sample</div>
+    </a>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 01 · HYPOTHESIS TESTING
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-hypothesis">
+
+  <div class="section-hero" data-symbol="H₀ H₁">
+    <div class="hero-tag" style="color:var(--accent)">Topic 01 · Hypotheses</div>
+    <h2>Null &amp; Alternative Hypotheses</h2>
+    <p>Before you can test anything statistically, you need to formalize what you're testing. Hypotheses are the foundation of every statistical test you'll ever run.</p>
+  </div>
+
+  <h3>The Core Idea — Scientific Skepticism</h3>
+
+  <div class="callout info">
+    <div class="callout-icon">🔬</div>
+    <div class="callout-body">
+      <div class="callout-title">The Fundamental Logic</div>
+      <div class="callout-text">Statistics doesn't <em>prove</em> things. It measures how surprised we should be by our data, assuming nothing interesting is happening. We start by <strong>assuming there's no effect</strong> (boring world), collect data, and ask: "How likely is this data in the boring world?" If it's very unlikely → we have evidence something IS happening.</div>
+    </div>
+  </div>
+
+  <h3>Null Hypothesis (H₀)</h3>
+
+  <div class="card card-accent-left">
+    <h4>H₀ — The "Nothing Interesting" Hypothesis</h4>
+    <p>The null hypothesis is the <strong style="color:#fff">default position</strong> — the claim that there is <em>no effect, no difference, no relationship</em>. It is what you assume to be true until evidence convinces you otherwise.</p>
+    <p>Think of it like a court of law: the accused is <strong style="color:#fff">innocent until proven guilty</strong>. H₀ is "innocent."</p>
+    <h4>Examples of H₀</h4>
+    <table>
+      <tr><th>Scenario</th><th>Null Hypothesis (H₀)</th></tr>
+      <tr><td>Does a new drug lower blood pressure?</td><td>"The drug has NO effect on blood pressure"</td></tr>
+      <tr><td>Is our trading strategy profitable?</td><td>"The strategy's mean return = 0 (no alpha)"</td></tr>
+      <tr><td>Does company size affect returns?</td><td>"Company size has NO relationship with returns"</td></tr>
+      <tr><td>Is this coin fair?</td><td>"P(heads) = 0.5"</td></tr>
+    </table>
+  </div>
+
+  <h3>Alternative Hypothesis (H₁ or Hₐ)</h3>
+
+  <div class="card card-success">
+    <h4>H₁ — The "Something Interesting" Hypothesis</h4>
+    <p>This is what you <strong style="color:#fff">believe might be true</strong> — the claim you're trying to find evidence for. If data strongly contradicts H₀, you "reject H₀ in favor of H₁."</p>
+    <h4>Examples of H₁</h4>
+    <table>
+      <tr><th>Scenario</th><th>Alternative Hypothesis (H₁)</th></tr>
+      <tr><td>Does a new drug lower blood pressure?</td><td>"The drug DOES lower blood pressure" (one-tailed)</td></tr>
+      <tr><td>Is our trading strategy profitable?</td><td>"Mean return &gt; 0 (positive alpha)" (one-tailed)</td></tr>
+      <tr><td>Does company size affect returns?</td><td>"Company size IS related to returns" (two-tailed)</td></tr>
+      <tr><td>Is this coin fair?</td><td>"P(heads) ≠ 0.5" (two-tailed)</td></tr>
+    </table>
+  </div>
+
+  <h3>One-Tailed vs Two-Tailed Tests</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>Two-Tailed Test ≠</h4>
+      <p>H₁ says the parameter is <strong style="color:#fff">different</strong> from H₀ — either larger OR smaller.</p>
+      <p>Use when you have no prior reason to expect direction.</p>
+      <p>Example: H₀: μ = 0 &nbsp;→&nbsp; H₁: μ <strong>≠</strong> 0</p>
+    </div>
+    <div class="card">
+      <h4>One-Tailed Test &gt; or &lt;</h4>
+      <p>H₁ says the parameter is <strong style="color:#fff">larger</strong> OR <strong style="color:#fff">smaller</strong> — you already expect a direction.</p>
+      <p>Use when theory or prior evidence gives you direction.</p>
+      <p>Example: H₀: μ = 0 &nbsp;→&nbsp; H₁: μ <strong>&gt;</strong> 0</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">One-Tailed vs Two-Tailed Rejection Regions</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="redFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#ef4444" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+      <!-- TWO-TAILED (left) -->
+      <g transform="translate(20,10)">
+        <text x="145" y="15" text-anchor="middle" fill="#94a3b8" font-size="11">TWO-TAILED (α/2 each side)</text>
+        <!-- bell -->
+        <path d="M20,150 C50,150 65,140 85,110 C95,93 105,70 120,50 C135,30 145,15 165,8 C175,5 183,5 190,5 C197,5 205,5 215,8 C235,15 245,30 260,50 C275,70 285,93 295,110 C315,140 330,150 360,150 Z" fill="url(#bg2)" stroke="#00d4ff" stroke-width="1.2"/>
+        <!-- left reject -->
+        <path d="M20,150 C50,150 65,140 85,110 C90,102 93,95 95,87 L95,150 Z" fill="url(#redFill)"/>
+        <!-- right reject -->
+        <path d="M285,87 C287,95 290,102 295,110 C315,140 330,150 360,150 L360,150 L285,150 Z" fill="url(#redFill)"/>
+        <!-- labels -->
+        <text x="55" y="135" fill="#ef4444" font-size="10">α/2</text>
+        <text x="55" y="147" fill="#ef4444" font-size="9">reject</text>
+        <text x="305" y="135" fill="#ef4444" font-size="10">α/2</text>
+        <text x="305" y="147" fill="#ef4444" font-size="9">reject</text>
+        <text x="190" y="170" text-anchor="middle" fill="#10b981" font-size="10">Do NOT reject H₀</text>
+        <!-- x axis -->
+        <line x1="20" y1="152" x2="360" y2="152" stroke="#1e2d45" stroke-width="1"/>
+        <text x="190" y="165" text-anchor="middle" fill="#64748b" font-size="10">μ₀ (H₀ value)</text>
+      </g>
+      <!-- ONE-TAILED (right) -->
+      <g transform="translate(360,10)">
+        <text x="145" y="15" text-anchor="middle" fill="#94a3b8" font-size="11">ONE-TAILED (right) — H₁: μ &gt; μ₀</text>
+        <path d="M20,150 C50,150 65,140 85,110 C95,93 105,70 120,50 C135,30 145,15 165,8 C175,5 183,5 190,5 C197,5 205,5 215,8 C235,15 245,30 260,50 C275,70 285,93 295,110 C315,140 330,150 360,150 Z" fill="url(#bg2)" stroke="#00d4ff" stroke-width="1.2"/>
+        <!-- right reject only -->
+        <path d="M265,70 C272,85 280,100 295,110 C315,140 330,150 360,150 L360,150 L265,150 Z" fill="url(#redFill)"/>
+        <text x="305" y="135" fill="#ef4444" font-size="10">α</text>
+        <text x="305" y="147" fill="#ef4444" font-size="9">reject</text>
+        <text x="140" y="170" text-anchor="middle" fill="#10b981" font-size="10">Do NOT reject H₀</text>
+        <line x1="20" y1="152" x2="360" y2="152" stroke="#1e2d45" stroke-width="1"/>
+        <text x="190" y="165" text-anchor="middle" fill="#64748b" font-size="10">μ₀</text>
+      </g>
+    </svg>
+  </div>
+
+  <h3>Significance Level (α) — The Decision Threshold</h3>
+
+  <div class="card card-warning">
+    <h4>Alpha (α) — How Much Doubt is Enough?</h4>
+    <p>Before collecting data, you <strong style="color:#fff">choose</strong> how strong the evidence needs to be to reject H₀. This is α (alpha), the significance level.</p>
+    <p><strong style="color:#fff">Common choices:</strong></p>
+    <p>α = 0.05 → "I'll only reject H₀ if there's less than 5% chance this data happens when H₀ is true."</p>
+    <p>α = 0.01 → More strict. Used in medical/safety-critical decisions.</p>
+    <p>α = 0.10 → More lenient. Sometimes used in exploratory quant research.</p>
+    <div class="callout warn" style="margin-top:14px">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <div class="callout-title">Critical Rule</div>
+        <div class="callout-text">You MUST choose α <em>before</em> collecting data. Choosing it after you see results is called <strong>p-hacking</strong> — a form of statistical fraud common in bad research.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Hypothesis Testing Workflow</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Step-by-Step Flow</div>
+    <svg viewBox="0 0 700 90" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1e2d45"/>
+        </marker>
+      </defs>
+      <!-- boxes -->
+      <g font-size="10" fill="#94a3b8" font-family="IBM Plex Mono">
+        <rect x="5" y="25" width="90" height="40" rx="6" fill="#111827" stroke="#00d4ff" stroke-width="1.2"/>
+        <text x="50" y="44" text-anchor="middle" fill="#00d4ff">State</text>
+        <text x="50" y="57" text-anchor="middle">H₀ and H₁</text>
+        <line x1="96" y1="45" x2="115" y2="45" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="116" y="25" width="90" height="40" rx="6" fill="#111827" stroke="#1e2d45" stroke-width="1.2"/>
+        <text x="161" y="44" text-anchor="middle" fill="#94a3b8">Choose α</text>
+        <text x="161" y="57" text-anchor="middle">&amp; test type</text>
+        <line x1="207" y1="45" x2="226" y2="45" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="227" y="25" width="90" height="40" rx="6" fill="#111827" stroke="#1e2d45" stroke-width="1.2"/>
+        <text x="272" y="44" text-anchor="middle" fill="#94a3b8">Collect</text>
+        <text x="272" y="57" text-anchor="middle">data</text>
+        <line x1="318" y1="45" x2="337" y2="45" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="338" y="25" width="90" height="40" rx="6" fill="#111827" stroke="#1e2d45" stroke-width="1.2"/>
+        <text x="383" y="44" text-anchor="middle" fill="#94a3b8">Compute</text>
+        <text x="383" y="57" text-anchor="middle">test stat &amp; p</text>
+        <line x1="429" y1="45" x2="448" y2="45" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="449" y="25" width="90" height="40" rx="6" fill="#111827" stroke="#1e2d45" stroke-width="1.2"/>
+        <text x="494" y="44" text-anchor="middle" fill="#94a3b8">Compare</text>
+        <text x="494" y="57" text-anchor="middle">p vs α</text>
+        <line x1="540" y1="45" x2="559" y2="45" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <rect x="560" y="25" width="130" height="40" rx="6" fill="#111827" stroke="#10b981" stroke-width="1.2"/>
+        <text x="625" y="44" text-anchor="middle" fill="#10b981">Reject H₀?</text>
+        <text x="625" y="57" text-anchor="middle">p &lt; α → Yes</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://www.statology.org/hypothesis-testing/" target="_blank">
+      <div class="resource-type">📖 Guide · Statology</div>
+      <div class="resource-name">Hypothesis Testing: Complete Guide</div>
+      <div class="resource-desc">Clear written walkthrough with examples</div>
+    </a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=0zZYBALbZgg" target="_blank">
+      <div class="resource-type">🎬 Video · StatQuest</div>
+      <div class="resource-name">Hypothesis Testing Explained</div>
+      <div class="resource-desc">Josh Starmer's famous easy-to-understand series</div>
+    </a>
+    <a class="resource-link" href="https://statsandr.com/blog/hypothesis-test-by-hand/" target="_blank">
+      <div class="resource-type">✍️ Practice · Stats &amp; R</div>
+      <div class="resource-name">Hypothesis Tests by Hand</div>
+      <div class="resource-desc">Step-by-step worked examples</div>
+    </a>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 02 · p-VALUES
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-pvalue">
+
+  <div class="section-hero" data-symbol="p">
+    <div class="hero-tag" style="color:var(--accent2)">Topic 02 · p-Values</div>
+    <h2>p-Values — The Most Misunderstood Number in Science</h2>
+    <p>The p-value is widely used and widely misunderstood. Once you truly understand what it says — and what it doesn't — you'll be ahead of most practitioners.</p>
+  </div>
+
+  <h3>What Exactly IS a p-Value?</h3>
+
+  <div class="callout info">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-body">
+      <div class="callout-title">The Precise Definition</div>
+      <div class="callout-text">The p-value is the probability of observing data <em>at least as extreme as what you actually observed</em>, <strong>assuming the null hypothesis is true</strong>.<br><br>
+      <strong>p-value = P(data this extreme | H₀ is true)</strong></div>
+    </div>
+  </div>
+
+  <h3>The Coin Flip Analogy</h3>
+
+  <div class="card">
+    <h4>Step-by-Step Intuition</h4>
+    <p><strong style="color:#fff">Scenario:</strong> You suspect a coin is biased toward heads. You flip it 20 times and get 16 heads.</p>
+    <p><strong style="color:#fff">H₀:</strong> The coin is fair — P(heads) = 0.5</p>
+    <p><strong style="color:#fff">H₁:</strong> The coin is biased — P(heads) &gt; 0.5</p>
+    <p><strong style="color:#fff">Question:</strong> If H₀ is true (fair coin), how likely is it to get 16 or more heads out of 20?</p>
+    <p><strong style="color:#fff">Answer:</strong> About 0.6% → p ≈ 0.006</p>
+    <p><strong style="color:#fff">Interpretation:</strong> If the coin were fair, seeing 16+ heads would happen only 0.6% of the time. That's very unlikely. We reject H₀ at α = 0.05.</p>
+  </div>
+
+  <h3>What p-Value IS and IS NOT</h3>
+
+  <div class="card-grid">
+    <div class="card card-success">
+      <h4>✅ p-value IS...</h4>
+      <p>The probability your data (or more extreme) would occur <strong>if H₀ were true</strong>.</p>
+      <p>A measure of how surprising your data is under H₀.</p>
+      <p>A basis for a binary decision: reject or not reject H₀.</p>
+    </div>
+    <div class="card card-danger">
+      <h4>❌ p-value is NOT...</h4>
+      <p>The probability that H₀ is true.</p>
+      <p>The probability that H₁ is true.</p>
+      <p>The probability you made an error.</p>
+      <p>A measure of the size or importance of an effect.</p>
+    </div>
+  </div>
+
+  <div class="callout danger">
+    <div class="callout-icon">🚨</div>
+    <div class="callout-body">
+      <div class="callout-title">Common Misconception to Burn Into Memory</div>
+      <div class="callout-text">"p = 0.03" does NOT mean "there's a 3% chance H₀ is true." It means "if H₀ WERE true, 3% of the time we'd see data this extreme." These are completely different statements. Confusing them is one of the most common errors in published research.</div>
+    </div>
+  </div>
+
+  <h3>The Test Statistic — How We Calculate p</h3>
+
+  <div class="card">
+    <h4>Test Statistics Turn Data Into a p-Value</h4>
+    <p>A test statistic measures how far your sample result is from the H₀ value, in units of standard error. Common ones:</p>
+    <table>
+      <tr><th>Test Statistic</th><th>When to Use</th><th>Formula</th></tr>
+      <tr><td>z-score</td><td>Large samples (n &gt; 30), σ known</td><td>z = (x̄ − μ₀) / (σ/√n)</td></tr>
+      <tr><td>t-statistic</td><td>Small samples, σ unknown</td><td>t = (x̄ − μ₀) / (s/√n)</td></tr>
+      <tr><td>chi-square (χ²)</td><td>Categorical data</td><td>Σ (O−E)²/E</td></tr>
+      <tr><td>F-statistic</td><td>Comparing variances/multiple groups</td><td>variance between / variance within</td></tr>
+    </table>
+    <p style="margin-top:14px">Once you have the test statistic, you look up (or compute) how extreme it is on the relevant distribution — that probability is your p-value.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">p-Value Visualized: Area in the Tail(s)</div>
+    <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bellB" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.02"/>
+        </linearGradient>
+        <linearGradient id="pArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#ef4444" stop-opacity="0.1"/>
+        </linearGradient>
+      </defs>
+      <g transform="translate(20,10)">
+        <path d="M20,150 C60,150 80,135 110,100 C130,76 148,48 175,25 C195,10 210,5 235,5 C260,5 275,10 295,25 C322,48 340,76 360,100 C390,135 410,150 450,150 Z" fill="url(#bellB)" stroke="#00d4ff" stroke-width="1.3"/>
+        <!-- x axis -->
+        <line x1="10" y1="151" x2="460" y2="151" stroke="#1e2d45"/>
+        <!-- test stat line -->
+        <line x1="355" y1="105" x2="355" y2="155" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- p-value area (right tail from test stat) -->
+        <path d="M355,108 C358,105 362,103 370,100 C390,93 410,130 450,150 L450,150 L355,150 Z" fill="url(#pArea)"/>
+        <!-- labels -->
+        <text x="355" y="170" text-anchor="middle" fill="#ef4444" font-size="11">test statistic</text>
+        <text x="410" y="135" fill="#ef4444" font-size="11">p-value</text>
+        <text x="410" y="147" fill="#ef4444" font-size="10">(shaded area)</text>
+        <text x="235" y="170" text-anchor="middle" fill="#64748b" font-size="11">H₀ value (μ₀)</text>
+        <line x1="235" y1="5" x2="235" y2="150" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3"/>
+        <!-- annotations -->
+        <text x="150" y="90" fill="#64748b" font-size="10">If test stat is far</text>
+        <text x="150" y="103" fill="#64748b" font-size="10">from H₀ → small</text>
+        <text x="150" y="116" fill="#64748b" font-size="10">p-value → evidence</text>
+        <text x="150" y="129" fill="#64748b" font-size="10">against H₀</text>
+      </g>
+    </svg>
+  </div>
+
+  <h3>Interactive p-Value Simulator</h3>
+
+  <div class="sim-wrap">
+    <div class="sim-title">🎲 p-Value Explorer — Coin Flip Experiment</div>
+    <div class="sim-desc">Adjust parameters and see how the p-value changes. Imagine testing if a coin is fair (H₀: p=0.5).</div>
+    <div class="slider-row">
+      <span class="slider-label">Num. Flips (n)</span>
+      <input type="range" id="nFlips" min="10" max="200" value="20" oninput="updateSim()">
+      <span class="slider-val" id="nFlipsVal">20</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Heads Observed (k)</span>
+      <input type="range" id="kHeads" min="0" max="200" value="14" oninput="updateSim()">
+      <span class="slider-val" id="kHeadsVal">14</span>
+    </div>
+    <canvas id="simCanvas" height="160"></canvas>
+    <div style="margin-top:14px">
+      <div class="output-stat">p-value: <span id="pvalOut">—</span></div>
+      <div class="output-stat">Test stat (z): <span id="zstatOut">—</span></div>
+      <div class="output-stat">Decision (α=0.05): <span id="decisionOut">—</span></div>
+    </div>
+  </div>
+
+  <h3>Significance vs Practical Importance</h3>
+
+  <div class="callout warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body">
+      <div class="callout-title">Statistical Significance ≠ Practical Significance</div>
+      <div class="callout-text">With a huge sample (n = 1,000,000), even a tiny, meaningless effect (return of 0.0001%) can give p &lt; 0.001. Always ask: "Is the effect size actually meaningful for my use case?" In quant finance, a <em>statistically significant</em> alpha might be economically insignificant after transaction costs.</div>
+    </div>
+  </div>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://www.youtube.com/watch?v=5Z9OIYA8He8" target="_blank">
+      <div class="resource-type">🎬 Video · StatQuest</div>
+      <div class="resource-name">p-values: What they are and how to interpret</div>
+      <div class="resource-desc">Josh Starmer makes this crystal clear</div>
+    </a>
+    <a class="resource-link" href="https://fivethirtyeight.com/features/not-even-scientists-can-easily-explain-p-values/" target="_blank">
+      <div class="resource-type">📰 Article · FiveThirtyEight</div>
+      <div class="resource-name">Scientists Can't Easily Explain p-Values</div>
+      <div class="resource-desc">Even experts get this wrong — great context</div>
+    </a>
+    <a class="resource-link" href="https://seeing-theory.brown.edu/frequentist-inference/index.html" target="_blank">
+      <div class="resource-type">🌐 Interactive · Brown Univ.</div>
+      <div class="resource-name">Frequentist Inference Visualizer</div>
+      <div class="resource-desc">Interactive tool for hypothesis testing</div>
+    </a>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 03 · CONFIDENCE INTERVALS
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-ci">
+
+  <div class="section-hero" data-symbol="CI">
+    <div class="hero-tag" style="color:var(--accent4)">Topic 03 · Confidence Intervals</div>
+    <h2>Confidence Intervals</h2>
+    <p>Instead of a single number estimate, a CI gives you a range. It's more informative and more honest about uncertainty than a point estimate alone.</p>
+  </div>
+
+  <h3>The Problem with Point Estimates</h3>
+
+  <div class="card">
+    <h4>Why a Single Number Isn't Enough</h4>
+    <p>Say you backtest a strategy and the mean daily return is <strong style="color:#fff">0.05%</strong>. Is that reliable? You've only seen one sample from a universe of possible markets. If you repeated the test on different 90-day windows, you'd get different numbers. How much would they vary?</p>
+    <p>A confidence interval acknowledges this: instead of "the return is 0.05%", it says "the return is <strong style="color:#fff">between 0.01% and 0.09%</strong> — and I'm 95% confident this range contains the true value."</p>
+  </div>
+
+  <h3>The Precise Definition (Read Carefully)</h3>
+
+  <div class="callout info">
+    <div class="callout-icon">📐</div>
+    <div class="callout-body">
+      <div class="callout-title">What "95% Confident" Actually Means</div>
+      <div class="callout-text">A 95% CI does NOT mean "there's a 95% chance the true parameter is in this interval." The true parameter is fixed — it's either in there or it isn't.<br><br>
+      What it DOES mean: If you repeated this experiment many times and built a CI from each sample, <strong>95% of those intervals would contain the true parameter</strong>. The 95% refers to the long-run performance of the <em>procedure</em>, not one specific interval.</div>
+    </div>
+  </div>
+
+  <h3>The Formula</h3>
+
+  <div class="card">
+    <h4>95% Confidence Interval for a Mean</h4>
+    <div class="formula-box">
+      <span class="formula-label">Confidence Interval</span>
+      CI = x̄ ± z* · (s / √n)
+    </div>
+    <table>
+      <tr><th>Component</th><th>Meaning</th></tr>
+      <tr><td>x̄</td><td>Sample mean — your best single estimate</td></tr>
+      <tr><td>z*</td><td>Critical value (1.96 for 95%, 2.576 for 99%)</td></tr>
+      <tr><td>s</td><td>Sample standard deviation</td></tr>
+      <tr><td>√n</td><td>Square root of sample size</td></tr>
+      <tr><td>s / √n</td><td>Standard Error (SE) — uncertainty in x̄</td></tr>
+      <tr><td>z* · SE</td><td>Margin of Error</td></tr>
+    </table>
+    <div class="callout info" style="margin-top:16px">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Where does 1.96 come from?</div>
+        <div class="callout-text">On a standard normal distribution, 95% of the area falls between -1.96 and +1.96. So if we go 1.96 standard errors in each direction, we capture the middle 95% of sampling outcomes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Visualizing the Confidence Interval Construction</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ciGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.03"/>
+        </linearGradient>
+      </defs>
+      <g transform="translate(30,10)">
+        <!-- sampling distribution -->
+        <path d="M20,150 C55,150 80,135 110,105 C130,84 148,55 175,28 C192,12 208,5 230,5 C252,5 268,12 285,28 C312,55 330,84 350,105 C380,135 405,150 440,150 Z" fill="url(#ciGrad)" stroke="#7c3aed" stroke-width="1.3"/>
+        <!-- axis -->
+        <line x1="10" y1="151" x2="460" y2="151" stroke="#1e2d45"/>
+        <!-- mean -->
+        <line x1="230" y1="5" x2="230" y2="151" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4"/>
+        <text x="230" y="168" text-anchor="middle" fill="#f59e0b" font-size="11">x̄ (estimate)</text>
+        <!-- CI bounds -->
+        <line x1="120" y1="95" x2="120" y2="151" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <line x1="340" y1="95" x2="340" y2="151" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <!-- CI bar -->
+        <line x1="120" y1="175" x2="340" y2="175" stroke="#10b981" stroke-width="2"/>
+        <line x1="120" y1="170" x2="120" y2="180" stroke="#10b981" stroke-width="2"/>
+        <line x1="340" y1="170" x2="340" y2="180" stroke="#10b981" stroke-width="2"/>
+        <text x="230" y="192" text-anchor="middle" fill="#10b981" font-size="11">95% Confidence Interval</text>
+        <!-- annotations -->
+        <text x="65" y="180" text-anchor="middle" fill="#64748b" font-size="10">x̄ − 1.96·SE</text>
+        <text x="395" y="180" text-anchor="middle" fill="#64748b" font-size="10">x̄ + 1.96·SE</text>
+        <!-- margin of error arrows -->
+        <line x1="231" y1="130" x2="339" y2="130" stroke="#00d4ff" stroke-width="1" marker-end="url(#arrow)"/>
+        <text x="285" y="125" text-anchor="middle" fill="#00d4ff" font-size="10">Margin of Error</text>
+      </g>
+    </svg>
+  </div>
+
+  <h3>What Affects the Width of a CI?</h3>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4>📈 Wider CI (Less Precise) When...</h4>
+      <p>• Higher confidence level (99% vs 95%)</p>
+      <p>• Smaller sample size (n is small)</p>
+      <p>• Higher variance in data (σ is large)</p>
+    </div>
+    <div class="card">
+      <h4>📉 Narrower CI (More Precise) When...</h4>
+      <p>• Lower confidence level (90% vs 95%)</p>
+      <p>• Larger sample size (n is large)</p>
+      <p>• Lower variance in data (σ is small)</p>
+    </div>
+  </div>
+
+  <h3>Interactive CI Simulator</h3>
+
+  <div class="sim-wrap">
+    <div class="sim-title">🎯 Confidence Interval Builder</div>
+    <div class="sim-desc">Adjust sample size and confidence level. Watch how the interval width changes.</div>
+    <div class="slider-row">
+      <span class="slider-label">Sample Size (n)</span>
+      <input type="range" id="ciN" min="5" max="500" value="30" oninput="updateCI()">
+      <span class="slider-val" id="ciNVal">30</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Std Dev (σ)</span>
+      <input type="range" id="ciSd" min="1" max="50" value="10" oninput="updateCI()">
+      <span class="slider-val" id="ciSdVal">10</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Confidence Level</span>
+      <input type="range" id="ciConf" min="80" max="99" value="95" oninput="updateCI()">
+      <span class="slider-val" id="ciConfVal">95%</span>
+    </div>
+    <canvas id="ciCanvas" height="140"></canvas>
+    <div style="margin-top:14px">
+      <div class="output-stat">Margin of Error: <span id="ciMOE">—</span></div>
+      <div class="output-stat">Interval: <span id="ciRange">—</span></div>
+      <div class="output-stat">z* value: <span id="ciZ">—</span></div>
+    </div>
+  </div>
+
+  <h3>The CI—Hypothesis Test Connection</h3>
+
+  <div class="callout success">
+    <div class="callout-icon">🔗</div>
+    <div class="callout-body">
+      <div class="callout-title">Key Link — CIs and p-Values are Two Sides of the Same Coin</div>
+      <div class="callout-text">A 95% CI corresponds exactly to a two-tailed hypothesis test at α = 0.05.<br><br>
+      <strong>Rule:</strong> If the H₀ value (e.g., 0 for "no effect") falls <em>outside</em> the 95% CI → you would reject H₀ at α = 0.05 (p &lt; 0.05).<br>
+      If it falls <em>inside</em> the CI → you fail to reject H₀ (p &gt; 0.05).<br><br>
+      CIs are often preferred because they show you both the decision AND the effect size range.</div>
+    </div>
+  </div>
+
+  <h3>CIs in Quant Finance</h3>
+
+  <div class="card">
+    <h4>Practical Usage</h4>
+    <p><strong style="color:#fff">Sharpe Ratio CI:</strong> "Our strategy has Sharpe 1.2, but the 95% CI is [0.4, 2.0]. We're not confident it's above 0 yet." (Wide CI → need more data)</p>
+    <p><strong style="color:#fff">Mean Return CI:</strong> If the 95% CI for daily return is [−0.1%, +0.2%] — it includes 0, so we can't confidently say the strategy is profitable.</p>
+    <p><strong style="color:#fff">Beta Estimation:</strong> Reporting a stock's beta as 1.3 ± 0.15 (CI) is more honest than just 1.3.</p>
+  </div>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://rpsychologist.com/d3/ci/" target="_blank">
+      <div class="resource-type">🌐 Interactive · R Psychologist</div>
+      <div class="resource-name">Confidence Interval Visualizer</div>
+      <div class="resource-desc">Beautiful interactive visualization of repeated sampling and CI coverage</div>
+    </a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=TqOeMYtOc1w" target="_blank">
+      <div class="resource-type">🎬 Video · StatQuest</div>
+      <div class="resource-name">Confidence Intervals Explained</div>
+      <div class="resource-desc">Clear, visual explanation of what CIs actually mean</div>
+    </a>
+    <a class="resource-link" href="https://seeing-theory.brown.edu/frequentist-inference/index.html#section2" target="_blank">
+      <div class="resource-type">🌐 Interactive · Brown Univ.</div>
+      <div class="resource-name">Seeing Theory: CI Interactive</div>
+      <div class="resource-desc">Watch repeated CIs capture the true parameter</div>
+    </a>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 04 · TYPE I & II ERRORS
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-errors">
+
+  <div class="section-hero" data-symbol="αβ">
+    <div class="hero-tag" style="color:var(--danger)">Topic 04 · Decision Errors</div>
+    <h2>Type I &amp; Type II Errors</h2>
+    <p>Every statistical decision can be wrong in two different ways. Understanding these errors — and the tradeoff between them — is critical for any quantitative practitioner.</p>
+  </div>
+
+  <h3>The Reality of Statistical Decisions</h3>
+
+  <div class="card">
+    <h4>Two Worlds, Two Possible Truths</h4>
+    <p>When you run a hypothesis test, one of two things is true in reality: either H₀ is true, or H₁ is true. And you make one of two decisions: either reject H₀ or don't. This gives us a 2×2 table:</p>
+
+    <div style="overflow-x:auto; margin:16px 0">
+    <table style="min-width:500px">
+      <tr>
+        <th></th>
+        <th>H₀ Is Actually TRUE</th>
+        <th>H₀ Is Actually FALSE (H₁ true)</th>
+      </tr>
+      <tr>
+        <td style="color:#fff;font-weight:600;background:var(--surface2)">You REJECT H₀</td>
+        <td style="background:rgba(239,68,68,0.08);color:#ef4444;font-weight:500">❌ Type I Error (False Positive)<br><small style="color:#64748b">Probability = α</small></td>
+        <td style="background:rgba(16,185,129,0.08);color:#10b981;font-weight:500">✅ Correct (True Positive)<br><small style="color:#64748b">Probability = Power = 1−β</small></td>
+      </tr>
+      <tr>
+        <td style="color:#fff;font-weight:600;background:var(--surface2)">You FAIL TO reject H₀</td>
+        <td style="background:rgba(16,185,129,0.08);color:#10b981;font-weight:500">✅ Correct (True Negative)<br><small style="color:#64748b">Probability = 1−α</small></td>
+        <td style="background:rgba(239,68,68,0.08);color:#ef4444;font-weight:500">❌ Type II Error (False Negative)<br><small style="color:#64748b">Probability = β</small></td>
+      </tr>
+    </table>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card card-danger">
+      <h4>🔴 Type I Error (α) — False Positive</h4>
+      <p><strong style="color:#fff">What it is:</strong> You reject H₀ when H₀ is actually true. You find a signal when there isn't one.</p>
+      <p><strong style="color:#fff">Controlled by:</strong> Your chosen significance level α. If α = 0.05, you have a 5% chance of Type I error when H₀ is true.</p>
+      <p><strong style="color:#fff">Finance example:</strong> You think your strategy has alpha, but it's actually random luck. You deploy capital based on a fluke.</p>
+      <p><strong style="color:#fff">Medical analogy:</strong> A healthy patient tests positive for a disease they don't have.</p>
+    </div>
+    <div class="card card-warning">
+      <h4>🟡 Type II Error (β) — False Negative</h4>
+      <p><strong style="color:#fff">What it is:</strong> You fail to reject H₀ when H₁ is actually true. You miss a real signal.</p>
+      <p><strong style="color:#fff">Controlled by:</strong> β (beta). Not directly set — depends on sample size, effect size, and α.</p>
+      <p><strong style="color:#fff">Finance example:</strong> A genuinely profitable strategy looks like noise in your test, so you pass on it.</p>
+      <p><strong style="color:#fff">Medical analogy:</strong> A sick patient gets a negative test — the disease goes undetected.</p>
+    </div>
+  </div>
+
+  <h3>Statistical Power = 1 − β</h3>
+
+  <div class="callout success">
+    <div class="callout-icon">⚡</div>
+    <div class="callout-body">
+      <div class="callout-title">Power — The Ability to Detect Real Effects</div>
+      <div class="callout-text"><strong>Power = 1 − β</strong> = the probability of correctly rejecting H₀ when H₁ is true.<br><br>
+      High power = low chance of missing real effects. We want power ≥ 0.80 (i.e., β ≤ 0.20) in most research.<br><br>
+      Power is increased by: larger sample size, larger effect size (easier to detect), and higher α (less strict threshold). But higher α increases Type I errors — there's a tradeoff!</div>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Type I vs Type II Error — Overlapping Distributions</div>
+    <svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="h0Grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.03"/>
+        </linearGradient>
+        <linearGradient id="h1Grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#10b981" stop-opacity="0.03"/>
+        </linearGradient>
+        <linearGradient id="t1Fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#ef4444" stop-opacity="0.1"/>
+        </linearGradient>
+        <linearGradient id="t2Fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.1"/>
+        </linearGradient>
+      </defs>
+      <g transform="translate(10,10)">
+        <!-- H0 distribution (left) -->
+        <path d="M10,160 C40,160 60,148 85,120 C100,103 115,78 130,55 C143,35 155,20 175,12 C185,8 193,7 200,7 C207,7 215,8 225,12 C245,20 257,35 270,55 C285,78 300,103 315,120 C340,148 360,160 390,160 Z" fill="url(#h0Grad)" stroke="#00d4ff" stroke-width="1.3"/>
+        <!-- H1 distribution (right) -->
+        <path d="M230,160 C265,160 285,148 310,120 C325,103 340,78 355,55 C368,35 380,20 400,12 C410,8 418,7 425,7 C432,7 440,8 450,12 C470,20 482,35 495,55 C510,78 525,103 540,120 C565,148 585,160 615,160 Z" fill="url(#h1Grad)" stroke="#10b981" stroke-width="1.3"/>
+        <!-- critical value line -->
+        <line x1="310" y1="10" x2="310" y2="163" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,3"/>
+        <text x="310" y="178" text-anchor="middle" fill="#ef4444" font-size="11">Critical Value (α)</text>
+        <!-- Type I error (right tail of H0) -->
+        <path d="M310,120 C325,103 340,78 355,55 C368,35 380,20 390,13 L390,160 L310,160 Z" fill="url(#t1Fill)"/>
+        <!-- Type II error (left tail of H1) -->
+        <path d="M230,160 C265,160 285,148 310,120 L310,160 Z" fill="url(#t2Fill)"/>
+        <!-- labels -->
+        <text x="355" y="130" fill="#ef4444" font-size="10">Type I</text>
+        <text x="355" y="142" fill="#ef4444" font-size="10">Error (α)</text>
+        <text x="267" y="155" fill="#f59e0b" font-size="10">Type II</text>
+        <text x="267" y="167" fill="#f59e0b" font-size="10">Error (β)</text>
+        <!-- distribution labels -->
+        <text x="200" y="195" text-anchor="middle" fill="#00d4ff" font-size="11">H₀ distribution</text>
+        <text x="425" y="195" text-anchor="middle" fill="#10b981" font-size="11">H₁ distribution</text>
+        <!-- axis -->
+        <line x1="10" y1="162" x2="620" y2="162" stroke="#1e2d45"/>
+      </g>
+    </svg>
+  </div>
+
+  <h3>The Fundamental Tradeoff</h3>
+
+  <div class="card">
+    <h4>You Cannot Simultaneously Minimize Both Errors</h4>
+    <p>Think about this: to reduce Type I errors, you make your test stricter (lower α, e.g. 0.01). But this means the critical value moves further from H₀ → the H₁ curve has even more of its area on the "fail to reject" side → Type II errors increase.</p>
+
+    <div class="diagram-wrap" style="margin:16px 0">
+      <div class="diagram-title">The Tradeoff Visualized</div>
+      <svg viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(20,10)">
+          <line x1="0" y1="50" x2="560" y2="50" stroke="#1e2d45" stroke-width="1"/>
+          <!-- markers -->
+          <circle cx="0" cy="50" r="4" fill="#ef4444"/>
+          <text x="0" y="68" text-anchor="middle" fill="#ef4444" font-size="10">α=0.01</text>
+          <text x="0" y="80" text-anchor="middle" fill="#64748b" font-size="9">strict</text>
+          <text x="0" y="30" text-anchor="middle" fill="#f59e0b" font-size="10">High β</text>
+          <text x="0" y="42" text-anchor="middle" fill="#64748b" font-size="9">(miss more)</text>
+
+          <circle cx="280" cy="50" r="4" fill="#7c3aed"/>
+          <text x="280" y="68" text-anchor="middle" fill="#7c3aed" font-size="10">α=0.05</text>
+          <text x="280" y="80" text-anchor="middle" fill="#64748b" font-size="9">balanced</text>
+
+          <circle cx="560" cy="50" r="4" fill="#10b981"/>
+          <text x="560" y="68" text-anchor="middle" fill="#10b981" font-size="10">α=0.20</text>
+          <text x="560" y="80" text-anchor="middle" fill="#64748b" font-size="9">lenient</text>
+          <text x="560" y="30" text-anchor="middle" fill="#ef4444" font-size="10">High α</text>
+          <text x="560" y="42" text-anchor="middle" fill="#64748b" font-size="9">(false alarms)</text>
+
+          <line x1="0" y1="50" x2="560" y2="50" stroke="url(#bellB)" stroke-width="8" stroke-linecap="round"/>
+          <text x="280" y="105" text-anchor="middle" fill="#64748b" font-size="10">← More strict α . . . . . . . . . . . . . . . . . More lenient α →</text>
+        </g>
+      </svg>
+    </div>
+
+    <h4>How to Choose α in Practice</h4>
+    <table>
+      <tr><th>Context</th><th>Typical α</th><th>Reasoning</th></tr>
+      <tr><td>Drug safety / medical</td><td>0.001 – 0.01</td><td>False positive could harm people</td></tr>
+      <tr><td>Academic research</td><td>0.05</td><td>Convention; balance of errors</td></tr>
+      <tr><td>Exploratory quant research</td><td>0.10 – 0.20</td><td>Cost of missing signals is high; want broad screen</td></tr>
+      <tr><td>Production algo decisions</td><td>0.01 – 0.05</td><td>False signal → real capital loss</td></tr>
+    </table>
+  </div>
+
+  <h3>Sample Size &amp; Power Analysis</h3>
+
+  <div class="card card-purple">
+    <h4>How Much Data Do You Need?</h4>
+    <p>Before running an experiment, use power analysis to determine the sample size that gives you sufficient power (usually 80%) to detect an effect of a given size at your chosen α.</p>
+    <div class="formula-box">
+      <span class="formula-label">Approximate Sample Size (two-sample t-test)</span>
+      n ≈ 2 · ((z_α + z_β)² · σ²) / δ²
+    </div>
+    <p>Where δ is the minimum effect size you care about detecting, σ is standard deviation, z_α is z-score for α, z_β for β (power).</p>
+    <p><strong style="color:#fff">Rule of thumb:</strong> Smaller effect size → need more data. This is why detecting small alpha in finance requires years of data.</p>
+  </div>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://rpsychologist.com/d3/nhst/" target="_blank">
+      <div class="resource-type">🌐 Interactive · R Psychologist</div>
+      <div class="resource-name">NHST Visualizer (Power &amp; Errors)</div>
+      <div class="resource-desc">Best interactive tool for understanding Type I/II errors and power</div>
+    </a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=Rsc5znwR5FA" target="_blank">
+      <div class="resource-type">🎬 Video · StatQuest</div>
+      <div class="resource-name">Statistical Power Explained</div>
+      <div class="resource-desc">Clear visual walkthrough of power and sample size</div>
+    </a>
+    <a class="resource-link" href="https://www.stat.ubc.ca/~rollin/stats/ssize/n2.html" target="_blank">
+      <div class="resource-type">🧮 Calculator · UBC</div>
+      <div class="resource-name">Sample Size Calculator</div>
+      <div class="resource-desc">Compute required sample size for your power/alpha goals</div>
+    </a>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 05 · BIG PICTURE
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-bigpicture">
+
+  <div class="section-hero" data-symbol="∑">
+    <div class="hero-tag" style="color:var(--accent5)">Topic 05 · Synthesis</div>
+    <h2>How It All Connects</h2>
+    <p>The real power comes from seeing all four topics as one unified framework. Here's the complete picture.</p>
+  </div>
+
+  <h3>The Complete Statistical Inference Framework</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Full Relationship Map</div>
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1e2d45"/>
+        </marker>
+        <marker id="arrG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#10b981"/>
+        </marker>
+        <marker id="arrR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#ef4444"/>
+        </marker>
+      </defs>
+      <!-- Node: H0/H1 -->
+      <rect x="10" y="120" width="130" height="50" rx="8" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="75" y="141" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="600">H₀ / H₁</text>
+      <text x="75" y="157" text-anchor="middle" fill="#64748b" font-size="10">Hypotheses</text>
+
+      <!-- Node: Alpha -->
+      <rect x="10" y="220" width="130" height="50" rx="8" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="75" y="241" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="600">α (alpha)</text>
+      <text x="75" y="257" text-anchor="middle" fill="#64748b" font-size="10">Significance Level</text>
+
+      <!-- Node: Data/Test Stat -->
+      <rect x="210" y="120" width="140" height="50" rx="8" fill="#111827" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="280" y="141" text-anchor="middle" fill="#7c3aed" font-size="12" font-weight="600">Test Statistic</text>
+      <text x="280" y="157" text-anchor="middle" fill="#64748b" font-size="10">From sample data</text>
+
+      <!-- Node: p-value -->
+      <rect x="210" y="10" width="140" height="50" rx="8" fill="#111827" stroke="#ff6b35" stroke-width="1.5"/>
+      <text x="280" y="31" text-anchor="middle" fill="#ff6b35" font-size="12" font-weight="600">p-value</text>
+      <text x="280" y="47" text-anchor="middle" fill="#64748b" font-size="10">P(data | H₀ true)</text>
+
+      <!-- Node: CI -->
+      <rect x="210" y="230" width="140" height="50" rx="8" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+      <text x="280" y="251" text-anchor="middle" fill="#10b981" font-size="12" font-weight="600">Confidence Interval</text>
+      <text x="280" y="267" text-anchor="middle" fill="#64748b" font-size="10">x̄ ± z*·SE</text>
+
+      <!-- Node: Decision -->
+      <rect x="430" y="70" width="140" height="50" rx="8" fill="#111827" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="500" y="91" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="600">Decision</text>
+      <text x="500" y="107" text-anchor="middle" fill="#64748b" font-size="10">Reject or not reject H₀</text>
+
+      <!-- Node: Type I -->
+      <rect x="430" y="160" width="130" height="50" rx="8" fill="#111827" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="495" y="181" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="600">Type I Error</text>
+      <text x="495" y="197" text-anchor="middle" fill="#64748b" font-size="10">False positive (α)</text>
+
+      <!-- Node: Type II -->
+      <rect x="430" y="230" width="130" height="50" rx="8" fill="#111827" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="495" y="251" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="600">Type II Error</text>
+      <text x="495" y="267" text-anchor="middle" fill="#64748b" font-size="10">False negative (β)</text>
+
+      <!-- Arrows -->
+      <line x1="140" y1="145" x2="208" y2="145" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="174" y="138" text-anchor="middle" fill="#334155" font-size="9">defines</text>
+
+      <line x1="280" y1="120" x2="280" y2="62" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="310" y="95" fill="#334155" font-size="9">gives</text>
+
+      <line x1="280" y1="170" x2="280" y2="228" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="288" y="205" fill="#334155" font-size="9">also</text>
+      <text x="288" y="218" fill="#334155" font-size="9">gives</text>
+
+      <line x1="350" y1="35" x2="428" y2="80" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="395" y="52" fill="#334155" font-size="9">compare to α</text>
+
+      <line x1="350" y1="255" x2="428" y2="230" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <line x1="500" y1="120" x2="495" y2="158" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="3,3" marker-end="url(#arrR)"/>
+      <text x="510" y="142" fill="#ef4444" font-size="9">may cause</text>
+
+      <line x1="75" y1="220" x2="75" y2="172" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="3,3"/>
+      <text x="50" y="200" fill="#f59e0b" font-size="9">sets</text>
+      <text x="50" y="212" fill="#f59e0b" font-size="9">Type I rate</text>
+    </svg>
+  </div>
+
+  <h3>The Unified Summary</h3>
+
+  <div class="card">
+    <h4>In One Paragraph</h4>
+    <p style="color:var(--text)">You start by stating your <strong style="color:#00d4ff">Null Hypothesis (H₀)</strong> and <strong style="color:#00d4ff">Alternative Hypothesis (H₁)</strong> — what you assume vs. what you suspect. You choose a <strong style="color:#f59e0b">significance level α</strong> that sets your tolerance for false positives (Type I errors). Then you collect data and compute a test statistic, which is converted to a <strong style="color:#ff6b35">p-value</strong> — the probability of seeing your data (or more extreme) under H₀. If p &lt; α, you reject H₀. A <strong style="color:#10b981">Confidence Interval</strong> gives you the same decision plus the range of plausible values for the true parameter. Throughout this process, you risk two types of mistakes: <strong style="color:#ef4444">Type I</strong> (rejecting a true H₀, prob = α) and <strong style="color:#f59e0b">Type II</strong> (failing to reject a false H₀, prob = β). These tradeoff against each other, and increasing sample size reduces both.</p>
+  </div>
+
+  <h3>Common Misconceptions — Master These</h3>
+
+  <div class="card-grid">
+    <div class="card card-danger">
+      <h4>❌ "p &lt; 0.05 means the result is true"</h4>
+      <p>No. It means the data is unlikely under H₀. With many tests (multiple comparisons), some will be &lt; 0.05 by chance alone.</p>
+    </div>
+    <div class="card card-danger">
+      <h4>❌ "p = 0.06 means no effect"</h4>
+      <p>No. It just means you didn't reach the 0.05 threshold. The effect may still be real but you need more data (power issue).</p>
+    </div>
+    <div class="card card-danger">
+      <h4>❌ "95% CI means 95% chance the true value is inside"</h4>
+      <p>No. The parameter is fixed. The 95% refers to the procedure's long-run coverage probability across repeated samples.</div>
+    </div>
+    <div class="card card-danger">
+      <h4>❌ "Significant = important"</h4>
+      <p>No. With large n, trivial effects become statistically significant. Always report effect sizes alongside p-values.</p>
+    </div>
+  </div>
+
+  <h3>Quick Reference Cheat Sheet</h3>
+
+  <div class="card">
+    <table>
+      <tr><th>Concept</th><th>Symbol</th><th>Plain English</th><th>Quant Example</th></tr>
+      <tr><td>Null Hypothesis</td><td>H₀</td><td>"Nothing interesting is happening"</td><td>Strategy alpha = 0</td></tr>
+      <tr><td>Alternative Hypothesis</td><td>H₁</td><td>"Something real is happening"</td><td>Strategy alpha &gt; 0</td></tr>
+      <tr><td>Significance Level</td><td>α</td><td>Max tolerable false positive rate</td><td>α = 0.05 for most tests</td></tr>
+      <tr><td>p-value</td><td>p</td><td>P(data this extreme | H₀ true)</td><td>p = 0.03 → reject H₀</td></tr>
+      <tr><td>Confidence Interval</td><td>CI</td><td>Plausible range for true parameter</td><td>Return ∈ [0.1%, 0.8%] at 95%</td></tr>
+      <tr><td>Type I Error</td><td>α (same as sig. level)</td><td>False positive — seeing effect that isn't there</td><td>Trading a strategy that has no real alpha</td></tr>
+      <tr><td>Type II Error</td><td>β</td><td>False negative — missing real effect</td><td>Rejecting a genuinely profitable strategy</td></tr>
+      <tr><td>Power</td><td>1−β</td><td>Probability of detecting a real effect</td><td>Want ≥ 80% power in studies</td></tr>
+    </table>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 06 · COLAB EXPERIMENTS
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-colab">
+
+  <div class="section-hero" data-symbol="⌨">
+    <div class="hero-tag" style="color:var(--accent3)">Tab 06 · Hands-On Code</div>
+    <h2>Google Colab Experiments</h2>
+    <p>The best way to understand statistics is to compute it yourself. Each experiment below is ready to paste into a Colab notebook.</p>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-icon">🚀</div>
+    <div class="callout-body">
+      <div class="callout-title">Getting Started</div>
+      <div class="callout-text">Go to <strong>colab.research.google.com</strong> → New notebook. Paste each experiment cell by cell. Run with Shift+Enter. All libraries (numpy, scipy, matplotlib) are pre-installed in Colab.</div>
+    </div>
+  </div>
+
+  <h3>Experiment 1 — CLT in Action</h3>
+  <p>Watch the Central Limit Theorem happen live: sample from a skewed distribution, see the bell curve emerge.</p>
+
+<pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+
+<span class="var">np.random.seed</span>(<span class="num">42</span>)
+
+<span class="cm"># Exponential distribution (very skewed — NOT normal!)</span>
+<span class="var">population</span> = <span class="var">np.random.exponential</span>(<span class="var">scale</span>=<span class="num">2</span>, <span class="var">size</span>=<span class="num">100_000</span>)
+
+<span class="var">fig</span>, <span class="var">axes</span> = <span class="var">plt.subplots</span>(<span class="num">1</span>, <span class="num">4</span>, <span class="var">figsize</span>=(<span class="num">16</span>, <span class="num">4</span>))
+<span class="var">sample_sizes</span> = [<span class="num">1</span>, <span class="num">5</span>, <span class="num">30</span>, <span class="num">100</span>]
+
+<span class="kw">for</span> <span class="var">ax</span>, <span class="var">n</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">axes</span>, <span class="var">sample_sizes</span>):
+    <span class="cm"># Take 2000 samples of size n, compute mean of each</span>
+    <span class="var">means</span> = [<span class="var">np.mean</span>(<span class="var">np.random.choice</span>(<span class="var">population</span>, <span class="var">n</span>)) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2000</span>)]
+    <span class="var">ax.hist</span>(<span class="var">means</span>, <span class="var">bins</span>=<span class="num">40</span>, <span class="var">density</span>=<span class="var">True</span>, <span class="var">color</span>=<span class="str">'#00d4ff'</span>, <span class="var">alpha</span>=<span class="num">0.6</span>, <span class="var">edgecolor</span>=<span class="str">'none'</span>)
+    <span class="var">ax.set_title</span>(<span class="str">f'n = {n}'</span>, <span class="var">fontsize</span>=<span class="num">13</span>)
+    <span class="var">ax.set_xlabel</span>(<span class="str">'Sample Mean'</span>)
+
+<span class="var">plt.suptitle</span>(<span class="str">'CLT: Distribution of Sample Means (Exponential Population)'</span>, <span class="var">fontsize</span>=<span class="num">14</span>)
+<span class="var">plt.tight_layout</span>()
+<span class="var">plt.show</span>()
+<span class="cm"># Notice: at n=1, it's skewed. At n=30, it's almost normal!</span></pre>
+
+  <h3>Experiment 2 — Hypothesis Test from Scratch</h3>
+  <p>Test whether a simulated trading strategy has a mean return greater than 0 (one-sided t-test).</p>
+
+<pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+
+<span class="var">np.random.seed</span>(<span class="num">7</span>)
+
+<span class="cm"># Simulate 60 days of strategy returns (mean=0.04%, slightly positive)</span>
+<span class="var">n</span> = <span class="num">60</span>
+<span class="var">true_mean</span> = <span class="num">0.04</span>   <span class="cm"># 0.04% per day</span>
+<span class="var">true_std</span>  = <span class="num">1.2</span>    <span class="cm"># 1.2% daily vol — realistic for a stock strategy</span>
+<span class="var">returns</span>   = <span class="var">np.random.normal</span>(<span class="var">true_mean</span>, <span class="var">true_std</span>, <span class="var">n</span>)
+
+<span class="cm"># H0: mu = 0 (no alpha)     H1: mu > 0 (positive alpha)</span>
+<span class="var">alpha</span> = <span class="num">0.05</span>
+
+<span class="cm"># Manual computation</span>
+<span class="var">x_bar</span> = <span class="var">np.mean</span>(<span class="var">returns</span>)
+<span class="var">s</span>     = <span class="var">np.std</span>(<span class="var">returns</span>, <span class="var">ddof</span>=<span class="num">1</span>)    <span class="cm"># sample std (n-1)</span>
+<span class="var">se</span>    = <span class="var">s</span> / <span class="var">np.sqrt</span>(<span class="var">n</span>)
+<span class="var">t_stat</span> = (<span class="var">x_bar</span> - <span class="num">0</span>) / <span class="var">se</span>          <span class="cm"># test statistic under H0</span>
+<span class="var">p_val</span>  = <span class="num">1</span> - <span class="var">stats.t.cdf</span>(<span class="var">t_stat</span>, <span class="var">df</span>=<span class="var">n</span>-<span class="num">1</span>)  <span class="cm"># one-tailed</span>
+
+<span class="fn">print</span>(<span class="str">f"Sample mean:    {x_bar:.4f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"Std dev:        {s:.4f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"Standard error: {se:.4f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"t-statistic:    {t_stat:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"p-value:        {p_val:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"\nDecision: {'REJECT H0 — evidence of positive alpha!' if p_val < alpha else 'Fail to reject H0 — no significant alpha'}"</span>)
+
+<span class="cm"># Verify using scipy</span>
+<span class="var">t2</span>, <span class="var">p2</span> = <span class="var">stats.ttest_1samp</span>(<span class="var">returns</span>, <span class="var">popmean</span>=<span class="num">0</span>, <span class="var">alternative</span>=<span class="str">'greater'</span>)
+<span class="fn">print</span>(<span class="str">f"\nSciPy confirms — t: {t2:.4f}, p: {p2:.4f}"</span>)</pre>
+
+  <h3>Experiment 3 — Build &amp; Visualize Confidence Intervals</h3>
+  <p>Simulate repeated sampling and visually confirm that 95% of CIs capture the true mean.</p>
+
+<pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+
+<span class="var">np.random.seed</span>(<span class="num">0</span>)
+<span class="var">TRUE_MEAN</span> = <span class="num">5.0</span>
+<span class="var">TRUE_STD</span>  = <span class="num">2.0</span>
+<span class="var">n</span>          = <span class="num">30</span>
+<span class="var">n_experiments</span> = <span class="num">100</span>
+<span class="var">confidence</span>    = <span class="num">0.95</span>
+
+<span class="var">captured</span> = <span class="num">0</span>
+<span class="var">fig</span>, <span class="var">ax</span> = <span class="var">plt.subplots</span>(<span class="var">figsize</span>=(<span class="num">14</span>, <span class="num">8</span>))
+
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">n_experiments</span>):
+    <span class="var">sample</span>  = <span class="var">np.random.normal</span>(<span class="var">TRUE_MEAN</span>, <span class="var">TRUE_STD</span>, <span class="var">n</span>)
+    <span class="var">x_bar</span>   = <span class="var">np.mean</span>(<span class="var">sample</span>)
+    <span class="var">se</span>      = <span class="var">stats.sem</span>(<span class="var">sample</span>)
+    <span class="var">ci</span>      = <span class="var">stats.t.interval</span>(<span class="var">confidence</span>, <span class="var">df</span>=<span class="var">n</span>-<span class="num">1</span>, <span class="var">loc</span>=<span class="var">x_bar</span>, <span class="var">scale</span>=<span class="var">se</span>)
+    <span class="var">covers</span>  = <span class="var">ci</span>[<span class="num">0</span>] &lt;= <span class="var">TRUE_MEAN</span> &lt;= <span class="var">ci</span>[<span class="num">1</span>]
+    <span class="kw">if</span> <span class="var">covers</span>: <span class="var">captured</span> += <span class="num">1</span>
+    <span class="var">color</span> = <span class="str">'#10b981'</span> <span class="kw">if</span> <span class="var">covers</span> <span class="kw">else</span> <span class="str">'#ef4444'</span>
+    <span class="var">ax.plot</span>([<span class="var">ci</span>[<span class="num">0</span>], <span class="var">ci</span>[<span class="num">1</span>]], [<span class="var">i</span>, <span class="var">i</span>], <span class="var">color</span>=<span class="var">color</span>, <span class="var">alpha</span>=<span class="num">0.6</span>, <span class="var">linewidth</span>=<span class="num">1.4</span>)
+    <span class="var">ax.plot</span>(<span class="var">x_bar</span>, <span class="var">i</span>, <span class="str">'o'</span>, <span class="var">color</span>=<span class="var">color</span>, <span class="var">markersize</span>=<span class="num">3</span>)
+
+<span class="var">ax.axvline</span>(<span class="var">TRUE_MEAN</span>, <span class="var">color</span>=<span class="str">'#f59e0b'</span>, <span class="var">linewidth</span>=<span class="num">2</span>, <span class="var">label</span>=<span class="str">f'True mean = {TRUE_MEAN}'</span>)
+<span class="var">ax.set_title</span>(<span class="str">f'{n_experiments} x 95% CIs — {captured} capture the true mean ({captured}%)'</span>)
+<span class="var">ax.legend</span>()
+<span class="var">plt.tight_layout</span>()
+<span class="var">plt.show</span>()
+<span class="fn">print</span>(<span class="str">f"Coverage: {captured}/{n_experiments} = {100*captured/n_experiments:.1f}% (expect ~95%)"</span>)</pre>
+
+  <h3>Experiment 4 — Type I Error Rate Simulation</h3>
+  <p>Empirically verify: if you run 1000 tests when H₀ is always true, about 5% reject at α=0.05.</p>
+
+<pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="var">np.random.seed</span>(<span class="num">1</span>)
+<span class="var">N_TESTS</span>  = <span class="num">1000</span>
+<span class="var">n</span>         = <span class="num">50</span>
+<span class="var">alpha</span>     = <span class="num">0.05</span>
+<span class="var">p_values</span>  = []
+
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="var">N_TESTS</span>):
+    <span class="cm"># H0 IS TRUE — both groups have identical mean (5.0)</span>
+    <span class="var">group_A</span> = <span class="var">np.random.normal</span>(<span class="num">5.0</span>, <span class="num">2.0</span>, <span class="var">n</span>)
+    <span class="var">group_B</span> = <span class="var">np.random.normal</span>(<span class="num">5.0</span>, <span class="num">2.0</span>, <span class="var">n</span>)
+    <span class="var">_</span>, <span class="var">p</span>    = <span class="var">stats.ttest_ind</span>(<span class="var">group_A</span>, <span class="var">group_B</span>)
+    <span class="var">p_values.append</span>(<span class="var">p</span>)
+
+<span class="var">type_I_rate</span> = <span class="var">np.mean</span>(<span class="var">np.array</span>(<span class="var">p_values</span>) &lt; <span class="var">alpha</span>)
+<span class="fn">print</span>(<span class="str">f"Type I Error Rate: {type_I_rate:.3f}  (expected: {alpha})"</span>)
+
+<span class="var">plt.figure</span>(<span class="var">figsize</span>=(<span class="num">10</span>, <span class="num">4</span>))
+<span class="var">plt.hist</span>(<span class="var">p_values</span>, <span class="var">bins</span>=<span class="num">50</span>, <span class="var">edgecolor</span>=<span class="str">'none'</span>, <span class="var">color</span>=<span class="str">'#00d4ff'</span>, <span class="var">alpha</span>=<span class="num">0.7</span>)
+<span class="var">plt.axvline</span>(<span class="num">0.05</span>, <span class="var">color</span>=<span class="str">'#ef4444'</span>, <span class="var">linewidth</span>=<span class="num">2</span>, <span class="var">label</span>=<span class="str">'α = 0.05'</span>)
+<span class="var">plt.xlabel</span>(<span class="str">'p-value'</span>)
+<span class="var">plt.title</span>(<span class="str">'p-value distribution when H₀ is TRUE (uniform — as expected)'</span>)
+<span class="var">plt.legend</span>()
+<span class="var">plt.show</span>()
+<span class="cm"># p-values should be uniform [0,1] when H0 is true — that's by design!</span></pre>
+
+  <h3>Experiment 5 — Power Analysis</h3>
+  <p>Find the minimum sample size to detect a given effect with 80% power.</p>
+
+<pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="cm"># Quant context: detect if daily return > 0 given volatility</span>
+<span class="var">true_mean</span>    = <span class="num">0.05</span>   <span class="cm"># 0.05% per day — small but real alpha</span>
+<span class="var">true_std</span>     = <span class="num">1.0</span>    <span class="cm"># 1% daily vol</span>
+<span class="var">alpha_thresh</span> = <span class="num">0.05</span>
+<span class="var">target_power</span> = <span class="num">0.80</span>
+
+<span class="var">sample_sizes</span> = <span class="fn">range</span>(<span class="num">50</span>, <span class="num">5000</span>, <span class="num">50</span>)
+<span class="var">powers</span>       = []
+
+<span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="var">sample_sizes</span>:
+    <span class="var">se</span>         = <span class="var">true_std</span> / <span class="var">np.sqrt</span>(<span class="var">n</span>)
+    <span class="var">t_crit</span>     = <span class="var">stats.t.ppf</span>(<span class="num">1</span> - <span class="var">alpha_thresh</span>, <span class="var">df</span>=<span class="var">n</span>-<span class="num">1</span>)
+    <span class="var">ncp</span>        = <span class="var">true_mean</span> / <span class="var">se</span>   <span class="cm"># non-centrality parameter</span>
+    <span class="var">power</span>      = <span class="num">1</span> - <span class="var">stats.t.cdf</span>(<span class="var">t_crit</span>, <span class="var">df</span>=<span class="var">n</span>-<span class="num">1</span>, <span class="var">loc</span>=<span class="var">ncp</span>)
+    <span class="var">powers.append</span>(<span class="var">power</span>)
+
+<span class="var">n_needed</span> = <span class="var">sample_sizes</span>[<span class="var">np.argmax</span>(<span class="var">np.array</span>(<span class="var">powers</span>) &gt;= <span class="var">target_power</span>)]
+<span class="fn">print</span>(<span class="str">f"To detect {true_mean}% return with 80% power at α={alpha_thresh}:"</span>)
+<span class="fn">print</span>(<span class="str">f"You need approximately {n_needed} trading days ≈ {n_needed/252:.1f} years of data!"</span>)
+
+<span class="var">plt.figure</span>(<span class="var">figsize</span>=(<span class="num">10</span>, <span class="num">5</span>))
+<span class="var">plt.plot</span>(<span class="var">list</span>(<span class="var">sample_sizes</span>), <span class="var">powers</span>, <span class="var">color</span>=<span class="str">'#00d4ff'</span>, <span class="var">linewidth</span>=<span class="num">2</span>)
+<span class="var">plt.axhline</span>(<span class="num">0.8</span>, <span class="var">color</span>=<span class="str">'#10b981'</span>, <span class="var">linestyle</span>=<span class="str">'--'</span>, <span class="var">label</span>=<span class="str">'80% Power Target'</span>)
+<span class="var">plt.axvline</span>(<span class="var">n_needed</span>, <span class="var">color</span>=<span class="str">'#ef4444'</span>, <span class="var">linestyle</span>=<span class="str">'--'</span>, <span class="var">label</span>=<span class="str">f'n={n_needed}'</span>)
+<span class="var">plt.xlabel</span>(<span class="str">'Sample Size (trading days)'</span>)
+<span class="var">plt.ylabel</span>(<span class="str">'Statistical Power'</span>)
+<span class="var">plt.title</span>(<span class="str">'Power vs Sample Size — Detecting Small Daily Alpha'</span>)
+<span class="var">plt.legend</span>()
+<span class="var">plt.grid</span>(<span class="var">True</span>, <span class="var">alpha</span>=<span class="num">0.2</span>)
+<span class="var">plt.show</span>()</pre>
+
+  <div class="callout success">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body">
+      <div class="callout-title">Colab Link</div>
+      <div class="callout-text">Open Google Colab at <strong>colab.research.google.com</strong>. Create a new notebook. Paste experiments one at a time and run them. Try modifying parameters (true_mean, n, alpha) to build intuition for how each variable affects the output.</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 07 · EXERCISES
+═══════════════════════════════════════════════════════ -->
+<section class="tab-panel" id="tab-exercises">
+
+  <div class="section-hero" data-symbol="✎">
+    <div class="hero-tag" style="color:var(--accent5)">Tab 07 · Practice</div>
+    <h2>Practice Exercises</h2>
+    <p>Three tiers for each topic. Work through them in order. The hard exercises are interview-level for quant internship/junior roles.</p>
+  </div>
+
+  <h3>Topic: Null &amp; Alternative Hypotheses</h3>
+
+  <div class="exercise-tier easy">
+    <div class="tier-header" onclick="toggleTier(this)">🟢 EASY — Conceptual Understanding <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">H-E1</div>
+        A pharmaceutical company tests whether a new painkiller reduces headache duration. State the null and alternative hypotheses in words and in symbols (let μ = mean duration, μ₀ = current mean duration).
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-E2</div>
+        A quant analyst wants to test if a moving average crossover strategy has positive expected daily returns. Write H₀ and H₁. Is this one-tailed or two-tailed? Explain why.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-E3</div>
+        State whether each is a valid null hypothesis and explain: (a) "Stock X will go up tomorrow." (b) "The mean return of Strategy A equals 0." (c) "Strategy A is better than Strategy B."
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-E4</div>
+        Why do we assume H₀ is true at the start? Why don't we just directly test if H₁ is true? (Hint: think about the legal analogy.)
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier medium">
+    <div class="tier-header" onclick="toggleTier(this)">🟡 MEDIUM — Applied Problems <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">H-M1</div>
+        You're testing two strategies: A (mean return 0.08%, std 1%) and B (mean return 0.05%, std 1.2%), both over n=120 days. Set up formal hypotheses to test if Strategy A has higher mean return than B. What test would you use and what are your assumptions?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-M2</div>
+        A colleague says: "I tested 50 technical indicators and found 3 are significant at α=0.05. This proves they work." What is the fundamental problem with this reasoning? How many significant results would you expect by chance?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-M3</div>
+        You're testing whether volatility on Mondays differs from other days. Should you use a one-tailed or two-tailed test? Write out both hypotheses and justify your choice of tail(s).
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier hard">
+    <div class="tier-header" onclick="toggleTier(this)">🔴 HARD — Quant-Level Challenges <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">H-H1</div>
+        Explain and quantify the multiple testing problem: you test 100 uncorrelated strategies at α=0.05. What is the expected number of false positives? What is the probability of at least one false positive? How would you correct for this (Bonferroni, FDR)?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">H-H2</div>
+        Design a formal hypothesis testing framework to evaluate whether a machine learning model's out-of-sample predictions are significantly better than a random walk for S&amp;P 500 daily returns. What are the exact hypotheses, what test would you use, and what practical considerations arise from financial time series (autocorrelation, regime changes)?
+      </div>
+    </div>
+  </div>
+
+  <h3>Topic: p-Values</h3>
+
+  <div class="exercise-tier easy">
+    <div class="tier-header" onclick="toggleTier(this)">🟢 EASY — Core Concepts <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">P-E1</div>
+        A test gives p = 0.03. With α = 0.05, do you reject H₀? What about α = 0.01? What changes between the two decisions?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-E2</div>
+        Mark each statement TRUE or FALSE and explain: (a) p = 0.04 means there's a 4% chance H₀ is true. (b) p = 0.04 means there's a 4% chance you made an error. (c) p = 0.04 means if H₀ is true, you'd see data this extreme 4% of the time.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-E3</div>
+        You flip a fair coin 10 times and get 9 heads. Qualitatively (no calculation needed): would you expect the p-value to be small or large? Would you reject H₀: p(heads) = 0.5 at α = 0.05?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-E4</div>
+        If the null hypothesis is always true, what distribution do p-values follow? Why? Draw or describe the shape.
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier medium">
+    <div class="tier-header" onclick="toggleTier(this)">🟡 MEDIUM — Calculations &amp; Interpretation <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">P-M1</div>
+        A strategy has 252 days of returns: x̄ = 0.06%, s = 1.5%. Compute the t-statistic and p-value for H₀: μ = 0 (two-sided). Then compute for H₀: μ = 0, H₁: μ &gt; 0 (one-sided). Why does the one-sided p-value differ? Code this in Python.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-M2</div>
+        Two researchers both run the same experiment. Researcher A gets p = 0.049 and publishes "significant result." Researcher B gets p = 0.051 and says "no effect found." Critique this binary thinking. What would be a better way to communicate the results?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-M3</div>
+        You run 20 independent backtests. 2 show p &lt; 0.05. Calculate the probability that both are false positives assuming H₀ is true for all. What does this tell you about your backtest results?
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier hard">
+    <div class="tier-header" onclick="toggleTier(this)">🔴 HARD — Advanced Analysis <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">P-H1</div>
+        The "p-hacking" problem: explain mathematically why searching through 20 features/parameters and reporting only the one with lowest p-value inflates Type I error. If you test 20 features all with no true effect at α=0.05, what is the true α of your procedure? How does Bonferroni correction address this?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">P-H2</div>
+        A hedge fund backtests a momentum strategy on 10 years of data and reports p = 0.002. A Bayesian colleague argues this p-value is misleading because it doesn't account for the prior probability that the strategy has true alpha, and that the fund has tested hundreds of strategies. Explain the Bayesian critique in mathematical terms using Bayes' theorem. What additional information would you need?
+      </div>
+    </div>
+  </div>
+
+  <h3>Topic: Confidence Intervals</h3>
+
+  <div class="exercise-tier easy">
+    <div class="tier-header" onclick="toggleTier(this)">🟢 EASY — Building Blocks <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">C-E1</div>
+        Calculate a 95% CI for the mean: x̄ = 8, s = 2, n = 64. Use z* = 1.96. Give the full interval [lower, upper].
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-E2</div>
+        Mark TRUE or FALSE: (a) "There is a 95% probability the true mean is in [6.5, 9.5]." (b) "95% of similarly constructed intervals will contain the true mean." (c) "The true mean has a 95% chance of being between 6.5 and 9.5." Explain the distinction carefully.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-E3</div>
+        If you increase the confidence level from 95% to 99% (keeping data the same), does the interval get wider or narrower? Why? Give an intuitive explanation.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-E4</div>
+        A 95% CI for a strategy's Sharpe ratio is [−0.2, 0.8]. Based on this alone, can you say the strategy is significantly profitable? Explain.
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier medium">
+    <div class="tier-header" onclick="toggleTier(this)">🟡 MEDIUM — Application <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">C-M1</div>
+        You run a strategy for 100 days: x̄ = 0.1%, s = 0.8%. (a) Construct 90%, 95%, and 99% CIs for the true mean daily return. (b) For each CI, state whether you'd reject H₀: μ = 0 at the corresponding α level and why.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-M2</div>
+        You want a margin of error no larger than 0.02% for your daily return estimate. Your historical σ ≈ 1%. How many days of data do you need for a 95% CI with this precision? Use the formula n = (z* · σ / E)².
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-M3</div>
+        Strategy A has 95% CI for Sharpe: [0.3, 1.4]. Strategy B: [0.8, 1.2]. (a) Which is more precisely estimated? (b) Can you say Strategy B is better? (c) What does the overlap (or lack thereof) of CIs tell you?
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier hard">
+    <div class="tier-header" onclick="toggleTier(this)">🔴 HARD — Quant Depth <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">C-H1</div>
+        The Sharpe ratio CI is more complex than the mean CI because the Sharpe is a ratio statistic. Look up the Jobson-Korkie formula for the standard error of the Sharpe ratio. Implement it in Python: given 252 daily returns, compute the Sharpe ratio and its 95% CI. Then test H₀: SR = 0.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">C-H2</div>
+        Bootstrap Confidence Intervals: instead of the formula-based approach, implement a percentile bootstrap CI in Python. Given 200 return observations: (a) resample with replacement 10,000 times, (b) compute the mean of each resample, (c) take the 2.5th and 97.5th percentiles as the 95% CI. Compare to the formula-based CI. When and why might bootstrap CIs be preferred for financial data?
+      </div>
+    </div>
+  </div>
+
+  <h3>Topic: Type I &amp; II Errors</h3>
+
+  <div class="exercise-tier easy">
+    <div class="tier-header" onclick="toggleTier(this)">🟢 EASY — Error Identification <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">E-E1</div>
+        Classify each as Type I error, Type II error, or correct decision: (a) A strategy has no real alpha, but your test says it does. You deploy capital. (b) A strategy genuinely has alpha, your test confirms it. (c) A strategy has no alpha, your test correctly shows no significance. (d) A genuine alpha strategy looks like noise in your test, so you don't trade it.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-E2</div>
+        What is the probability of a Type I error if you set α = 0.05 and H₀ is true? What controls this probability? Can you reduce it to zero?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-E3</div>
+        In a medical context (testing a new cancer treatment): which error is more dangerous — Type I or Type II? In a quant context (screening algo strategies): which might be more costly, and why might the answer differ from the medical case?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-E4</div>
+        If you want to reduce Type II errors without changing α, what can you do? Name two specific approaches and explain why each works.
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier medium">
+    <div class="tier-header" onclick="toggleTier(this)">🟡 MEDIUM — Tradeoffs &amp; Calculations <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">E-M1</div>
+        A strategy has true daily return μ = 0.05%, σ = 1%. You test H₀: μ = 0 (one-sided, α = 0.05) over n = 252 days. (a) Compute the critical value for x̄. (b) What is the power (probability of correctly rejecting H₀)? Use scipy.stats.norm. (c) What n would you need for 80% power?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-M2</div>
+        Complete the 2×2 error table for a study that runs 200 hypothesis tests where 20 are truly alternative (H₁ true) and the rest are null (H₀ true). Assume α=0.05 and power=0.80. How many True Positives, False Positives, True Negatives, and False Negatives do you expect?
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-M3</div>
+        You lower your significance threshold from α=0.05 to α=0.01 to be more conservative. Show mathematically how this changes your Type I error rate, your Type II error rate (β), and your power — assuming sample size is fixed. Is this always the right tradeoff?
+      </div>
+    </div>
+  </div>
+
+  <div class="exercise-tier hard">
+    <div class="tier-header" onclick="toggleTier(this)">🔴 HARD — Advanced Scenarios <span style="margin-left:auto">▼</span></div>
+    <div class="tier-body">
+      <div class="exercise-item">
+        <div class="exercise-num">E-H1</div>
+        The False Discovery Rate (FDR): you're running 500 backtests simultaneously, each at α=0.05. Using the Benjamini-Hochberg procedure, explain how to control the expected proportion of false positives among all rejections (FDR). Implement it in Python: given 500 p-values (450 under H₀, 50 under H₁ with true effect), apply B-H correction at FDR=0.05 and compare to uncorrected results.
+      </div>
+      <div class="exercise-item">
+        <div class="exercise-num">E-H2</div>
+        Walk-Forward Testing and Overfitting: a strategy shows p=0.001 in in-sample testing but p=0.34 out-of-sample. Frame this as a Type I / Type II error problem. Why does in-sample testing systematically inflate Type I error rates? What is the deflated Sharpe ratio (Bailey &amp; Lopez de Prado) and how does it attempt to correct for this? Provide the formula and implement a simplified version.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<script>
+/* ── TAB NAVIGATION ── */
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── EXERCISE TOGGLE ── */
+function toggleTier(header) {
+  const body = header.nextElementSibling;
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  header.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
+}
+// Start all open
+document.querySelectorAll('.tier-body').forEach(b => b.style.display = 'block');
+
+/* ── COIN FLIP p-VALUE SIMULATOR ── */
+function binomialPValue(n, k, p) {
+  // P(X >= k) for X ~ Binomial(n, p) — one-sided
+  let prob = 0;
+  for (let i = k; i <= n; i++) {
+    prob += binomCoeff(n, i) * Math.pow(p, i) * Math.pow(1 - p, n - i);
+  }
+  return Math.min(1, prob);
+}
+
+function binomCoeff(n, k) {
+  if (k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  let result = 1;
+  for (let i = 0; i < Math.min(k, n - k); i++) {
+    result = result * (n - i) / (i + 1);
+  }
+  return result;
+}
+
+function updateSim() {
+  const n = parseInt(document.getElementById('nFlips').value);
+  const k = Math.min(parseInt(document.getElementById('kHeads').value), n);
+  document.getElementById('kHeads').max = n;
+  document.getElementById('nFlipsVal').textContent = n;
+  document.getElementById('kHeadsVal').textContent = k;
+
+  const p = 0.5; // H0
+  const pVal = binomialPValue(n, k, p);
+  const zStat = ((k/n) - p) / Math.sqrt(p*(1-p)/n);
+
+  document.getElementById('pvalOut').textContent = pVal.toFixed(4);
+  document.getElementById('zstatOut').textContent = zStat.toFixed(3);
+  const rejected = pVal < 0.05;
+  const decEl = document.getElementById('decisionOut');
+  decEl.textContent = rejected ? 'REJECT H₀' : 'Fail to reject H₀';
+  decEl.style.color = rejected ? '#ef4444' : '#10b981';
+
+  drawSimCanvas(n, k, pVal);
+}
+
+function drawSimCanvas(n, k, pVal) {
+  const canvas = document.getElementById('simCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth * window.devicePixelRatio || 600;
+  const H = 160 * window.devicePixelRatio || 160;
+  canvas.width = W; canvas.height = H;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const cW = canvas.offsetWidth, cH = 160;
+
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, cW, cH);
+
+  const maxProb = Math.max(...Array.from({length: n+1}, (_, i) => binomCoeff(n,i)*Math.pow(0.5,n)));
+  const barW = Math.max(1, (cW - 40) / (n + 1));
+
+  for (let i = 0; i <= n; i++) {
+    const prob = binomCoeff(n, i) * Math.pow(0.5, n);
+    const barH = (prob / maxProb) * (cH - 40);
+    const x = 20 + i * barW;
+    const y = cH - 20 - barH;
+    ctx.fillStyle = i >= k ? 'rgba(239,68,68,0.7)' : 'rgba(0,212,255,0.5)';
+    ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+  }
+
+  // axis label
+  ctx.fillStyle = '#64748b';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('Number of Heads (Binomial Distribution under H₀)', cW/2, cH - 5);
+
+  // legend
+  ctx.fillStyle = 'rgba(239,68,68,0.7)';
+  ctx.fillRect(20, 10, 12, 10);
+  ctx.fillStyle = '#94a3b8';
+  ctx.textAlign = 'left';
+  ctx.font = '10px IBM Plex Mono';
+  ctx.fillText(`p-value region (k ≥ ${k})`, 38, 19);
+}
+
+/* ── CI SIMULATOR ── */
+function zStar(conf) {
+  const alpha = 1 - conf/100;
+  const z = {80:1.282, 85:1.440, 90:1.645, 91:1.695, 92:1.751, 93:1.812,
+             94:1.881, 95:1.960, 96:2.054, 97:2.170, 98:2.326, 99:2.576};
+  return z[conf] || 1.96;
+}
+
+function updateCI() {
+  const n = parseInt(document.getElementById('ciN').value);
+  const sd = parseFloat(document.getElementById('ciSd').value);
+  const conf = parseInt(document.getElementById('ciConf').value);
+  document.getElementById('ciNVal').textContent = n;
+  document.getElementById('ciSdVal').textContent = sd;
+  document.getElementById('ciConfVal').textContent = conf + '%';
+
+  const z = zStar(conf);
+  const se = sd / Math.sqrt(n);
+  const moe = z * se;
+  const mean = 50; // assume x_bar = 50 for display
+
+  document.getElementById('ciMOE').textContent = '±' + moe.toFixed(3);
+  document.getElementById('ciRange').textContent = `[${(mean-moe).toFixed(2)}, ${(mean+moe).toFixed(2)}]`;
+  document.getElementById('ciZ').textContent = z.toFixed(3);
+
+  drawCICanvas(mean, moe, conf);
+}
+
+function drawCICanvas(mean, moe, conf) {
+  const canvas = document.getElementById('ciCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth * window.devicePixelRatio || 700;
+  const H = 140 * window.devicePixelRatio;
+  canvas.width = W; canvas.height = H;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const cW = canvas.offsetWidth, cH = 140;
+
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, cW, cH);
+
+  const scale = (cW - 80) / (moe * 6);
+  const cx = cW / 2;
+  const cy = cH / 2;
+  const pxMoe = moe * scale;
+
+  // CI line
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx - pxMoe, cy);
+  ctx.lineTo(cx + pxMoe, cy);
+  ctx.stroke();
+
+  // end caps
+  [-1, 1].forEach(d => {
+    ctx.beginPath();
+    ctx.moveTo(cx + d*pxMoe, cy-10);
+    ctx.lineTo(cx + d*pxMoe, cy+10);
+    ctx.stroke();
+  });
+
+  // center dot
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, 2*Math.PI);
+  ctx.fill();
+
+  // labels
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '11px IBM Plex Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText(`x̄ = ${mean}`, cx, cy - 20);
+  ctx.fillText(`${(mean - moe).toFixed(2)}`, cx - pxMoe, cy + 25);
+  ctx.fillText(`${(mean + moe).toFixed(2)}`, cx + pxMoe, cy + 25);
+  ctx.fillStyle = '#10b981';
+  ctx.fillText(`${conf}% Confidence Interval`, cx, cy + 42);
+  ctx.fillStyle = '#64748b';
+  ctx.fillText(`Width = ${(2*moe).toFixed(3)}`, cx, cy + 56);
+}
+
+// Initial renders
+window.addEventListener('load', () => {
+  updateSim();
+  updateCI();
+});
+window.addEventListener('resize', () => {
+  updateSim();
+  updateCI();
+});
+</script>
+</body>
+</html>

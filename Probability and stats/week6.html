@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoM & MLE — Quant Engineer Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:        #f7f3ee;
+  --bg2:       #efe9df;
+  --bg3:       #e6ddd0;
+  --ink:       #1a1208;
+  --ink2:      #3d2e1a;
+  --ink3:      #6b5840;
+  --ink4:      #9e856a;
+  --rust:      #b94a1a;
+  --rust-l:    #d9632a;
+  --rust-pale: rgba(185,74,26,0.08);
+  --teal:      #0e6b6b;
+  --teal-l:    #158888;
+  --teal-pale: rgba(14,107,107,0.08);
+  --gold:      #b58500;
+  --gold-l:    #d4a017;
+  --gold-pale: rgba(181,133,0,0.08);
+  --plum:      #6b2d6b;
+  --plum-pale: rgba(107,45,107,0.08);
+  --border:    #cec0ab;
+  --border2:   #bfad95;
+  --shadow:    0 4px 24px rgba(26,18,8,0.12);
+  --shadow2:   0 2px 8px rgba(26,18,8,0.08);
+  --code-bg:   #1e1812;
+  --code-text: #e8d5b0;
+}
+
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family:'Outfit', sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.75;
+  font-size:17px;
+  font-weight:300;
+}
+
+/* ── HEADER ── */
+header {
+  background:var(--ink);
+  color:var(--bg);
+  padding:60px 48px 52px;
+  position:relative;
+  overflow:hidden;
+}
+header::before {
+  content:'';
+  position:absolute;
+  top:-120px; right:-80px;
+  width:420px; height:420px;
+  border:70px solid var(--rust);
+  border-radius:50%;
+  opacity:0.07;
+}
+header::after {
+  content:'';
+  position:absolute;
+  bottom:-60px; left:10%;
+  width:240px; height:240px;
+  border:40px solid var(--gold);
+  border-radius:50%;
+  opacity:0.06;
+}
+.h-label {
+  font-family:'Fira Code', monospace;
+  font-size:11px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--rust-l);
+  margin-bottom:18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.h-label::after { content:''; flex:1; height:1px; background:var(--rust); opacity:0.4; max-width:120px; }
+header h1 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(34px,6vw,66px);
+  line-height:1.05;
+  font-weight:400;
+  color:#f7f3ee;
+  letter-spacing:-0.5px;
+  max-width:780px;
+  margin-bottom:22px;
+}
+header h1 em { color:var(--rust-l); font-style:italic; }
+.h-desc {
+  font-size:16px;
+  color:var(--ink4);
+  max-width:540px;
+  line-height:1.65;
+  font-weight:400;
+}
+.h-tags {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:26px;
+}
+.tag {
+  font-family:'Fira Code', monospace;
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:5px 13px;
+  border-radius:3px;
+  border:1px solid;
+}
+.t-rust  { color:var(--rust-l); border-color:rgba(185,74,26,.4); background:rgba(185,74,26,.08); }
+.t-teal  { color:var(--teal-l); border-color:rgba(14,107,107,.4); background:rgba(14,107,107,.08); }
+.t-gold  { color:var(--gold-l); border-color:rgba(181,133,0,.4); background:rgba(181,133,0,.08); }
+
+/* ── TABS ── */
+.tabs {
+  position:sticky; top:0; z-index:100;
+  background:var(--bg2);
+  border-bottom:2px solid var(--border);
+  display:flex; overflow-x:auto;
+  padding:0 20px; gap:0;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  font-family:'Fira Code', monospace;
+  font-size:11.5px;
+  font-weight:500;
+  letter-spacing:0.3px;
+  padding:15px 20px;
+  border:none;
+  background:transparent;
+  color:var(--ink4);
+  cursor:pointer;
+  white-space:nowrap;
+  border-bottom:3px solid transparent;
+  margin-bottom:-2px;
+  transition:all .2s;
+}
+.tab:hover { color:var(--ink2); }
+.tab.on { color:var(--rust); border-bottom-color:var(--rust); font-weight:600; }
+
+/* ── PANELS ── */
+.panel { display:none; }
+.panel.on { display:block; }
+.wrap {
+  max-width:980px;
+  margin:0 auto;
+  padding:52px 36px 100px;
+}
+
+/* ── TYPOGRAPHY ── */
+.eyebrow {
+  font-family:'Fira Code', monospace;
+  font-size:10px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--rust);
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.eyebrow::before { content:''; width:28px; height:2px; background:var(--rust); }
+
+h2 {
+  font-family:'DM Serif Display', serif;
+  font-size:clamp(30px,4.5vw,50px);
+  font-weight:400;
+  color:var(--ink);
+  line-height:1.1;
+  letter-spacing:-0.3px;
+  margin-bottom:8px;
+}
+h2 .acc { color:var(--rust); }
+h3 {
+  font-family:'DM Serif Display', serif;
+  font-size:24px;
+  font-weight:400;
+  color:var(--ink);
+  margin:44px 0 12px;
+  padding-bottom:8px;
+  border-bottom:1.5px solid var(--border);
+}
+h4 {
+  font-family:'Fira Code', monospace;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin:26px 0 8px;
+}
+p { margin-bottom:14px; color:var(--ink2); font-weight:300; }
+.lead {
+  font-size:19px;
+  color:var(--ink3);
+  font-style:italic;
+  line-height:1.65;
+  margin-bottom:32px;
+  font-family:'DM Serif Display', serif;
+  font-weight:400;
+}
+
+/* ── SEPARATOR ── */
+.sep {
+  height:1px;
+  background:linear-gradient(to right, var(--border2), transparent);
+  margin:44px 0;
+}
+
+/* ── CARDS ── */
+.prereq-card {
+  background:var(--gold-pale);
+  border:1px solid rgba(181,133,0,.25);
+  border-left:4px solid var(--gold);
+  border-radius:6px;
+  padding:22px 26px;
+  margin:26px 0;
+}
+.prereq-card h4 { color:var(--gold); margin-top:0; }
+.prereq-card p { color:var(--ink3); margin-bottom:0; }
+
+.note-card {
+  background:var(--teal-pale);
+  border:1px solid rgba(14,107,107,.2);
+  border-left:4px solid var(--teal);
+  border-radius:6px;
+  padding:20px 24px;
+  margin:22px 0;
+}
+.note-card h4 { color:var(--teal); margin-top:0; font-size:10px; }
+.note-card p { color:var(--ink3); margin-bottom:0; }
+
+.insight-card {
+  background:var(--ink);
+  color:var(--bg);
+  border-radius:10px;
+  padding:30px 34px;
+  margin:30px 0;
+  position:relative;
+  overflow:hidden;
+}
+.insight-card::before {
+  content:'"';
+  font-family:'DM Serif Display',serif;
+  font-size:180px;
+  position:absolute;
+  top:-30px; right:20px;
+  color:var(--rust);
+  opacity:0.1;
+  line-height:1;
+}
+.insight-card p { color:rgba(247,243,238,.8); margin-bottom:0; font-size:16px; }
+.insight-card strong { color:var(--rust-l); }
+
+.warn-card {
+  background:var(--rust-pale);
+  border:1px solid rgba(185,74,26,.2);
+  border-left:4px solid var(--rust);
+  border-radius:6px;
+  padding:20px 24px;
+  margin:22px 0;
+}
+.warn-card h4 { color:var(--rust); margin-top:0; }
+.warn-card p { color:var(--ink3); margin-bottom:0; }
+
+.analogy-card {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:26px 30px;
+  margin:26px 0;
+  position:relative;
+}
+.analogy-card::before {
+  content:'💡';
+  font-size:18px;
+  position:absolute;
+  top:-11px; left:20px;
+}
+.analogy-card h4 { color:var(--plum); margin-top:0; }
+.analogy-card p { color:var(--ink3); }
+.analogy-card p:last-child { margin-bottom:0; }
+
+/* ── FORMULA ── */
+.formula-box {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:26px 30px;
+  margin:22px 0;
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+}
+.formula-box::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(to right, var(--rust), var(--gold));
+}
+.f-tag {
+  font-family:'Fira Code',monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  background:var(--rust);
+  color:#fff;
+  padding:3px 10px;
+  border-radius:0 0 6px 6px;
+  position:absolute;
+  top:0; left:20px;
+}
+.formula {
+  font-family:'Fira Code',monospace;
+  font-size:18px;
+  color:var(--ink);
+  line-height:1.7;
+  font-weight:500;
+}
+.formula-note {
+  font-size:13px;
+  color:var(--ink4);
+  margin-top:10px;
+  font-style:italic;
+  font-family:'Outfit',sans-serif;
+  font-weight:300;
+}
+
+/* ── CODE ── */
+.code-wrap {
+  background:var(--code-bg);
+  border-radius:10px;
+  overflow:hidden;
+  margin:26px 0;
+  box-shadow:var(--shadow);
+}
+.code-top {
+  background:#2a221a;
+  padding:11px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.dots { display:flex; gap:6px; }
+.dots span { width:11px; height:11px; border-radius:50%; display:block; }
+.dr { background:#ff5f57; } .dy { background:#febc2e; } .dg { background:#28c840; }
+.fname {
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  color:rgba(232,213,176,.4);
+}
+.colab-link {
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  color:var(--gold-l);
+  text-decoration:none;
+  border:1px solid rgba(181,133,0,.4);
+  padding:4px 10px;
+  border-radius:4px;
+  background:rgba(181,133,0,.08);
+  transition:all .2s;
+}
+.colab-link:hover { background:rgba(181,133,0,.16); }
+pre {
+  padding:22px 22px;
+  overflow-x:auto;
+  font-family:'Fira Code',monospace;
+  font-size:13px;
+  line-height:1.7;
+  color:var(--code-text);
+}
+.k { color:#f28b54; }  /* keyword */
+.f { color:#79c0ff; }  /* function */
+.s { color:#a5d6a7; }  /* string */
+.c { color:#5a5040; font-style:italic; }  /* comment */
+.n { color:#ffcc80; }  /* number */
+.o { color:#80deea; }  /* operator */
+
+/* ── CHARTS ── */
+.chart-box {
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:22px 22px 16px;
+  margin:24px 0;
+  box-shadow:var(--shadow2);
+}
+.chart-box canvas { max-height:280px; }
+.ct { font-family:'DM Serif Display',serif; font-size:15px; color:var(--ink); margin-bottom:3px; }
+.cs { font-family:'Fira Code',monospace; font-size:10px; color:var(--ink4); margin-bottom:14px; }
+.chart-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:24px 0; }
+@media(max-width:640px) { .chart-row { grid-template-columns:1fr; } }
+
+/* ── INTERACTIVE ── */
+.sim-box {
+  background:#fff;
+  border:1.5px solid var(--border2);
+  border-radius:10px;
+  padding:26px;
+  margin:26px 0;
+  box-shadow:var(--shadow2);
+}
+.sim-box > h4:first-child {
+  color:var(--rust);
+  margin-top:0;
+  border-bottom:1px solid var(--border);
+  padding-bottom:10px;
+  margin-bottom:18px;
+}
+.row {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+.row label {
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  color:var(--ink3);
+  min-width:170px;
+  font-weight:500;
+}
+input[type=range] { flex:1; min-width:100px; accent-color:var(--rust); cursor:pointer; }
+select {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--ink);
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  padding:6px 10px;
+  border-radius:5px;
+  cursor:pointer;
+}
+.val {
+  font-family:'Fira Code',monospace;
+  font-size:13px;
+  font-weight:600;
+  color:var(--rust);
+  min-width:56px;
+  text-align:right;
+}
+.out-panel {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:14px 18px;
+  margin-top:14px;
+  font-family:'Fira Code',monospace;
+  font-size:12.5px;
+  line-height:2;
+}
+.ol { color:var(--ink4); }
+.ov { color:var(--teal); font-weight:600; }
+.or { color:var(--rust); font-weight:600; }
+.og { color:var(--gold); font-weight:600; }
+.btn {
+  background:var(--rust);
+  color:#fff;
+  border:none;
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  padding:10px 20px;
+  border-radius:5px;
+  cursor:pointer;
+  margin-top:12px;
+  transition:all .2s;
+}
+.btn:hover { background:var(--rust-l); }
+
+/* ── STEPS LIST ── */
+.steps { list-style:none; margin:22px 0; counter-reset:st; }
+.steps li {
+  counter-increment:st;
+  padding-left:52px;
+  margin-bottom:20px;
+  position:relative;
+}
+.steps li::before {
+  content:counter(st);
+  position:absolute;
+  left:0; top:0;
+  width:34px; height:34px;
+  background:var(--rust);
+  color:#fff;
+  font-family:'DM Serif Display',serif;
+  font-size:17px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.steps li h5 {
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  font-weight:600;
+  color:var(--teal);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:3px;
+}
+.steps li p { font-size:15px; color:var(--ink3); margin-bottom:0; }
+
+/* ── EXERCISES ── */
+.ex-grid { display:grid; gap:14px; margin:22px 0; }
+.ex-card { border-radius:8px; padding:22px 26px; border:1px solid; }
+.ex-card.easy   { background:rgba(14,107,107,.04); border-color:rgba(14,107,107,.2); }
+.ex-card.medium { background:rgba(181,133,0,.04); border-color:rgba(181,133,0,.2); }
+.ex-card.hard   { background:rgba(185,74,26,.04); border-color:rgba(185,74,26,.2); }
+.ex-tag {
+  font-family:'Fira Code',monospace;
+  font-size:9px; font-weight:600;
+  letter-spacing:2px; text-transform:uppercase;
+  padding:3px 10px; border-radius:3px;
+  margin-bottom:10px; display:inline-block;
+}
+.easy   .ex-tag { background:var(--teal);  color:#fff; }
+.medium .ex-tag { background:var(--gold);  color:#fff; }
+.hard   .ex-tag { background:var(--rust);  color:#fff; }
+.ex-num { font-family:'Fira Code',monospace; font-size:10px; color:var(--ink4); margin-bottom:5px; }
+.ex-card h5 { font-family:'DM Serif Display',serif; font-size:18px; font-weight:400; color:var(--ink); margin-bottom:8px; }
+.ex-card p { font-size:15px; color:var(--ink3); margin-bottom:6px; }
+.hint {
+  margin-top:12px; font-size:12.5px; color:var(--ink4);
+  font-family:'Fira Code',monospace; font-weight:400;
+  border-top:1px solid var(--border); padding-top:10px;
+}
+.hint strong { color:var(--ink3); }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x:auto; margin:22px 0; }
+table { border-collapse:collapse; width:100%; font-size:13.5px; }
+th {
+  background:var(--ink);
+  color:var(--bg);
+  padding:11px 16px;
+  text-align:left;
+  font-family:'Fira Code',monospace;
+  font-size:10px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+td { border:1px solid var(--border); padding:11px 16px; background:var(--bg); color:var(--ink3); }
+tr:hover td { background:var(--bg2); }
+.tr { color:var(--rust) !important; font-weight:600; }
+.tt { color:var(--teal) !important; font-weight:600; }
+.tg { color:var(--gold) !important; font-weight:600; }
+
+/* ── DEFINITION LIST ── */
+dl { margin:14px 0; }
+dt { font-family:'Fira Code',monospace; font-size:12px; font-weight:600; color:var(--teal); margin-top:16px; }
+dd { margin-left:16px; padding-left:12px; border-left:2px solid var(--border2); font-size:15px; color:var(--ink3); line-height:1.65; }
+
+/* ── COMPARE GRID ── */
+.cmp { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:26px 0; }
+@media(max-width:580px) { .cmp { grid-template-columns:1fr; } }
+.cmp-card { background:var(--bg2); border:1px solid var(--border2); border-radius:8px; padding:22px 24px; }
+.cmp-card.mom { border-top:3px solid var(--teal); }
+.cmp-card.mle { border-top:3px solid var(--rust); }
+.cmp-card h4 { margin-top:0; margin-bottom:12px; }
+.mom h4 { color:var(--teal); }
+.mle h4 { color:var(--rust); }
+.cmp-item { display:flex; gap:8px; margin-bottom:9px; font-size:14px; color:var(--ink3); }
+.blt { width:5px; height:5px; border-radius:50%; margin-top:8px; flex-shrink:0; }
+.mom .blt { background:var(--teal); }
+.mle .blt { background:var(--rust); }
+
+/* ── RESOURCES ── */
+.res-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; margin:22px 0; }
+.res-card {
+  display:block; text-decoration:none; color:inherit;
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:8px; padding:18px 20px;
+  transition:all .2s;
+}
+.res-card:hover { border-color:var(--rust); box-shadow:var(--shadow2); transform:translateY(-2px); }
+.ri { font-size:20px; margin-bottom:8px; }
+.res-card h5 { font-family:'Fira Code',monospace; font-size:11.5px; color:var(--teal); margin-bottom:6px; }
+.res-card p { font-size:12.5px; color:var(--ink4); margin:0; line-height:1.45; }
+.ru { font-family:'Fira Code',monospace; font-size:9.5px; color:var(--rust-l); display:block; margin-top:7px; word-break:break-all; }
+
+/* ── QUIZ ── */
+.quiz { background:var(--bg2); border:1px solid var(--border2); border-radius:8px; padding:22px 26px; margin:16px 0; }
+.qt { font-size:16px; font-weight:500; color:var(--ink); margin-bottom:14px; }
+.qo { list-style:none; display:grid; gap:9px; }
+.qo li { display:flex; align-items:flex-start; gap:9px; }
+.qo input { margin-top:3px; accent-color:var(--rust); cursor:pointer; }
+.qo label { cursor:pointer; font-size:14px; color:var(--ink3); line-height:1.5; }
+.qbtn {
+  margin-top:12px;
+  background:transparent; border:1.5px solid var(--rust);
+  color:var(--rust);
+  font-family:'Fira Code',monospace; font-size:10px;
+  letter-spacing:2px; text-transform:uppercase;
+  padding:9px 18px; border-radius:5px;
+  cursor:pointer; transition:all .2s;
+}
+.qbtn:hover { background:var(--rust-pale); }
+.qres {
+  margin-top:10px; padding:12px 16px; border-radius:6px;
+  font-size:13px; display:none; line-height:1.6;
+}
+.qc { background:rgba(14,107,107,.08); color:var(--teal); border:1px solid rgba(14,107,107,.2); }
+.qw { background:var(--rust-pale); color:var(--rust); border:1px solid rgba(185,74,26,.2); }
+
+/* ── SVG DIAGRAM WRAP ── */
+.svg-wrap { text-align:center; margin:28px 0; overflow-x:auto; }
+.svg-wrap svg { max-width:100%; }
+
+/* ── FOOTER ── */
+footer {
+  background:var(--ink);
+  color:var(--ink4);
+  text-align:center;
+  padding:28px;
+  font-family:'Fira Code',monospace;
+  font-size:11px;
+  letter-spacing:1.5px;
+}
+footer span { color:var(--rust-l); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px) { .wrap { padding:28px 16px 72px; } h2 { font-size:28px; } .formula { font-size:14px; } pre { font-size:11px; } }
+
+/* ── ANIMATION ── */
+@keyframes fadeIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.panel.on .wrap { animation:fadeIn .3s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <div class="h-label">Quantitative Engineering · Statistical Estimation · Series III</div>
+  <h1>Method of Moments<br>&amp; <em>Maximum Likelihood</em></h1>
+  <p class="h-desc">Two fundamental techniques for fitting statistical models to data — the engine behind every quant's parameter estimation toolkit.</p>
+  <div class="h-tags">
+    <span class="tag t-rust">100% Offline</span>
+    <span class="tag t-teal">Interactive Demos</span>
+    <span class="tag t-gold">3 Colab Experiments</span>
+    <span class="tag t-rust">18 Practice Exercises</span>
+  </div>
+</header>
+
+<!-- ═══════════ TABS ═══════════ -->
+<div class="tabs">
+  <button class="tab on" onclick="go('pre',this)">0 · Prerequisites</button>
+  <button class="tab" onclick="go('mom',this)">1 · Method of Moments</button>
+  <button class="tab" onclick="go('mle',this)">2 · Maximum Likelihood</button>
+  <button class="tab" onclick="go('cmp',this)">3 · MoM vs MLE</button>
+  <button class="tab" onclick="go('qfin',this)">4 · Quant Applications</button>
+  <button class="tab" onclick="go('res',this)">5 · Resources</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 0 — PREREQUISITES
+═══════════════════════════════════════════════════════ -->
+<div id="tab-pre" class="panel on">
+<div class="wrap">
+  <div class="eyebrow">Start Here</div>
+  <h2>Prerequisites</h2>
+  <p class="lead">Before estimating parameters, you need these building blocks. Each one is explained from scratch — read even if you've seen them before.</p>
+
+  <div class="prereq-card">
+    <h4>⚠ What You Need First</h4>
+    <p>All five topics below are used throughout MoM and MLE. Take 5–10 minutes per section. You don't need mastery — just enough familiarity to follow the main content comfortably.</p>
+  </div>
+
+  <h3>1. Probability Distributions &amp; Parameters</h3>
+  <p>A <strong>probability distribution</strong> is a mathematical recipe that describes the randomness of a variable. Most distributions are characterised by one or a few numbers called <strong>parameters</strong> — the unknowns we want to estimate.</p>
+  <dl>
+    <dt>Parameter (θ)</dt>
+    <dd>A fixed but unknown number that controls the shape of a distribution. For a coin, θ = p (probability of heads). For a Normal, θ = (μ, σ). MoM and MLE are two methods to estimate θ from data.</dd>
+    <dt>Parametric Model</dt>
+    <dd>A family of distributions indexed by parameters. Example: X ~ Normal(μ, σ²) — the family is "all normal distributions." Choosing μ=0, σ=1 pins down one member of that family.</dd>
+  </dl>
+
+  <div class="analogy-card">
+    <h4>The Recipe Analogy</h4>
+    <p>Think of a distribution family as a recipe template (e.g., "chocolate cake"), and parameters as the specific quantities (e.g., "2 cups flour, 1 cup sugar"). The recipe tells you the shape; the parameters fill in the exact amounts. Estimation is reading measurements from a finished cake (data) and guessing what quantities were used.</p>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="ct">Same Family, Different Parameters</div>
+      <div class="cs">Normal(μ, σ²) with varying μ and σ</div>
+      <canvas id="paramDemo1"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="ct">Exponential(λ) — changing λ</div>
+      <div class="cs">Different rates λ → different shapes</div>
+      <canvas id="paramDemo2"></canvas>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>2. Expected Value &amp; Moments</h3>
+  <p>The <strong>k-th moment</strong> of a distribution is E[Xᵏ] — the expected value of X raised to the power k. Moments capture shape properties of a distribution.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Moments</span>
+    <div class="formula">μₖ = E[Xᵏ] = ∫ xᵏ · f(x; θ) dx</div>
+    <div class="formula-note">1st moment (k=1): E[X] = mean. 2nd moment (k=2): E[X²]. Central 2nd moment: E[(X−μ)²] = variance.</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Moment</th><th>Definition</th><th>What It Tells You</th><th>Example: Normal(μ,σ²)</th></tr>
+      <tr><td class="tt">1st (mean)</td><td>E[X]</td><td>Centre of distribution</td><td>μ</td></tr>
+      <tr><td class="tt">2nd central</td><td>E[(X−μ)²]</td><td>Spread / variance</td><td>σ²</td></tr>
+      <tr><td class="tt">3rd central</td><td>E[(X−μ)³]/σ³</td><td>Skewness (asymmetry)</td><td>0 (symmetric)</td></tr>
+      <tr><td class="tt">4th central</td><td>E[(X−μ)⁴]/σ⁴</td><td>Kurtosis (tail weight)</td><td>3 (normal baseline)</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>3. Likelihood — What Does It Mean?</h3>
+  <p>Given data x₁,...,xₙ and a model with parameter θ, the <strong>likelihood</strong> L(θ) answers: "How probable was this data, if θ were the true parameter?"</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Likelihood</span>
+    <div class="formula">L(θ; x₁,...,xₙ) = ∏ᵢ f(xᵢ; θ)</div>
+    <div class="formula-note">For i.i.d. data, joint probability = product of individual probabilities. L(θ) is a function of θ, not of the data.</div>
+  </div>
+
+  <div class="analogy-card">
+    <h4>The Likelihood Intuition — Reverse Detective</h4>
+    <p>Imagine you observe three coin flips: Heads, Heads, Tails. If the coin were fair (θ=0.5): L(0.5) = 0.5 × 0.5 × 0.5 = 0.125. If the coin were biased to 70% heads (θ=0.7): L(0.7) = 0.7 × 0.7 × 0.3 = 0.147. The biased coin makes this data <em>more likely</em> to have occurred. MLE asks: which θ maximises L(θ)?</p>
+  </div>
+
+  <div class="chart-box">
+    <div class="ct">Likelihood as a Function of θ — Coin Example</div>
+    <div class="cs">Data: 7 Heads, 3 Tails. L(p) = p⁷(1-p)³. Which p is most likely?</div>
+    <canvas id="likelihoodIntro"></canvas>
+  </div>
+
+  <div class="sep"></div>
+  <h3>4. Estimation vs Truth</h3>
+  <p>An <strong>estimator</strong> θ̂ is a function of the data that produces a guess for the true parameter θ. It has two key properties:</p>
+  <dl>
+    <dt>Bias</dt>
+    <dd>E[θ̂] − θ. An unbiased estimator has E[θ̂] = θ on average. Bias is the systematic error in one direction.</dd>
+    <dt>Variance</dt>
+    <dd>How spread out different estimates are across different samples. Low variance = consistent estimates.</dd>
+    <dt>Mean Squared Error (MSE)</dt>
+    <dd>MSE = Bias² + Variance. The overall error metric. A biased but low-variance estimator can beat an unbiased high-variance one.</dd>
+  </dl>
+
+  <div class="sep"></div>
+  <h3>5. Logarithm Rules (for Log-Likelihood)</h3>
+  <p>MLE almost always uses the <strong>log-likelihood</strong> ℓ(θ) = log L(θ) because products become sums and optimisation is easier. Essential rules:</p>
+  <div class="formula-box">
+    <span class="f-tag">Log Rules</span>
+    <div class="formula">log(ab) = log(a) + log(b)</div>
+    <div class="formula" style="margin-top:8px">log(aᵏ) = k·log(a)</div>
+    <div class="formula" style="margin-top:8px">log(∏ᵢ xᵢ) = Σᵢ log(xᵢ)</div>
+    <div class="formula-note">Since log is monotone increasing, argmax L(θ) = argmax log L(θ). Always use log-likelihood for computation.</div>
+  </div>
+
+  <div class="sep"></div>
+  <div class="insight-card">
+    <p>✅ <strong>Ready to proceed!</strong> With distributions, moments, likelihood, estimator properties, and log rules in hand — you have everything needed to master Method of Moments and Maximum Likelihood Estimation.</p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 1 — METHOD OF MOMENTS
+═══════════════════════════════════════════════════════ -->
+<div id="tab-mom" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 1 of 2</div>
+  <h2>Method of <em class="acc">Moments</em></h2>
+  <p class="lead">The oldest, most intuitive estimation technique: match what the distribution theoretically predicts with what you actually observe in your data.</p>
+
+  <div class="note-card">
+    <h4>🎯 Why Quants Need This</h4>
+    <p>Method of Moments is often the first pass at parameter estimation — fast, algebraic, and analytically tractable. It gives closed-form estimates for many distributions, making it ideal for initialising more complex optimisations like MLE, and for understanding the structure of the estimation problem.</p>
+  </div>
+
+  <h3>The Core Idea — Matching Moments</h3>
+  <p>The key insight is beautifully simple. Every distribution has <em>theoretical moments</em> — formulas like "E[X] = μ" and "E[X²] = σ² + μ²" — that are functions of the unknown parameters. And from data, we can compute <em>sample moments</em> — the actual averages like (1/n)ΣXᵢ and (1/n)ΣXᵢ².</p>
+  <p>Method of Moments says: <strong>set the theoretical moments equal to the sample moments and solve for the parameters.</strong></p>
+
+  <div class="analogy-card">
+    <h4>The Fingerprint Matching Analogy</h4>
+    <p>Suppose a criminal left behind two fingerprint features: finger length and ridge count. Each criminal has unique known values for these features. Method of Moments is like measuring those two features at the crime scene, then finding the criminal whose known features match. We have k unknowns (parameters), so we match k equations (moments) to solve uniquely.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Formal Procedure</h3>
+
+  <div class="formula-box">
+    <span class="f-tag">Method of Moments Recipe</span>
+    <div class="formula" style="text-align:left; padding-left:20px;">
+      Step 1: Compute theoretical moments μₖ(θ) = E[Xᵏ; θ]<br>
+      Step 2: Compute sample moments m̂ₖ = (1/n)Σᵢ Xᵢᵏ<br>
+      Step 3: Set μₖ(θ) = m̂ₖ for k = 1, 2, ..., p<br>
+      Step 4: Solve the system of equations for θ̂
+    </div>
+    <div class="formula-note">Need p equations for p parameters. Use the first p moments: E[X], E[X²], ..., E[Xᵖ].</div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h5>Count the parameters</h5>
+      <p>How many unknowns θ₁, θ₂, ... does your distribution have? That's how many moment equations you need.</p>
+    </li>
+    <li>
+      <h5>Write theoretical moment formulas</h5>
+      <p>Derive E[X] = g₁(θ) and E[X²] = g₂(θ) etc. These are known functions of the parameters from the distribution's theory.</p>
+    </li>
+    <li>
+      <h5>Compute sample moments from data</h5>
+      <p>m̂₁ = (1/n)ΣXᵢ (sample mean), m̂₂ = (1/n)ΣXᵢ² (sample second moment), etc.</p>
+    </li>
+    <li>
+      <h5>Solve the system</h5>
+      <p>Set g₁(θ) = m̂₁ and g₂(θ) = m̂₂ and solve algebraically. The solutions are the MoM estimators θ̂.</p>
+    </li>
+  </ol>
+
+  <div class="sep"></div>
+  <h3>Worked Example 1 — Normal Distribution</h3>
+  <p>Data: x₁,...,xₙ ~ Normal(μ, σ²). Two parameters: μ and σ². Need two moment equations.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Normal MoM Derivation</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      Theoretical:  E[X] = μ  →  set equal to  m̂₁ = X̄<br>
+      Theoretical:  E[X²] = σ² + μ²  →  set equal to  m̂₂ = (1/n)ΣXᵢ²<br><br>
+      From equation 1:  μ̂ = X̄ = (1/n)ΣXᵢ<br>
+      Substitute into equation 2:<br>
+      σ̂² + X̄² = (1/n)ΣXᵢ²<br>
+      σ̂² = (1/n)ΣXᵢ² − X̄² = (1/n)Σ(Xᵢ − X̄)²
+    </div>
+    <div class="formula-note">Result: μ̂ = sample mean, σ̂² = biased sample variance (divides by n, not n−1). MoM gives the biased version.</div>
+  </div>
+
+  <div class="note-card">
+    <h4>📌 Note: MoM Variance is Biased</h4>
+    <p>The MoM estimator σ̂² = (1/n)Σ(Xᵢ−X̄)² has E[σ̂²] = ((n−1)/n)σ² ≠ σ². It's slightly biased downward. The unbiased version uses (n−1) in the denominator — this is why your calculator divides by n−1 for sample variance.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Worked Example 2 — Exponential Distribution</h3>
+  <p>Data: x₁,...,xₙ ~ Exponential(λ). One parameter λ. Need only the first moment.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Exponential MoM</span>
+    <div class="formula" style="text-align:left; padding-left:20px;">
+      Theoretical:  E[X] = 1/λ<br>
+      Sample:       m̂₁ = X̄ = (1/n)ΣXᵢ<br><br>
+      Set equal:    1/λ = X̄<br>
+      Solve:        λ̂ = 1/X̄
+    </div>
+    <div class="formula-note">The MoM estimator of the rate λ is the reciprocal of the sample mean. Intuitive: if average waiting time is 5 minutes, rate = 1/5 = 0.2 events per minute.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Worked Example 3 — Beta Distribution (two parameters)</h3>
+  <p>Data: x₁,...,xₙ ~ Beta(α, β). Two parameters. First two moments:</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Beta MoM</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      Theoretical:  E[X] = α/(α+β) = m̂₁<br>
+      Theoretical:  Var[X] = αβ/((α+β)²(α+β+1)) = m̂₂ − m̂₁²<br><br>
+      Let m = m̂₁,  v = m̂₂ − m̂₁²  (sample mean and variance)<br>
+      α̂ = m·(m(1−m)/v − 1)<br>
+      β̂ = (1−m)·(m(1−m)/v − 1)
+    </div>
+    <div class="formula-note">Beta distribution used in Bayesian analysis for modelling probabilities. MoM gives explicit formulas — MLE does not have closed-form solutions for Beta.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🎛 Interactive Demo — MoM Estimation</h3>
+  <div class="sim-box">
+    <h4>🔬 FIT A DISTRIBUTION USING METHOD OF MOMENTS</h4>
+    <div class="row">
+      <label>Distribution</label>
+      <select id="momDist" onchange="runMoM()">
+        <option value="normal">Normal(μ, σ²)</option>
+        <option value="expo">Exponential(λ)</option>
+        <option value="gamma">Gamma(α, β)</option>
+        <option value="beta">Beta(α, β)</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>Sample size n</label>
+      <input type="range" min="20" max="1000" value="100" id="momN" oninput="document.getElementById('momNv').textContent=this.value; runMoM()">
+      <span class="val" id="momNv">100</span>
+    </div>
+    <div class="row">
+      <label>True parameter 1</label>
+      <input type="range" min="10" max="90" value="40" id="momP1" oninput="document.getElementById('momP1v').textContent=(this.value/20).toFixed(2); runMoM()">
+      <span class="val" id="momP1v">2.00</span>
+    </div>
+    <div class="row">
+      <label>True parameter 2</label>
+      <input type="range" min="10" max="80" value="30" id="momP2" oninput="document.getElementById('momP2v').textContent=(this.value/20).toFixed(2); runMoM()">
+      <span class="val" id="momP2v">1.50</span>
+    </div>
+    <canvas id="momChart" height="220"></canvas>
+    <div class="out-panel">
+      <span class="ol">True θ: </span><span class="or" id="momTrue">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">MoM estimate θ̂: </span><span class="ov" id="momEst">—</span><br>
+      <span class="ol">Sample mean m̂₁: </span><span class="og" id="momM1">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Sample 2nd moment m̂₂: </span><span class="og" id="momM2">—</span><br>
+      <span class="ol">Estimation error: </span><span class="or" id="momErr">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Properties of MoM Estimators</h3>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Property</th><th>MoM Result</th><th>Details</th></tr>
+      <tr><td class="tt">Consistency</td><td>✓ Always</td><td>θ̂ → θ as n → ∞ (by LLN applied to sample moments)</td></tr>
+      <tr><td class="tt">Unbiasedness</td><td>Sometimes</td><td>Not guaranteed; depends on whether g(E[X]) = E[g(X)]</td></tr>
+      <tr><td class="tt">Efficiency</td><td>Usually not</td><td>MLE is typically more efficient (lower variance)</td></tr>
+      <tr><td class="tt">Closed-form</td><td>Often yes</td><td>Key advantage — can often solve explicitly without optimisation</td></tr>
+      <tr><td class="tt">Asymptotic Normality</td><td>✓ Yes</td><td>√n(θ̂ − θ) → N(0, Σ) where Σ involves the Jacobian of moment equations</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 1 — Method of Moments from Scratch</h3>
+  <div class="code-wrap">
+    <div class="code-top">
+      <div class="dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div>
+      <span class="fname">experiment_1_method_of_moments.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> stats
+
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 1A: MoM for Normal Distribution
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"=== MoM for Normal Distribution ==="</span>)
+
+<span class="c"># True parameters</span>
+mu_true, sigma_true = <span class="n">3.5</span>, <span class="n">1.2</span>
+n = <span class="n">200</span>
+data = np.random.<span class="f">normal</span>(mu_true, sigma_true, n)
+
+<span class="c"># Step 1: Compute sample moments</span>
+m1_hat = data.<span class="f">mean</span>()          <span class="c"># (1/n) * sum(Xi)</span>
+m2_hat = (data**<span class="n">2</span>).<span class="f">mean</span>()    <span class="c"># (1/n) * sum(Xi^2)</span>
+
+<span class="c"># Step 2: Solve for parameters</span>
+mu_hat    = m1_hat                           <span class="c"># from E[X] = mu</span>
+sigma_sq_hat = m2_hat - m1_hat**<span class="n">2</span>           <span class="c"># from E[X^2] = sigma^2 + mu^2</span>
+sigma_hat = np.<span class="f">sqrt</span>(sigma_sq_hat)
+
+<span class="k">print</span>(<span class="s">f"True: μ={mu_true}, σ={sigma_true}"</span>)
+<span class="k">print</span>(<span class="s">f"MoM:  μ̂={mu_hat:.4f}, σ̂={sigma_hat:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"Note: MoM σ̂ divides by n (biased). Unbiased uses n-1: {data.std(ddof=1):.4f}"</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 1B: MoM for Exponential Distribution
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"\n=== MoM for Exponential Distribution ==="</span>)
+
+lambda_true = <span class="n">0.5</span>  <span class="c"># mean = 1/lambda = 2</span>
+data_exp = np.random.<span class="f">exponential</span>(<span class="n">1</span>/lambda_true, n)
+
+m1_exp = data_exp.<span class="f">mean</span>()
+lambda_hat = <span class="n">1</span> / m1_exp  <span class="c"># E[X] = 1/lambda => lambda = 1/X̄</span>
+
+<span class="k">print</span>(<span class="s">f"True λ={lambda_true}, mean should be {1/lambda_true}"</span>)
+<span class="k">print</span>(<span class="s">f"Sample mean: {m1_exp:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"MoM λ̂ = 1/X̄ = {lambda_hat:.4f}"</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 1C: Visualise MoM — Fitted vs True Distribution
+# ═══════════════════════════════════════════════════════</span>
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">3</span>, figsize=(<span class="n">15</span>, <span class="n">5</span>))
+distributions = [
+    (<span class="s">'Normal'</span>,   np.random.<span class="f">normal</span>(<span class="n">3.5</span>, <span class="n">1.2</span>, <span class="n">300</span>),   stats.norm),
+    (<span class="s">'Exponential'</span>, np.random.<span class="f">exponential</span>(<span class="n">2</span>, <span class="n">300</span>),  stats.expon),
+    (<span class="s">'Gamma'</span>,    np.random.<span class="f">gamma</span>(<span class="n">2</span>, <span class="n">1.5</span>, <span class="n">300</span>),    stats.gamma),
+]
+
+<span class="k">for</span> ax, (name, data_i, dist_cls) <span class="k">in</span> <span class="f">zip</span>(axes, distributions):
+    <span class="c"># Plot histogram</span>
+    ax.<span class="f">hist</span>(data_i, bins=<span class="n">35</span>, density=<span class="k">True</span>, alpha=<span class="n">0.55</span>,
+            color=<span class="s">'#b94a1a'</span>, label=<span class="s">'Data'</span>)
+
+    <span class="c"># MoM fit</span>
+    m1 = data_i.<span class="f">mean</span>()
+    m2 = (data_i**<span class="n">2</span>).<span class="f">mean</span>()
+    var = m2 - m1**<span class="n">2</span>
+
+    xs = np.<span class="f">linspace</span>(data_i.<span class="f">min</span>(), data_i.<span class="f">max</span>(), <span class="n">200</span>)
+    <span class="k">if</span> name == <span class="s">'Normal'</span>:
+        ax.<span class="f">plot</span>(xs, stats.norm.<span class="f">pdf</span>(xs, m1, np.<span class="f">sqrt</span>(var)),
+                <span class="s">'b-'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">f'MoM fit: μ={m1:.2f}, σ={np.sqrt(var):.2f}'</span>)
+    <span class="k">elif</span> name == <span class="s">'Exponential'</span>:
+        lam = <span class="n">1</span>/m1
+        ax.<span class="f">plot</span>(xs, stats.expon.<span class="f">pdf</span>(xs, scale=<span class="n">1</span>/lam),
+                <span class="s">'b-'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">f'MoM fit: λ={lam:.3f}'</span>)
+    <span class="k">elif</span> name == <span class="s">'Gamma'</span>:
+        alpha_hat = m1**<span class="n">2</span>/var
+        beta_hat  = var/m1
+        ax.<span class="f">plot</span>(xs, stats.gamma.<span class="f">pdf</span>(xs, a=alpha_hat, scale=beta_hat),
+                <span class="s">'b-'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">f'MoM fit: α={alpha_hat:.2f}, β={beta_hat:.2f}'</span>)
+
+    ax.<span class="f">set_title</span>(<span class="s">f'MoM Fit: {name}'</span>, fontweight=<span class="s">'bold'</span>)
+    ax.<span class="f">legend</span>(fontsize=<span class="n">9</span>)
+
+plt.<span class="f">suptitle</span>(<span class="s">'Method of Moments: Fitted Distributions vs Data'</span>, fontsize=<span class="n">14</span>)
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 1D: Sampling Distribution of MoM Estimator
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"\n=== Sampling Distribution of MoM Estimator ==="</span>)
+REPS = <span class="n">2000</span>
+n_vals = [<span class="n">20</span>, <span class="n">100</span>, <span class="n">500</span>]
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">3</span>, figsize=(<span class="n">14</span>, <span class="n">4</span>))
+<span class="k">for</span> ax, n <span class="k">in</span> <span class="f">zip</span>(axes, n_vals):
+    mom_ests = []
+    <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(REPS):
+        d = np.random.<span class="f">exponential</span>(<span class="n">2</span>, n)
+        mom_ests.<span class="f">append</span>(<span class="n">1</span>/d.<span class="f">mean</span>())
+    ax.<span class="f">hist</span>(mom_ests, bins=<span class="n">50</span>, density=<span class="k">True</span>, color=<span class="s">'#0e6b6b'</span>, alpha=<span class="n">0.7</span>)
+    ax.<span class="f">axvline</span>(<span class="n">0.5</span>, color=<span class="s">'red'</span>, linewidth=<span class="n">2</span>, linestyle=<span class="s">'--'</span>, label=<span class="s">'True λ=0.5'</span>)
+    ax.<span class="f">axvline</span>(np.<span class="f">mean</span>(mom_ests), color=<span class="s">'gold'</span>, linewidth=<span class="n">2</span>, label=<span class="s">f'Mean λ̂={np.mean(mom_ests):.4f}'</span>)
+    ax.<span class="f">set_title</span>(<span class="s">f'n={n}: Bias={np.mean(mom_ests)-0.5:.4f}, SE={np.std(mom_ests):.4f}'</span>)
+    ax.<span class="f">legend</span>(fontsize=<span class="n">8</span>)
+
+plt.<span class="f">suptitle</span>(<span class="s">'Sampling Distribution of MoM λ̂ = 1/X̄ for Exp(0.5)'</span>, fontsize=<span class="n">13</span>)
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()</pre>
+  </div>
+
+  <div class="sep"></div>
+  <h3>✏️ Practice Exercises — Method of Moments</h3>
+  <div class="ex-grid">
+    <div class="ex-card easy">
+      <span class="ex-tag">Easy</span>
+      <div class="ex-num">Exercise 1.1</div>
+      <h5>Poisson MoM</h5>
+      <p>For X ~ Poisson(λ): (a) Show E[X] = λ and Var(X) = λ. (b) Given data {2,1,3,1,2,4,0,1,2,3}, compute the MoM estimate λ̂. (c) Why do we only need one moment equation for Poisson?</p>
+      <div class="hint"><strong>Hint:</strong> λ̂ = sample mean = (sum of values)/n. Only one parameter → one equation suffices.</div>
+    </div>
+    <div class="ex-card easy">
+      <span class="ex-tag">Easy</span>
+      <div class="ex-num">Exercise 1.2</div>
+      <h5>Uniform MoM</h5>
+      <p>For X ~ Uniform(a, b): (a) Find E[X] = (a+b)/2 and Var(X) = (b−a)²/12. (b) Given sample mean X̄ = 4.2 and sample variance s² = 3.0, find MoM estimates â and b̂. (c) Check: do your estimates satisfy â &lt; b̂?</p>
+      <div class="hint"><strong>Hint:</strong> Solve: (a+b)/2 = X̄ and (b-a)²/12 = s². From the second: b-a = √(12s²) = 6. Then use the first to find a and b separately.</div>
+    </div>
+    <div class="ex-card medium">
+      <span class="ex-tag">Medium</span>
+      <div class="ex-num">Exercise 1.3</div>
+      <h5>Gamma Distribution MoM</h5>
+      <p>For X ~ Gamma(α, β) where mean = αβ and variance = αβ²: (a) Derive MoM estimators α̂ and β̂ in terms of sample mean m̂₁ and sample variance ŝ². (b) Given 50 observations with X̄=6.3 and s²=9.8, compute α̂ and β̂. (c) Interpret: what does α represent geometrically?</p>
+      <div class="hint"><strong>Hint:</strong> β̂ = s²/X̄ (sample variance over mean). α̂ = X̄/β̂ = X̄²/s².</div>
+    </div>
+    <div class="ex-card medium">
+      <span class="ex-tag">Medium</span>
+      <div class="ex-num">Exercise 1.4</div>
+      <h5>MoM Bias Investigation</h5>
+      <p>For X ~ Exponential(λ), the MoM estimator is λ̂ = 1/X̄. (a) Is λ̂ unbiased? (Hint: E[1/X̄] ≠ 1/E[X̄] by Jensen's inequality since 1/x is convex.) (b) In Python, simulate 5000 replications with n=50 and λ=2. Compute mean λ̂ across replications — is it close to 2? (c) What is the direction of the bias?</p>
+      <div class="hint"><strong>Hint:</strong> Jensen's inequality says E[g(X)] ≥ g(E[X]) for convex g. Since g(x) = 1/x is convex, E[1/X̄] &gt; 1/E[X̄] = λ. So MoM overestimates λ on average.</div>
+    </div>
+    <div class="ex-card hard">
+      <span class="ex-tag">Hard</span>
+      <div class="ex-num">Exercise 1.5</div>
+      <h5>Log-Normal MoM</h5>
+      <p>X ~ LogNormal(μ, σ²) means log(X) ~ Normal(μ, σ²). The moments are: E[X] = exp(μ + σ²/2) and E[X²] = exp(2μ + 2σ²). (a) Derive MoM estimators μ̂ and σ̂² in terms of sample moments m̂₁ and m̂₂. (b) Implement in Python. (c) What issue arises when the sample variance is very small?</p>
+      <div class="hint"><strong>Hint:</strong> From the two equations: σ̂² = log(m̂₂/m̂₁²) and μ̂ = log(m̂₁) − σ̂²/2. Take logs of both moment equations and solve the resulting linear system.</div>
+    </div>
+    <div class="ex-card hard">
+      <span class="ex-tag">Hard</span>
+      <div class="ex-num">Exercise 1.6 — Quant Finance</div>
+      <h5>Fitting Return Distributions</h5>
+      <p>Daily stock returns are often modelled as Student-t(ν, μ, σ²). The moments are: E[X]=μ, Var(X)=σ²ν/(ν-2) for ν>2, and kurtosis = 6/(ν-4) + 3 for ν>4. (a) Derive MoM estimators for μ, σ², and ν using the first two moments plus kurtosis. (b) Simulate 500 returns from t(ν=5, μ=0.001, σ=0.02) and apply your estimators. (c) Why does the t-distribution's heavy tail matter for risk management?</p>
+      <div class="hint"><strong>Hint:</strong> From kurtosis excess κ: ν̂ = 6/κ + 4. Then σ̂² from Var formula. Uses 3 moment equations for 3 parameters.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 2 — MAXIMUM LIKELIHOOD ESTIMATION
+═══════════════════════════════════════════════════════ -->
+<div id="tab-mle" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Topic 2 of 2</div>
+  <h2>Maximum <em class="acc">Likelihood</em></h2>
+  <p class="lead">Find the parameter values that make your observed data as probable as possible. The gold standard of statistical estimation — efficient, principled, and universally applicable.</p>
+
+  <div class="note-card">
+    <h4>🔗 Builds on Prerequisites</h4>
+    <p>MLE requires understanding the likelihood function from the prerequisites, plus logarithm rules (since we maximise log-likelihood) and basic calculus (taking derivatives and setting to zero to find maxima).</p>
+  </div>
+
+  <h3>The Core Philosophy</h3>
+  <p>You've observed data x₁,...,xₙ. The data has already happened — it's fixed. But we don't know which parameter θ generated it. MLE's answer: <strong>choose the θ that would have made this specific data most probable to occur.</strong></p>
+
+  <div class="analogy-card">
+    <h4>The Archery Analogy</h4>
+    <p>You walk into a room and see 10 arrows all clustered near the bullseye. You want to estimate where the archer was aiming. MLE says: "The archer must have been aiming at the bullseye — because that's the aim that makes the observed shot pattern most probable." The parameter (aim point) is chosen to maximise the probability of the observed evidence (arrow positions).</p>
+    <p style="margin-bottom:0">MoM would say: "Take the average position of the arrows and call that the aim." MLE is more principled — it uses the full shape of the likelihood surface.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Formal Definition</h3>
+
+  <div class="formula-box">
+    <span class="f-tag">MLE Definition</span>
+    <div class="formula">θ̂_MLE = argmax_θ L(θ; x) = argmax_θ ∏ᵢ f(xᵢ; θ)</div>
+    <div class="formula" style="margin-top:10px">= argmax_θ ℓ(θ; x) = argmax_θ Σᵢ log f(xᵢ; θ)</div>
+    <div class="formula-note">Since log is monotone, maximising the log-likelihood ℓ(θ) is equivalent to maximising L(θ). Always use log-likelihood in practice.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Standard MLE Procedure</h3>
+
+  <ol class="steps">
+    <li>
+      <h5>Write the likelihood</h5>
+      <p>L(θ) = ∏ᵢ f(xᵢ; θ). For i.i.d. data this is the product of individual densities/probabilities evaluated at each observed xᵢ.</p>
+    </li>
+    <li>
+      <h5>Take the log → log-likelihood</h5>
+      <p>ℓ(θ) = Σᵢ log f(xᵢ; θ). Products become sums. Much easier to differentiate.</p>
+    </li>
+    <li>
+      <h5>Differentiate w.r.t. θ</h5>
+      <p>Compute ∂ℓ/∂θ. Set equal to zero: this is the "score equation" or "likelihood equation."</p>
+    </li>
+    <li>
+      <h5>Solve for θ</h5>
+      <p>If the score equation has an analytic solution, that's your MLE. Otherwise, use numerical optimisation (gradient ascent, Newton-Raphson, scipy.optimize).</p>
+    </li>
+    <li>
+      <h5>Verify it's a maximum</h5>
+      <p>Check ∂²ℓ/∂θ² &lt; 0 (concave down). Or verify the solution is not a boundary or saddle point.</p>
+    </li>
+  </ol>
+
+  <div class="sep"></div>
+  <h3>Worked Example 1 — Bernoulli / Binomial MLE</h3>
+  <p>Observe n coin flips: k heads, n−k tails. X₁,...,Xₙ ~ Bernoulli(p). Find p̂_MLE.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Bernoulli MLE — Full Derivation</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      L(p) = pᵏ(1−p)ⁿ⁻ᵏ<br><br>
+      ℓ(p) = k·log(p) + (n−k)·log(1−p)<br><br>
+      ∂ℓ/∂p = k/p − (n−k)/(1−p) = 0<br><br>
+      k(1−p) = (n−k)p<br>
+      k − kp = np − kp<br>
+      k = np<br><br>
+      <span style="color:var(--rust)">p̂_MLE = k/n = (number of heads) / (total flips)</span>
+    </div>
+    <div class="formula-note">The MLE is just the sample proportion — intuitively obvious, but now formally justified as the principled maximum likelihood solution.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Worked Example 2 — Normal Distribution MLE</h3>
+  <p>Observe x₁,...,xₙ ~ Normal(μ, σ²). Find μ̂_MLE and σ̂²_MLE.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Normal MLE Derivation</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      f(xᵢ; μ, σ²) = (1/√(2πσ²)) exp(−(xᵢ−μ)²/(2σ²))<br><br>
+      ℓ(μ,σ²) = −(n/2)log(2π) − (n/2)log(σ²) − Σᵢ(xᵢ−μ)²/(2σ²)<br><br>
+      ∂ℓ/∂μ = Σᵢ(xᵢ−μ)/σ² = 0  →  <span style="color:var(--rust)">μ̂ = X̄</span><br><br>
+      ∂ℓ/∂σ² = −n/(2σ²) + Σᵢ(xᵢ−μ)²/(2σ⁴) = 0<br>
+      →  <span style="color:var(--rust)">σ̂² = (1/n)Σᵢ(xᵢ − X̄)²</span>
+    </div>
+    <div class="formula-note">MLE and MoM agree for Normal! Both give μ̂ = X̄ and σ̂² = (1/n)Σ(xᵢ−X̄)² (biased). This is a lucky coincidence — not universal.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Worked Example 3 — Exponential MLE</h3>
+
+  <div class="formula-box">
+    <span class="f-tag">Exponential MLE</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      f(xᵢ; λ) = λ·exp(−λxᵢ)  for xᵢ &gt; 0<br><br>
+      ℓ(λ) = n·log(λ) − λ·Σᵢ xᵢ<br><br>
+      ∂ℓ/∂λ = n/λ − Σᵢ xᵢ = 0<br><br>
+      <span style="color:var(--rust)">λ̂_MLE = n / Σᵢ xᵢ = 1/X̄</span>
+    </div>
+    <div class="formula-note">Same as MoM for Exponential! Again, a coincidence. For many distributions, MoM ≠ MLE.</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🎛 Interactive MLE Demo — Visualise the Likelihood Surface</h3>
+  <div class="sim-box">
+    <h4>🔬 WATCH MLE FIND THE OPTIMAL θ — LIKELIHOOD SURFACE</h4>
+    <div class="row">
+      <label>Distribution</label>
+      <select id="mleDist" onchange="runMLE()">
+        <option value="bernoulli">Bernoulli(p)</option>
+        <option value="normal">Normal(μ, σ²) — fix σ</option>
+        <option value="expo">Exponential(λ)</option>
+        <option value="poisson">Poisson(λ)</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>True parameter θ</label>
+      <input type="range" min="5" max="90" value="35" id="mleTheta" oninput="document.getElementById('mleTv').textContent=(this.value/100).toFixed(2); runMLE()">
+      <span class="val" id="mleTv">0.35</span>
+    </div>
+    <div class="row">
+      <label>Sample size n</label>
+      <input type="range" min="5" max="500" value="30" id="mleN" oninput="document.getElementById('mleNv').textContent=this.value; runMLE()">
+      <span class="val" id="mleNv">30</span>
+    </div>
+    <canvas id="mleChart" height="230"></canvas>
+    <div class="out-panel">
+      <span class="ol">True θ: </span><span class="or" id="mleTrueOut">0.35</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">MLE θ̂: </span><span class="ov" id="mleEstOut">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Log-likelihood at θ̂: </span><span class="og" id="mleLL">—</span><br>
+      <span class="ol">95% Wald CI: </span><span class="ov" id="mleCI">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The Information Matrix &amp; Fisher Information</h3>
+  <p>MLE comes with built-in uncertainty quantification via <strong>Fisher Information</strong> — a measure of how much information the data carries about θ.</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Fisher Information</span>
+    <div class="formula">I(θ) = E[−∂²ℓ/∂θ² | θ] = E[(∂ℓ/∂θ)²]</div>
+    <div class="formula" style="margin-top:10px">Var(θ̂_MLE) ≈ 1/(n·I(θ))  [Cramér-Rao Lower Bound]</div>
+    <div class="formula-note">The MLE achieves the CRLB asymptotically — it is the most efficient unbiased estimator for large n. No estimator can have lower variance.</div>
+  </div>
+
+  <div class="analogy-card">
+    <h4>The Fisher Information Intuition</h4>
+    <p>Fisher Information measures how "peaked" the log-likelihood is at θ. A sharply peaked likelihood → high information → small uncertainty → tight confidence intervals. A flat likelihood → low information → parameter is hard to pin down → wide confidence intervals.</p>
+    <p style="margin-bottom:0">Think of it as: "How sensitive is the log-likelihood to changes in θ near the true value?" High sensitivity = high information = better estimates.</p>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="ct">Sharp Likelihood = Low Uncertainty</div>
+      <div class="cs">High Fisher Information → peaked → tight CI</div>
+      <canvas id="likelihoodSharp"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="ct">Flat Likelihood = High Uncertainty</div>
+      <div class="cs">Low Fisher Information → flat → wide CI</div>
+      <canvas id="likelihoodFlat"></canvas>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Asymptotic Properties of MLE</h3>
+  <p>Under mild regularity conditions, the MLE has three powerful asymptotic properties:</p>
+
+  <div class="formula-box">
+    <span class="f-tag">MLE Asymptotic Normality</span>
+    <div class="formula">√n · (θ̂_MLE − θ₀) → N(0, 1/I(θ₀)) as n → ∞</div>
+    <div class="formula-note">θ₀ = true parameter. This allows Wald confidence intervals: θ̂ ± z_{α/2}/√(n·Î(θ̂)).</div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Property</th><th>Statement</th><th>Practical Use</th></tr>
+      <tr><td class="tr">Consistency</td><td>θ̂_MLE → θ₀ as n → ∞</td><td>Large samples converge to truth</td></tr>
+      <tr><td class="tr">Asymp. Normality</td><td>√n(θ̂ − θ) → N(0, I⁻¹)</td><td>Confidence intervals, hypothesis tests</td></tr>
+      <tr><td class="tr">Efficiency</td><td>Var(θ̂) → CRLB = 1/(nI)</td><td>Best possible estimator for large n</td></tr>
+      <tr><td class="tr">Invariance</td><td>MLE of g(θ) is g(θ̂_MLE)</td><td>Estimate transformations without re-fitting</td></tr>
+    </table>
+  </div>
+
+  <div class="note-card">
+    <h4>📌 MLE Invariance Property — Very Useful!</h4>
+    <p>If θ̂ is the MLE of θ, then g(θ̂) is the MLE of g(θ) for any function g. Example: if λ̂_MLE = 0.5 is the MLE of the rate, then 1/λ̂ = 2 is the MLE of the mean. You never need to re-solve the optimisation for transformed parameters.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Numerical MLE — When No Closed Form Exists</h3>
+  <p>Many distributions (Beta, Gamma with both parameters, Weibull, etc.) have no closed-form MLE. We use numerical optimisation:</p>
+
+  <div class="formula-box">
+    <span class="f-tag">Numerical MLE Strategy</span>
+    <div class="formula" style="text-align:left; padding-left:20px; font-size:15px;">
+      1. Define negative log-likelihood: nll(θ) = −Σᵢ log f(xᵢ; θ)<br>
+      2. Minimise nll using scipy.optimize.minimize<br>
+      3. Use gradient methods (L-BFGS-B) or trust-region<br>
+      4. Hessian at solution → Fisher information → CIs
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 2 — MLE Full Workflow</h3>
+  <div class="code-wrap">
+    <div class="code-top">
+      <div class="dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div>
+      <span class="fname">experiment_2_maximum_likelihood.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> stats, optimize
+<span class="k">from</span> scipy.stats <span class="k">import</span> norm, expon, gamma
+
+np.random.<span class="f">seed</span>(<span class="n">0</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 2A: Visualise Likelihood Surface
+# ═══════════════════════════════════════════════════════</span>
+n = <span class="n">30</span>
+p_true = <span class="n">0.35</span>
+data = np.random.<span class="f">binomial</span>(<span class="n">1</span>, p_true, n)
+k = data.<span class="f">sum</span>()
+
+p_vals = np.<span class="f">linspace</span>(<span class="n">0.001</span>, <span class="n">0.999</span>, <span class="n">300</span>)
+log_likelihood = k * np.<span class="f">log</span>(p_vals) + (n-k) * np.<span class="f">log</span>(<span class="n">1</span> - p_vals)
+likelihood     = np.<span class="f">exp</span>(log_likelihood - log_likelihood.<span class="f">max</span>())  <span class="c"># normalise for plot</span>
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">13</span>, <span class="n">5</span>))
+axes[<span class="n">0</span>].<span class="f">plot</span>(p_vals, likelihood, color=<span class="s">'#b94a1a'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">'Likelihood (normalised)'</span>)
+axes[<span class="n">0</span>].<span class="f">axvline</span>(k/n, color=<span class="s">'navy'</span>, linestyle=<span class="s">'--'</span>, linewidth=<span class="n">2</span>, label=<span class="s">f'MLE: p̂={k/n:.3f}'</span>)
+axes[<span class="n">0</span>].<span class="f">axvline</span>(p_true, color=<span class="s">'green'</span>, linestyle=<span class="s">':'</span>, linewidth=<span class="n">2</span>, label=<span class="s">f'True: p={p_true}'</span>)
+axes[<span class="n">0</span>].<span class="f">set_xlabel</span>(<span class="s">'p'</span>); axes[<span class="n">0</span>].<span class="f">set_title</span>(<span class="s">'Likelihood Function L(p) — Bernoulli'</span>)
+axes[<span class="n">0</span>].<span class="f">legend</span>()
+
+axes[<span class="n">1</span>].<span class="f">plot</span>(p_vals, log_likelihood, color=<span class="s">'#0e6b6b'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">'Log-Likelihood ℓ(p)'</span>)
+axes[<span class="n">1</span>].<span class="f">axvline</span>(k/n, color=<span class="s">'navy'</span>, linestyle=<span class="s">'--'</span>, linewidth=<span class="n">2</span>, label=<span class="s">f'MLE: p̂={k/n:.3f}'</span>)
+axes[<span class="n">1</span>].<span class="f">set_xlabel</span>(<span class="s">'p'</span>); axes[<span class="n">1</span>].<span class="f">set_title</span>(<span class="s">'Log-Likelihood ℓ(p) — same maximum!'</span>)
+axes[<span class="n">1</span>].<span class="f">legend</span>()
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 2B: Numerical MLE for Gamma Distribution
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"\n=== Numerical MLE for Gamma(α, β) ==="</span>)
+alpha_true, beta_true = <span class="n">3.0</span>, <span class="n">2.0</span>
+data_gamma = np.random.<span class="f">gamma</span>(alpha_true, beta_true, <span class="n">200</span>)
+
+<span class="k">def</span> <span class="f">neg_log_lik_gamma</span>(params):
+    alpha, beta = params
+    <span class="k">if</span> alpha <= <span class="n">0</span> <span class="k">or</span> beta <= <span class="n">0</span>: <span class="k">return</span> <span class="n">1e10</span>
+    <span class="k">return</span> -np.<span class="f">sum</span>(stats.gamma.<span class="f">logpdf</span>(data_gamma, a=alpha, scale=beta))
+
+<span class="c"># Initial guess from MoM</span>
+m1, m2 = data_gamma.<span class="f">mean</span>(), (data_gamma**<span class="n">2</span>).<span class="f">mean</span>()
+var_hat = m2 - m1**<span class="n">2</span>
+alpha0 = m1**<span class="n">2</span>/var_hat
+beta0  = var_hat/m1
+<span class="k">print</span>(<span class="s">f"MoM initial guess: α₀={alpha0:.3f}, β₀={beta0:.3f}"</span>)
+
+result = optimize.<span class="f">minimize</span>(neg_log_lik_gamma, [alpha0, beta0],
+                           method=<span class="s">'L-BFGS-B'</span>, bounds=[(<span class="n">0.001</span>,<span class="k">None</span>),(<span class="n">0.001</span>,<span class="k">None</span>)])
+alpha_mle, beta_mle = result.x
+<span class="k">print</span>(<span class="s">f"True:  α={alpha_true}, β={beta_true}"</span>)
+<span class="k">print</span>(<span class="s">f"MLE:   α̂={alpha_mle:.4f}, β̂={beta_mle:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"MLE converged: {result.success}, log-lik = {-result.fun:.2f}"</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 2C: Asymptotic Normality of MLE
+# ═══════════════════════════════════════════════════════</span>
+REPS = <span class="n">3000</span>
+n_vals = [<span class="n">20</span>, <span class="n">100</span>, <span class="n">500</span>]
+p0 = <span class="n">0.4</span>
+
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">3</span>, figsize=(<span class="n">14</span>, <span class="n">4</span>))
+<span class="k">for</span> ax, n <span class="k">in</span> <span class="f">zip</span>(axes, n_vals):
+    mle_ests = [np.random.<span class="f">binomial</span>(<span class="n">1</span>, p0, n).<span class="f">mean</span>() <span class="k">for</span> _ <span class="k">in</span> <span class="f">range</span>(REPS)]
+    mle_std = np.<span class="f">array</span>(mle_ests).<span class="f">std</span>()
+    ax.<span class="f">hist</span>(mle_ests, bins=<span class="n">40</span>, density=<span class="k">True</span>, alpha=<span class="n">0.65</span>, color=<span class="s">'#b94a1a'</span>)
+    <span class="c"># Overlay N(p0, p0(1-p0)/n) — theoretical asymptotic distribution</span>
+    xs = np.<span class="f">linspace</span>(p0-<span class="n">4</span>/np.<span class="f">sqrt</span>(n), p0+<span class="n">4</span>/np.<span class="f">sqrt</span>(n), <span class="n">200</span>)
+    theo_std = np.<span class="f">sqrt</span>(p0*(<span class="n">1</span>-p0)/n)
+    ax.<span class="f">plot</span>(xs, norm.<span class="f">pdf</span>(xs, p0, theo_std), <span class="s">'k-'</span>, linewidth=<span class="n">2</span>, label=<span class="s">f'N({p0}, I⁻¹/n)'</span>)
+    ax.<span class="f">axvline</span>(p0, color=<span class="s">'green'</span>, linestyle=<span class="s">'--'</span>, label=<span class="s">f'True p={p0}'</span>)
+    ax.<span class="f">set_title</span>(<span class="s">f'n={n}: MLE ~ N(p, p(1-p)/n)'</span>)
+    ax.<span class="f">legend</span>(fontsize=<span class="n">8</span>)
+
+plt.<span class="f">suptitle</span>(<span class="s">'MLE Asymptotic Normality: Bernoulli MLE Converges to Normal'</span>, fontsize=<span class="n">13</span>)
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 2D: Likelihood Ratio Test
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"\n=== Likelihood Ratio Test: H0: p=0.5 vs H1: p≠0.5 ==="</span>)
+data_lrt = np.random.<span class="f">binomial</span>(<span class="n">1</span>, <span class="n">0.6</span>, <span class="n">50</span>)  <span class="c"># true p=0.6</span>
+k_obs = data_lrt.<span class="f">sum</span>()
+n_obs = <span class="f">len</span>(data_lrt)
+p_null = <span class="n">0.5</span>
+p_hat  = k_obs/n_obs
+
+ll_null = k_obs*np.<span class="f">log</span>(p_null) + (n_obs-k_obs)*np.<span class="f">log</span>(<span class="n">1</span>-p_null)
+ll_alt  = k_obs*np.<span class="f">log</span>(p_hat)  + (n_obs-k_obs)*np.<span class="f">log</span>(<span class="n">1</span>-p_hat)
+LR_stat = <span class="n">2</span> * (ll_alt - ll_null)  <span class="c"># ~ chi-squared(1) under H0</span>
+p_val = <span class="n">1</span> - stats.chi2.<span class="f">cdf</span>(LR_stat, df=<span class="n">1</span>)
+
+<span class="k">print</span>(<span class="s">f"Observed k={k_obs} out of n={n_obs}, p̂={p_hat:.3f}"</span>)
+<span class="k">print</span>(<span class="s">f"LR statistic: {LR_stat:.4f} (chi2(1) under H0)"</span>)
+<span class="k">print</span>(<span class="s">f"p-value: {p_val:.4f}"</span>)
+<span class="k">print</span>(<span class="s">f"Reject H0: p=0.5? {'YES' if p_val < 0.05 else 'NO'}"</span>)</pre>
+  </div>
+
+  <div class="sep"></div>
+  <h3>✏️ Practice Exercises — Maximum Likelihood Estimation</h3>
+  <div class="ex-grid">
+    <div class="ex-card easy">
+      <span class="ex-tag">Easy</span>
+      <div class="ex-num">Exercise 2.1</div>
+      <h5>Poisson MLE</h5>
+      <p>For X ~ Poisson(λ), f(x;λ) = e⁻λλˣ/x!. (a) Write the log-likelihood ℓ(λ) for data x₁,...,xₙ. (b) Differentiate and find λ̂_MLE. (c) Verify: does MLE agree with MoM for Poisson?</p>
+      <div class="hint"><strong>Hint:</strong> ℓ(λ) = −nλ + log(λ)·Σxᵢ + const. Differentiate w.r.t. λ and set to zero → λ̂ = X̄.</div>
+    </div>
+    <div class="ex-card easy">
+      <span class="ex-tag">Easy</span>
+      <div class="ex-num">Exercise 2.2</div>
+      <h5>Likelihood Ratio Comparison</h5>
+      <p>You flip a coin 20 times and get 14 heads. (a) Compute L(0.5) and L(0.7). (b) Compute L(14/20) — the MLE. (c) Which hypothesis is most supported? (d) Compute the likelihood ratio L(0.7)/L(0.5) and interpret.</p>
+      <div class="hint"><strong>Hint:</strong> L(p) = p¹⁴(1-p)⁶. For numerical stability, compare log-likelihoods instead of likelihoods.</div>
+    </div>
+    <div class="ex-card medium">
+      <span class="ex-tag">Medium</span>
+      <div class="ex-num">Exercise 2.3</div>
+      <h5>Fisher Information &amp; Confidence Intervals</h5>
+      <p>For X ~ Bernoulli(p), the Fisher Information is I(p) = 1/(p(1-p)). (a) Compute the Cramér-Rao lower bound for variance of any unbiased estimator of p with n=100 observations and p=0.3. (b) Does the MLE p̂=k/n achieve this bound? (c) Construct a 95% Wald confidence interval given k=28 and n=100.</p>
+      <div class="hint"><strong>Hint:</strong> Var(p̂) = p(1-p)/n by standard binomial result. CRLB = 1/(n·I(p)) = p(1-p)/n. Yes, they match! CI: p̂ ± 1.96√(p̂(1-p̂)/n).</div>
+    </div>
+    <div class="ex-card medium">
+      <span class="ex-tag">Medium</span>
+      <div class="ex-num">Exercise 2.4</div>
+      <h5>MLE Invariance</h5>
+      <p>X ~ Exponential(λ), n=50, X̄=3.2. (a) Find λ̂_MLE. (b) Using invariance, find the MLE of: the mean (1/λ), the median (log(2)/λ), and P(X &gt; 5) = e^{-5λ}. (c) Compute 95% CIs for all four quantities using the Delta Method.</p>
+      <div class="hint"><strong>Hint:</strong> λ̂ = 1/3.2 = 0.3125. For g(λ) by invariance: g(λ̂). Delta Method CI for g: g(λ̂) ± 1.96·|g'(λ̂)|·SE(λ̂) where SE(λ̂) = λ̂/√n.</div>
+    </div>
+    <div class="ex-card hard">
+      <span class="ex-tag">Hard</span>
+      <div class="ex-num">Exercise 2.5</div>
+      <h5>Likelihood Ratio Test</h5>
+      <p>You want to test H₀: λ=0.5 vs H₁: λ≠0.5 for an Exponential population. You observe n=100 data points with X̄=2.5. (a) Compute the MLE λ̂. (b) Compute the log-likelihood under H₀ and under H₁. (c) Compute the LR test statistic Λ = 2(ℓ(λ̂) − ℓ(0.5)). (d) Compare to χ²(1) critical value 3.84 at 5% significance. (e) What is the p-value?</p>
+      <div class="hint"><strong>Hint:</strong> ℓ(λ; data) = n·log(λ) − λ·n·X̄. Plug in λ=0.5 for H₀ and λ̂=1/X̄ for H₁. LR stat ~ χ²(1) under H₀.</div>
+    </div>
+    <div class="ex-card hard">
+      <span class="ex-tag">Hard</span>
+      <div class="ex-num">Exercise 2.6 — Quant Finance</div>
+      <h5>Volatility MLE for Black-Scholes</h5>
+      <p>Log-returns rₜ = log(Sₜ/Sₜ₋₁) ~ Normal(μ, σ²) under geometric Brownian motion. Given 252 daily log-returns: (a) Derive the MLE for both μ and σ². (b) If r̄ = 0.0004, s = 0.0142: compute μ̂ and σ̂, then annualise (×252 for μ, ×√252 for σ). (c) Compute 95% CIs for annualised σ. (d) How many years of daily data would you need for the CI on annualised σ to be narrower than ±1%?</p>
+      <div class="hint"><strong>Hint:</strong> MLE: μ̂ = r̄, σ̂² = (1/n)Σ(rₜ−r̄)². Asymptotic Var(σ̂²) = 2σ⁴/n. For CI on σ: use Delta Method. Annualised σ_ann = σ·√252.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 3 — MoM vs MLE
+═══════════════════════════════════════════════════════ -->
+<div id="tab-cmp" class="panel">
+<div class="wrap">
+  <div class="eyebrow">The Big Picture</div>
+  <h2>MoM <em class="acc">vs</em> MLE</h2>
+  <p class="lead">Two roads to the same destination — but they take very different routes. Knowing when to use each is the mark of a practised statistician.</p>
+
+  <h3>Side-by-Side Comparison</h3>
+
+  <div class="cmp">
+    <div class="cmp-card mom">
+      <h4>Method of Moments</h4>
+      <div class="cmp-item"><div class="blt"></div><p>Often has <strong>closed-form</strong> analytical solution</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Algebraic — no optimisation needed</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Sometimes biased (e.g., variance estimate)</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Consistent (converges to truth as n→∞)</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Usually <strong>less efficient</strong> than MLE</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Excellent as initialiser for numerical MLE</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>May give invalid parameter values</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Does not use full distributional information</p></div>
+    </div>
+    <div class="cmp-card mle">
+      <h4>Maximum Likelihood</h4>
+      <div class="cmp-item"><div class="blt"></div><p>Sometimes closed-form; often requires <strong>numerical optimisation</strong></p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Principled — maximises data probability</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Sometimes biased (same variance for Normal)</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Consistent + asymptotically <strong>efficient</strong></p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Achieves Cramér-Rao bound asymptotically</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Natural framework for hypothesis testing (LRT)</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Built-in uncertainty via Fisher information</p></div>
+      <div class="cmp-item"><div class="blt"></div><p>Uses full distributional structure</p></div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>When Do They Agree?</h3>
+  <p>For some distributions, MoM and MLE produce exactly the same estimator — a lucky coincidence.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Distribution</th><th>MoM Estimator</th><th>MLE Estimator</th><th>Same?</th></tr>
+      <tr><td class="tt">Normal(μ, σ²)</td><td>μ̂=X̄, σ̂²=(1/n)Σ(Xᵢ−X̄)²</td><td>μ̂=X̄, σ̂²=(1/n)Σ(Xᵢ−X̄)²</td><td class="tt">✓ Yes</td></tr>
+      <tr><td class="tt">Exponential(λ)</td><td>λ̂=1/X̄</td><td>λ̂=1/X̄</td><td class="tt">✓ Yes</td></tr>
+      <tr><td class="tt">Poisson(λ)</td><td>λ̂=X̄</td><td>λ̂=X̄</td><td class="tt">✓ Yes</td></tr>
+      <tr><td class="tr">Bernoulli(p)</td><td>p̂=X̄</td><td>p̂=X̄</td><td class="tt">✓ Yes</td></tr>
+      <tr><td class="tr">Beta(α, β)</td><td>α̂, β̂ from mean &amp; var</td><td>No closed form — numerical only</td><td class="tr">✗ No</td></tr>
+      <tr><td class="tr">Gamma(α, β)</td><td>α̂=X̄²/s², β̂=s²/X̄</td><td>No closed form — numerical only</td><td class="tr">✗ No</td></tr>
+      <tr><td class="tr">Uniform(0, θ)</td><td>θ̂=2X̄</td><td>θ̂=max(X₁,...,Xₙ)</td><td class="tr">✗ Very different!</td></tr>
+    </table>
+  </div>
+
+  <div class="analogy-card">
+    <h4>The Uniform(0,θ) Case — Dramatic Difference</h4>
+    <p><strong>MoM:</strong> θ̂ = 2X̄. Uses only the mean, doesn't use the fact that all observations must be ≤ θ.</p>
+    <p><strong>MLE:</strong> θ̂ = max(X₁,...,Xₙ). Logically perfect — the largest observation is the best lower bound for θ. Any θ below the max would make those observations impossible!</p>
+    <p style="margin-bottom:0">MLE is dramatically better here: it's consistent, uses data more cleverly, and has smaller error. MoM θ̂ = 2X̄ could actually be SMALLER than the largest observation — a clear impossibility for the true θ.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Efficiency Comparison — MoM vs MLE</h3>
+  <div class="chart-box">
+    <div class="ct">Asymptotic Relative Efficiency (ARE) — Sampling Distribution Width</div>
+    <div class="cs">MLE (teal) vs MoM (rust) — n=200 simulations, Exponential(0.5) population</div>
+    <canvas id="efficiencyChart" height="220"></canvas>
+  </div>
+
+  <div class="note-card">
+    <h4>📌 Asymptotic Relative Efficiency (ARE)</h4>
+    <p>ARE(MoM, MLE) = Var(θ̂_MLE) / Var(θ̂_MoM). If ARE = 0.80, MoM needs 25% more data to achieve the same precision as MLE. For many distributions, ARE is close to 1 — but for some (like the uniform) the gap is enormous.</p>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🎛 Head-to-Head Interactive Comparison</h3>
+  <div class="sim-box">
+    <h4>🔬 MoM vs MLE SIDE BY SIDE — Compare Estimates</h4>
+    <div class="row">
+      <label>Distribution</label>
+      <select id="cmpDist" onchange="runCMP()">
+        <option value="expo">Exponential(λ) — same result</option>
+        <option value="gamma">Gamma(α,β) — different!</option>
+        <option value="uniform_theta">Uniform(0,θ) — very different!</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>True parameter</label>
+      <input type="range" min="10" max="80" value="40" id="cmpTheta" oninput="document.getElementById('cmpTv').textContent=(this.value/10).toFixed(1); runCMP()">
+      <span class="val" id="cmpTv">4.0</span>
+    </div>
+    <div class="row">
+      <label>Sample size n</label>
+      <input type="range" min="10" max="500" value="100" id="cmpN" oninput="document.getElementById('cmpNv').textContent=this.value; runCMP()">
+      <span class="val" id="cmpNv">100</span>
+    </div>
+    <div class="row">
+      <label>Replications for MSE</label>
+      <input type="range" min="100" max="2000" value="500" id="cmpReps" oninput="document.getElementById('cmpRv').textContent=this.value">
+      <span class="val" id="cmpRv">500</span>
+    </div>
+    <button class="btn" onclick="runCMP()">Run Simulation</button>
+    <canvas id="cmpChart" height="240" style="margin-top:16px"></canvas>
+    <div class="out-panel">
+      <span class="ol">MoM estimate: </span><span class="ov" id="cmpMoM">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">MLE estimate: </span><span class="or" id="cmpMLE">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">True θ: </span><span class="og" id="cmpTrue">—</span><br>
+      <span class="ol">MoM MSE (sim): </span><span class="ov" id="cmpMoMMSE">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">MLE MSE (sim): </span><span class="or" id="cmpMLEMSE">—</span>&nbsp;&nbsp;&nbsp;
+      <span class="ol">Winner: </span><span class="og" id="cmpWinner">—</span>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>Concept-Check Quiz</h3>
+
+  <div class="quiz">
+    <div class="qt">Q1: For the Uniform(0,θ) distribution, the MLE θ̂ = max(X₁,...,Xₙ) is biased (it underestimates θ on average). Despite this, it's preferred over the unbiased MoM estimator θ̂ = 2X̄. Why?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q1" id="q1a" value="w"><label for="q1a">MLE is always unbiased, so this premise is wrong.</label></li>
+      <li><input type="radio" name="q1" id="q1b" value="c"><label for="q1b">MLE has much lower MSE (Bias² + Variance). The MoM's high variance makes its MSE larger despite being unbiased.</label></li>
+      <li><input type="radio" name="q1" id="q1c" value="w"><label for="q1c">MoM and MLE give the same answer for Uniform.</label></li>
+      <li><input type="radio" name="q1" id="q1d" value="w"><label for="q1d">MoM can't be used for continuous distributions.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q1','r1')">Check Answer</button>
+    <div class="qres" id="r1"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="qt">Q2: You're fitting a Gamma distribution to data on option prices. MoM gives α̂=2.1, β̂=3.4 in milliseconds, but there's no closed-form MLE. What's the recommended workflow?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q2" id="q2a" value="c"><label for="q2a">Use MoM estimates as the starting point for numerical MLE optimisation — this is the standard practice.</label></li>
+      <li><input type="radio" name="q2" id="q2b" value="w"><label for="q2b">Only use MoM since MLE has no closed form for Gamma.</label></li>
+      <li><input type="radio" name="q2" id="q2c" value="w"><label for="q2c">Switch to a Normal distribution since it has closed-form MLE.</label></li>
+      <li><input type="radio" name="q2" id="q2d" value="w"><label for="q2d">MLE exists in closed form for all distributions.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q2','r2')">Check Answer</button>
+    <div class="qres" id="r2"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="qt">Q3: For the Normal distribution, MoM and MLE give σ̂² = (1/n)Σ(Xᵢ−X̄)². This is biased. Which of the following is correct?</div>
+    <ul class="qo">
+      <li><input type="radio" name="q3" id="q3a" value="w"><label for="q3a">Bias means it's a bad estimator and should never be used.</label></li>
+      <li><input type="radio" name="q3" id="q3b" value="w"><label for="q3b">Both MoM and MLE always produce unbiased estimators.</label></li>
+      <li><input type="radio" name="q3" id="q3c" value="c"><label for="q3c">The biased version ((1/n)) is the MLE; the unbiased version ((1/(n-1))) is used for inference. The bias is small for large n and both are consistent.</label></li>
+      <li><input type="radio" name="q3" id="q3d" value="w"><label for="q3d">The MLE divides by (n-1) to correct the bias.</label></li>
+    </ul>
+    <button class="qbtn" onclick="ck('q3','r3')">Check Answer</button>
+    <div class="qres" id="r3"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 4 — QUANT APPLICATIONS
+═══════════════════════════════════════════════════════ -->
+<div id="tab-qfin" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Real-World Impact</div>
+  <h2>Quant <em class="acc">Applications</em></h2>
+  <p class="lead">MoM and MLE are the engines behind volatility estimation, risk modelling, derivative pricing calibration, and factor model fitting.</p>
+
+  <h3>1. Volatility Estimation (Normal MLE)</h3>
+  <p>Under Black-Scholes, log-returns rₜ ~ Normal(μ, σ²). MLE gives the standard formula for historical volatility:</p>
+  <div class="formula-box">
+    <span class="f-tag">Historical Volatility MLE</span>
+    <div class="formula">σ̂²_daily = (1/n) Σᵢ (rᵢ − r̄)²</div>
+    <div class="formula" style="margin-top:8px">σ̂_annual = σ̂_daily × √252</div>
+    <div class="formula-note">This is the textbook volatility estimator used by every trading desk. It IS the MLE. The choice of n (lookback window) is a model choice, not an estimation choice.</div>
+  </div>
+
+  <h3>2. Fat-Tail Modelling — Student-t MLE</h3>
+  <p>Market returns have heavier tails than Normal. The Student-t distribution with ν degrees of freedom is fitted via numerical MLE:</p>
+  <div class="formula-box">
+    <span class="f-tag">Student-t Log-Likelihood</span>
+    <div class="formula" style="font-size:15px;">ℓ(ν,μ,σ) = n·[log Γ((ν+1)/2) − log Γ(ν/2) − log(√(νπ)σ)]<br>− ((ν+1)/2) Σᵢ log(1 + (xᵢ−μ)²/(νσ²))</div>
+    <div class="formula-note">No closed form for ν (degrees of freedom). MoM provides initial guess; numerical MLE refines it. Lower ν = heavier tails = more crisis risk.</div>
+  </div>
+
+  <h3>3. Implied Volatility — MLE in Reverse</h3>
+  <p>In options markets, we observe market prices of options and "invert" the Black-Scholes formula to find the implied volatility σ_IV. This is a single-parameter MLE problem:</p>
+  <div class="formula-box">
+    <span class="f-tag">Implied Vol as MLE</span>
+    <div class="formula">σ̂_IV = argmin_σ Σᵢ (C_market(i) − C_BS(σ; Sᵢ,Kᵢ,rᵢ,Tᵢ))²</div>
+    <div class="formula-note">Minimising squared pricing errors is equivalent to MLE under Gaussian errors. Solved by numerical methods (Newton-Raphson on vega).</div>
+  </div>
+
+  <h3>4. Credit Risk — Fitting Loss Distributions</h3>
+  <p>Banks fit loss distributions (Gamma, Log-Normal, or Beta) to historical loan default rates using MLE, then compute regulatory capital requirements (VaR at 99.9%).</p>
+
+  <h3>5. Factor Models — Linear Regression as MLE</h3>
+  <p>Under Gaussian errors, OLS (Ordinary Least Squares) regression is identical to MLE. The factor loadings β in the CAPM/APT model are found by MLE:</p>
+  <div class="formula-box">
+    <span class="f-tag">Linear Regression = Gaussian MLE</span>
+    <div class="formula">rᵢ = α + βᵢ·rₘ + εᵢ,  εᵢ ~ N(0, σ²)</div>
+    <div class="formula" style="margin-top:8px">β̂_MLE = β̂_OLS = (XᵀX)⁻¹Xᵀy</div>
+    <div class="formula-note">This is why OLS works: it is MLE under Gaussian errors. Gauss-Markov theorem guarantees BLUE (Best Linear Unbiased Estimator).</div>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🧪 Colab Experiment 3 — Applied Quant Estimation</h3>
+  <div class="code-wrap">
+    <div class="code-top">
+      <div class="dots"><span class="dr"></span><span class="dy"></span><span class="dg"></span></div>
+      <span class="fname">experiment_3_quant_applications.py</span>
+      <a href="https://colab.research.google.com/new" target="_blank" class="colab-link">▶ Open Colab</a>
+    </div>
+    <pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+<span class="k">from</span> scipy <span class="k">import</span> stats, optimize
+<span class="k">import</span> warnings; warnings.<span class="f">filterwarnings</span>(<span class="s">'ignore'</span>)
+
+np.random.<span class="f">seed</span>(<span class="n">42</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 3A: Fit Normal vs Student-t to Returns
+#   Compare: which distribution is a better fit?
+# ═══════════════════════════════════════════════════════</span>
+
+<span class="c"># Simulate "realistic" stock returns with fat tails</span>
+nu_true = <span class="n">5</span>  <span class="c"># 5 degrees of freedom — heavy tails</span>
+mu_true, sigma_true = <span class="n">0.0005</span>, <span class="n">0.015</span>
+n = <span class="n">252</span>  <span class="c"># one year of daily returns</span>
+returns = mu_true + sigma_true * stats.t.<span class="f">rvs</span>(df=nu_true, size=n)
+
+<span class="c"># Fit 1: Normal MLE (closed form)</span>
+mu_norm = returns.<span class="f">mean</span>()
+sigma_norm = returns.<span class="f">std</span>(ddof=<span class="n">1</span>)
+ll_norm = stats.norm.<span class="f">logpdf</span>(returns, mu_norm, sigma_norm).<span class="f">sum</span>()
+<span class="k">print</span>(<span class="s">f"Normal MLE: μ={mu_norm:.5f}, σ={sigma_norm:.5f}"</span>)
+<span class="k">print</span>(<span class="s">f"Normal log-likelihood: {ll_norm:.2f}"</span>)
+
+<span class="c"># Fit 2: Student-t MLE (numerical)</span>
+<span class="k">def</span> <span class="f">neg_ll_t</span>(params):
+    nu, mu, sigma = params
+    <span class="k">if</span> nu <= <span class="n">2</span> <span class="k">or</span> sigma <= <span class="n">0</span>: <span class="k">return</span> <span class="n">1e10</span>
+    <span class="k">return</span> -stats.t.<span class="f">logpdf</span>(returns, df=nu, loc=mu, scale=sigma).<span class="f">sum</span>()
+
+res = optimize.<span class="f">minimize</span>(neg_ll_t, [<span class="n">10</span>, mu_norm, sigma_norm],
+                         method=<span class="s">'L-BFGS-B'</span>,
+                         bounds=[(<span class="n">2.001</span>,<span class="k">None</span>),(<span class="k">None</span>,<span class="k">None</span>),(<span class="n">0.001</span>,<span class="k">None</span>)])
+nu_mle, mu_mle, sigma_mle = res.x
+ll_t = -res.fun
+<span class="k">print</span>(<span class="s">f"\nStudent-t MLE: ν={nu_mle:.2f}, μ={mu_mle:.5f}, σ={sigma_mle:.5f}"</span>)
+<span class="k">print</span>(<span class="s">f"Student-t log-likelihood: {ll_t:.2f}"</span>)
+<span class="k">print</span>(<span class="s">f"LR test stat: {2*(ll_t - ll_norm):.2f} (df=1, critical=3.84)"</span>)
+<span class="k">print</span>(<span class="s">f"Student-t significantly better? {2*(ll_t - ll_norm) > 3.84}"</span>)
+
+<span class="c"># Plot</span>
+fig, axes = plt.<span class="f">subplots</span>(<span class="n">1</span>, <span class="n">2</span>, figsize=(<span class="n">13</span>, <span class="n">5</span>))
+xs = np.<span class="f">linspace</span>(returns.<span class="f">min</span>(), returns.<span class="f">max</span>(), <span class="n">200</span>)
+axes[<span class="n">0</span>].<span class="f">hist</span>(returns, bins=<span class="n">40</span>, density=<span class="k">True</span>, alpha=<span class="n">0.5</span>, label=<span class="s">'Data'</span>, color=<span class="s">'gray'</span>)
+axes[<span class="n">0</span>].<span class="f">plot</span>(xs, stats.norm.<span class="f">pdf</span>(xs, mu_norm, sigma_norm),
+        <span class="s">'r-'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">f'Normal MLE'</span>)
+axes[<span class="n">0</span>].<span class="f">plot</span>(xs, stats.t.<span class="f">pdf</span>(xs, nu_mle, mu_mle, sigma_mle),
+        <span class="s">'b-'</span>, linewidth=<span class="n">2.5</span>, label=<span class="s">f'Student-t MLE (ν={nu_mle:.1f})'</span>)
+axes[<span class="n">0</span>].<span class="f">legend</span>(); axes[<span class="n">0</span>].<span class="f">set_title</span>(<span class="s">'Normal vs Student-t MLE Fit'</span>)
+
+<span class="c"># QQ plot: Normal vs t-distribution fit</span>
+(osm, osr), (slope, intercept, _) = stats.<span class="f">probplot</span>(returns, dist=<span class="s">'norm'</span>)
+axes[<span class="n">1</span>].<span class="f">plot</span>(osm, osr, <span class="s">'ro'</span>, alpha=<span class="n">0.4</span>, ms=<span class="n">4</span>, label=<span class="s">'vs Normal'</span>)
+axes[<span class="n">1</span>].<span class="f">plot</span>(osm, slope*np.<span class="f">array</span>(osm)+intercept, <span class="s">'r-'</span>, linewidth=<span class="n">2</span>)
+axes[<span class="n">1</span>].<span class="f">set_title</span>(<span class="s">'QQ Plot: Heavy tails visible as deviations at extremes'</span>)
+axes[<span class="n">1</span>].<span class="f">set_xlabel</span>(<span class="s">'Theoretical Normal Quantiles'</span>)
+plt.<span class="f">tight_layout</span>(); plt.<span class="f">show</span>()
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 3B: 99% VaR — Normal vs t-distribution
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">print</span>(<span class="s">"\n=== Risk Implications: VaR Comparison ==="</span>)
+portfolio_value = <span class="n">1_000_000</span>
+VaR_norm = portfolio_value * stats.norm.<span class="f">ppf</span>(<span class="n">0.01</span>, mu_norm, sigma_norm) * (-<span class="n">1</span>)
+VaR_t    = portfolio_value * stats.t.<span class="f">ppf</span>(<span class="n">0.01</span>, nu_mle, mu_mle, sigma_mle) * (-<span class="n">1</span>)
+<span class="k">print</span>(<span class="s">f"Normal model 1-day 99% VaR: ${VaR_norm:,.0f}"</span>)
+<span class="k">print</span>(<span class="s">f"Student-t model 1-day 99% VaR: ${VaR_t:,.0f}"</span>)
+<span class="k">print</span>(<span class="s">f"t-model VaR is {(VaR_t/VaR_norm-1)*100:.1f}% larger"</span>)
+<span class="k">print</span>(<span class="s">f"→ Underestimating tail risk by using Normal!"</span>)
+
+<span class="c"># ═══════════════════════════════════════════════════════
+# EXPERIMENT 3C: Implied Volatility via MLE / Root-Finding
+# ═══════════════════════════════════════════════════════</span>
+<span class="k">from</span> scipy.stats <span class="k">import</span> norm <span class="k">as</span> N
+
+<span class="k">def</span> <span class="f">bs_call</span>(S, K, r, T, sigma):
+    d1 = (np.<span class="f">log</span>(S/K) + (r + <span class="n">0.5</span>*sigma**<span class="n">2</span>)*T) / (sigma*np.<span class="f">sqrt</span>(T))
+    d2 = d1 - sigma*np.<span class="f">sqrt</span>(T)
+    <span class="k">return</span> S*N.<span class="f">cdf</span>(d1) - K*np.<span class="f">exp</span>(-r*T)*N.<span class="f">cdf</span>(d2)
+
+<span class="c"># Market prices and option specs</span>
+S, K, r, T = <span class="n">100</span>, <span class="n">105</span>, <span class="n">0.05</span>, <span class="n">0.25</span>
+C_market = <span class="n">3.80</span>  <span class="c"># observed market price</span>
+<span class="c"># Find implied vol: which sigma makes BS price = market price</span>
+<span class="k">def</span> <span class="f">iv_target</span>(sigma): <span class="k">return</span> <span class="f">bs_call</span>(S, K, r, T, sigma) - C_market
+
+sigma_iv = optimize.<span class="f">brentq</span>(iv_target, <span class="n">0.001</span>, <span class="n">5.0</span>)
+<span class="k">print</span>(<span class="s">f"\n=== Implied Volatility ==="</span>)
+<span class="k">print</span>(<span class="s">f"Market price: ${C_market:.2f}"</span>)
+<span class="k">print</span>(<span class="s">f"Implied Vol:  {sigma_iv:.4f} ({sigma_iv*100:.2f}%)"</span>)
+<span class="k">print</span>(<span class="s">f"Verify BS({sigma_iv:.4f}) = ${bs_call(S,K,r,T,sigma_iv):.4f}"</span>)</pre>
+  </div>
+
+  <div class="sep"></div>
+  <h3>The MoM → MLE Pipeline in Practice</h3>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" style="max-width:680px;width:100%">
+      <rect width="680" height="200" fill="#f7f3ee" rx="10"/>
+
+      <!-- Box 1: Data -->
+      <rect x="20" y="65" width="110" height="70" rx="8" fill="#1a1208" stroke="none"/>
+      <text x="75" y="93" text-anchor="middle" font-family="DM Serif Display, serif" font-size="13" fill="#f7f3ee">Raw</text>
+      <text x="75" y="111" text-anchor="middle" font-family="DM Serif Display, serif" font-size="13" fill="#f7f3ee">Data</text>
+      <text x="75" y="126" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#9e856a">x₁,...,xₙ</text>
+
+      <path d="M130,100 L175,100" stroke="#6b5840" stroke-width="1.5" marker-end="url(#a1)"/>
+      <text x="152" y="92" text-anchor="middle" font-family="Fira Code, monospace" font-size="9" fill="#6b5840">compute</text>
+
+      <!-- Box 2: Sample Moments -->
+      <rect x="175" y="65" width="120" height="70" rx="8" fill="#0e6b6b" stroke="none"/>
+      <text x="235" y="90" text-anchor="middle" font-family="DM Serif Display, serif" font-size="12" fill="#fff">Sample</text>
+      <text x="235" y="106" text-anchor="middle" font-family="DM Serif Display, serif" font-size="12" fill="#fff">Moments</text>
+      <text x="235" y="122" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#a8d8d8">m̂₁, m̂₂, ...</text>
+
+      <path d="M295,100 L340,100" stroke="#6b5840" stroke-width="1.5" marker-end="url(#a2)"/>
+      <text x="317" y="88" text-anchor="middle" font-family="Fira Code, monospace" font-size="9" fill="#b94a1a">MoM solve</text>
+      <text x="317" y="99" text-anchor="middle" font-family="Fira Code, monospace" font-size="9" fill="#b94a1a">closed form</text>
+
+      <!-- Box 3: MoM -->
+      <rect x="340" y="65" width="120" height="70" rx="8" fill="#b94a1a" stroke="none"/>
+      <text x="400" y="90" text-anchor="middle" font-family="DM Serif Display, serif" font-size="12" fill="#fff">MoM</text>
+      <text x="400" y="106" text-anchor="middle" font-family="DM Serif Display, serif" font-size="12" fill="#fff">Estimate θ̂</text>
+      <text x="400" y="122" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#f5c8b8">starting point</text>
+
+      <path d="M460,100 L505,100" stroke="#6b5840" stroke-width="1.5" marker-end="url(#a3)"/>
+      <text x="482" y="88" text-anchor="middle" font-family="Fira Code, monospace" font-size="9" fill="#b58500">numerical</text>
+      <text x="482" y="99" text-anchor="middle" font-family="Fira Code, monospace" font-size="9" fill="#b58500">MLE refine</text>
+
+      <!-- Box 4: MLE -->
+      <rect x="505" y="55" width="155" height="90" rx="8" fill="#1a1208" stroke="#b94a1a" stroke-width="2"/>
+      <text x="582" y="85" text-anchor="middle" font-family="DM Serif Display, serif" font-size="13" fill="#f7f3ee">MLE θ̂ + CI</text>
+      <text x="582" y="103" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#d9632a">efficient estimate</text>
+      <text x="582" y="118" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#b58500">Fisher Info CIs</text>
+      <text x="582" y="133" text-anchor="middle" font-family="Fira Code, monospace" font-size="10" fill="#15a0a0">hypothesis tests</text>
+
+      <defs>
+        <marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#6b5840"/></marker>
+        <marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#b94a1a"/></marker>
+        <marker id="a3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#b58500"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <p style="text-align:center;font-size:13px;color:var(--ink4);font-style:italic;margin-top:-12px">Standard workflow: MoM provides fast analytical starting values; MLE polishes them numerically for optimal efficiency.</p>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TAB 5 — RESOURCES
+═══════════════════════════════════════════════════════ -->
+<div id="tab-res" class="panel">
+<div class="wrap">
+  <div class="eyebrow">Go Deeper</div>
+  <h2>Resources &amp; <em class="acc">Next Steps</em></h2>
+  <p class="lead">Your curated collection of the best free resources — from visual intuition to rigorous proofs to finance applications.</p>
+
+  <h3>📚 Textbooks &amp; Lecture Notes</h3>
+  <div class="res-grid">
+    <a href="https://www.probabilitycourse.com/chapter8/8_2_0_mle.php" target="_blank" class="res-card">
+      <span class="ri">📖</span>
+      <h5>Introduction to Probability (Free)</h5>
+      <p>Chapters 8-9 cover MoM and MLE with worked examples. Completely free online textbook with exercises.</p>
+      <span class="ru">probabilitycourse.com → Chapter 8-9</span>
+    </a>
+    <a href="https://ocw.mit.edu/courses/18-650-statistics-for-applications-fall-2016/" target="_blank" class="res-card">
+      <span class="ri">🏫</span>
+      <h5>MIT 18.650 — Statistics for Applications</h5>
+      <p>Full MLE treatment including Fisher information, LRT, Wald tests. Free lecture notes and problem sets.</p>
+      <span class="ru">ocw.mit.edu → 18-650</span>
+    </a>
+    <a href="https://projects.iq.harvard.edu/stat110/home" target="_blank" class="res-card">
+      <span class="ri">🎓</span>
+      <h5>Harvard Stat 110 — Blitzstein</h5>
+      <p>Best probability course available free. Covers moments, MLE with elegant story proofs and intuition.</p>
+      <span class="ru">projects.iq.harvard.edu/stat110</span>
+    </a>
+    <a href="https://www.cambridge.org/core/books/all-of-statistics/DA7983B0D0CD2BECBF1E8A0616B0E71F" target="_blank" class="res-card">
+      <span class="ri">📗</span>
+      <h5>All of Statistics — Wasserman</h5>
+      <p>Compact rigorous treatment of MoM and MLE. Chapters 9-10. Used in many quant programs.</p>
+      <span class="ru">cambridge.org → search "All of Statistics"</span>
+    </a>
+  </div>
+
+  <h3>🎬 Video Resources</h3>
+  <div class="res-grid">
+    <a href="https://www.youtube.com/watch?v=XepXtl9YKwc" target="_blank" class="res-card">
+      <span class="ri">▶️</span>
+      <h5>StatQuest — Maximum Likelihood</h5>
+      <p>Josh Starmer's visual explanation of MLE. Perfect first video — builds intuition before formulas.</p>
+      <span class="ru">youtube.com/@statquest → MLE playlist</span>
+    </a>
+    <a href="https://www.youtube.com/watch?v=I10q6fjPxJ0" target="_blank" class="res-card">
+      <span class="ri">🎥</span>
+      <h5>3Blue1Brown — Bayes Theorem</h5>
+      <p>While Bayesian, this builds the visual intuition for likelihood functions essential for understanding MLE.</p>
+      <span class="ru">youtube.com/3blue1brown → Bayes video</span>
+    </a>
+    <a href="https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo" target="_blank" class="res-card">
+      <span class="ri">📺</span>
+      <h5>Harvard Stat 110 Lectures</h5>
+      <p>Lectures 26-28 cover MoM, MLE, and Fisher information. Best available free lecture series.</p>
+      <span class="ru">youtube.com → search "Stat 110 Harvard"</span>
+    </a>
+  </div>
+
+  <h3>💻 Interactive Tools</h3>
+  <div class="res-grid">
+    <a href="https://seeing-theory.brown.edu/frequentist-inference/index.html" target="_blank" class="res-card">
+      <span class="ri">👁️</span>
+      <h5>Seeing Theory — Frequentist Inference</h5>
+      <p>Beautiful visual MLE demonstration from Brown University. Watch the likelihood surface update with data.</p>
+      <span class="ru">seeing-theory.brown.edu</span>
+    </a>
+    <a href="https://shiny.rstudio.com/gallery/" target="_blank" class="res-card">
+      <span class="ri">🔬</span>
+      <h5>Shiny Apps — MLE Visualisers</h5>
+      <p>Search "maximum likelihood estimation" for interactive R Shiny apps that show likelihood surfaces live.</p>
+      <span class="ru">shiny.rstudio.com/gallery</span>
+    </a>
+    <a href="https://www.geogebra.org" target="_blank" class="res-card">
+      <span class="ri">📐</span>
+      <h5>GeoGebra — Likelihood Curves</h5>
+      <p>Build your own interactive likelihood function visualiser. Great for experimenting with different samples.</p>
+      <span class="ru">geogebra.org → Statistics</span>
+    </a>
+    <a href="https://colab.research.google.com/new" target="_blank" class="res-card">
+      <span class="ri">🐍</span>
+      <h5>Google Colab — Free Python</h5>
+      <p>Run all three Colab experiments from this guide. scipy.stats and scipy.optimize have full MLE support.</p>
+      <span class="ru">colab.research.google.com</span>
+    </a>
+  </div>
+
+  <div class="sep"></div>
+  <h3>🗺 Your Learning Path from Here</h3>
+
+  <div style="display:grid;gap:10px;margin:20px 0">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">1</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Master the foundations</div><p style="font-size:15px;color:var(--ink3);margin:0">Complete all 18 exercises. Run every Colab experiment. Ensure MoM and MLE feel intuitive, not mechanical.</p></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">2</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Hypothesis Testing &amp; LRT</div><p style="font-size:15px;color:var(--ink3);margin:0">The Likelihood Ratio Test is the gold standard. Learn Wald, Score (Lagrange Multiplier), and LRT tests — the "holy trinity" of inference.</p></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">3</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Bayesian Estimation</div><p style="font-size:15px;color:var(--ink3);margin:0">MLE is the frequentist approach. The Bayesian alternative uses priors and posteriors. MAP (Maximum A Posteriori) is MLE with regularisation.</p></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">4</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">EM Algorithm</div><p style="font-size:15px;color:var(--ink3);margin:0">Expectation-Maximisation is MLE with hidden/latent variables. Core algorithm for Gaussian Mixture Models (GMM) — widely used in regime detection in finance.</p></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">5</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">GLMs &amp; Regression</div><p style="font-size:15px;color:var(--ink3);margin:0">Generalised Linear Models unify linear regression, logistic regression, and Poisson regression as MLE with different link functions.</p></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+      <div style="width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;flex-shrink:0">6</div>
+      <div><div style="font-family:'Fira Code',monospace;font-size:11px;color:var(--rust);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Time-Series MLE</div><p style="font-size:15px;color:var(--ink3);margin:0">ARMA/GARCH model parameters are estimated via MLE. The GARCH log-likelihood is the workhorse of volatility modelling in quantitative finance.</p></div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+  <div class="insight-card">
+    <p><strong>The Deepest Insight:</strong> MoM and MLE are not just estimation methods — they are philosophies for connecting theory to data. MoM says "match the summaries." MLE says "find the world that makes your data most likely." Both are valid. Together they give you a complete toolkit for building the statistical backbone of every model you will ever use as a quant engineer. The skill is not in memorising formulas — it is in understanding when to use which, what their limitations are, and how to interpret the uncertainty they reveal.</p>
+  </div>
+</div>
+</div>
+
+<footer>
+  <span>MoM &amp; MLE Study Guide</span> · Method of Moments · Maximum Likelihood Estimation · Built for Quant Engineers · 100% Offline
+</footer>
+
+<!-- ═══════════════════════════════ SCRIPTS ═══════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── TABS ── */
+function go(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ── HELPERS ── */
+function randn() {
+  let u=0,v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function normalPDF(x, mu, sigma) {
+  return Math.exp(-0.5*((x-mu)/sigma)**2) / (sigma*Math.sqrt(2*Math.PI));
+}
+function expoPDF(x, lambda) {
+  return x >= 0 ? lambda * Math.exp(-lambda*x) : 0;
+}
+function gammaPDF(x, alpha, beta) {
+  if(x<=0) return 0;
+  const k = alpha, theta = beta;
+  return Math.exp((k-1)*Math.log(x) - x/theta - k*Math.log(theta) - lgamma(k));
+}
+function lgamma(n) {
+  // Stirling approximation
+  if(n<0.5) return Math.log(Math.PI/Math.sin(Math.PI*n)) - lgamma(1-n);
+  n--;
+  let x = 0.99999999999980993;
+  const c = [676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  for(let i=0;i<8;i++) x += c[i]/(n+i+1);
+  const t = n+7.5;
+  return 0.5*Math.log(2*Math.PI) + (n+0.5)*Math.log(t) - t + Math.log(x);
+}
+function mean(arr) { return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function variance(arr) { const m=mean(arr); return arr.reduce((a,b)=>a+(b-m)**2,0)/arr.length; }
+
+const charts = {};
+function mkChart(id, cfg) {
+  if(charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if(!ctx) return null;
+  charts[id] = new Chart(ctx.getContext('2d'), cfg);
+  return charts[id];
+}
+const COLORS = ['#b94a1a','#0e6b6b','#b58500','#6b2d6b','#3d7a3d','#1a4a7a','#8b4513','#006666'];
+const baseOpts = {
+  plugins: { legend: { labels: { color:'#3d2e1a', font:{ family:"'Outfit',sans-serif", size:11 }, padding:10 } } },
+  scales: {
+    x: { grid:{ color:'#e6ddd0' }, ticks:{ color:'#6b5840' } },
+    y: { grid:{ color:'#e6ddd0' }, ticks:{ color:'#6b5840' } }
+  }
+};
+
+/* ── PREREQUISITE CHARTS ── */
+function initPrereq() {
+  // Normal family
+  const xs = Array.from({length:200}, (_,i) => -5 + 10*i/199);
+  const dists = [{mu:0,s:0.8,c:'#b94a1a',l:'N(0,0.64)'},{mu:1,s:1.5,c:'#0e6b6b',l:'N(1,2.25)'},{mu:-1,s:2,c:'#b58500',l:'N(-1,4)'}];
+  mkChart('paramDemo1', { type:'line', data:{ labels:xs.map(x=>x.toFixed(1)), datasets: dists.map(d=>({ label:d.l, data:xs.map(x=>normalPDF(x,d.mu,d.s)), borderColor:d.c, borderWidth:2, pointRadius:0, fill:false, tension:0.4 })) }, options:{...baseOpts, animation:false} });
+
+  // Exponential family
+  const xe = Array.from({length:150}, (_,i) => i*6/149);
+  const lams = [{l:0.3,c:'#b94a1a',lbl:'λ=0.3'},{l:0.8,c:'#0e6b6b',lbl:'λ=0.8'},{l:2.0,c:'#b58500',lbl:'λ=2.0'}];
+  mkChart('paramDemo2', { type:'line', data:{ labels:xe.map(x=>x.toFixed(1)), datasets: lams.map(d=>({ label:d.lbl, data:xe.map(x=>expoPDF(x,d.l)), borderColor:d.c, borderWidth:2, pointRadius:0, fill:false, tension:0.3 })) }, options:{...baseOpts, animation:false} });
+
+  // Likelihood intro — Bernoulli
+  const pv = Array.from({length:300}, (_,i) => 0.001 + 0.998*i/299);
+  const k=7, n=10;
+  const ll = pv.map(p => k*Math.log(p) + (n-k)*Math.log(1-p));
+  const maxLL = Math.max(...ll);
+  mkChart('likelihoodIntro', { type:'line', data:{ labels:pv.map(p=>p.toFixed(3)), datasets:[{
+    label:'Log-likelihood ℓ(p) = 7log(p)+3log(1-p)',
+    data:ll, borderColor:'#b94a1a', borderWidth:2.5, pointRadius:0, fill:false, tension:0.2
+  }, {
+    label:'MLE: p̂=0.7 (maximum)',
+    data:pv.map((p,i)=>Math.abs(p-0.7)<0.004 ? ll[i] : null),
+    borderColor:'#0e6b6b', borderWidth:0, pointRadius:6, showLine:false,
+    pointBackgroundColor:'#0e6b6b'
+  }] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales, y:{ ...baseOpts.scales.y, min:maxLL-20 }}} });
+}
+
+/* ── MoM SIM ── */
+function sampleDist(dist, n, p1, p2) {
+  const arr = [];
+  if(dist==='normal') { for(let i=0;i<n;i++) arr.push(p1 + p2*randn()); }
+  else if(dist==='expo') { for(let i=0;i<n;i++) arr.push(-Math.log(1-Math.random())/p1); }
+  else if(dist==='gamma') { for(let i=0;i<n;i++) { let s=0; for(let j=0;j<Math.round(p1);j++) s+=-Math.log(1-Math.random()); arr.push(s*p2); } }
+  else if(dist==='beta') { for(let i=0;i<n;i++) { const u=Math.random()**( 1/p1), v=(1-Math.random())**(1/p2); arr.push(u/(u+v)); } }
+  return arr;
+}
+
+function runMoM() {
+  const dist = document.getElementById('momDist').value;
+  const n = +document.getElementById('momN').value;
+  const p1 = +document.getElementById('momP1').value / 20;
+  const p2 = +document.getElementById('momP2').value / 20;
+
+  const data = sampleDist(dist, n, p1, p2);
+  const m1 = mean(data);
+  const m2 = data.reduce((a,b)=>a+b*b,0)/data.length;
+  const v = m2 - m1*m1;
+
+  let trueStr='', estStr='', errStr='';
+  let theta_est=[], theta_true=[];
+
+  if(dist==='normal') {
+    trueStr=`μ=${p1.toFixed(2)}, σ=${p2.toFixed(2)}`;
+    estStr=`μ̂=${m1.toFixed(3)}, σ̂=${Math.sqrt(v).toFixed(3)}`;
+    theta_true=[p1,p2]; theta_est=[m1,Math.sqrt(v)];
+  } else if(dist==='expo') {
+    const lam=1/m1;
+    trueStr=`λ=${p1.toFixed(2)} (mean=${(1/p1).toFixed(2)})`;
+    estStr=`λ̂=${lam.toFixed(4)}`;
+    theta_true=[p1]; theta_est=[lam];
+  } else if(dist==='gamma') {
+    const alpha_hat=m1*m1/v, beta_hat=v/m1;
+    trueStr=`α=${p1.toFixed(2)}, β=${p2.toFixed(2)}`;
+    estStr=`α̂=${alpha_hat.toFixed(3)}, β̂=${beta_hat.toFixed(3)}`;
+    theta_true=[p1,p2]; theta_est=[alpha_hat,beta_hat];
+  } else if(dist==='beta') {
+    const factor=m1*(1-m1)/v - 1;
+    const a=m1*factor, b=(1-m1)*factor;
+    trueStr=`α=${p1.toFixed(2)}, β=${p2.toFixed(2)}`;
+    estStr=`α̂=${Math.max(0,a).toFixed(3)}, β̂=${Math.max(0,b).toFixed(3)}`;
+    theta_true=[p1,p2]; theta_est=[Math.max(0,a),Math.max(0,b)];
+  }
+
+  document.getElementById('momTrue').textContent = trueStr;
+  document.getElementById('momEst').textContent = estStr;
+  document.getElementById('momM1').textContent = m1.toFixed(4);
+  document.getElementById('momM2').textContent = m2.toFixed(4);
+  const errVal = theta_true.map((t,i)=>Math.abs(t-theta_est[i])).reduce((a,b)=>a+b,0)/theta_true.length;
+  document.getElementById('momErr').textContent = errVal.toFixed(5);
+
+  // Histogram + fitted curve
+  const BINS=30, mn=Math.min(...data), mx=Math.max(...data), bw=(mx-mn)/BINS;
+  const hist=Array(BINS).fill(0);
+  data.forEach(v=>{ const b=Math.min(Math.floor((v-mn)/bw),BINS-1); hist[b]++; });
+  const lbls=Array.from({length:BINS},(_,i)=>(mn+(i+0.5)*bw).toFixed(2));
+  const total=data.length*bw;
+
+  const xs=Array.from({length:200},(_,i)=>mn+(mx-mn)*i/199);
+  let fitted;
+  if(dist==='normal') fitted=xs.map(x=>normalPDF(x,m1,Math.sqrt(v)));
+  else if(dist==='expo') fitted=xs.map(x=>expoPDF(x,1/m1));
+  else if(dist==='gamma') { const a=m1*m1/v, b=v/m1; fitted=xs.map(x=>gammaPDF(x,a,b)); }
+  else fitted=xs.map(x=>x>=0&&x<=1 ? 1/(Math.sqrt(2*Math.PI*v))*Math.exp(-0.5*(x-m1)**2/v)*0.8 : 0);
+
+  mkChart('momChart', { type:'bar', data:{ labels:lbls, datasets:[
+    { label:'Data histogram', data:hist.map(h=>h/total), backgroundColor:'rgba(185,74,26,0.4)', borderColor:'#b94a1a', borderWidth:1 },
+    { label:'MoM fitted PDF', data:lbls.map((l,i)=>{const x=+l; return dist==='normal'?normalPDF(x,m1,Math.sqrt(v)):dist==='expo'?expoPDF(x,1/m1):dist==='gamma'?gammaPDF(x,m1*m1/v,v/m1):0;}), type:'line', borderColor:'#0e6b6b', borderWidth:2.5, pointRadius:0, fill:false, tension:0.4, yAxisID:'y' }
+  ] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales}} });
+}
+
+/* ── MLE SIM ── */
+function runMLE() {
+  const dist = document.getElementById('mleDist').value;
+  const theta = +document.getElementById('mleTheta').value / 100;
+  const n = +document.getElementById('mleN').value;
+  document.getElementById('mleTrueOut').textContent = theta.toFixed(2);
+
+  let data=[], loglikFn, thetaRange, mleEst, trueMu, trueParam;
+  const thetaRangeStart=0.001, thetaRangeEnd=0.999;
+  const nPts=300;
+
+  if(dist==='bernoulli') {
+    for(let i=0;i<n;i++) data.push(Math.random()<theta?1:0);
+    const k=data.reduce((a,b)=>a+b,0);
+    mleEst=k/n;
+    trueParam=theta;
+    const ps=Array.from({length:nPts},(_,i)=>0.001+0.998*i/(nPts-1));
+    const lls=ps.map(p=>k*Math.log(p)+(n-k)*Math.log(1-p));
+    const maxLL=Math.max(...lls);
+    const se=Math.sqrt(mleEst*(1-mleEst)/n);
+    document.getElementById('mleEstOut').textContent=mleEst.toFixed(4);
+    document.getElementById('mleLL').textContent=( k*Math.log(mleEst)+(n-k)*Math.log(1-mleEst) ).toFixed(2);
+    document.getElementById('mleCI').textContent=`[${Math.max(0,mleEst-1.96*se).toFixed(3)}, ${Math.min(1,mleEst+1.96*se).toFixed(3)}]`;
+
+    mkChart('mleChart', { type:'line', data:{ labels:ps.map(p=>p.toFixed(3)), datasets:[
+      { label:'Log-likelihood ℓ(p)', data:lls, borderColor:'#b94a1a', borderWidth:2, pointRadius:0, fill:false, tension:0.2 },
+      { label:`MLE p̂=${mleEst.toFixed(3)}`, data:ps.map(p=>Math.abs(p-mleEst)<0.004?lls[Math.round(p*(nPts-1))]:null), borderColor:'#0e6b6b', pointRadius:8, showLine:false, pointBackgroundColor:'#0e6b6b' },
+      { label:`True p=${theta}`, data:ps.map(p=>Math.abs(p-theta)<0.004?lls[Math.round(p*(nPts-1))]:null), borderColor:'#b58500', pointRadius:7, showLine:false, pointBackgroundColor:'#b58500', pointStyle:'triangle' }
+    ] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales, y:{...baseOpts.scales.y, min:Math.max(...lls)-50}}} });
+  } else if(dist==='expo') {
+    for(let i=0;i<n;i++) data.push(-Math.log(1-Math.random())/theta);
+    const xbar=mean(data);
+    mleEst=1/xbar;
+    const lams=Array.from({length:nPts},(_,i)=>0.05+4*i/(nPts-1));
+    const lls=lams.map(l=>n*Math.log(l)-l*n*xbar);
+    const se=mleEst/Math.sqrt(n);
+    document.getElementById('mleEstOut').textContent=mleEst.toFixed(4);
+    document.getElementById('mleLL').textContent=(n*Math.log(mleEst)-mleEst*n*xbar).toFixed(2);
+    document.getElementById('mleCI').textContent=`[${(mleEst-1.96*se).toFixed(3)}, ${(mleEst+1.96*se).toFixed(3)}]`;
+    mkChart('mleChart', { type:'line', data:{ labels:lams.map(l=>l.toFixed(2)), datasets:[
+      { label:'Log-likelihood ℓ(λ)', data:lls, borderColor:'#b94a1a', borderWidth:2, pointRadius:0, fill:false, tension:0.2 },
+      { label:`MLE λ̂=${mleEst.toFixed(3)}`, data:lams.map((l,i)=>Math.abs(l-mleEst)<0.07?lls[i]:null), borderColor:'#0e6b6b', pointRadius:8, showLine:false, pointBackgroundColor:'#0e6b6b' }
+    ] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales, y:{...baseOpts.scales.y, min:Math.max(...lls)-50}}} });
+  } else if(dist==='normal') {
+    const sigmaFixed=0.5;
+    for(let i=0;i<n;i++) data.push(theta+sigmaFixed*randn());
+    const xbar=mean(data);
+    mleEst=xbar;
+    const mus=Array.from({length:nPts},(_,i)=>theta-3+6*i/(nPts-1));
+    const lls=mus.map(mu=>-n*Math.log(sigmaFixed*Math.sqrt(2*Math.PI))-data.reduce((a,x)=>a+(x-mu)**2,0)/(2*sigmaFixed**2));
+    const se=sigmaFixed/Math.sqrt(n);
+    document.getElementById('mleEstOut').textContent=mleEst.toFixed(4);
+    document.getElementById('mleLL').textContent=Math.max(...lls).toFixed(2);
+    document.getElementById('mleCI').textContent=`[${(mleEst-1.96*se).toFixed(3)}, ${(mleEst+1.96*se).toFixed(3)}]`;
+    mkChart('mleChart', { type:'line', data:{ labels:mus.map(m=>m.toFixed(2)), datasets:[
+      { label:'Log-likelihood ℓ(μ)', data:lls, borderColor:'#b94a1a', borderWidth:2, pointRadius:0, fill:false, tension:0.2 },
+      { label:`MLE μ̂=${mleEst.toFixed(3)}`, data:mus.map((m,i)=>Math.abs(m-mleEst)<0.12?lls[i]:null), borderColor:'#0e6b6b', pointRadius:8, showLine:false, pointBackgroundColor:'#0e6b6b' }
+    ] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales, y:{...baseOpts.scales.y, min:Math.max(...lls)-30}}} });
+  } else { // poisson
+    const lam=Math.max(0.5, theta*10);
+    for(let i=0;i<n;i++) { let l=Math.exp(-lam), p=l, x=0; while(Math.random()>p) { x++; l*=lam/x; p+=l; } data.push(x); }
+    const xbar=mean(data);
+    mleEst=xbar;
+    const lams=Array.from({length:nPts},(_,i)=>0.5+lam*2*i/(nPts-1));
+    const lls=lams.map(l=>data.reduce((a,x)=>a+x*Math.log(l)-l,0));
+    const se=Math.sqrt(mleEst/n);
+    document.getElementById('mleEstOut').textContent=mleEst.toFixed(4);
+    document.getElementById('mleLL').textContent=Math.max(...lls).toFixed(2);
+    document.getElementById('mleCI').textContent=`[${(mleEst-1.96*se).toFixed(3)}, ${(mleEst+1.96*se).toFixed(3)}]`;
+    mkChart('mleChart', { type:'line', data:{ labels:lams.map(l=>l.toFixed(2)), datasets:[
+      { label:'Log-likelihood ℓ(λ)', data:lls, borderColor:'#b94a1a', borderWidth:2, pointRadius:0, fill:false, tension:0.2 },
+      { label:`MLE λ̂=${mleEst.toFixed(3)}`, data:lams.map((l,i)=>Math.abs(l-mleEst)<lam*0.05?lls[i]:null), borderColor:'#0e6b6b', pointRadius:8, showLine:false, pointBackgroundColor:'#0e6b6b' }
+    ] }, options:{...baseOpts, animation:false, scales:{...baseOpts.scales, y:{...baseOpts.scales.y, min:Math.max(...lls)-80}}} });
+  }
+}
+
+/* ── LIKELIHOOD SHARP/FLAT ── */
+function initLikelihoodCharts() {
+  const xs=Array.from({length:300},(_,i)=>-4+8*i/299);
+  // Sharp: n=200, k=80 → p̂=0.4
+  const sharp=xs.map(x=>{const p=1/(1+Math.exp(-x)); return 80*Math.log(p)+120*Math.log(1-p);});
+  const maxS=Math.max(...sharp);
+  mkChart('likelihoodSharp',{type:'line',data:{labels:xs.map(x=>x.toFixed(2)),datasets:[{label:'ℓ(θ) — n=200 (peaked)',data:sharp,borderColor:'#0e6b6b',borderWidth:2.5,pointRadius:0,fill:false,tension:0.2}]},options:{...baseOpts,animation:false,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,min:maxS-30}}}});
+  // Flat: n=5, k=2
+  const flat=xs.map(x=>{const p=1/(1+Math.exp(-x)); return 2*Math.log(p)+3*Math.log(1-p);});
+  const maxF=Math.max(...flat);
+  mkChart('likelihoodFlat',{type:'line',data:{labels:xs.map(x=>x.toFixed(2)),datasets:[{label:'ℓ(θ) — n=5 (flat)',data:flat,borderColor:'#b94a1a',borderWidth:2.5,pointRadius:0,fill:false,tension:0.2}]},options:{...baseOpts,animation:false,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,min:maxF-10}}}});
+}
+
+/* ── EFFICIENCY CHART ── */
+function initEfficiencyChart() {
+  const REPS=1000, n=200, lambda=0.5;
+  const mom=[], mle=[];
+  for(let r=0;r<REPS;r++){
+    const d=Array.from({length:n},()=>-Math.log(1-Math.random())/lambda);
+    mom.push(1/mean(d));
+    mle.push(n/d.reduce((a,b)=>a+b,0));
+  }
+  const mn=Math.min(...mom,...mle), mx=Math.max(...mom,...mle);
+  const BINS=40, bw=(mx-mn)/BINS;
+  const momH=Array(BINS).fill(0), mleH=Array(BINS).fill(0);
+  mom.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);momH[b]++;});
+  mle.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);mleH[b]++;});
+  const lbls=Array.from({length:BINS},(_,i)=>(mn+(i+0.5)*bw).toFixed(3));
+  const total=REPS*bw;
+  mkChart('efficiencyChart',{type:'bar',data:{labels:lbls,datasets:[
+    {label:`MoM λ̂=1/X̄ (Var=${variance(mom).toFixed(5)})`,data:momH.map(h=>h/total),backgroundColor:'rgba(185,74,26,0.5)',borderColor:'#b94a1a',borderWidth:1},
+    {label:`MLE λ̂=n/ΣXᵢ (Var=${variance(mle).toFixed(5)})`,data:mleH.map(h=>h/total),backgroundColor:'rgba(14,107,107,0.5)',borderColor:'#0e6b6b',borderWidth:1}
+  ]},options:{...baseOpts,animation:false,scales:{...baseOpts.scales,x:{...baseOpts.scales.x,ticks:{maxTicksLimit:8,color:'#6b5840'}}}}});
+}
+
+/* ── CMP SIM ── */
+function runCMP() {
+  const dist = document.getElementById('cmpDist').value;
+  const theta = +document.getElementById('cmpTheta').value / 10;
+  const n = +document.getElementById('cmpN').value;
+  const reps = +document.getElementById('cmpReps').value;
+  document.getElementById('cmpTrue').textContent = theta.toFixed(2);
+
+  let momEsts=[], mleEsts=[];
+  let momLabel='MoM', mleLabel='MLE';
+
+  for(let r=0;r<reps;r++) {
+    let data=[];
+    if(dist==='expo') {
+      for(let i=0;i<n;i++) data.push(-Math.log(1-Math.random())/theta);
+      momEsts.push(1/mean(data));
+      mleEsts.push(n/data.reduce((a,b)=>a+b,0));
+      momLabel='MoM: 1/X̄'; mleLabel='MLE: 1/X̄';
+    } else if(dist==='gamma') {
+      const alpha=2, beta=theta/2;
+      for(let i=0;i<n;i++){let s=0;for(let j=0;j<alpha;j++)s+=-Math.log(1-Math.random());data.push(s*beta);}
+      const m=mean(data), v=variance(data);
+      momEsts.push(m*m/v); // alpha hat
+      // MLE via Newton approx: digamma approximation
+      const logMean=Math.log(m)-data.reduce((a,x)=>a+Math.log(x),0)/n;
+      let a=(3-logMean+Math.sqrt((logMean-3)**2+24*logMean))/(12*logMean);
+      for(let iter=0;iter<10;iter++){
+        const dig=Math.log(a)-1/(2*a); // approx digamma
+        a=a-(Math.log(a)-dig-logMean)/(1/a-1/(2*a**2));
+      }
+      mleEsts.push(a);
+      momLabel='MoM: α̂=X̄²/s²'; mleLabel='MLE: α̂ (numerical)';
+    } else { // uniform
+      for(let i=0;i<n;i++) data.push(Math.random()*theta);
+      momEsts.push(2*mean(data));
+      mleEsts.push(Math.max(...data));
+      momLabel='MoM: 2X̄'; mleLabel='MLE: max(Xᵢ)';
+    }
+  }
+
+  const momMSE = momEsts.reduce((a,b)=>a+(b-theta)**2,0)/reps;
+  const mleMSE = mleEsts.reduce((a,b)=>a+(b-theta)**2,0)/reps;
+  const winner = momMSE < mleMSE ? 'MoM (lower MSE)' : 'MLE (lower MSE)';
+
+  document.getElementById('cmpMoM').textContent = mean(momEsts).toFixed(4);
+  document.getElementById('cmpMLE').textContent = mean(mleEsts).toFixed(4);
+  document.getElementById('cmpMoMMSE').textContent = momMSE.toFixed(6);
+  document.getElementById('cmpMLEMSE').textContent = mleMSE.toFixed(6);
+  document.getElementById('cmpWinner').textContent = winner;
+
+  const mn=Math.min(...momEsts,...mleEsts), mx=Math.max(...momEsts,...mleEsts);
+  const BINS=40, bw=(mx-mn)/BINS;
+  const momH=Array(BINS).fill(0), mleH=Array(BINS).fill(0);
+  momEsts.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);momH[b]++;});
+  mleEsts.forEach(v=>{const b=Math.min(Math.floor((v-mn)/bw),BINS-1);mleH[b]++;});
+  const lbls=Array.from({length:BINS},(_,i)=>(mn+(i+0.5)*bw).toFixed(3));
+  const total=reps*bw;
+
+  mkChart('cmpChart',{type:'bar',data:{labels:lbls,datasets:[
+    {label:momLabel+` (MSE=${momMSE.toFixed(5)})`,data:momH.map(h=>h/total),backgroundColor:'rgba(14,107,107,0.5)',borderColor:'#0e6b6b',borderWidth:1},
+    {label:mleLabel+` (MSE=${mleMSE.toFixed(5)})`,data:mleH.map(h=>h/total),backgroundColor:'rgba(185,74,26,0.5)',borderColor:'#b94a1a',borderWidth:1}
+  ]},options:{...baseOpts,animation:false,scales:{...baseOpts.scales,x:{...baseOpts.scales.x,ticks:{maxTicksLimit:8,color:'#6b5840'}}}}});
+}
+
+/* ── QUIZ ── */
+const QA = {
+  r1:{ c:'✅ Correct! This is the bias-variance tradeoff in action. MSE = Bias² + Variance. The Uniform MLE max(Xᵢ) is biased (always < θ) but has extremely low variance. The MoM 2X̄ is unbiased but high variance. The MLE\'s low variance wins on MSE.', w:'❌ Not quite. The bias-variance tradeoff is key: MLE can be biased yet superior in MSE if its variance is much lower. Unbiasedness is not the only criterion for a good estimator.' },
+  r2:{ c:'✅ Exactly right! MoM closed-form estimates are the standard initialisation strategy for numerical MLE. This is called a "two-step" approach: (1) quick MoM solution, (2) polish with numerical MLE for efficiency gains.', w:'❌ Not quite. The right approach is to use MoM as starting values for numerical MLE — you get the best of both: speed of MoM + efficiency of MLE. Never abandon MLE just because it lacks a closed form.' },
+  r3:{ c:'✅ Correct! The biased (1/n) version is what both MoM and MLE produce. The unbiased (1/(n-1)) is Bessel\'s correction. For large n the difference is negligible. Both are consistent — they converge to the true σ² as n→∞.', w:'❌ Not quite. MLE produces the biased (1/n) version — it maximises the likelihood, not the unbiasedness criterion. The unbiased (1/(n-1)) version is a separate "correction" applied for inferential purposes.' }
+};
+function ck(name, resId) {
+  const sel=document.querySelector(`input[name="${name}"]:checked`);
+  const el=document.getElementById(resId);
+  if(!sel){el.style.display='block';el.className='qres qw';el.textContent='Please select an answer.';return;}
+  el.style.display='block';
+  el.className='qres '+(sel.value==='c'?'qc':'qw');
+  el.textContent=sel.value==='c'?QA[resId].c:QA[resId].w;
+}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  initPrereq();
+  runMoM();
+  runMLE();
+  initLikelihoodCharts();
+  initEfficiencyChart();
+  runCMP();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prob & Stats for Quant Engineers</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f0e8;
+  --cream: #ede8dc;
+  --accent: #c0392b;
+  --accent2: #2c3e7a;
+  --accent3: #1a7a4a;
+  --gold: #b8860b;
+  --muted: #6b6560;
+  --border: #c8c0b0;
+  --code-bg: #1a1a2e;
+  --code-text: #e0e0ff;
+  --highlight: #fff3cd;
+  --tab-active: #0d0d0d;
+  --tab-inactive: #8a8070;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 2rem 3rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 40px,
+    rgba(192,57,43,0.08) 40px, rgba(192,57,43,0.08) 41px
+  );
+}
+.header-inner { position: relative; z-index: 1; }
+.site-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.site-header h1 span { color: var(--accent); }
+.site-header .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.header-tags { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 2px;
+  color: #ccc;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.tag.red { border-color: var(--accent); color: #ff9980; }
+
+/* ── TABS ── */
+.tab-nav {
+  background: var(--ink);
+  border-bottom: 2px solid var(--accent);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.9rem 1.4rem;
+  background: none;
+  border: none;
+  color: var(--tab-inactive);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: #ccc; }
+.tab-btn.active {
+  color: var(--paper);
+  border-bottom-color: var(--accent);
+}
+
+/* ── CONTENT PANES ── */
+.pane { display: none; padding: 2rem 3rem 4rem; max-width: 960px; margin: 0 auto; }
+.pane.active { display: block; }
+
+/* ── SECTION HEADINGS ── */
+h2.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 0.25rem;
+  color: var(--ink);
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 0.5rem;
+}
+h3.sub-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 2rem 0 0.75rem;
+  color: var(--accent2);
+}
+h4.mini-title {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+p { margin-bottom: 1rem; }
+ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+li { margin-bottom: 0.4rem; }
+
+/* ── CALLOUTS ── */
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--cream);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.callout.blue { border-color: var(--accent2); }
+.callout.green { border-color: var(--accent3); }
+.callout.gold { border-color: var(--gold); background: #fffbe6; }
+.callout-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.callout.blue .callout-title { color: var(--accent2); }
+.callout.green .callout-title { color: var(--accent3); }
+.callout.gold .callout-title { color: var(--gold); }
+
+/* ── FORMULA BOX ── */
+.formula-box {
+  background: var(--ink);
+  color: #e8e0d0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  overflow-x: auto;
+  border-left: 4px solid var(--accent);
+  line-height: 2;
+}
+.formula-box .label {
+  font-size: 0.68rem;
+  color: #aaa;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── CODE BLOCK ── */
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  line-height: 1.6;
+  border: 1px solid #2a2a4a;
+}
+pre .comment { color: #6a9f6a; font-style: italic; }
+pre .keyword { color: #ff9980; }
+pre .string { color: #90e0a0; }
+pre .number { color: #80c8ff; }
+pre .func { color: #ffd080; }
+
+/* ── DIAGRAM CONTAINERS ── */
+.diagram-wrap {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin: 1.25rem 0;
+  text-align: center;
+}
+.diagram-wrap canvas { max-width: 100%; height: auto; }
+.diagram-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── INTERACTIVE CONTROLS ── */
+.controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+.ctrl-group { display: flex; align-items: center; gap: 0.5rem; }
+.ctrl-group label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+input[type=range] { width: 100px; accent-color: var(--accent); }
+.ctrl-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+button.run-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button.run-btn:hover { background: #a93226; }
+button.run-btn.blue { background: var(--accent2); }
+button.run-btn.green { background: var(--accent3); }
+
+/* ── EXERCISE TIERS ── */
+.exercise-section { margin: 2rem 0; }
+.tier-tabs { display: flex; gap: 0; margin-bottom: 0; }
+.tier-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 1.2rem;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.tier-btn.active.easy { background: #d4edda; color: #155724; border-color: #28a745; }
+.tier-btn.active.medium { background: #fff3cd; color: #856404; border-color: #ffc107; }
+.tier-btn.active.hard { background: #f8d7da; color: #721c24; border-color: #dc3545; }
+.tier-content { display: none; border: 1px solid var(--border); padding: 1.25rem; border-radius: 0 4px 4px 4px; background: var(--cream); }
+.tier-content.active { display: block; }
+.exercise-item {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.exercise-item .ex-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+
+/* ── RESOURCE LINKS ── */
+.resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.resource-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.resource-card:hover { border-color: var(--accent); background: white; }
+.resource-card .res-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.resource-card .res-name { font-weight: 600; font-size: 0.9rem; }
+.resource-card .res-desc { font-size: 0.8rem; color: var(--muted); }
+
+/* ── INLINE SVG DIAGRAMS ── */
+svg.inline-diagram { width: 100%; max-width: 700px; height: auto; }
+
+/* ── TABLE ── */
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+th { background: var(--ink); color: var(--paper); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.6rem 0.85rem; text-align: left; }
+td { padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
+tr:nth-child(even) td { background: var(--cream); }
+
+/* ── CONCEPT MAP ── */
+.concept-map { width: 100%; overflow-x: auto; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .pane { padding: 1.25rem 1rem 3rem; }
+  .site-header { padding: 1.25rem 1rem; }
+}
+
+/* ── SCROLL BAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── INTRO ROADMAP ── */
+.roadmap { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; }
+.roadmap-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-top: none;
+  position: relative;
+}
+.roadmap-step:first-child { border-top: 1px solid var(--border); border-radius: 4px 4px 0 0; }
+.roadmap-step:last-child { border-radius: 0 0 4px 4px; }
+.roadmap-step .step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--ink);
+  color: var(--paper);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.roadmap-step.highlight .step-num { background: var(--accent); }
+.roadmap-step .step-info strong { display: block; font-size: 0.95rem; }
+.roadmap-step .step-info span { font-size: 0.82rem; color: var(--muted); }
+
+/* ── FOOTNOTE ── */
+.page-footer {
+  text-align: center;
+  padding: 2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+/* ─ animation ─ */
+@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.pane.active { animation: fadein 0.25s ease; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <h1>Probability &amp; Statistics<br><span>for Quant Engineers</span></h1>
+    <div class="subtitle">A 100% self-contained study guide · First-time learners · Offline ready</div>
+    <div class="header-tags">
+      <span class="tag red">Distributions</span>
+      <span class="tag">CLT</span>
+      <span class="tag">MLE</span>
+      <span class="tag">Hypothesis Testing</span>
+      <span class="tag">Bayesian Basics</span>
+      <span class="tag">Interactive Diagrams</span>
+      <span class="tag">Colab Experiments</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="showTab('roadmap')">0 · Roadmap</button>
+  <button class="tab-btn" onclick="showTab('prereq')">1 · Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('prob')">2 · Probability</button>
+  <button class="tab-btn" onclick="showTab('dist')">3 · Distributions</button>
+  <button class="tab-btn" onclick="showTab('clt')">4 · CLT</button>
+  <button class="tab-btn" onclick="showTab('mle')">5 · MLE</button>
+  <button class="tab-btn" onclick="showTab('hypo')">6 · Hypothesis Testing</button>
+  <button class="tab-btn" onclick="showTab('bayes')">7 · Bayesian Basics</button>
+  <button class="tab-btn" onclick="showTab('colab')">8 · Colab Labs</button>
+</nav>
+
+<!-- ════════════════════════════════════════════ TAB 0: ROADMAP ════ -->
+<div class="pane active" id="pane-roadmap">
+  <h2 class="section-title">Your Learning Roadmap</h2>
+  <p>Welcome, future Quant Engineer! This guide walks you through the essential probability and statistics backbone of quantitative finance. Every topic is self-contained and builds on the previous one. Read in order for the best experience.</p>
+
+  <div class="callout gold">
+    <div class="callout-title">⚡ How to use this guide</div>
+    Each tab is a complete lesson. Start with <strong>Prerequisites</strong> even if you think you know them — the framing here is specific to quant thinking. Each topic has: plain-language explanations → math → interactive diagrams → Python code → exercises.
+  </div>
+
+  <h3 class="sub-title">Topic Dependency Map</h3>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 740 340" xmlns="http://www.w3.org/2000/svg" class="inline-diagram">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#c0392b"/>
+        </marker>
+      </defs>
+      <!-- nodes -->
+      <rect x="10" y="130" width="130" height="44" rx="5" fill="#0d0d0d"/>
+      <text x="75" y="148" text-anchor="middle" fill="#f5f0e8" font-family="JetBrains Mono" font-size="10" font-weight="700">PREREQUISITES</text>
+      <text x="75" y="162" text-anchor="middle" fill="#aaa" font-family="JetBrains Mono" font-size="9">Sets, Sigma, Calc</text>
+
+      <rect x="200" y="130" width="130" height="44" rx="5" fill="#c0392b"/>
+      <text x="265" y="148" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">PROBABILITY</text>
+      <text x="265" y="162" text-anchor="middle" fill="#ffd0d0" font-family="JetBrains Mono" font-size="9">Axioms, Cond, Bayes</text>
+
+      <rect x="390" y="60" width="130" height="44" rx="5" fill="#2c3e7a"/>
+      <text x="455" y="78" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">DISTRIBUTIONS</text>
+      <text x="455" y="92" text-anchor="middle" fill="#c0c8ff" font-family="JetBrains Mono" font-size="9">Normal, Binomial…</text>
+
+      <rect x="390" y="200" width="130" height="44" rx="5" fill="#2c3e7a"/>
+      <text x="455" y="218" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">CLT</text>
+      <text x="455" y="232" text-anchor="middle" fill="#c0c8ff" font-family="JetBrains Mono" font-size="9">Central Limit Theorem</text>
+
+      <rect x="590" y="60" width="130" height="44" rx="5" fill="#1a7a4a"/>
+      <text x="655" y="78" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">MLE</text>
+      <text x="655" y="92" text-anchor="middle" fill="#a0ffc0" font-family="JetBrains Mono" font-size="9">Max Likelihood Est.</text>
+
+      <rect x="590" y="200" width="130" height="44" rx="5" fill="#1a7a4a"/>
+      <text x="655" y="218" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">HYPOTHESIS TEST</text>
+      <text x="655" y="232" text-anchor="middle" fill="#a0ffc0" font-family="JetBrains Mono" font-size="9">p-values, t-test…</text>
+
+      <rect x="590" y="285" width="130" height="44" rx="5" fill="#b8860b"/>
+      <text x="655" y="303" text-anchor="middle" fill="white" font-family="JetBrains Mono" font-size="10" font-weight="700">BAYESIAN</text>
+      <text x="655" y="317" text-anchor="middle" fill="#ffe080" font-family="JetBrains Mono" font-size="9">Prior → Posterior</text>
+
+      <!-- arrows -->
+      <line x1="140" y1="152" x2="198" y2="152" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="330" y1="140" x2="388" y2="100" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="330" y1="165" x2="388" y2="218" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="520" y1="82" x2="588" y2="82" stroke="#2c3e7a" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="520" y1="222" x2="588" y2="222" stroke="#2c3e7a" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="655" y1="244" x2="655" y2="283" stroke="#1a7a4a" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <!-- Dist → CLT -->
+      <line x1="455" y1="104" x2="455" y2="198" stroke="#2c3e7a" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+    </svg>
+    <div class="diagram-caption">Figure 0.1 — Topic Dependency Graph. Follow arrows in order.</div>
+  </div>
+
+  <div class="roadmap">
+    <div class="roadmap-step">
+      <div class="step-num">1</div>
+      <div class="step-info"><strong>Prerequisites</strong><span>Sets, Σ notation, basic calculus, Python basics — the building blocks you need</span></div>
+    </div>
+    <div class="roadmap-step highlight">
+      <div class="step-num">2</div>
+      <div class="step-info"><strong>Probability Foundations</strong><span>Axioms, conditional probability, independence — the language of uncertainty</span></div>
+    </div>
+    <div class="roadmap-step">
+      <div class="step-num">3</div>
+      <div class="step-info"><strong>Distributions</strong><span>Normal, Binomial, Poisson, Exponential — the models for random phenomena</span></div>
+    </div>
+    <div class="roadmap-step">
+      <div class="step-num">4</div>
+      <div class="step-info"><strong>Central Limit Theorem</strong><span>Why averages are normally distributed and why this is magical</span></div>
+    </div>
+    <div class="roadmap-step">
+      <div class="step-num">5</div>
+      <div class="step-info"><strong>Maximum Likelihood Estimation</strong><span>Fitting distributions to real data — the heart of statistical modeling</span></div>
+    </div>
+    <div class="roadmap-step">
+      <div class="step-num">6</div>
+      <div class="step-info"><strong>Hypothesis Testing</strong><span>p-values, t-tests, z-tests — making decisions under uncertainty</span></div>
+    </div>
+    <div class="roadmap-step">
+      <div class="step-num">7</div>
+      <div class="step-info"><strong>Bayesian Basics</strong><span>Prior, likelihood, posterior — updating beliefs with data</span></div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">Quant Engineer Context</h3>
+  <p>As a quant engineer, you will use these concepts every day:</p>
+  <table>
+    <tr><th>Topic</th><th>Where you'll use it</th></tr>
+    <tr><td>Distributions</td><td>Modeling asset returns, trade volumes, option pricing</td></tr>
+    <tr><td>CLT</td><td>Portfolio aggregation, Monte Carlo confidence bounds</td></tr>
+    <tr><td>MLE</td><td>Fitting GARCH/volatility models to price series</td></tr>
+    <tr><td>Hypothesis Testing</td><td>Backtesting strategy significance, A/B testing features</td></tr>
+    <tr><td>Bayesian Methods</td><td>Regime detection, updating factor models with new data</td></tr>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════ TAB 1: PREREQUISITES ════ -->
+<div class="pane" id="pane-prereq">
+  <h2 class="section-title">Prerequisites</h2>
+  <p>Before diving into probability and statistics, make sure you're comfortable with these building blocks. Don't skip this section — the notation and concepts here appear everywhere in the rest of the guide.</p>
+
+  <h3 class="sub-title">1.1 Sets &amp; Set Notation</h3>
+  <p>A <strong>set</strong> is just a collection of distinct objects. Think of it as a bag of unique items.</p>
+  <div class="callout blue">
+    <div class="callout-title">📦 Intuition</div>
+    Imagine you have a bag of outcomes from rolling a die: {1, 2, 3, 4, 5, 6}. This is a set. Sets are the foundation of probability spaces.
+  </div>
+
+  <h4 class="mini-title">Key Set Operations</h4>
+  <table>
+    <tr><th>Symbol</th><th>Name</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td>A ∪ B</td><td>Union</td><td>"A or B" — all elements in either</td><td>{1,2,3} ∪ {3,4} = {1,2,3,4}</td></tr>
+    <tr><td>A ∩ B</td><td>Intersection</td><td>"A and B" — elements in both</td><td>{1,2,3} ∩ {3,4} = {3}</td></tr>
+    <tr><td>Aᶜ</td><td>Complement</td><td>"not A" — everything outside A</td><td>If A = {1,2}, Aᶜ = {3,4,5,6}</td></tr>
+    <tr><td>∅</td><td>Empty Set</td><td>Set with no elements</td><td>{} or ∅</td></tr>
+    <tr><td>Ω</td><td>Sample Space</td><td>All possible outcomes</td><td>{1,2,3,4,5,6} for a die</td></tr>
+  </table>
+
+  <h3 class="sub-title">1.2 Sigma (Σ) Notation</h3>
+  <p>Σ (capital sigma) is shorthand for "add up a sequence of terms". You'll see it constantly.</p>
+  <div class="formula-box">
+    <span class="label">Sigma Notation</span>
+    Σᵢ₌₁ⁿ xᵢ  =  x₁ + x₂ + x₃ + ... + xₙ
+
+    Example: Σᵢ₌₁⁵ i  =  1 + 2 + 3 + 4 + 5  =  15
+  </div>
+  <p>Similarly, <strong>Π</strong> (capital pi) means multiply:</p>
+  <div class="formula-box">
+    <span class="label">Product Notation</span>
+    Πᵢ₌₁ⁿ xᵢ  =  x₁ × x₂ × x₃ × ... × xₙ
+  </div>
+
+  <h3 class="sub-title">1.3 Basic Calculus You'll Need</h3>
+  <p>We need two calculus concepts: <strong>derivatives</strong> (rates of change) and <strong>integrals</strong> (areas under curves). Here's the minimum you need:</p>
+  
+  <div class="formula-box">
+    <span class="label">Derivative — rate of change</span>
+    d/dx [xⁿ]  =  n·xⁿ⁻¹
+    d/dx [eˣ]  =  eˣ
+    d/dx [ln(x)]  =  1/x
+
+    <span class="label">Integral — area under curve</span>
+    ∫ xⁿ dx  =  xⁿ⁺¹/(n+1) + C
+    ∫₋∞^∞ f(x) dx  =  1   (for any probability density)
+  </div>
+
+  <div class="callout green">
+    <div class="callout-title">🎯 Why integrals matter in stats</div>
+    For continuous random variables, probability IS an integral. The probability that X falls between a and b is the area under the curve from a to b: P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx.
+  </div>
+
+  <h3 class="sub-title">1.4 Logarithms &amp; Exponentials</h3>
+  <p>Log and exp appear in almost every formula in this guide. Here are the rules you must know:</p>
+  <div class="formula-box">
+    <span class="label">Log Rules</span>
+    ln(a·b)  =  ln(a) + ln(b)       ← Products become sums
+    ln(a/b)  =  ln(a) - ln(b)
+    ln(aᵏ)  =  k·ln(a)
+    ln(eˣ)  =  x       and       e^(ln x) = x
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ Most important log property for quants</div>
+    <code>ln(a·b·c) = ln(a) + ln(b) + ln(c)</code><br><br>
+    This converts products into sums, which is why MLE uses log-likelihood — products of small probabilities become manageable sums!
+  </div>
+
+  <h3 class="sub-title">1.5 Expected Value &amp; Variance — Concept Preview</h3>
+  <p>These appear in every topic. Here's a plain-language preview:</p>
+  <table>
+    <tr><th>Concept</th><th>Plain English</th><th>Formula</th></tr>
+    <tr><td>Expected Value E[X]</td><td>Long-run average of X if we repeat forever</td><td>Σ x·P(X=x) or ∫ x·f(x)dx</td></tr>
+    <tr><td>Variance Var(X)</td><td>Average squared distance from the mean</td><td>E[(X-μ)²] = E[X²] - (E[X])²</td></tr>
+    <tr><td>Std Deviation σ</td><td>Square root of variance — same units as X</td><td>σ = √Var(X)</td></tr>
+    <tr><td>Covariance Cov(X,Y)</td><td>How X and Y move together</td><td>E[(X-μₓ)(Y-μᵧ)]</td></tr>
+  </table>
+
+  <!-- Interactive: E[X] demo -->
+  <div class="diagram-wrap">
+    <canvas id="cvs-prereq" width="620" height="200"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>Die faces</label>
+        <input type="range" id="prereq-n" min="2" max="20" value="6" oninput="drawPrereq()">
+        <span class="ctrl-val" id="prereq-n-val">6</span>
+      </div>
+      <div class="ctrl-group"><label>Samples</label>
+        <input type="range" id="prereq-s" min="10" max="2000" value="200" oninput="drawPrereq()">
+        <span class="ctrl-val" id="prereq-s-val">200</span>
+      </div>
+      <button class="run-btn" onclick="drawPrereq()">Resample</button>
+    </div>
+    <div class="diagram-caption">Figure 1.1 — Rolling a fair n-sided die many times. Red line = true E[X]. Blue = sample mean. Watch them converge!</div>
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — Prerequisites</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-pre')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-pre')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-pre')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-pre-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>Let A = {1,3,5} and B = {3,5,7}. Find A∪B, A∩B, Aᶜ assuming Ω = {1,2,3,4,5,6,7}.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>Compute Σᵢ₌₁⁶ i².</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 3 · Easy</div>You roll a fair 4-sided die. Write out E[X] using the discrete formula Σ x·P(X=x).</div>
+    </div>
+    <div class="tier-content" id="t-pre-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>Simplify: ln(4) + ln(3) - ln(6). Express as ln of a single number.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>If X has values {0, 1, 2} with probabilities {0.5, 0.3, 0.2}, compute E[X], E[X²], and then Var(X) using the formula Var = E[X²] - (E[X])².</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 3 · Medium</div>Verify that ∫₀¹ 2x dx = 1. This means f(x)=2x is a valid PDF on [0,1]. What is P(X ≤ 0.5)?</div>
+    </div>
+    <div class="tier-content" id="t-pre-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Prove that for any random variable X: Var(aX + b) = a²·Var(X) using the definition of variance. What happens to the standard deviation?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>If Cov(X,Y) = E[XY] - E[X]E[Y], show that if X and Y are independent, Cov(X,Y)=0. (Hint: independence means E[XY]=E[X]·E[Y].)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ TAB 2: PROBABILITY ════ -->
+<div class="pane" id="pane-prob">
+  <h2 class="section-title">Probability Foundations</h2>
+  <p>Probability is the formal language of uncertainty. Before understanding distributions or hypothesis tests, you must speak this language fluently.</p>
+
+  <h3 class="sub-title">2.1 The Three Axioms of Probability</h3>
+  <p>All of probability theory rests on three simple rules (Kolmogorov axioms):</p>
+  <div class="formula-box">
+    <span class="label">Kolmogorov Axioms</span>
+    Axiom 1:  P(A) ≥ 0          (probabilities are non-negative)
+    Axiom 2:  P(Ω) = 1          (something must happen)
+    Axiom 3:  P(A ∪ B) = P(A) + P(B)  if A ∩ B = ∅   (additivity)
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🎲 Real-world analogy</div>
+    Think of a weather forecast. "30% chance of rain" means if you simulated tomorrow 1000 times, about 300 would have rain. Probability measures the long-run frequency of outcomes.
+  </div>
+
+  <h4 class="mini-title">Useful derived rules</h4>
+  <div class="formula-box">
+    <span class="label">Rules derived from axioms</span>
+    P(Aᶜ)        =  1 - P(A)                         (complement)
+    P(A ∪ B)    =  P(A) + P(B) - P(A ∩ B)          (inclusion-exclusion)
+    P(∅)         =  0
+  </div>
+
+  <h3 class="sub-title">2.2 Conditional Probability</h3>
+  <p><strong>Key insight:</strong> When you learn that event B happened, it changes the probability of A. This is called conditional probability.</p>
+
+  <div class="formula-box">
+    <span class="label">Conditional Probability</span>
+    P(A | B)  =  P(A ∩ B) / P(B)     (read: "probability of A given B")
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-title">📊 Quant context</div>
+    P(stock rises | earnings beat) — the probability a stock rises <em>given that</em> earnings beat expectations. Conditioning on information is the core of quantitative finance.
+  </div>
+
+  <h4 class="mini-title">Interactive: Conditional Probability Venn Diagram</h4>
+  <div class="diagram-wrap">
+    <canvas id="cvs-cond" width="620" height="260"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>P(A)</label>
+        <input type="range" id="pa" min="0.1" max="0.9" step="0.05" value="0.5" oninput="drawCond()">
+        <span class="ctrl-val" id="pa-val">0.50</span>
+      </div>
+      <div class="ctrl-group"><label>P(B)</label>
+        <input type="range" id="pb" min="0.1" max="0.9" step="0.05" value="0.5" oninput="drawCond()">
+        <span class="ctrl-val" id="pb-val">0.50</span>
+      </div>
+      <div class="ctrl-group"><label>Overlap</label>
+        <input type="range" id="pab" min="0.01" max="0.5" step="0.01" value="0.2" oninput="drawCond()">
+        <span class="ctrl-val" id="pab-val">0.20</span>
+      </div>
+    </div>
+    <div class="diagram-caption">Figure 2.1 — Adjust sliders to see how P(A|B) = P(A∩B)/P(B) changes. Blue shaded = A∩B.</div>
+  </div>
+
+  <h3 class="sub-title">2.3 Independence</h3>
+  <p>Two events A and B are <strong>independent</strong> if knowing B happened gives you zero information about A.</p>
+  <div class="formula-box">
+    <span class="label">Independence</span>
+    A ⊥ B  ⟺  P(A ∩ B) = P(A) · P(B)
+              ⟺  P(A | B) = P(A)
+  </div>
+
+  <h3 class="sub-title">2.4 Bayes' Theorem (Intro)</h3>
+  <p>Bayes' theorem lets you <em>reverse</em> conditional probabilities. Given P(B|A), find P(A|B).</p>
+  <div class="formula-box">
+    <span class="label">Bayes' Theorem</span>
+    P(A | B)  =  P(B | A) · P(A)
+                 ─────────────────
+                      P(B)
+
+    where:  P(B) = Σᵢ P(B|Aᵢ)·P(Aᵢ)   (law of total probability)
+  </div>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ Classic example: Medical Test</div>
+    Disease prevalence: 1%. Test accuracy: 99%. You test positive. What's P(you have disease)?<br><br>
+    P(disease|+) = P(+|disease)·P(disease) / P(+)<br>
+    = 0.99 × 0.01 / (0.99×0.01 + 0.01×0.99)<br>
+    = 0.0099 / 0.0198 ≈ <strong>50%!</strong><br><br>
+    This surprises everyone. Even with a 99% accurate test, a rare disease means a positive test is only 50% reliable. This is why we'll spend a whole tab on Bayesian reasoning.
+  </div>
+
+  <h3 class="sub-title">2.5 Random Variables</h3>
+  <p>A <strong>random variable</strong> (RV) X is a function that maps outcomes of a random experiment to numbers. There are two types:</p>
+  <table>
+    <tr><th>Type</th><th>Values</th><th>Described by</th><th>Example</th></tr>
+    <tr><td>Discrete RV</td><td>Countable (0,1,2,…)</td><td>PMF: P(X=k)</td><td>Number of heads in 10 flips</td></tr>
+    <tr><td>Continuous RV</td><td>Any real interval</td><td>PDF: f(x), CDF: F(x)</td><td>Stock return tomorrow</td></tr>
+  </table>
+
+  <div class="formula-box">
+    <span class="label">CDF — Cumulative Distribution Function</span>
+    F(x)  =  P(X ≤ x)
+
+    Properties:
+      · F is non-decreasing
+      · lim F(x) = 0 as x→-∞
+      · lim F(x) = 1 as x→+∞
+      · For continuous: f(x) = dF/dx  (PDF is derivative of CDF)
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — Probability</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-prob')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-prob')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-prob')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-prob-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>A card is drawn from a 52-card deck. What is P(Heart)? What is P(Face card)? What is P(Heart AND Face card)?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>P(A)=0.3, P(B)=0.5, P(A∩B)=0.1. Find P(A|B) and P(B|A). Are A and B independent?</div>
+    </div>
+    <div class="tier-content" id="t-prob-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>A factory has 3 machines producing 20%, 30%, 50% of output. Defect rates are 1%, 2%, 3%. A random item is defective. What's the probability it came from Machine 3? (Use Bayes' Theorem.)</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>Show that if P(A|B) = P(A), then P(B|A) = P(B). (Independence is symmetric.)</div>
+    </div>
+    <div class="tier-content" id="t-prob-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Monty Hall Problem: You pick door 1. Host opens door 3 (always a goat). Should you switch to door 2? Compute P(car behind door 2 | host opened door 3) using Bayes' theorem rigorously.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>Prove the law of total expectation: E[X] = E[E[X|Y]]. Start from the definition of conditional expectation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ TAB 3: DISTRIBUTIONS ════ -->
+<div class="pane" id="pane-dist">
+  <h2 class="section-title">Probability Distributions</h2>
+  <p>A distribution is a complete description of a random variable — it tells us all possible values and their probabilities. Think of it as the "personality profile" of randomness.</p>
+
+  <h3 class="sub-title">3.1 The Normal (Gaussian) Distribution</h3>
+  <p>The most important distribution in statistics. Bell-shaped, symmetric, and appears everywhere due to the Central Limit Theorem (next section!).</p>
+
+  <div class="formula-box">
+    <span class="label">Normal Distribution N(μ, σ²)</span>
+    f(x)  =  1/(σ√(2π)) · exp(-(x-μ)²/(2σ²))
+
+    where:
+      μ = mean (center of bell)
+      σ = standard deviation (width of bell)
+      σ² = variance
+
+    E[X] = μ       Var(X) = σ²
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🔔 68–95–99.7 Rule</div>
+    For N(μ,σ²):
+    <ul style="margin:0.5rem 0 0 1rem">
+      <li>~68% of data falls within μ ± 1σ</li>
+      <li>~95% of data falls within μ ± 2σ</li>
+      <li>~99.7% of data falls within μ ± 3σ</li>
+    </ul>
+    In quant finance: if daily returns are N(0%, 1%), only 0.3% of days should be "3-sigma events."
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="cvs-normal" width="620" height="280"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>μ (mean)</label>
+        <input type="range" id="n-mu" min="-3" max="3" step="0.1" value="0" oninput="drawNormal()">
+        <span class="ctrl-val" id="n-mu-val">0.0</span>
+      </div>
+      <div class="ctrl-group"><label>σ (std)</label>
+        <input type="range" id="n-sig" min="0.3" max="3" step="0.1" value="1" oninput="drawNormal()">
+        <span class="ctrl-val" id="n-sig-val">1.0</span>
+      </div>
+    </div>
+    <div class="diagram-caption">Figure 3.1 — Normal PDF. μ shifts the bell, σ controls its width. Shaded region = ±1σ (≈68%).</div>
+  </div>
+
+  <h4 class="mini-title">Standard Normal Z-Score</h4>
+  <div class="formula-box">
+    <span class="label">Standardization</span>
+    If X ~ N(μ, σ²), then Z = (X - μ)/σ ~ N(0, 1)
+
+    Z-score tells you: "how many standard deviations is X from the mean?"
+    In quant finance: Z = (daily return - mean return) / volatility
+  </div>
+
+  <h3 class="sub-title">3.2 The Binomial Distribution</h3>
+  <p>Models the number of "successes" in n independent trials, each with probability p of success.</p>
+
+  <div class="formula-box">
+    <span class="label">Binomial Distribution Bin(n, p)</span>
+    P(X = k)  =  C(n,k) · pᵏ · (1-p)^(n-k)
+
+    where C(n,k) = n! / (k!(n-k)!)  (n choose k)
+
+    E[X] = np          Var(X) = np(1-p)
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-title">📈 Quant context</div>
+    If a strategy wins 55% of trades (p=0.55), over 100 trades (n=100), the expected number of wins = 100×0.55 = 55, with σ = √(100×0.55×0.45) ≈ 4.97. This lets you assess if a backtest result of "63 wins" is statistically significant.
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="cvs-binom" width="620" height="260"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>n (trials)</label>
+        <input type="range" id="b-n" min="5" max="60" value="20" oninput="drawBinom()">
+        <span class="ctrl-val" id="b-n-val">20</span>
+      </div>
+      <div class="ctrl-group"><label>p (success)</label>
+        <input type="range" id="b-p" min="0.05" max="0.95" step="0.05" value="0.5" oninput="drawBinom()">
+        <span class="ctrl-val" id="b-p-val">0.50</span>
+      </div>
+    </div>
+    <div class="diagram-caption">Figure 3.2 — Binomial PMF. Notice how it approaches a bell shape as n increases (CLT preview!).</div>
+  </div>
+
+  <h3 class="sub-title">3.3 The Poisson Distribution</h3>
+  <p>Models the number of events in a fixed time period when events happen at a constant average rate λ (lambda) and independently.</p>
+
+  <div class="formula-box">
+    <span class="label">Poisson Distribution Pois(λ)</span>
+    P(X = k)  =  e^(-λ) · λᵏ / k!
+
+    E[X] = λ          Var(X) = λ
+    (mean equals variance — distinctive property!)
+  </div>
+
+  <div class="callout green">
+    <div class="callout-title">💡 When to use Poisson</div>
+    Count of events per unit time/space where: events are rare, independent, at constant rate. Examples: number of trades in a minute, number of order book cancellations per second, number of defaults in a bond portfolio.
+  </div>
+
+  <h3 class="sub-title">3.4 The Exponential Distribution</h3>
+  <p>If Poisson counts events, Exponential models the <em>time between</em> events. If events follow Poisson(λ), time between events follows Exp(λ).</p>
+
+  <div class="formula-box">
+    <span class="label">Exponential Distribution Exp(λ)</span>
+    f(x)  =  λ · e^(-λx)    for x ≥ 0
+    F(x)  =  1 - e^(-λx)   (CDF)
+
+    E[X] = 1/λ        Var(X) = 1/λ²
+
+    KEY PROPERTY — Memorylessness:
+    P(X > s+t | X > s)  =  P(X > t)
+    "How long you've waited doesn't change how long you'll still wait"
+  </div>
+
+  <h3 class="sub-title">3.5 Lognormal Distribution</h3>
+  <p>If X = e^Y where Y ~ N(μ,σ²), then X is lognormal. <strong>Stock prices are often modeled as lognormal</strong> because prices can't go negative, and log-returns are approximately normal.</p>
+
+  <div class="formula-box">
+    <span class="label">Lognormal Distribution</span>
+    If X ~ LogNormal(μ, σ²):
+      ln(X) ~ N(μ, σ²)
+
+    E[X] = e^(μ + σ²/2)
+    Var(X) = (e^σ² - 1) · e^(2μ+σ²)
+
+    Stock price model: S(t) = S(0) · e^((μ - σ²/2)t + σW(t))
+    where W(t) is Brownian motion
+  </div>
+
+  <h3 class="sub-title">3.6 Distribution Comparison Table</h3>
+  <table>
+    <tr><th>Distribution</th><th>Type</th><th>Parameters</th><th>E[X]</th><th>Var(X)</th><th>Use in quant finance</th></tr>
+    <tr><td>Normal N(μ,σ²)</td><td>Continuous</td><td>μ, σ</td><td>μ</td><td>σ²</td><td>Returns, residuals</td></tr>
+    <tr><td>Lognormal</td><td>Continuous</td><td>μ, σ</td><td>e^(μ+σ²/2)</td><td>(eˢ²-1)e^(2μ+σ²)</td><td>Stock prices, volatility</td></tr>
+    <tr><td>Binomial Bin(n,p)</td><td>Discrete</td><td>n, p</td><td>np</td><td>np(1-p)</td><td>Trade win/loss counts</td></tr>
+    <tr><td>Poisson Pois(λ)</td><td>Discrete</td><td>λ</td><td>λ</td><td>λ</td><td>Order arrivals, defaults</td></tr>
+    <tr><td>Exponential Exp(λ)</td><td>Continuous</td><td>λ</td><td>1/λ</td><td>1/λ²</td><td>Time between events</td></tr>
+    <tr><td>Student-t t(ν)</td><td>Continuous</td><td>ν (degrees)</td><td>0</td><td>ν/(ν-2)</td><td>Fat tails, small samples</td></tr>
+  </table>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — Distributions</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-dist')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-dist')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-dist')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-dist-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>X ~ N(100, 225). What is the z-score of x=115? What percentage of data falls above this value?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>A coin is flipped 10 times. X ~ Bin(10, 0.5). What is P(X=5)? What is E[X] and Var(X)?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 3 · Easy</div>Orders arrive at a rate of 3 per minute (Poisson). What is P(exactly 5 orders in one minute)?</div>
+    </div>
+    <div class="tier-content" id="t-dist-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>A stock has daily log-returns with mean 0.05% and std 1.2%. Assuming normality: (a) What is the probability of a daily loss exceeding 2%? (b) What is the 5th percentile return (Value at Risk)?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>A trading strategy wins 60% of trades. Out of 50 trades, what is the probability of getting 25 or fewer wins? Use normal approximation to binomial (with continuity correction).</div>
+    </div>
+    <div class="tier-content" id="t-dist-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Prove that if X ~ Exp(λ), then X has the memoryless property P(X>s+t|X>s)=P(X>t). Use only the CDF definition.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>The Student-t distribution with ν degrees of freedom has heavier tails than normal. Compute the probability P(|X|>3) for both N(0,1) and t(5) and compare. What does this mean for risk models that assume normality?</div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">🔗 External Resources</h3>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://seeing-theory.brown.edu/probability-distributions/index.html" target="_blank">
+      <span class="res-type">📊 Interactive</span>
+      <span class="res-name">Seeing Theory (Brown Univ)</span>
+      <span class="res-desc">Beautiful visual probability & distributions explorer</span>
+    </a>
+    <a class="resource-card" href="https://distribution.scottfreitas.com/" target="_blank">
+      <span class="res-type">🎮 Tool</span>
+      <span class="res-name">Distribution Explorer</span>
+      <span class="res-desc">Interactive probability distribution viewer with parameter sliders</span>
+    </a>
+    <a class="resource-card" href="https://en.wikipedia.org/wiki/Normal_distribution" target="_blank">
+      <span class="res-type">📖 Reference</span>
+      <span class="res-name">Wikipedia: Normal Distribution</span>
+      <span class="res-desc">Comprehensive reference with all properties and derivations</span>
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 4: CLT ════ -->
+<div class="pane" id="pane-clt">
+  <h2 class="section-title">Central Limit Theorem (CLT)</h2>
+  <p>The Central Limit Theorem is one of the most astonishing facts in all of mathematics. It explains why the normal distribution appears so often in nature and in finance.</p>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ The CLT — Plain English</div>
+    Take ANY distribution (uniform, exponential, binomial, whatever). Take the average of n samples from it. As n grows, that average will approach a normal distribution — <em>no matter what the original distribution looked like</em>.
+  </div>
+
+  <h3 class="sub-title">4.1 Formal Statement</h3>
+  <div class="formula-box">
+    <span class="label">Central Limit Theorem</span>
+    Let X₁, X₂, ..., Xₙ be i.i.d. with mean μ and variance σ².
+
+    Define the sample mean: X̄ₙ = (X₁ + X₂ + ... + Xₙ) / n
+
+    Then as n → ∞:
+      √n · (X̄ₙ - μ) / σ  →  N(0, 1)
+
+    Equivalently:  X̄ₙ  ~  N(μ,  σ²/n)   approximately, for large n
+
+    The standard error of the mean:  SE = σ/√n
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-title">📌 Key insight: Standard Error</div>
+    The std deviation of X̄ is σ/√n, not σ. This means: as you average more samples, your estimate of the mean becomes more precise. Doubling the sample size makes your estimate √2 ≈ 1.41 times more precise.
+  </div>
+
+  <h3 class="sub-title">4.2 Interactive CLT Simulation</h3>
+  <p>This is the best way to understand CLT — watch it happen. Choose any underlying distribution and see the sample mean distribution converge to normal.</p>
+
+  <div class="diagram-wrap">
+    <canvas id="cvs-clt" width="620" height="320"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>Distribution</label>
+        <select id="clt-dist" onchange="drawCLT()" style="font-family:JetBrains Mono;font-size:0.8rem;padding:4px 8px;">
+          <option value="uniform">Uniform</option>
+          <option value="exp">Exponential</option>
+          <option value="binom">Binomial</option>
+          <option value="bimodal">Bimodal</option>
+        </select>
+      </div>
+      <div class="ctrl-group"><label>n (sample size)</label>
+        <input type="range" id="clt-n" min="1" max="100" value="30" oninput="drawCLT()">
+        <span class="ctrl-val" id="clt-n-val">30</span>
+      </div>
+      <button class="run-btn" onclick="drawCLT()">Resample</button>
+    </div>
+    <div class="diagram-caption">Figure 4.1 — Top: original distribution (not normal!). Bottom: distribution of sample means. Watch the bottom become a bell curve as n increases.</div>
+  </div>
+
+  <h3 class="sub-title">4.3 Why CLT Matters for Quants</h3>
+  <table>
+    <tr><th>Application</th><th>CLT in action</th></tr>
+    <tr><td>Portfolio returns</td><td>Sum of many asset returns → approximately normal, even if individuals aren't</td></tr>
+    <tr><td>Monte Carlo simulation</td><td>Average of simulated outcomes has N(μ, σ²/n) distribution, letting us build confidence intervals</td></tr>
+    <tr><td>Backtesting</td><td>Average strategy P&amp;L over many trades → normal, enabling significance testing</td></tr>
+    <tr><td>Risk aggregation</td><td>VaR of diversified portfolio can use normal approximation</td></tr>
+  </table>
+
+  <h3 class="sub-title">4.4 Conditions and Caveats</h3>
+  <div class="callout">
+    <div class="callout-title">⚠️ When CLT can fail</div>
+    CLT requires finite mean and variance. Be careful when:
+    <ul style="margin:0.5rem 0 0 1rem">
+      <li><strong>Fat tails:</strong> Returns from Cauchy distribution have infinite variance — CLT doesn't apply</li>
+      <li><strong>Small n:</strong> CLT is approximate; for n&lt;30 with non-normal data, be cautious</li>
+      <li><strong>Dependence:</strong> CLT assumes i.i.d. — correlated returns (time series) require corrections</li>
+      <li><strong>Extreme events:</strong> CLT doesn't help predict tail risk / black swans</li>
+    </ul>
+  </div>
+
+  <h3 class="sub-title">4.5 Confidence Intervals from CLT</h3>
+  <p>CLT directly gives us confidence intervals for the population mean:</p>
+  <div class="formula-box">
+    <span class="label">95% Confidence Interval for Mean</span>
+    X̄ ± z₀.₀₂₅ · (σ/√n)   where z₀.₀₂₅ = 1.96
+
+    Example: X̄ = 5.2, σ = 2.1, n = 100
+    CI = 5.2 ± 1.96 × (2.1/√100)
+       = 5.2 ± 1.96 × 0.21
+       = 5.2 ± 0.412
+       = [4.788, 5.612]
+
+    Interpretation: If you repeated this experiment many times,
+    95% of such intervals would contain the true mean μ.
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — CLT</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-clt')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-clt')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-clt')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-clt-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>A die has μ=3.5, σ²=35/12. If you average 36 dice rolls, what is the distribution of the sample mean? Compute SE.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>You sample 100 trades with mean profit = $50 and std $200. Construct a 95% CI for the true mean profit per trade.</div>
+    </div>
+    <div class="tier-content" id="t-clt-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>A stock has daily returns with mean 0.1% and std 1.5%. What is the probability that the average daily return over 252 trading days is negative? (Use CLT to find distribution of annual average, then compute probability.)</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>A quant strategy has 60% win rate (p=0.6) per trade with profit/loss = ±$100. After 400 trades, what is the approximate 95% CI for total P&amp;L? (Use CLT: note E[single trade] and Var[single trade] first.)</div>
+    </div>
+    <div class="tier-content" id="t-clt-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Prove the CLT informally using moment-generating functions: show that the MGF of √n(X̄-μ)/σ converges to e^(t²/2) (the MGF of N(0,1)) as n→∞. Use the Taylor expansion of ln(MGF).</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>The Law of Large Numbers says X̄→μ as n→∞. How is CLT stronger than LLN? Write a precise comparison of what each theorem says about convergence.</div>
+    </div>
+  </div>
+
+  <div class="resource-grid" style="margin-top:1.5rem">
+    <a class="resource-card" href="https://seeing-theory.brown.edu/probability-distributions/index.html#section3" target="_blank">
+      <span class="res-type">🎮 Interactive</span>
+      <span class="res-name">Seeing Theory — CLT</span>
+      <span class="res-desc">Animated CLT demonstration from Brown University</span>
+    </a>
+    <a class="resource-card" href="https://www.khanacademy.org/math/statistics-probability/sampling-distributions-library" target="_blank">
+      <span class="res-type">📺 Video</span>
+      <span class="res-name">Khan Academy: Sampling Distributions</span>
+      <span class="res-desc">Step-by-step video series on CLT and sampling</span>
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 5: MLE ════ -->
+<div class="pane" id="pane-mle">
+  <h2 class="section-title">Maximum Likelihood Estimation (MLE)</h2>
+  <p>You have data. You want to fit a distribution to it. MLE is the principled method: find the parameters that make your observed data most probable.</p>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ Core Idea</div>
+    Imagine you measured 5 people's heights: [168, 172, 175, 169, 174]. You want to fit a Normal distribution to this. MLE asks: "What values of μ and σ make these 5 numbers most likely?" The answer is μ=sample mean, σ=sample std. But MLE generalizes this to ANY distribution.
+  </div>
+
+  <h3 class="sub-title">5.1 The Likelihood Function</h3>
+  <div class="formula-box">
+    <span class="label">Likelihood Function</span>
+    Given data x₁, x₂, ..., xₙ and parameters θ:
+
+    L(θ)  =  P(data | θ)  =  Πᵢ f(xᵢ; θ)
+
+    (Assumes data points are independent — joint probability = product)
+
+    Log-Likelihood (always use this!):
+    ℓ(θ) = ln L(θ) = Σᵢ ln f(xᵢ; θ)
+
+    MLE estimate:  θ̂ = argmax_θ ℓ(θ)
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-title">📌 Why log-likelihood?</div>
+    Multiplying 1000 probabilities (all between 0-1) causes numerical underflow — the product becomes effectively zero. Taking log converts the product to a sum, which is numerically stable and mathematically easier to optimize (derivatives of sums are simple).
+  </div>
+
+  <h3 class="sub-title">5.2 MLE for Normal Distribution — Full Derivation</h3>
+  <div class="formula-box">
+    <span class="label">Step-by-step MLE for Normal N(μ, σ²)</span>
+    1. Write log-likelihood:
+       ℓ(μ,σ) = Σᵢ [-½ ln(2π) - ln(σ) - (xᵢ-μ)²/(2σ²)]
+              = -n/2·ln(2π) - n·ln(σ) - 1/(2σ²)·Σᵢ(xᵢ-μ)²
+
+    2. Maximize over μ: take ∂ℓ/∂μ = 0
+       ∂ℓ/∂μ = Σᵢ (xᵢ-μ)/σ² = 0
+       ⟹  μ̂ = (1/n)·Σᵢ xᵢ = x̄   ✓ (sample mean!)
+
+    3. Maximize over σ: take ∂ℓ/∂σ = 0
+       ∂ℓ/∂σ = -n/σ + Σᵢ(xᵢ-μ)²/σ³ = 0
+       ⟹  σ̂² = (1/n)·Σᵢ(xᵢ-x̄)²  (biased sample variance!)
+
+    Note: MLE gives biased σ̂. Unbiased uses (n-1) denominator.
+  </div>
+
+  <h3 class="sub-title">5.3 MLE for Exponential Distribution</h3>
+  <div class="formula-box">
+    <span class="label">MLE for Exp(λ)</span>
+    f(x; λ) = λe^(-λx)
+
+    Log-likelihood:
+    ℓ(λ) = n·ln(λ) - λ·Σᵢ xᵢ
+
+    Take ∂ℓ/∂λ = 0:
+    n/λ - Σᵢ xᵢ = 0
+    ⟹  λ̂ = n / Σᵢ xᵢ = 1/x̄
+
+    The MLE rate is 1 over the sample mean. Intuitive!
+  </div>
+
+  <h3 class="sub-title">5.4 Interactive: MLE Fitting</h3>
+  <div class="diagram-wrap">
+    <canvas id="cvs-mle" width="620" height="300"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>True μ</label>
+        <input type="range" id="mle-mu" min="-3" max="3" step="0.1" value="1" oninput="drawMLE()">
+        <span class="ctrl-val" id="mle-mu-val">1.0</span>
+      </div>
+      <div class="ctrl-group"><label>True σ</label>
+        <input type="range" id="mle-sig" min="0.3" max="3" step="0.1" value="1.2" oninput="drawMLE()">
+        <span class="ctrl-val" id="mle-sig-val">1.2</span>
+      </div>
+      <div class="ctrl-group"><label>n samples</label>
+        <input type="range" id="mle-n" min="5" max="500" value="50" oninput="drawMLE()">
+        <span class="ctrl-val" id="mle-n-val">50</span>
+      </div>
+      <button class="run-btn" onclick="drawMLE()">Resample</button>
+    </div>
+    <div class="diagram-caption">Figure 5.1 — Gray: data histogram. Red dashed: true N(μ,σ). Blue solid: MLE-fitted curve. Watch MLE converge to truth as n increases.</div>
+  </div>
+
+  <h3 class="sub-title">5.5 Properties of MLE</h3>
+  <table>
+    <tr><th>Property</th><th>Meaning</th></tr>
+    <tr><td>Consistency</td><td>θ̂ → θ as n → ∞ (converges to truth with enough data)</td></tr>
+    <tr><td>Asymptotic Normality</td><td>√n(θ̂ - θ) → N(0, I(θ)⁻¹) where I(θ) is Fisher Information</td></tr>
+    <tr><td>Efficiency</td><td>Achieves Cramér-Rao Lower Bound asymptotically (most precise possible)</td></tr>
+    <tr><td>Invariance</td><td>If θ̂ is MLE of θ, then g(θ̂) is MLE of g(θ)</td></tr>
+  </table>
+
+  <h3 class="sub-title">5.6 Fisher Information &amp; Cramér-Rao Bound</h3>
+  <div class="formula-box">
+    <span class="label">Fisher Information</span>
+    I(θ)  =  E[(∂/∂θ ln f(X;θ))²]
+           =  -E[∂²/∂θ² ln f(X;θ)]
+
+    Cramér-Rao Bound:
+    Var(θ̂) ≥ 1/I(θ)   for any unbiased estimator θ̂
+
+    This is the theoretical minimum variance any estimator can achieve.
+    MLE achieves this bound asymptotically — it's "as good as it gets."
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — MLE</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-mle')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-mle')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-mle')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-mle-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>You observe 5 coin flips: H, H, T, H, T. The coin has probability p of heads. Write down the likelihood L(p) and log-likelihood ℓ(p). Find the MLE p̂.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>Times between trade arrivals: [0.5, 1.2, 0.8, 2.1, 0.3] minutes. Model as Exponential. Find the MLE of λ.</div>
+    </div>
+    <div class="tier-content" id="t-mle-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>Derive the MLE for the Poisson distribution Pois(λ). Show that λ̂ = x̄ (sample mean). Is this MLE biased or unbiased?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>You have 20 daily stock returns. You fit a Normal distribution via MLE and get μ̂=0.08%, σ̂=1.5%. Compute the 95% confidence interval for μ using the asymptotic normality of MLE: μ̂ ± 1.96·σ/√n.</div>
+    </div>
+    <div class="tier-content" id="t-mle-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Compute the Fisher Information I(λ) for the Exponential distribution. Show that the Cramér-Rao bound gives Var(λ̂) ≥ λ²/n, and that the MLE λ̂=1/x̄ achieves this asymptotically.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>Show that the MLE for a Normal distribution is biased for σ²: E[σ̂²_MLE] = (n-1)/n · σ². Why does this bias disappear as n→∞? Propose the unbiased estimator.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ TAB 6: HYPOTHESIS TESTING ════ -->
+<div class="pane" id="pane-hypo">
+  <h2 class="section-title">Hypothesis Testing</h2>
+  <p>Hypothesis testing is the formal framework for making decisions from data under uncertainty. In quant finance, this is how you decide if a strategy is genuinely profitable or just got lucky.</p>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ Core Question</div>
+    "My strategy made $500 over 100 trades. Is this real signal or just luck?" Hypothesis testing gives a rigorous, probability-based answer.
+  </div>
+
+  <h3 class="sub-title">6.1 The Framework</h3>
+  <div class="formula-box">
+    <span class="label">Hypothesis Testing Framework</span>
+    H₀ (Null hypothesis):      The "boring" default (no effect, no difference)
+    H₁ (Alternative hypothesis): What you're trying to show
+
+    Example:
+    H₀: Strategy has zero mean return (μ = 0)
+    H₁: Strategy has positive mean return (μ > 0)
+
+    Steps:
+    1. State H₀ and H₁
+    2. Choose significance level α (typically 0.05 or 0.01)
+    3. Compute test statistic from data
+    4. Find p-value
+    5. Reject H₀ if p-value &lt; α
+  </div>
+
+  <h3 class="sub-title">6.2 The p-value — Most Misunderstood Concept</h3>
+  <div class="callout">
+    <div class="callout-title">📌 What a p-value IS and IS NOT</div>
+    <strong>p-value = P(observing data as extreme as yours | H₀ is true)</strong><br><br>
+    ✅ It IS: The probability of seeing results this extreme if H₀ is true<br>
+    ❌ It is NOT: The probability that H₀ is true<br>
+    ❌ It is NOT: The probability that your result is due to chance<br>
+    ❌ It is NOT: A measure of effect size or practical importance<br><br>
+    Small p-value → data is surprising under H₀ → evidence against H₀
+  </div>
+
+  <h3 class="sub-title">6.3 Z-Test (known σ)</h3>
+  <div class="formula-box">
+    <span class="label">One-Sample Z-Test</span>
+    H₀: μ = μ₀     H₁: μ ≠ μ₀ (two-tailed)
+
+    Test statistic:  Z = (X̄ - μ₀) / (σ/√n)    ~ N(0,1) under H₀
+
+    Reject H₀ if |Z| > z_{α/2}
+    For α=0.05: z_{0.025} = 1.96
+
+    p-value = 2·P(Z > |z_obs|)   (two-tailed)
+  </div>
+
+  <h3 class="sub-title">6.4 T-Test (unknown σ)</h3>
+  <p>In practice, you rarely know σ. The t-test uses the sample standard deviation instead:</p>
+  <div class="formula-box">
+    <span class="label">One-Sample t-Test</span>
+    Test statistic: t = (X̄ - μ₀) / (s/√n)    ~ t(n-1) under H₀
+
+    where s = sample standard deviation
+    t(n-1) = Student's t with (n-1) degrees of freedom
+
+    Key difference from z-test:
+    - t-distribution has heavier tails than Normal
+    - Heavier tails = more conservative (harder to reject H₀)
+    - As n → ∞, t(n-1) → N(0,1)
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="cvs-ttest" width="620" height="280"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>True μ</label>
+        <input type="range" id="tt-mu" min="-2" max="2" step="0.1" value="0.3" oninput="drawTTest()">
+        <span class="ctrl-val" id="tt-mu-val">0.3</span>
+      </div>
+      <div class="ctrl-group"><label>n</label>
+        <input type="range" id="tt-n" min="5" max="200" value="30" oninput="drawTTest()">
+        <span class="ctrl-val" id="tt-n-val">30</span>
+      </div>
+      <div class="ctrl-group"><label>σ</label>
+        <input type="range" id="tt-sig" min="0.2" max="3" step="0.1" value="1" oninput="drawTTest()">
+        <span class="ctrl-val" id="tt-sig-val">1.0</span>
+      </div>
+      <button class="run-btn" onclick="drawTTest()">Resample</button>
+    </div>
+    <div class="diagram-caption">Figure 6.1 — Null distribution (gray), observed test statistic (red line), critical region (shaded), p-value shown.</div>
+  </div>
+
+  <h3 class="sub-title">6.5 Type I and Type II Errors</h3>
+  <table>
+    <tr><th></th><th>H₀ is TRUE</th><th>H₀ is FALSE</th></tr>
+    <tr><td><strong>Reject H₀</strong></td><td>❌ Type I Error (False Positive) — rate = α</td><td>✅ Correct (True Positive) — Power = 1-β</td></tr>
+    <tr><td><strong>Fail to Reject H₀</strong></td><td>✅ Correct (True Negative)</td><td>❌ Type II Error (False Negative) — rate = β</td></tr>
+  </table>
+
+  <div class="callout blue">
+    <div class="callout-title">📊 Quant context: Strategy backtesting</div>
+    Type I Error (α=0.05): You think the strategy is profitable, but it's actually random luck. You trade it live and lose money. In quant finance, setting α too high leads to overfitted strategies.<br><br>
+    Type II Error: You miss a genuinely profitable strategy. You incorrectly think it's luck and don't trade it.
+  </div>
+
+  <h3 class="sub-title">6.6 Two-Sample Tests &amp; ANOVA</h3>
+  <div class="formula-box">
+    <span class="label">Two-Sample t-Test (independent samples)</span>
+    H₀: μ₁ = μ₂      (two populations have same mean)
+
+    t = (X̄₁ - X̄₂) / √(s₁²/n₁ + s₂²/n₂)
+
+    Used when: comparing returns of two strategies, two stocks, two time periods.
+
+    Paired t-Test: Use when observations are paired (same stock, before/after).
+    t = d̄ / (s_d/√n)   where d = x₁ - x₂ (differences)
+  </div>
+
+  <h3 class="sub-title">6.7 Multiple Testing Problem</h3>
+  <div class="callout">
+    <div class="callout-title">⚠️ Critical for Quants!</div>
+    If you test 100 strategies with α=0.05, you expect ~5 false positives just by chance! This is the "strategy overfitting" problem in quant finance.<br><br>
+    <strong>Bonferroni correction:</strong> Use α/m as threshold if testing m hypotheses simultaneously.<br>
+    If testing 100 strategies with target α=0.05: use 0.0005 per test.
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — Hypothesis Testing</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-hypo')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-hypo')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-hypo')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-hypo-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>State H₀ and H₁ for each: (a) testing if a coin is fair, (b) testing if a new drug lowers blood pressure, (c) testing if a quant strategy has positive Sharpe ratio.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>A z-test gives z_obs = 2.3 for a two-tailed test. Is this significant at α=0.05? At α=0.01? (z critical values: 1.96 for 5%, 2.58 for 1%.)</div>
+    </div>
+    <div class="tier-content" id="t-hypo-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>A momentum strategy shows: mean daily return = 0.08%, std = 0.9%, n = 252 days. Test H₀: μ=0 vs H₁: μ>0 using a one-sample t-test. Compute the t-statistic and interpret.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>Strategy A: mean return 0.1%, std 0.8%, n=200. Strategy B: mean 0.05%, std 0.6%, n=150. Test if they have the same mean return. Use two-sample t-test.</div>
+    </div>
+    <div class="tier-content" id="t-hypo-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>You backtest 50 strategies, each over 2 years of daily data. 8 pass the 5% significance threshold. How many do you expect to be false positives? Apply Bonferroni correction and state the new threshold. How many now pass?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>Define statistical power formally: Power = P(reject H₀ | H₁ true). For the one-sample z-test with H₁: μ=μ₁, derive an expression for power as a function of n, α, σ, and δ=μ₁-μ₀. Show that power → 1 as n → ∞.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════ TAB 7: BAYESIAN BASICS ════ -->
+<div class="pane" id="pane-bayes">
+  <h2 class="section-title">Bayesian Basics</h2>
+  <p>Bayesian statistics is a completely different philosophy from frequentist (classical) hypothesis testing. Instead of fixed unknown parameters, Bayesian statistics treats parameters as random variables with distributions — and updates them when new data arrives.</p>
+
+  <div class="callout gold">
+    <div class="callout-title">⭐ Frequentist vs Bayesian Philosophy</div>
+    <strong>Frequentist:</strong> "μ is a fixed unknown value. Data is random. I make decisions based on P(data | μ)."<br><br>
+    <strong>Bayesian:</strong> "μ is a random variable with a distribution. I start with a prior belief about μ, then update it with data to get a posterior belief."
+  </div>
+
+  <h3 class="sub-title">7.1 The Bayesian Framework</h3>
+  <div class="formula-box">
+    <span class="label">Bayes' Theorem for Inference</span>
+    P(θ | data)  ∝  P(data | θ) · P(θ)
+
+    Posterior  ∝  Likelihood × Prior
+
+    Full form:
+    P(θ | data)  =  P(data | θ) · P(θ) / P(data)
+
+    where P(data) = ∫ P(data|θ)·P(θ) dθ  (normalizing constant)
+  </div>
+
+  <h3 class="sub-title">7.2 Prior, Likelihood, Posterior — Explained</h3>
+  <table>
+    <tr><th>Term</th><th>Meaning</th><th>Example (coin fairness)</th></tr>
+    <tr><td>Prior P(θ)</td><td>Your belief about θ before seeing data</td><td>P(p=0.5) is high — you think coin is fair</td></tr>
+    <tr><td>Likelihood P(data|θ)</td><td>Probability of data given a parameter value</td><td>P(8 heads in 10 flips | p=0.5)</td></tr>
+    <tr><td>Posterior P(θ|data)</td><td>Updated belief after seeing data</td><td>New distribution over p after 10 flips</td></tr>
+    <tr><td>Normalizing constant P(data)</td><td>Makes posterior integrate to 1</td><td>A constant — often computed numerically</td></tr>
+  </table>
+
+  <h3 class="sub-title">7.3 Conjugate Priors — When Math Is Elegant</h3>
+  <p>A <strong>conjugate prior</strong> is a prior that, when combined with a specific likelihood, gives a posterior in the same distributional family. This makes computation exact and tractable.</p>
+  <div class="formula-box">
+    <span class="label">Beta-Binomial Conjugacy (most common example)</span>
+    Likelihood: X | p ~ Binomial(n, p)   (n trials, k successes)
+    Prior:       p ~ Beta(α, β)
+
+    Posterior:   p | X=k ~ Beta(α + k, β + n - k)
+
+    Beta(α, β) has mean = α/(α+β)
+    So prior mean = α/(α+β), posterior mean = (α+k)/(α+β+n)
+
+    As n → ∞, posterior mean → k/n (MLE estimate)
+    Data eventually overwhelms the prior!
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="cvs-bayes" width="620" height="300"></canvas>
+    <div class="controls">
+      <div class="ctrl-group"><label>Prior α</label>
+        <input type="range" id="bay-a" min="0.5" max="20" step="0.5" value="2" oninput="drawBayes()">
+        <span class="ctrl-val" id="bay-a-val">2</span>
+      </div>
+      <div class="ctrl-group"><label>Prior β</label>
+        <input type="range" id="bay-b" min="0.5" max="20" step="0.5" value="2" oninput="drawBayes()">
+        <span class="ctrl-val" id="bay-b-val">2</span>
+      </div>
+      <div class="ctrl-group"><label>n (flips)</label>
+        <input type="range" id="bay-n" min="0" max="100" value="20" oninput="drawBayes()">
+        <span class="ctrl-val" id="bay-n-val">20</span>
+      </div>
+      <div class="ctrl-group"><label>k (heads)</label>
+        <input type="range" id="bay-k" min="0" max="100" value="14" oninput="drawBayes()">
+        <span class="ctrl-val" id="bay-k-val">14</span>
+      </div>
+    </div>
+    <div class="diagram-caption">Figure 7.1 — Prior (blue dashed), Likelihood (gray), Posterior (red solid). See how data shifts the prior. Try large n to see data overwhelm the prior.</div>
+  </div>
+
+  <h3 class="sub-title">7.4 Credible Intervals vs Confidence Intervals</h3>
+  <div class="callout blue">
+    <div class="callout-title">📌 Critical distinction</div>
+    <strong>Frequentist Confidence Interval:</strong> "If I repeated this experiment many times, 95% of my computed intervals would contain the true μ." The parameter is fixed; the interval is random.<br><br>
+    <strong>Bayesian Credible Interval:</strong> "Given the data, there is 95% probability that θ lies in this interval." The interval is fixed; the parameter is random (has a distribution).<br><br>
+    The Bayesian version says what most people <em>think</em> confidence intervals mean!
+  </div>
+
+  <h3 class="sub-title">7.5 Bayesian Updating — Sequential Learning</h3>
+  <p>One of Bayesian inference's greatest strengths: you can update continuously as new data arrives. Each posterior becomes the next prior.</p>
+  <div class="formula-box">
+    <span class="label">Sequential Bayesian Updating</span>
+    Start:  P(θ)  =  prior
+
+    See data batch 1:
+    P(θ|data₁)  ∝  P(data₁|θ) · P(θ)
+
+    See data batch 2:  (use posterior as new prior!)
+    P(θ|data₁,data₂)  ∝  P(data₂|θ) · P(θ|data₁)
+
+    Order doesn't matter — final posterior is the same!
+    This is perfect for streaming financial data.
+  </div>
+
+  <h3 class="sub-title">7.6 Bayesian vs Frequentist — Practical Comparison</h3>
+  <table>
+    <tr><th>Aspect</th><th>Frequentist</th><th>Bayesian</th></tr>
+    <tr><td>What varies?</td><td>Data (parameter is fixed)</td><td>Parameter (data is fixed)</td></tr>
+    <tr><td>Prior knowledge</td><td>Not used formally</td><td>Explicitly encoded as prior</td></tr>
+    <tr><td>Output</td><td>Point estimate + confidence interval</td><td>Full posterior distribution</td></tr>
+    <tr><td>Interpretation</td><td>Statements about long-run frequencies</td><td>Probability statements about parameter</td></tr>
+    <tr><td>Computation</td><td>Usually simpler formulas</td><td>Often needs MCMC/numerical methods</td></tr>
+    <tr><td>Quant use</td><td>Backtesting, significance testing</td><td>Regime detection, signal combination</td></tr>
+  </table>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3 class="sub-title">📝 Exercises — Bayesian Basics</h3>
+    <div class="tier-tabs">
+      <button class="tier-btn active easy" onclick="showTier(this,'t-bayes')">Easy</button>
+      <button class="tier-btn medium" onclick="showTier(this,'t-bayes')">Medium</button>
+      <button class="tier-btn hard" onclick="showTier(this,'t-bayes')">Hard</button>
+    </div>
+    <div class="tier-content active" id="t-bayes-easy">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Easy</div>You have a Beta(2,2) prior for coin fairness p. You flip the coin 10 times and get 7 heads. What is the posterior distribution? What is the posterior mean?</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Easy</div>In your own words, explain the difference between: "P(hypothesis|data)" and "P(data|hypothesis)". Which does a Bayesian compute? Which does a frequentist compute?</div>
+    </div>
+    <div class="tier-content" id="t-bayes-medium">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Medium</div>A stock is in either bull regime (μ=0.1% daily) or bear regime (μ=-0.1%). Your prior: P(bull)=0.6. Today's return was -0.8%. Assuming daily returns are N(μ, 1%²), update your probability of being in the bull regime using Bayes' theorem.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Medium</div>Show that as n→∞ with k/n=p̂ (fixed observed frequency), the Beta posterior mean (α+k)/(α+β+n) converges to p̂=MLE estimate. What does this tell us about the relationship between Bayesian and frequentist methods?</div>
+    </div>
+    <div class="tier-content" id="t-bayes-hard">
+      <div class="exercise-item"><div class="ex-num">Exercise 1 · Hard</div>Derive the Normal-Normal conjugate: if X|μ ~ N(μ,σ²) (known σ) and prior μ ~ N(μ₀,τ²), derive the posterior μ|X analytically. Show the posterior mean is a precision-weighted average of prior mean and data mean.</div>
+      <div class="exercise-item"><div class="ex-num">Exercise 2 · Hard</div>A portfolio manager uses Bayesian Black-Litterman: prior returns from CAPM, views from your own research. Set up the Bayesian framework formally. What distribution represents "views"? What is the posterior for returns?</div>
+    </div>
+  </div>
+
+  <div class="resource-grid" style="margin-top:1.5rem">
+    <a class="resource-card" href="https://seeing-theory.brown.edu/bayesian-inference/index.html" target="_blank">
+      <span class="res-type">🎮 Interactive</span>
+      <span class="res-name">Seeing Theory — Bayesian Inference</span>
+      <span class="res-desc">Interactive Bayesian updating visualizer</span>
+    </a>
+    <a class="resource-card" href="https://www.bayesrulesbook.com/" target="_blank">
+      <span class="res-type">📖 Free Book</span>
+      <span class="res-name">Bayes Rules! (free online)</span>
+      <span class="res-desc">Excellent free textbook on Bayesian analysis</span>
+    </a>
+    <a class="resource-card" href="https://chi-feng.github.io/mcmc-demo/" target="_blank">
+      <span class="res-type">🎮 Tool</span>
+      <span class="res-name">MCMC Visualization</span>
+      <span class="res-desc">See Markov Chain Monte Carlo sampling in action</span>
+    </a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ TAB 8: COLAB LABS ════ -->
+<div class="pane" id="pane-colab">
+  <h2 class="section-title">Google Colab Lab Experiments</h2>
+  <p>These are complete, runnable experiments for Google Colab. Copy each code block into a Colab cell and run it. Each lab is self-contained.</p>
+
+  <div class="callout blue">
+    <div class="callout-title">🚀 Getting Started</div>
+    Go to <a href="https://colab.research.google.com" target="_blank" style="color:var(--accent2)">colab.research.google.com</a> → New Notebook. Copy each lab's code into a cell and press Shift+Enter to run.
+  </div>
+
+  <h3 class="sub-title">Lab 1 — Exploring Distributions</h3>
+<pre>
+<span class="comment"># Lab 1: Visualizing Probability Distributions</span>
+<span class="comment"># Copy into Google Colab and run!</span>
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 9))
+fig.suptitle(<span class="string">'Probability Distributions Explorer'</span>, fontsize=16, fontweight=<span class="string">'bold'</span>)
+
+x = np.linspace(-5, 5, 300)
+
+<span class="comment"># 1. Normal distribution</span>
+ax = axes[0, 0]
+for mu, sigma, col in [(<span class="number">0</span>, <span class="number">1</span>, <span class="string">'blue'</span>), (<span class="number">1</span>, <span class="number">1</span>, <span class="string">'red'</span>), (<span class="number">0</span>, <span class="number">2</span>, <span class="string">'green'</span>)]:
+    ax.plot(x, stats.norm.pdf(x, mu, sigma), label=f<span class="string">'N({mu},{sigma}²)'</span>, color=col)
+ax.fill_between(x, stats.norm.pdf(x, 0, 1), where=(x>=-1) & (x<=1), alpha=0.2)
+ax.set_title(<span class="string">'Normal Distribution'</span>); ax.legend(); ax.set_xlabel(<span class="string">'x'</span>)
+
+<span class="comment"># 2. Binomial distribution</span>
+ax = axes[0, 1]
+for n, p, col in [(<span class="number">20</span>, <span class="number">0.5</span>, <span class="string">'blue'</span>), (<span class="number">20</span>, <span class="number">0.3</span>, <span class="string">'red'</span>), (<span class="number">40</span>, <span class="number">0.5</span>, <span class="string">'green'</span>)]:
+    k = np.arange(0, n+1)
+    ax.plot(k, stats.binom.pmf(k, n, p), <span class="string">'o-'</span>, label=f<span class="string">'Bin({n},{p})'</span>, color=col, markersize=3)
+ax.set_title(<span class="string">'Binomial Distribution'</span>); ax.legend(); ax.set_xlabel(<span class="string">'k'</span>)
+
+<span class="comment"># 3. Poisson distribution</span>
+ax = axes[0, 2]
+k = np.arange(0, 20)
+for lam, col in [(<span class="number">2</span>, <span class="string">'blue'</span>), (<span class="number">5</span>, <span class="string">'red'</span>), (<span class="number">10</span>, <span class="string">'green'</span>)]:
+    ax.plot(k, stats.poisson.pmf(k, lam), <span class="string">'o-'</span>, label=f<span class="string">'Pois({lam})'</span>, color=col, markersize=3)
+ax.set_title(<span class="string">'Poisson Distribution'</span>); ax.legend()
+
+<span class="comment"># 4. Exponential distribution</span>
+ax = axes[1, 0]
+x_exp = np.linspace(0, 5, 200)
+for lam, col in [(<span class="number">0.5</span>, <span class="string">'blue'</span>), (<span class="number">1</span>, <span class="string">'red'</span>), (<span class="number">2</span>, <span class="string">'green'</span>)]:
+    ax.plot(x_exp, stats.expon.pdf(x_exp, scale=<span class="number">1</span>/lam), label=f<span class="string">'Exp({lam})'</span>, color=col)
+ax.set_title(<span class="string">'Exponential Distribution'</span>); ax.legend()
+
+<span class="comment"># 5. Lognormal distribution</span>
+ax = axes[1, 1]
+x_ln = np.linspace(0.01, 6, 200)
+for mu, sig, col in [(<span class="number">0</span>, <span class="number">0.5</span>, <span class="string">'blue'</span>), (<span class="number">0.5</span>, <span class="string">'0.5'</span>, <span class="string">'red'</span>), (<span class="number">0</span>, <span class="number">1</span>, <span class="string">'green'</span>)]:
+    ax.plot(x_ln, stats.lognorm.pdf(x_ln, float(sig), scale=np.exp(mu)), 
+            label=f<span class="string">'LogN({mu},{sig})'</span>, color=col)
+ax.set_title(<span class="string">'Lognormal Distribution'</span>); ax.legend()
+
+<span class="comment"># 6. Normal vs Student-t (fat tails)</span>
+ax = axes[1, 2]
+ax.plot(x, stats.norm.pdf(x), <span class="string">'b-'</span>, label=<span class="string">'Normal'</span>, linewidth=2)
+for nu, col in [(<span class="number">3</span>, <span class="string">'red'</span>), (<span class="number">10</span>, <span class="string">'orange'</span>)]:
+    ax.plot(x, stats.t.pdf(x, nu), color=col, label=f<span class="string">'t(ν={nu})'</span>)
+ax.set_title(<span class="string">'Fat Tails: Normal vs t'</span>); ax.legend()
+ax.set_yscale(<span class="string">'log'</span>)  <span class="comment"># log scale reveals tail differences!</span>
+
+plt.tight_layout()
+plt.savefig(<span class="string">'distributions.png'</span>, dpi=150, bbox_inches=<span class="string">'tight'</span>)
+plt.show()
+print(<span class="string">"Lab 1 complete! Distributions visualized."</span>)
+</pre>
+
+  <h3 class="sub-title">Lab 2 — Central Limit Theorem Simulation</h3>
+<pre>
+<span class="comment"># Lab 2: CLT Simulation — Watch the magic happen</span>
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+<span class="func">def simulate_clt</span>(dist_name, n_samples_per_mean, n_experiments=3000):
+    <span class="string">"""Sample means from different distributions"""</span>
+    if dist_name == <span class="string">'uniform'</span>:
+        samples = np.random.uniform(0, 1, (n_experiments, n_samples_per_mean))
+        true_mu, true_sigma = 0.5, np.sqrt(1/12)
+    elif dist_name == <span class="string">'exponential'</span>:
+        samples = np.random.exponential(1, (n_experiments, n_samples_per_mean))
+        true_mu, true_sigma = 1, 1
+    elif dist_name == <span class="string">'bimodal'</span>:
+        s1 = np.random.normal(-2, 0.5, (n_experiments, n_samples_per_mean//2))
+        s2 = np.random.normal(2, 0.5, (n_experiments, n_samples_per_mean//2))
+        samples = np.hstack([s1, s2])
+        true_mu, true_sigma = 0, np.sqrt(4 + 0.25)
+    else:  <span class="comment"># chi-squared</span>
+        k = 3
+        samples = np.random.chisquare(k, (n_experiments, n_samples_per_mean))
+        true_mu, true_sigma = k, np.sqrt(2*k)
+    
+    return samples.mean(axis=1), true_mu, true_sigma
+
+fig, axes = plt.subplots(4, 4, figsize=(16, 14))
+fig.suptitle(<span class="string">'Central Limit Theorem: Any Distribution → Normal Means'</span>, 
+             fontsize=14, fontweight=<span class="string">'bold'</span>)
+
+distributions = [(<span class="string">'uniform'</span>, <span class="string">'Uniform'</span>), (<span class="string">'exponential'</span>, <span class="string">'Exponential'</span>),
+                 (<span class="string">'bimodal'</span>, <span class="string">'Bimodal'</span>), (<span class="string">'chisq'</span>, <span class="string">'Chi-Squared'</span>)]
+sample_sizes = [1, 5, 30, 100]
+colors = [<span class="string">'#2c3e7a'</span>, <span class="string">'#c0392b'</span>, <span class="string">'#1a7a4a'</span>, <span class="string">'#b8860b'</span>]
+
+for row, (dist, name) in enumerate(distributions):
+    for col, n in enumerate(sample_sizes):
+        ax = axes[row, col]
+        means, mu, sigma = simulate_clt(dist, n)
+        se = sigma / np.sqrt(n)
+        
+        ax.hist(means, bins=50, density=True, color=colors[row], alpha=0.7, 
+                edgecolor=<span class="string">'white'</span>, linewidth=0.3)
+        
+        <span class="comment"># Overlay theoretical normal curve</span>
+        x = np.linspace(means.min(), means.max(), 200)
+        ax.plot(x, stats.norm.pdf(x, mu, se), <span class="string">'k-'</span>, linewidth=2)
+        
+        <span class="comment"># Normality test</span>
+        _, p_val = stats.shapiro(means[:200])
+        
+        if row == 0: ax.set_title(f<span class="string">'n = {n}'</span>, fontsize=12, fontweight=<span class="string">'bold'</span>)
+        if col == 0: ax.set_ylabel(name, fontsize=10, fontweight=<span class="string">'bold'</span>)
+        ax.text(0.05, 0.92, f<span class="string">'Shapiro p={p_val:.3f}'</span>, transform=ax.transAxes, 
+                fontsize=7, color=<span class="string">'green'</span> if p_val > 0.05 else <span class="string">'red'</span>)
+        ax.set_yticks([])
+
+plt.tight_layout()
+plt.show()
+print(<span class="string">"Lab 2 complete! Notice how all distributions converge to bell curve."</span>)
+</pre>
+
+  <h3 class="sub-title">Lab 3 — Maximum Likelihood Estimation</h3>
+<pre>
+<span class="comment"># Lab 3: MLE — Find the best-fitting distribution</span>
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats, optimize
+
+np.random.seed(42)
+true_mu, true_sigma = 2.5, 1.3
+data = np.random.normal(true_mu, true_sigma, 100)
+
+<span class="comment"># Manual log-likelihood function</span>
+<span class="func">def log_likelihood</span>(params, data):
+    mu, sigma = params
+    if sigma <= 0: return -np.inf
+    return np.sum(stats.norm.logpdf(data, mu, sigma))
+
+<span class="comment"># Grid search: visualize likelihood landscape</span>
+mu_range = np.linspace(1.5, 3.5, 100)
+sig_range = np.linspace(0.5, 2.5, 100)
+LL = np.array([[log_likelihood([m, s], data) for s in sig_range] for m in mu_range])
+
+fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+fig.suptitle(<span class="string">'Maximum Likelihood Estimation for Normal Distribution'</span>)
+
+<span class="comment"># 1. Log-likelihood surface</span>
+ax = axes[0]
+im = ax.contourf(sig_range, mu_range, LL, levels=30, cmap=<span class="string">'viridis'</span>)
+plt.colorbar(im, ax=ax)
+ax.set_xlabel(<span class="string">'σ'</span>); ax.set_ylabel(<span class="string">'μ'</span>)
+ax.set_title(<span class="string">'Log-Likelihood Surface'</span>)
+<span class="comment"># Mark MLE and true values</span>
+ax.axvline(true_sigma, color=<span class="string">'white'</span>, linestyle=<span class="string">'--'</span>, label=<span class="string">'True'</span>)
+ax.axhline(true_mu, color=<span class="string">'white'</span>, linestyle=<span class="string">'--'</span>)
+mle_mu, mle_sig = data.mean(), data.std()
+ax.plot(mle_sig, mle_mu, <span class="string">'r*'</span>, markersize=15, label=<span class="string">'MLE'</span>)
+ax.legend()
+
+<span class="comment"># 2. Data histogram with MLE fit</span>
+ax = axes[1]
+ax.hist(data, bins=20, density=True, color=<span class="string">'steelblue'</span>, alpha=0.7, label=<span class="string">'Data'</span>)
+x = np.linspace(data.min()-1, data.max()+1, 200)
+ax.plot(x, stats.norm.pdf(x, true_mu, true_sigma), <span class="string">'r--'</span>, lw=2, label=f<span class="string">'True N({true_mu},{true_sigma})'</span>)
+ax.plot(x, stats.norm.pdf(x, mle_mu, mle_sig), <span class="string">'b-'</span>, lw=2.5, label=f<span class="string">'MLE N({mle_mu:.2f},{mle_sig:.2f})'</span>)
+ax.legend(); ax.set_title(<span class="string">'MLE Fit to Data'</span>)
+
+<span class="comment"># 3. MLE as function of n (convergence)</span>
+ax = axes[2]
+ns = [5, 10, 20, 50, 100, 200, 500, 1000]
+mu_estimates, sig_estimates = [], []
+for n in ns:
+    d = data[:n] if n <= len(data) else np.random.normal(true_mu, true_sigma, n)
+    mu_estimates.append(d.mean())
+    sig_estimates.append(d.std())
+
+ax.axhline(true_mu, color=<span class="string">'r'</span>, linestyle=<span class="string">'--'</span>, label=f<span class="string">'True μ={true_mu}'</span>)
+ax.plot(ns, mu_estimates, <span class="string">'bo-'</span>, label=<span class="string">'MLE μ̂'</span>)
+ax.set_xscale(<span class="string">'log'</span>); ax.set_xlabel(<span class="string">'Sample size n'</span>)
+ax.set_title(<span class="string">'MLE Consistency: μ̂ → μ'</span>); ax.legend()
+
+plt.tight_layout()
+plt.show()
+
+print(f<span class="string">"True: μ={true_mu}, σ={true_sigma}"</span>)
+print(f<span class="string">"MLE:  μ̂={mle_mu:.4f}, σ̂={mle_sig:.4f}"</span>)
+print(f<span class="string">"MLE is consistent: estimates converge to truth as n increases!"</span>)
+</pre>
+
+  <h3 class="sub-title">Lab 4 — Hypothesis Testing in Practice</h3>
+<pre>
+<span class="comment"># Lab 4: Complete Hypothesis Testing Pipeline</span>
+<span class="comment"># Simulates a quant strategy backtesting scenario</span>
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+np.random.seed(123)
+
+<span class="comment"># Simulate a strategy with small true edge</span>
+true_mean = 0.05  <span class="comment"># 0.05% daily return (positive but small)</span>
+volatility = 1.0  <span class="comment"># 1% daily volatility</span>
+n_days = 252      <span class="comment"># 1 year</span>
+
+returns = np.random.normal(true_mean, volatility, n_days)
+
+<span class="comment"># ── One-sample t-test ──</span>
+t_stat, p_value = stats.ttest_1samp(returns, 0)
+sample_mean = returns.mean()
+sample_std = returns.std()
+SE = sample_std / np.sqrt(n_days)
+
+print(<span class="string">"═══ Strategy Significance Test ═══"</span>)
+print(f<span class="string">"Sample mean return: {sample_mean:.4f}%"</span>)
+print(f<span class="string">"Standard error:     {SE:.4f}%"</span>)
+print(f<span class="string">"t-statistic:        {t_stat:.4f}"</span>)
+print(f<span class="string">"p-value (two-tail): {p_value:.4f}"</span>)
+print(f<span class="string">"Significant at 5%:  {'YES ✓' if p_value < 0.05 else 'NO ✗'}"</span>)
+print(f<span class="string">"Significant at 1%:  {'YES ✓' if p_value < 0.01 else 'NO ✗'}"</span>)
+
+<span class="comment"># Annualized Sharpe Ratio</span>
+sharpe = (sample_mean / sample_std) * np.sqrt(252)
+print(f<span class="string">"\nSharpe Ratio (annualized): {sharpe:.3f}"</span>)
+
+<span class="comment"># ── Visualization ──</span>
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+<span class="comment"># 1. Returns distribution</span>
+ax = axes[0]
+ax.hist(returns, bins=30, color=<span class="string">'steelblue'</span>, alpha=0.7, density=True, edgecolor=<span class="string">'white'</span>)
+x = np.linspace(returns.min(), returns.max(), 200)
+ax.plot(x, stats.norm.pdf(x, sample_mean, sample_std), <span class="string">'r-'</span>, lw=2)
+ax.axvline(0, color=<span class="string">'black'</span>, linestyle=<span class="string">'--'</span>, label=<span class="string">'H₀: μ=0'</span>)
+ax.axvline(sample_mean, color=<span class="string">'red'</span>, linewidth=2, label=f<span class="string">'X̄={sample_mean:.3f}'</span>)
+ax.set_title(<span class="string">'Daily Returns'</span>); ax.legend()
+
+<span class="comment"># 2. t-distribution with test statistic</span>
+ax = axes[1]
+t_range = np.linspace(-5, 5, 300)
+ax.plot(t_range, stats.t.pdf(t_range, n_days-1), <span class="string">'b-'</span>, lw=2, label=f<span class="string">'t({n_days-1})'</span>)
+crit = stats.t.ppf(0.975, n_days-1)
+ax.fill_between(t_range, stats.t.pdf(t_range, n_days-1),
+                where=(np.abs(t_range) > crit), color=<span class="string">'red'</span>, alpha=0.3, label=<span class="string">'Rejection region'</span>)
+ax.axvline(t_stat, color=<span class="string">'darkred'</span>, lw=2, linestyle=<span class="string">'--'</span>, label=f<span class="string">'t_obs={t_stat:.2f}'</span>)
+ax.set_title(<span class="string">'Null Distribution + Test Stat'</span>); ax.legend()
+
+<span class="comment"># 3. Power analysis: n needed for significance</span>
+ax = axes[2]
+effect = true_mean / volatility  <span class="comment"># standardized effect size</span>
+n_range = np.arange(10, 1000, 10)
+power = [stats.ttest_1samp(np.random.normal(true_mean, volatility, n), 0)[1] for n in n_range]
+<span class="comment"># Analytical power</span>
+from scipy.stats import norm as norm_dist
+alpha_val = 0.05
+power_analytical = 1 - stats.t.cdf(
+    stats.t.ppf(1-alpha_val/2, n_range-1), n_range-1, 
+    loc=effect*np.sqrt(n_range))
+
+ax.plot(n_range, power_analytical, <span class="string">'b-'</span>, lw=2, label=<span class="string">'Analytical Power'</span>)
+ax.axhline(0.8, color=<span class="string">'red'</span>, linestyle=<span class="string">'--'</span>, label=<span class="string">'80% Power target'</span>)
+ax.set_xlabel(<span class="string">'Sample size (days)'</span>); ax.set_ylabel(<span class="string">'Power'</span>)
+ax.set_title(<span class="string">'Power Analysis'</span>); ax.legend()
+
+plt.suptitle(<span class="string">'Quant Strategy: Hypothesis Testing Pipeline'</span>, fontsize=13)
+plt.tight_layout()
+plt.show()
+</pre>
+
+  <h3 class="sub-title">Lab 5 — Bayesian Updating</h3>
+<pre>
+<span class="comment"># Lab 5: Bayesian Updating — Coin fairness estimation</span>
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+<span class="func">def beta_posterior</span>(alpha_prior, beta_prior, n_heads, n_tails):
+    <span class="keyword">return</span> alpha_prior + n_heads, beta_prior + n_tails
+
+<span class="comment"># Simulate a biased coin (true p=0.7)</span>
+np.random.seed(42)
+true_p = 0.7
+n_flips_total = 100
+flips = np.random.binomial(1, true_p, n_flips_total)
+
+<span class="comment"># Start with uninformative prior Beta(1,1) = Uniform</span>
+alpha_prior, beta_prior = 1, 1
+checkpoints = [1, 5, 10, 25, 50, 100]
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 9))
+fig.suptitle(<span class="string">'Bayesian Updating: Learning Coin Fairness'</span>, fontsize=14)
+axes = axes.flatten()
+
+p_range = np.linspace(0, 1, 300)
+
+for i, n in enumerate(checkpoints):
+    ax = axes[i]
+    heads = flips[:n].sum()
+    tails = n - heads
+    
+    <span class="comment"># Compute posterior</span>
+    alpha_post = alpha_prior + heads
+    beta_post = beta_prior + tails
+    
+    <span class="comment"># Plot prior, likelihood, posterior</span>
+    prior = stats.beta.pdf(p_range, alpha_prior, beta_prior)
+    posterior = stats.beta.pdf(p_range, alpha_post, beta_post)
+    likelihood = stats.binom.pmf(heads, n, p_range)
+    likelihood = likelihood / likelihood.max() * posterior.max()
+    
+    ax.plot(p_range, prior, <span class="string">'b--'</span>, label=<span class="string">'Prior'</span>, alpha=0.5)
+    ax.plot(p_range, likelihood, <span class="string">'g:'</span>, label=<span class="string">'Likelihood'</span>, alpha=0.6)
+    ax.plot(p_range, posterior, <span class="string">'r-'</span>, lw=2.5, label=<span class="string">'Posterior'</span>)
+    ax.axvline(true_p, color=<span class="string">'black'</span>, linestyle=<span class="string">'--'</span>, alpha=0.5, label=f<span class="string">'True p={true_p}'</span>)
+    ax.axvline(alpha_post/(alpha_post+beta_post), color=<span class="string">'red'</span>, linewidth=1.5, linestyle=<span class="string">'dotted'</span>)
+    
+    post_mean = alpha_post / (alpha_post + beta_post)
+    ax.set_title(f<span class="string">'n={n}: {heads}H/{tails}T | Post. mean={post_mean:.3f}'</span>)
+    ax.set_xlabel(<span class="string">'p (coin bias)'</span>); ax.legend(fontsize=7)
+    ax.set_xlim(0, 1)
+
+plt.tight_layout()
+plt.show()
+print(<span class="string">"\nObserve: As n increases, posterior peaks at true p=0.7 and gets narrower!"</span>)
+print(<span class="string">"This is Bayesian learning in action — data overwhelms prior uncertainty."</span>)
+</pre>
+
+  <div class="resource-grid" style="margin-top:1.5rem">
+    <a class="resource-card" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/math_linear_algebra.ipynb" target="_blank">
+      <span class="res-type">📓 Colab</span>
+      <span class="res-name">Math for ML (Geron)</span>
+      <span class="res-desc">Official Colab with linear algebra and probability foundations</span>
+    </a>
+    <a class="resource-card" href="https://colab.research.google.com/github/probml/pml-book/blob/main/notebooks/intro_colab.ipynb" target="_blank">
+      <span class="res-type">📓 Colab</span>
+      <span class="res-name">Probabilistic ML (Murphy)</span>
+      <span class="res-desc">Kevin Murphy's PML book companion notebooks</span>
+    </a>
+    <a class="resource-card" href="https://numpy.org/doc/stable/reference/random/index.html" target="_blank">
+      <span class="res-type">📖 Docs</span>
+      <span class="res-name">NumPy Random Reference</span>
+      <span class="res-desc">All NumPy random distributions for sampling</span>
+    </a>
+    <a class="resource-card" href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">
+      <span class="res-type">📖 Docs</span>
+      <span class="res-name">SciPy Stats Reference</span>
+      <span class="res-desc">Complete reference for all statistical tests and distributions</span>
+    </a>
+  </div>
+</div>
+
+<footer class="page-footer">
+  <div style="max-width:960px;margin:0 auto">
+    Probability &amp; Statistics for Quant Engineers · 100% Offline Study Guide ·
+    Topics: Prerequisites → Probability → Distributions → CLT → MLE → Hypothesis Testing → Bayesian Basics
+  </div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// TAB SWITCHING
+// ─────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  event.target.classList.add('active');
+  // trigger redraws for visible canvases
+  setTimeout(() => { drawAllVisible(); }, 50);
+}
+
+function drawAllVisible() {
+  const active = document.querySelector('.pane.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'pane-prereq') drawPrereq();
+  if (id === 'pane-prob') drawCond();
+  if (id === 'pane-dist') { drawNormal(); drawBinom(); }
+  if (id === 'pane-clt') drawCLT();
+  if (id === 'pane-mle') drawMLE();
+  if (id === 'pane-hypo') drawTTest();
+  if (id === 'pane-bayes') drawBayes();
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXERCISE TIERS
+// ─────────────────────────────────────────────────────────────
+function showTier(btn, prefix) {
+  const tiers = ['easy', 'medium', 'hard'];
+  const parent = btn.closest('.exercise-section');
+  parent.querySelectorAll('.tier-btn').forEach(b => {
+    b.classList.remove('active');
+  });
+  parent.querySelectorAll('.tier-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const tier = btn.textContent.trim().toLowerCase();
+  document.getElementById(prefix + '-' + tier).classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────
+// MATH UTILITIES
+// ─────────────────────────────────────────────────────────────
+function normalPDF(x, mu, sigma) {
+  return Math.exp(-0.5 * ((x - mu) / sigma) ** 2) / (sigma * Math.sqrt(2 * Math.PI));
+}
+function erf(x) {
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const sign = x < 0 ? -1 : 1; x = Math.abs(x);
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t)*Math.exp(-x*x);
+  return sign * y;
+}
+function normalCDF(x, mu = 0, sigma = 1) {
+  return 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
+}
+function binomCoeff(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  let result = 1;
+  for (let i = 0; i < k; i++) {
+    result = result * (n - i) / (i + 1);
+  }
+  return result;
+}
+function binomPMF(k, n, p) {
+  return binomCoeff(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+}
+function betaPDF(x, a, b) {
+  if (x <= 0 || x >= 1) return 0;
+  return Math.pow(x, a - 1) * Math.pow(1 - x, b - 1) / betaFn(a, b);
+}
+function gammaLn(n) {
+  if (n < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * n)) - gammaLn(1 - n);
+  n -= 1;
+  const c = [76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,
+             0.1208650973866179e-2,-0.5395239384953e-5];
+  let x = n + 5.5;
+  let t = Math.log(Math.sqrt(2*Math.PI)) + (n+0.5)*Math.log(x) - x;
+  let s = 1.000000000190015;
+  c.forEach((ci, i) => { s += ci / (n + i + 1); });
+  return t + Math.log(s);
+}
+function betaFn(a, b) { return Math.exp(gammaLn(a) + gammaLn(b) - gammaLn(a + b)); }
+
+// Box-Muller normal samples
+function randNormal(mu = 0, sigma = 1) {
+  const u1 = Math.random(), u2 = Math.random();
+  return mu + sigma * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+// ─────────────────────────────────────────────────────────────
+// CANVAS HELPERS
+// ─────────────────────────────────────────────────────────────
+function initCanvas(id) {
+  const cvs = document.getElementById(id);
+  if (!cvs) return null;
+  const ctx = cvs.getContext('2d');
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  return { cvs, ctx, W: cvs.width, H: cvs.height };
+}
+
+function drawAxes(ctx, W, H, pad, xMin, xMax, yMin, yMax, xLabel, yLabel) {
+  ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+  // x-axis
+  const y0 = H - pad - ((0 - yMin) / (yMax - yMin)) * (H - 2 * pad);
+  ctx.beginPath(); ctx.moveTo(pad, Math.max(pad, Math.min(H-pad,y0))); ctx.lineTo(W - pad, Math.max(pad, Math.min(H-pad,y0))); ctx.stroke();
+  // y-axis
+  ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.stroke();
+  // labels
+  ctx.fillStyle = '#555'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 4; i++) {
+    const x = xMin + (xMax - xMin) * i / 4;
+    const px = pad + (x - xMin) / (xMax - xMin) * (W - 2 * pad);
+    ctx.fillText(x.toFixed(1), px, H - pad + 14);
+  }
+  if (xLabel) { ctx.font = '11px DM Sans'; ctx.fillText(xLabel, W / 2, H - 2); }
+}
+
+function toPixel(x, y, W, H, pad, xMin, xMax, yMin, yMax) {
+  return [
+    pad + (x - xMin) / (xMax - xMin) * (W - 2 * pad),
+    H - pad - (y - yMin) / (yMax - yMin) * (H - 2 * pad)
+  ];
+}
+
+// ─────────────────────────────────────────────────────────────
+// PREREQUISITE CANVAS: die sampling
+// ─────────────────────────────────────────────────────────────
+function drawPrereq() {
+  const n = +document.getElementById('prereq-n').value;
+  const s = +document.getElementById('prereq-s').value;
+  document.getElementById('prereq-n-val').textContent = n;
+  document.getElementById('prereq-s-val').textContent = s;
+
+  const c = initCanvas('cvs-prereq');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#f9f7f2'; ctx.fillRect(0, 0, W, H);
+
+  const faces = Array.from({ length: n }, (_, i) => i + 1);
+  const trueMean = (n + 1) / 2;
+  
+  // Sample
+  const rolls = Array.from({ length: s }, () => faces[Math.floor(Math.random() * n)]);
+  const sampleMean = rolls.reduce((a, b) => a + b, 0) / s;
+
+  // Running mean
+  const running = []; let sum = 0;
+  rolls.forEach((r, i) => { sum += r; running.push(sum / (i + 1)); });
+
+  const pad = 40, xMin = 0, xMax = s, yMin = 1, yMax = n;
+  drawAxes(ctx, W, H, pad, xMin, xMax, yMin, yMax);
+
+  // Plot running mean
+  ctx.strokeStyle = '#2c3e7a'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  running.forEach((m, i) => {
+    const [px, py] = toPixel(i, m, W, H, pad, xMin, xMax, yMin, yMax);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // True mean line
+  ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2; ctx.setLineDash([6, 3]);
+  const [, py0] = toPixel(0, trueMean, W, H, pad, xMin, xMax, yMin, yMax);
+  ctx.beginPath(); ctx.moveTo(pad, py0); ctx.lineTo(W - pad, py0); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Sample mean line
+  ctx.strokeStyle = '#1a7a4a'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+  const [, pySM] = toPixel(0, sampleMean, W, H, pad, xMin, xMax, yMin, yMax);
+  ctx.beginPath(); ctx.moveTo(pad, pySM); ctx.lineTo(W - pad, pySM); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Legend
+  ctx.font = '11px DM Sans'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#c0392b'; ctx.fillText(`True E[X] = ${trueMean.toFixed(2)}`, pad + 5, 20);
+  ctx.fillStyle = '#1a7a4a'; ctx.fillText(`Sample mean = ${sampleMean.toFixed(2)}`, pad + 5, 36);
+}
+
+// ─────────────────────────────────────────────────────────────
+// CONDITIONAL PROBABILITY VENN
+// ─────────────────────────────────────────────────────────────
+function drawCond() {
+  const pa = +document.getElementById('pa').value;
+  const pb = +document.getElementById('pb').value;
+  const pab = Math.min(+document.getElementById('pab').value, Math.min(pa, pb));
+  document.getElementById('pa-val').textContent = pa.toFixed(2);
+  document.getElementById('pb-val').textContent = pb.toFixed(2);
+  document.getElementById('pab-val').textContent = pab.toFixed(2);
+
+  const c = initCanvas('cvs-cond');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#f9f7f2'; ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2 - 10;
+  const rA = Math.sqrt(pa) * 120, rB = Math.sqrt(pb) * 120;
+  const overlap = pab / Math.min(pa, pb);
+  const dist = (rA + rB) * (1 - overlap * 0.6);
+  const xA = cx - dist / 2.5, xB = cx + dist / 2.5;
+
+  // Draw A
+  ctx.globalAlpha = 0.25; ctx.fillStyle = '#2c3e7a';
+  ctx.beginPath(); ctx.arc(xA, cy, rA, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.strokeStyle = '#2c3e7a'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(xA, cy, rA, 0, Math.PI * 2); ctx.stroke();
+
+  // Draw B
+  ctx.globalAlpha = 0.25; ctx.fillStyle = '#c0392b';
+  ctx.beginPath(); ctx.arc(xB, cy, rB, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(xB, cy, rB, 0, Math.PI * 2); ctx.stroke();
+
+  // Intersection highlight
+  ctx.globalAlpha = 0.5; ctx.fillStyle = '#8e44ad';
+  ctx.save(); ctx.beginPath(); ctx.arc(xA, cy, rA, 0, Math.PI*2); ctx.clip();
+  ctx.beginPath(); ctx.arc(xB, cy, rB, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  ctx.globalAlpha = 1;
+
+  // Labels
+  ctx.font = 'bold 16px Playfair Display,serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#2c3e7a'; ctx.fillText('A', xA - rA * 0.6, cy + 5);
+  ctx.fillStyle = '#c0392b'; ctx.fillText('B', xB + rB * 0.6, cy + 5);
+  ctx.fillStyle = '#6c3483'; ctx.fillText('A∩B', (xA + xB) / 2, cy + 5);
+
+  // Stats
+  const pAgivenB = pab / pb;
+  ctx.font = '12px JetBrains Mono'; ctx.textAlign = 'left'; ctx.fillStyle = '#333';
+  ctx.fillText(`P(A) = ${pa.toFixed(2)}`, 10, H - 65);
+  ctx.fillText(`P(B) = ${pb.toFixed(2)}`, 10, H - 48);
+  ctx.fillText(`P(A∩B) = ${pab.toFixed(2)}`, 10, H - 31);
+  ctx.font = 'bold 12px JetBrains Mono'; ctx.fillStyle = '#c0392b';
+  ctx.fillText(`P(A|B) = P(A∩B)/P(B) = ${pAgivenB.toFixed(3)}`, 10, H - 10);
+}
+
+// ─────────────────────────────────────────────────────────────
+// NORMAL DISTRIBUTION CANVAS
+// ─────────────────────────────────────────────────────────────
+function drawNormal() {
+  const mu = +document.getElementById('n-mu').value;
+  const sig = +document.getElementById('n-sig').value;
+  document.getElementById('n-mu-val').textContent = mu.toFixed(1);
+  document.getElementById('n-sig-val').textContent = sig.toFixed(1);
+
+  const c = initCanvas('cvs-normal');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const pad = 45, xMin = -8, xMax = 8, yMax = 0.85;
+  drawAxes(ctx, W, H, pad, xMin, xMax, 0, yMax, 'x', 'f(x)');
+
+  const N = 500;
+  const xs = Array.from({ length: N }, (_, i) => xMin + (xMax - xMin) * i / (N - 1));
+  const ys = xs.map(x => normalPDF(x, mu, sig));
+
+  // Fill ±1σ region
+  ctx.fillStyle = 'rgba(192,57,43,0.15)';
+  ctx.beginPath();
+  xs.forEach((x, i) => {
+    if (Math.abs(x - mu) <= sig) {
+      const [px, py] = toPixel(x, ys[i], W, H, pad, xMin, xMax, 0, yMax);
+      const [, py0] = toPixel(x, 0, W, H, pad, xMin, xMax, 0, yMax);
+      if (i === 0 || Math.abs(xs[i - 1] - mu) > sig) ctx.moveTo(px, py0);
+      ctx.lineTo(px, py);
+    }
+  });
+  // close
+  const rightEdge = xs.filter(x => Math.abs(x - mu) <= sig);
+  if (rightEdge.length) {
+    const last = rightEdge[rightEdge.length - 1];
+    const [px, py0] = toPixel(last, 0, W, H, pad, xMin, xMax, 0, yMax);
+    ctx.lineTo(px, py0);
+  }
+  ctx.fill();
+
+  // Draw curve
+  ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  xs.forEach((x, i) => {
+    const [px, py] = toPixel(x, ys[i], W, H, pad, xMin, xMax, 0, yMax);
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+  });
+  ctx.stroke();
+
+  // Mean line
+  ctx.strokeStyle = '#2c3e7a'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 3]);
+  const [pmu] = toPixel(mu, 0, W, H, pad, xMin, xMax, 0, yMax);
+  ctx.beginPath(); ctx.moveTo(pmu, pad); ctx.lineTo(pmu, H - pad); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.font = '12px JetBrains Mono'; ctx.fillStyle = '#333'; ctx.textAlign = 'center';
+  const p68 = normalCDF(mu + sig, mu, sig) - normalCDF(mu - sig, mu, sig);
+  ctx.fillText(`μ=${mu.toFixed(1)}, σ=${sig.toFixed(1)}, ±1σ covers ≈${(p68*100).toFixed(1)}%`, W/2, 20);
+}
+
+// ─────────────────────────────────────────────────────────────
+// BINOMIAL DISTRIBUTION
+// ─────────────────────────────────────────────────────────────
+function drawBinom() {
+  const n = +document.getElementById('b-n').value;
+  const p = +document.getElementById('b-p').value;
+  document.getElementById('b-n-val').textContent = n;
+  document.getElementById('b-p-val').textContent = p.toFixed(2);
+
+  const c = initCanvas('cvs-binom');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const pad = 45;
+  const ks = Array.from({ length: n + 1 }, (_, i) => i);
+  const probs = ks.map(k => binomPMF(k, n, p));
+  const yMax = Math.max(...probs) * 1.15;
+  const mean = n * p;
+
+  drawAxes(ctx, W, H, pad, 0, n, 0, yMax, 'k', 'P(X=k)');
+
+  const barW = Math.max(2, (W - 2 * pad) / (n + 1) - 2);
+  ks.forEach((k, i) => {
+    const prob = probs[i];
+    const [px] = toPixel(k, 0, W, H, pad, 0, n, 0, yMax);
+    const [, py] = toPixel(k, prob, W, H, pad, 0, n, 0, yMax);
+    const [, py0] = toPixel(k, 0, W, H, pad, 0, n, 0, yMax);
+    ctx.fillStyle = k === Math.round(mean) ? '#c0392b' : '#2c3e7a';
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(px - barW / 2, py, barW, py0 - py);
+    ctx.globalAlpha = 1;
+  });
+
+  // Normal approx overlay
+  if (n > 20) {
+    const mu = n * p, sigma = Math.sqrt(n * p * (1 - p));
+    ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2; ctx.setLineDash([4, 2]);
+    ctx.beginPath();
+    for (let x = 0; x <= n; x += 0.1) {
+      const y = normalPDF(x, mu, sigma);
+      const [px, py] = toPixel(x, y, W, H, pad, 0, n, 0, yMax);
+      x < 0.2 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.font = '10px JetBrains Mono'; ctx.fillStyle = '#c0392b'; ctx.textAlign = 'left';
+    ctx.fillText('Normal approx', pad + 5, 18);
+  }
+
+  ctx.font = '12px JetBrains Mono'; ctx.fillStyle = '#333'; ctx.textAlign = 'center';
+  ctx.fillText(`E[X]=${mean.toFixed(1)}, Var=${(n*p*(1-p)).toFixed(2)}, SD=${Math.sqrt(n*p*(1-p)).toFixed(2)}`, W/2, 20);
+}
+
+// ─────────────────────────────────────────────────────────────
+// CLT SIMULATION
+// ─────────────────────────────────────────────────────────────
+function drawCLT() {
+  const dist = document.getElementById('clt-dist').value;
+  const n = +document.getElementById('clt-n').value;
+  document.getElementById('clt-n-val').textContent = n;
+
+  const c = initCanvas('cvs-clt');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const EXPERIMENTS = 2000;
+  const SAMPLES_DISPLAY = 2000;
+
+  // Generate samples from chosen distribution
+  function sample() {
+    if (dist === 'uniform') return Math.random();
+    if (dist === 'exp') return -Math.log(Math.random());
+    if (dist === 'binom') { let s=0; for(let i=0;i<10;i++) s+=Math.random()<0.3?1:0; return s; }
+    if (dist === 'bimodal') return Math.random()<0.5 ? randNormal(-2,0.5) : randNormal(2,0.5);
+    return Math.random();
+  }
+
+  // Original distribution histogram (top half)
+  const orig = Array.from({ length: SAMPLES_DISPLAY }, sample);
+  const topH = H / 2 - 15;
+  const pad = 40;
+
+  function histBins(data, numBins, xMin, xMax) {
+    const bins = new Array(numBins).fill(0);
+    data.forEach(v => {
+      const bi = Math.floor((v - xMin) / (xMax - xMin) * numBins);
+      if (bi >= 0 && bi < numBins) bins[bi]++;
+    });
+    return bins;
+  }
+
+  const xMins = {uniform:0,exp:0,binom:0,bimodal:-4};
+  const xMaxs = {uniform:1,exp:6,binom:10,bimodal:4};
+  const xMin = xMins[dist], xMax = xMaxs[dist];
+  const bins1 = histBins(orig, 30, xMin, xMax);
+  const max1 = Math.max(...bins1);
+
+  // Draw original dist
+  ctx.fillStyle = '#6c757d';
+  ctx.font = '11px JetBrains Mono'; ctx.fillStyle = '#333'; ctx.textAlign = 'center';
+  ctx.fillText('Original Distribution (NOT Normal)', W/2, 14);
+  ctx.fillStyle = '#2c3e7a';
+  bins1.forEach((cnt, i) => {
+    const x = xMin + (i + 0.5) * (xMax - xMin) / 30;
+    const px = pad + (x - xMin) / (xMax - xMin) * (W - 2*pad);
+    const ph = (cnt / max1) * (topH - pad) * 0.9;
+    ctx.globalAlpha = 0.75;
+    ctx.fillRect(px - (W-2*pad)/30/2, topH - ph, (W-2*pad)/30 - 1, ph);
+    ctx.globalAlpha = 1;
+  });
+
+  // Compute sample means
+  const means = Array.from({ length: EXPERIMENTS }, () => {
+    let s = 0; for (let i = 0; i < n; i++) s += sample();
+    return s / n;
+  });
+
+  const muMeans = means.reduce((a,b)=>a+b,0)/EXPERIMENTS;
+  const sdMeans = Math.sqrt(means.map(m=>(m-muMeans)**2).reduce((a,b)=>a+b,0)/EXPERIMENTS);
+
+  const mMin = muMeans - 4*sdMeans, mMax = muMeans + 4*sdMeans;
+  const bins2 = histBins(means, 40, mMin, mMax);
+  const max2 = Math.max(...bins2);
+  const botStart = H/2 + 10;
+
+  ctx.fillStyle = '#333'; ctx.textAlign = 'center';
+  ctx.fillText(`Distribution of Sample Means (n=${n}) — should be Normal!`, W/2, botStart - 2);
+
+  // Bars
+  bins2.forEach((cnt, i) => {
+    const x = mMin + (i + 0.5) * (mMax - mMin) / 40;
+    const px = pad + (x - mMin) / (mMax - mMin) * (W - 2*pad);
+    const ph = (cnt / max2) * (H - botStart - pad) * 0.9;
+    ctx.globalAlpha = 0.7; ctx.fillStyle = '#c0392b';
+    ctx.fillRect(px - (W-2*pad)/40/2, H - pad - ph, (W-2*pad)/40 - 1, ph);
+    ctx.globalAlpha = 1;
+  });
+
+  // Normal overlay
+  ctx.strokeStyle = '#0d0d0d'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  const scale = max2 * (H - botStart - pad) * 0.9 / EXPERIMENTS * 40 / (mMax - mMin);
+  for (let i = 0; i <= 200; i++) {
+    const x = mMin + (mMax-mMin)*i/200;
+    const px = pad + (x-mMin)/(mMax-mMin)*(W-2*pad);
+    const y = normalPDF(x, muMeans, sdMeans) * scale;
+    const py = H - pad - y;
+    i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  ctx.font = '11px JetBrains Mono'; ctx.fillStyle = '#1a7a4a';
+  ctx.fillText(`Sample mean distribution: N(${muMeans.toFixed(3)}, ${(sdMeans**2).toFixed(4)})`, W/2, H - 5);
+}
+
+// ─────────────────────────────────────────────────────────────
+// MLE CANVAS
+// ─────────────────────────────────────────────────────────────
+function drawMLE() {
+  const mu = +document.getElementById('mle-mu').value;
+  const sig = +document.getElementById('mle-sig').value;
+  const n = +document.getElementById('mle-n').value;
+  document.getElementById('mle-mu-val').textContent = mu.toFixed(1);
+  document.getElementById('mle-sig-val').textContent = sig.toFixed(1);
+  document.getElementById('mle-n-val').textContent = n;
+
+  const c = initCanvas('cvs-mle');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const data = Array.from({ length: n }, () => randNormal(mu, sig));
+  const mleMu = data.reduce((a,b)=>a+b,0)/n;
+  const mleSig = Math.sqrt(data.map(x=>(x-mleMu)**2).reduce((a,b)=>a+b,0)/n);
+
+  const xMin = Math.min(...data) - 1, xMax = Math.max(...data) + 1;
+  const pad = 45;
+
+  // Histogram
+  const numBins = Math.min(30, Math.max(8, Math.floor(n/5)));
+  const binW = (xMax - xMin) / numBins;
+  const bins = new Array(numBins).fill(0);
+  data.forEach(v => { const i = Math.floor((v-xMin)/binW); if(i>=0&&i<numBins) bins[i]++; });
+  const maxDens = Math.max(...bins) / (n * binW);
+
+  bins.forEach((cnt, i) => {
+    const bx = xMin + i * binW + binW / 2;
+    const dens = cnt / (n * binW);
+    const px = pad + (bx-xMin)/(xMax-xMin)*(W-2*pad);
+    const pw = binW/(xMax-xMin)*(W-2*pad) - 1;
+    const ph = dens/maxDens * (H - 2*pad - 30) * 0.85;
+    ctx.globalAlpha = 0.6; ctx.fillStyle = '#aab8d0';
+    ctx.fillRect(px - pw/2, H-pad-ph, pw, ph);
+    ctx.globalAlpha = 1;
+  });
+
+  const yMax = maxDens * 1.3;
+  const xs = Array.from({length:300},(_,i) => xMin + (xMax-xMin)*i/299);
+
+  // True curve
+  ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 2; ctx.setLineDash([6,3]);
+  ctx.beginPath();
+  xs.forEach((x,i)=>{
+    const [px,py]=toPixel(x,normalPDF(x,mu,sig),W,H,pad,xMin,xMax,0,yMax);
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  });
+  ctx.stroke();
+
+  // MLE curve
+  ctx.strokeStyle = '#2c3e7a'; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+  ctx.beginPath();
+  xs.forEach((x,i)=>{
+    const [px,py]=toPixel(x,normalPDF(x,mleMu,mleSig),W,H,pad,xMin,xMax,0,yMax);
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  });
+  ctx.stroke();
+
+  // Legend
+  ctx.font='11px JetBrains Mono'; ctx.textAlign='left';
+  ctx.fillStyle='#c0392b'; ctx.setLineDash([4,2]); ctx.strokeStyle='#c0392b'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(pad,16); ctx.lineTo(pad+25,16); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillText(`True: N(${mu.toFixed(1)}, ${sig.toFixed(1)})`, pad+30, 20);
+  ctx.fillStyle='#2c3e7a'; ctx.strokeStyle='#2c3e7a'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad,32); ctx.lineTo(pad+25,32); ctx.stroke();
+  ctx.fillText(`MLE: N(${mleMu.toFixed(3)}, ${mleSig.toFixed(3)})`, pad+30, 36);
+  ctx.fillStyle='#555'; ctx.fillText(`n=${n} samples`, W/2, H-5);
+}
+
+// ─────────────────────────────────────────────────────────────
+// HYPOTHESIS TEST CANVAS
+// ─────────────────────────────────────────────────────────────
+function drawTTest() {
+  const trueMu = +document.getElementById('tt-mu').value;
+  const n = +document.getElementById('tt-n').value;
+  const sig = +document.getElementById('tt-sig').value;
+  document.getElementById('tt-mu-val').textContent = trueMu.toFixed(1);
+  document.getElementById('tt-n-val').textContent = n;
+  document.getElementById('tt-sig-val').textContent = sig.toFixed(1);
+
+  const c = initCanvas('cvs-ttest');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const data = Array.from({length:n}, ()=>randNormal(trueMu, sig));
+  const xBar = data.reduce((a,b)=>a+b,0)/n;
+  const s = Math.sqrt(data.map(x=>(x-xBar)**2).reduce((a,b)=>a+b,0)/(n-1));
+  const tStat = xBar / (s / Math.sqrt(n));
+
+  // Approximate t-distribution (use normal for large n)
+  const pad=45, xMin=-5, xMax=5;
+  function tPDF(x, nu) {
+    const coeff = Math.exp(gammaLn((nu+1)/2) - gammaLn(nu/2)) / (Math.sqrt(nu*Math.PI));
+    return coeff * Math.pow(1 + x*x/nu, -(nu+1)/2);
+  }
+  const nu = n-1;
+  const xs = Array.from({length:300},(_,i)=>xMin+(xMax-xMin)*i/299);
+  const ys = xs.map(x=>tPDF(x,nu));
+  const yMax = Math.max(...ys)*1.3;
+
+  drawAxes(ctx, W, H, pad, xMin, xMax, 0, yMax, 't', '');
+
+  // Critical value (approximate: use 1.96 for simplicity)
+  const crit = n > 30 ? 1.96 : 2.045;
+  const alpha = 0.05;
+
+  // Rejection regions
+  ctx.fillStyle = 'rgba(192,57,43,0.2)';
+  ctx.beginPath();
+  xs.forEach((x, i) => {
+    if (Math.abs(x) >= crit) {
+      const [px,py]=toPixel(x,ys[i],W,H,pad,xMin,xMax,0,yMax);
+      const [,py0]=toPixel(x,0,W,H,pad,xMin,xMax,0,yMax);
+      (i===0||Math.abs(xs[i-1])<crit)?ctx.moveTo(px,py0):null;
+      ctx.lineTo(px,py);
+    }
+  });
+  ctx.closePath(); ctx.fill();
+
+  // t-curve
+  ctx.strokeStyle='#2c3e7a'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  xs.forEach((x,i)=>{
+    const [px,py]=toPixel(x,ys[i],W,H,pad,xMin,xMax,0,yMax);
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  });
+  ctx.stroke();
+
+  // Observed t-statistic
+  const clampedT = Math.max(xMin+0.1, Math.min(xMax-0.1, tStat));
+  ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5; ctx.setLineDash([5,3]);
+  const [ptx]=toPixel(clampedT,0,W,H,pad,xMin,xMax,0,yMax);
+  ctx.beginPath(); ctx.moveTo(ptx,pad); ctx.lineTo(ptx,H-pad); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // p-value (two-sided, approximate)
+  const pval = 2 * (1 - normalCDF(Math.abs(tStat)));
+
+  ctx.font='12px JetBrains Mono'; ctx.textAlign='left'; ctx.fillStyle='#333';
+  ctx.fillText(`t_obs = ${tStat.toFixed(3)}`, pad+5, 22);
+  ctx.fillText(`p-value ≈ ${pval.toFixed(4)}`, pad+5, 38);
+  ctx.fillStyle = pval < 0.05 ? '#c0392b' : '#1a7a4a';
+  ctx.fillText(pval < 0.05 ? '✓ Reject H₀ at α=0.05' : '✗ Fail to reject H₀', pad+5, 54);
+  ctx.fillStyle='#aaa';
+  ctx.fillText(`Critical region: |t| > ${crit.toFixed(3)}`, W-pad-150, 22);
+}
+
+// ─────────────────────────────────────────────────────────────
+// BAYESIAN (BETA-BINOMIAL) CANVAS
+// ─────────────────────────────────────────────────────────────
+function drawBayes() {
+  const a = +document.getElementById('bay-a').value;
+  const b = +document.getElementById('bay-b').value;
+  const n = +document.getElementById('bay-n').value;
+  const k = Math.min(+document.getElementById('bay-k').value, n);
+  document.getElementById('bay-a-val').textContent = a;
+  document.getElementById('bay-b-val').textContent = b;
+  document.getElementById('bay-n-val').textContent = n;
+  document.getElementById('bay-k-val').textContent = k;
+
+  const c = initCanvas('cvs-bayes');
+  if (!c) return;
+  const { ctx, W, H } = c;
+  ctx.fillStyle = '#fafafa'; ctx.fillRect(0, 0, W, H);
+
+  const postA = a + k, postB = b + (n - k);
+  const ps = Array.from({length:300},(_,i)=>0.001+0.998*i/299);
+
+  const priorY = ps.map(p=>betaPDF(p,a,b));
+  const postY = ps.map(p=>betaPDF(p,postA,postB));
+  const likeY = ps.map(p=>p**k*(1-p)**(n-k));
+  const likeMax = Math.max(...likeY.filter(isFinite))||1;
+  const postMax = Math.max(...postY.filter(isFinite));
+  const likNorm = likeY.map(y=>isFinite(y)?(y/likeMax)*postMax*0.8:0);
+  const yMax = Math.max(Math.max(...priorY.filter(isFinite)), postMax) * 1.25;
+
+  const pad = 45;
+  drawAxes(ctx, W, H, pad, 0, 1, 0, yMax, 'p', '');
+
+  function drawCurve(ys, color, dash=[]) {
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.setLineDash(dash);
+    ctx.beginPath();
+    ps.forEach((p,i)=>{
+      const y=ys[i]; if(!isFinite(y)||y>yMax*2) return;
+      const [px,py]=toPixel(p,Math.min(y,yMax),W,H,pad,0,1,0,yMax);
+      i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    });
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  drawCurve(priorY, '#2c3e7a', [6,4]);
+  drawCurve(likNorm, '#888', [3,3]);
+  drawCurve(postY, '#c0392b');
+
+  const priorMean = a/(a+b);
+  const postMean = postA/(postA+postB);
+
+  const [ppx]=toPixel(priorMean,0,W,H,pad,0,1,0,yMax);
+  ctx.strokeStyle='#2c3e7a'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(ppx,pad); ctx.lineTo(ppx,H-pad); ctx.stroke();
+
+  const [pox]=toPixel(postMean,0,W,H,pad,0,1,0,yMax);
+  ctx.strokeStyle='#c0392b'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(pox,pad); ctx.lineTo(pox,H-pad); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font='11px JetBrains Mono'; ctx.textAlign='left';
+  ctx.fillStyle='#2c3e7a'; ctx.fillText(`Prior Beta(${a},${b}), mean=${priorMean.toFixed(3)}`, pad, 18);
+  ctx.fillStyle='#555'; ctx.fillText(`Likelihood (${k}H / ${n-k}T)`, pad, 33);
+  ctx.fillStyle='#c0392b'; ctx.fillText(`Posterior Beta(${postA},${postB}), mean=${postMean.toFixed(3)}`, pad, 48);
+  
+  if(n>0) {
+    const mle = k/n;
+    ctx.fillStyle='#888'; ctx.fillText(`MLE = ${mle.toFixed(3)} (${k}/${n})`, pad, 63);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  drawPrereq();
+});
+</script>
+</body>
+</html>

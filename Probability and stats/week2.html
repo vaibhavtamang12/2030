@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability for Quant Engineers — Complete Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #243050;
+    --accent: #38bdf8;
+    --accent2: #a78bfa;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --accent5: #f472b6;
+    --text: #e2e8f0;
+    --text-muted: #8899b4;
+    --heading-font: 'Playfair Display', Georgia, serif;
+    --body-font: 'Source Sans 3', sans-serif;
+    --mono-font: 'JetBrains Mono', monospace;
+    --gold: #fbbf24;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body-font);
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    background: linear-gradient(135deg, #0b0f1a 0%, #0f172a 50%, #0b1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(56,189,248,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(167,139,250,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block;
+    font-family: var(--mono-font);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(56,189,248,0.3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+  }
+  .site-header h1 {
+    font-family: var(--heading-font);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+  .site-header p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 600px;
+  }
+
+  /* ===== TABS ===== */
+  .tab-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: var(--mono-font);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.4rem;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(56,189,248,0.05); }
+
+  /* ===== PANELS ===== */
+  .tab-panel { display: none; padding: 2.5rem 2rem 4rem; max-width: 1100px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* ===== SECTIONS ===== */
+  .section { margin-bottom: 3rem; }
+  .section-title {
+    font-family: var(--heading-font);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-title .tag {
+    font-family: var(--mono-font);
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .tag-prereq { background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+  .tag-core { background: rgba(56,189,248,0.15); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); }
+  .tag-advanced { background: rgba(167,139,250,0.15); color: var(--accent2); border: 1px solid rgba(167,139,250,0.3); }
+
+  .section-intro { color: var(--text-muted); font-size: 1.0rem; margin-bottom: 1.5rem; max-width: 700px; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-family: var(--mono-font);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .highlight-card {
+    background: linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(167,139,250,0.05) 100%);
+    border: 1px solid rgba(56,189,248,0.25);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .warning-card {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .warning-card::before { content: '⚠ '; color: var(--gold); }
+
+  .success-card {
+    background: rgba(52,211,153,0.07);
+    border: 1px solid rgba(52,211,153,0.25);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .success-card::before { content: '✓ '; color: var(--accent3); }
+
+  /* ===== FORMULA BOX ===== */
+  .formula-box {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    font-family: var(--mono-font);
+    font-size: 0.95rem;
+  }
+  .formula-label {
+    font-family: var(--mono-font);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent2);
+    margin-bottom: 0.5rem;
+  }
+
+  /* ===== CODE BLOCK ===== */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    overflow-x: auto;
+    position: relative;
+    margin: 1rem 0;
+  }
+  .code-block pre {
+    font-family: var(--mono-font);
+    font-size: 0.82rem;
+    color: #c9d1d9;
+    line-height: 1.7;
+  }
+  .code-lang {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    font-family: var(--mono-font);
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .cm { color: #6e7681; font-style: italic; }
+  .num { color: #79c0ff; }
+  .op { color: #ff9a3c; }
+
+  /* ===== CANVAS CONTAINER ===== */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+  }
+  .chart-title {
+    font-family: var(--mono-font);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  canvas { max-width: 100%; }
+
+  /* ===== INTERACTIVE ===== */
+  .controls {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .control-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .control-group label {
+    font-family: var(--mono-font);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .control-group input[type=range] {
+    accent-color: var(--accent);
+    width: 150px;
+  }
+  .control-group .val {
+    font-family: var(--mono-font);
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  /* ===== ANALOGY BOX ===== */
+  .analogy-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .analogy-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .analogy-text { color: var(--text); line-height: 1.7; }
+  .analogy-text strong { color: var(--accent3); }
+
+  /* ===== EXERCISE BOX ===== */
+  .exercise-tier { margin-bottom: 2rem; }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .tier-badge {
+    font-family: var(--mono-font);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+  }
+  .tier-easy { background: rgba(52,211,153,0.15); color: var(--accent3); border: 1px solid rgba(52,211,153,0.3); }
+  .tier-medium { background: rgba(251,191,36,0.15); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+  .tier-hard { background: rgba(244,114,182,0.15); color: var(--accent5); border: 1px solid rgba(244,114,182,0.3); }
+
+  .exercise-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    counter-increment: exercise;
+  }
+  .exercise-item p { color: var(--text); }
+  .exercise-hint {
+    font-family: var(--mono-font);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  /* ===== RESOURCE LINKS ===== */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .resource-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s, transform 0.2s;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .resource-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .resource-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .resource-name { font-weight: 600; font-size: 0.9rem; color: var(--accent); margin-bottom: 0.15rem; }
+  .resource-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+
+  /* ===== TOPIC MAP ===== */
+  .topic-map {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1rem 0;
+  }
+  .topic-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.9rem;
+    font-family: var(--mono-font);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+  .topic-node.active { color: var(--accent); border-color: rgba(56,189,248,0.4); background: rgba(56,189,248,0.08); }
+  .topic-arrow { color: var(--border); font-size: 1.1rem; }
+
+  /* ===== GRID LAYOUTS ===== */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  h2 { font-family: var(--heading-font); font-size: 1.5rem; font-weight: 700; margin: 1.5rem 0 0.75rem; color: var(--text); }
+  h3 { font-family: var(--body-font); font-size: 1.1rem; font-weight: 600; margin: 1.2rem 0 0.5rem; color: var(--text); }
+  p { margin-bottom: 0.85rem; color: var(--text); }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 0.85rem; }
+  li { margin-bottom: 0.35rem; color: var(--text); }
+  strong { color: var(--accent3); }
+  em { color: var(--accent); font-style: normal; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, transparent 100%);
+    margin: 2.5rem 0;
+    opacity: 0.3;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: var(--mono-font);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.7rem 1rem;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+  .pill {
+    display: inline-block;
+    font-family: var(--mono-font);
+    font-size: 0.68rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 100px;
+    margin: 0.1rem;
+  }
+  .pill-blue { background: rgba(56,189,248,0.15); color: var(--accent); }
+  .pill-purple { background: rgba(167,139,250,0.15); color: var(--accent2); }
+  .pill-green { background: rgba(52,211,153,0.15); color: var(--accent3); }
+
+  .number-highlight {
+    font-family: var(--mono-font);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+  .number-label {
+    font-family: var(--mono-font);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-badge">Quant Engineering · Probability Theory · Complete Study Guide</div>
+  <h1>Probability for Quant Engineers</h1>
+  <p>A self-contained, visual, interactive guide from first principles to PMF, CDF, Expectation, Variance, Covariance & Correlation — built for first-time learners.</p>
+
+  <div class="topic-map" style="margin-top:1.5rem;">
+    <div class="topic-node">Sample Space</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node">Random Variables</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">PMF</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">CDF</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">Expectation</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">Variance</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">Covariance</div>
+    <div class="topic-arrow">→</div>
+    <div class="topic-node active">Correlation</div>
+  </div>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" onclick="showTab('prereq')">📐 Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('pmf')">📊 PMF</button>
+  <button class="tab-btn" onclick="showTab('cdf')">📈 CDF</button>
+  <button class="tab-btn" onclick="showTab('expectation')">🎯 Expectation</button>
+  <button class="tab-btn" onclick="showTab('variance')">📏 Variance</button>
+  <button class="tab-btn" onclick="showTab('covariance')">🔗 Covariance</button>
+  <button class="tab-btn" onclick="showTab('correlation')">⚡ Correlation</button>
+  <button class="tab-btn" onclick="showTab('colab')">🧪 Colab Labs</button>
+  <button class="tab-btn" onclick="showTab('summary')">🗺️ Summary</button>
+</nav>
+
+<!-- ============================== PREREQUISITES ============================== -->
+<div class="tab-panel active" id="tab-prereq">
+
+  <div class="section">
+    <div class="section-title">Prerequisites <span class="tag tag-prereq">Must Read First</span></div>
+    <p class="section-intro">Before diving into probability distributions, you need three foundational ideas: what randomness means, what a sample space is, and what a random variable is. Everything else builds from these.</p>
+
+    <div class="resource-grid">
+      <a class="resource-card" href="https://seeing-theory.brown.edu/basic-probability/index.html" target="_blank">
+        <div class="resource-icon">🌐</div>
+        <div><div class="resource-name">Seeing Theory</div><div class="resource-desc">Visual, interactive intro to basic probability from Brown University</div></div>
+      </a>
+      <a class="resource-card" href="https://www.khanacademy.org/math/statistics-probability/probability-library" target="_blank">
+        <div class="resource-icon">📚</div>
+        <div><div class="resource-name">Khan Academy Probability</div><div class="resource-desc">Free, structured video lessons from absolute basics</div></div>
+      </a>
+      <a class="resource-card" href="https://brilliant.org/courses/probability/" target="_blank">
+        <div class="resource-icon">💡</div>
+        <div><div class="resource-name">Brilliant.org Probability</div><div class="resource-desc">Interactive puzzles and problems to build intuition fast</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>1. What is a Random Experiment?</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">🎲</div>
+      <div class="analogy-text">A <strong>random experiment</strong> is any process whose outcome you cannot predict with certainty before it happens. Rolling a die, flipping a coin, checking tomorrow's stock price — all random experiments. The key property: if you repeat it under identical conditions, you might get different results.</div>
+    </div>
+
+    <p>Examples you'll encounter as a quant:</p>
+    <ul>
+      <li>Price of Apple stock at market close tomorrow</li>
+      <li>Number of trades executed in the next hour</li>
+      <li>Whether a bond defaults before maturity</li>
+      <li>Return of a portfolio over one month</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>2. Sample Space (Ω)</h2>
+    <div class="card">
+      <div class="card-title">Definition</div>
+      <p>The <strong>sample space Ω</strong> is the set of ALL possible outcomes of a random experiment. Every outcome that could conceivably happen must be in Ω.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Experiment</th><th>Sample Space Ω</th><th>Size</th></tr></thead>
+      <tbody>
+        <tr><td>Flip a coin</td><td>{H, T}</td><td>2</td></tr>
+        <tr><td>Roll a die</td><td>{1, 2, 3, 4, 5, 6}</td><td>6</td></tr>
+        <tr><td>Roll two dice (sum)</td><td>{2, 3, 4, ..., 12}</td><td>11</td></tr>
+        <tr><td>Stock return</td><td>(-∞, +∞) — any real number</td><td>∞ (continuous)</td></tr>
+        <tr><td>Number of trades/hour</td><td>{0, 1, 2, 3, ...}</td><td>∞ (countable)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-card">The sample space must be <em>exhaustive</em> (covers every possible outcome) and <em>mutually exclusive</em> (no two outcomes can happen at the same time).</div>
+  </div>
+
+  <div class="section">
+    <h2>3. Events and Probability</h2>
+    <p>An <strong>event</strong> is a subset of the sample space — it's a collection of outcomes you're interested in.</p>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Example</div>
+        <p>Rolling a die: Ω = {1,2,3,4,5,6}</p>
+        <p>Event A = "rolling an even number" = {2, 4, 6}</p>
+        <p>P(A) = 3/6 = <em>0.5</em></p>
+      </div>
+      <div class="card">
+        <div class="card-title">Probability Rules</div>
+        <ul>
+          <li>0 ≤ P(A) ≤ 1 for any event A</li>
+          <li>P(Ω) = 1 (something must happen)</li>
+          <li>P(∅) = 0 (impossible event)</li>
+          <li>P(A or B) = P(A) + P(B) - P(A and B)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>4. Random Variables — The Most Important Concept</h2>
+
+    <div class="highlight-card">
+      <div class="card-title">🔑 Key Definition</div>
+      <p>A <strong>Random Variable (RV)</strong> is a function that assigns a real number to each outcome in the sample space. It's not a variable in the algebraic sense — it's a <em>function from outcomes to numbers</em>.</p>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-icon">🗺️</div>
+      <div class="analogy-text">Think of a random variable as a <strong>translator</strong>. The random experiment produces outcomes (H, T, or faces of a die). The random variable translates those into numbers we can do math with. For a coin flip: X(H) = 1, X(T) = 0. Now we can calculate averages, spreads, and so on.</div>
+    </div>
+
+    <h3>Two Types of Random Variables</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title" style="color: var(--accent);">Discrete RV</div>
+        <p>Takes countable values: 0, 1, 2, 3, ...</p>
+        <p><strong>Examples:</strong></p>
+        <ul>
+          <li>Number of trades per hour</li>
+          <li>Number of defaults in a portfolio</li>
+          <li>Die roll result</li>
+        </ul>
+        <p style="margin-top:0.5rem;">→ Described by <strong>PMF</strong></p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color: var(--accent2);">Continuous RV</div>
+        <p>Takes any value in an interval: (-∞, +∞)</p>
+        <p><strong>Examples:</strong></p>
+        <ul>
+          <li>Stock return over a period</li>
+          <li>Time between two trades</li>
+          <li>Temperature tomorrow</li>
+        </ul>
+        <p style="margin-top:0.5rem;">→ Described by <strong>PDF + CDF</strong></p>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Quick check — which type of RV are these?</div>
+      <canvas id="rvTypeChart" height="120"></canvas>
+    </div>
+
+    <h3>Notation Cheat Sheet</h3>
+    <table>
+      <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-blue">X, Y, Z</span></td><td>Random variables (capital letters)</td></tr>
+        <tr><td><span class="pill pill-purple">x, y, z</span></td><td>Specific values a RV can take (lowercase)</td></tr>
+        <tr><td><span class="pill pill-green">P(X = x)</span></td><td>Probability that RV X equals the specific value x</td></tr>
+        <tr><td><span class="pill pill-blue">F(x)</span></td><td>CDF: P(X ≤ x)</td></tr>
+        <tr><td><span class="pill pill-purple">E[X] or μ</span></td><td>Expected value (average) of X</td></tr>
+        <tr><td><span class="pill pill-green">Var(X) or σ²</span></td><td>Variance of X</td></tr>
+        <tr><td><span class="pill pill-blue">σ</span></td><td>Standard deviation of X</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>5. Summation Notation (Σ)</h2>
+    <p>You'll see this constantly. It just means "add these up for all values of i":</p>
+    <div class="formula-box">
+      <div class="formula-label">Summation</div>
+      \[ \sum_{i=1}^{n} x_i = x_1 + x_2 + x_3 + \cdots + x_n \]
+    </div>
+    <p>Example: Σᵢ P(X=xᵢ) = 1 means "the probabilities of all outcomes add up to 1."</p>
+  </div>
+
+  <div class="section">
+    <h2>Prerequisite Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> A bag contains 3 red balls and 7 blue balls. You draw one at random. Write out the sample space and calculate P(red).</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> You flip two coins. Write out Ω. Define RV X = "number of heads". What values can X take?</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> Classify each as discrete or continuous: (a) height of a person, (b) number of emails received today, (c) time until next trade, (d) score on a 10-question quiz.</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> Roll a die twice. What is the probability that the sum equals 7? List all favorable outcomes.</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> Are events "rolling a 3" and "rolling an odd number" mutually exclusive? Explain and calculate P(A ∪ B).</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> A stock can go up by 2%, stay flat, or go down by 1% with equal probability. Define a random variable R for the daily return. What is Ω? Why is this an abstraction of a more complex reality?</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== PMF ============================== -->
+<div class="tab-panel" id="tab-pmf">
+
+  <div class="section">
+    <div class="section-title">Probability Mass Function (PMF) <span class="tag tag-core">Core Topic</span></div>
+    <p class="section-intro">The PMF is the complete "recipe" for a discrete random variable — it tells you exactly how likely each possible value is. Master this and CDF becomes trivial.</p>
+  </div>
+
+  <div class="section">
+    <h2>What is a PMF?</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">🍕</div>
+      <div class="analogy-text">Imagine you're splitting a pizza (100%) between different outcomes. The PMF tells you <strong>what slice size (probability) each outcome gets</strong>. All slices must add up to exactly 100%. No slice can be negative. This is the entire idea.</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="card-title">Formal Definition</div>
+      <p>For a discrete random variable X, the PMF is the function:</p>
+      <div class="formula-box">
+        \[ p(x) = P(X = x) \]
+      </div>
+      <p>subject to two conditions:</p>
+      <ul>
+        <li><strong>Non-negativity:</strong> p(x) ≥ 0 for all x</li>
+        <li><strong>Normalization:</strong> Σₓ p(x) = 1 (probabilities sum to 1)</li>
+      </ul>
+    </div>
+
+    <div class="warning-card">p(x) gives the probability AT exactly x. For continuous variables, P(X = exact value) = 0. PMF only works for discrete random variables!</div>
+  </div>
+
+  <div class="section">
+    <h2>PMF of a Fair Die — Building Intuition</h2>
+
+    <div class="two-col">
+      <div>
+        <p>Roll a fair 6-sided die. X = outcome. All six outcomes are equally likely:</p>
+        <div class="formula-box">
+          \[ p(x) = P(X = x) = \frac{1}{6}, \quad x \in \{1, 2, 3, 4, 5, 6\} \]
+        </div>
+        <table>
+          <thead><tr><th>x</th><th>P(X=x)</th><th>Fraction</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td>2</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td>3</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td>4</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td>5</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td>6</td><td>0.1667</td><td>1/6</td></tr>
+            <tr><td style="color:var(--accent)"><strong>Sum</strong></td><td style="color:var(--accent)"><strong>1.0000</strong></td><td>6/6</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="chart-wrap" style="margin:0;">
+        <div class="chart-title">PMF of a Fair Die</div>
+        <canvas id="diePMFChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Interactive PMF: Binomial Distribution</h2>
+    <p>The Binomial distribution is the most important discrete distribution in finance. X ~ Binomial(n, p) counts the number of "successes" in n independent trials, each with probability p of success.</p>
+
+    <div class="analogy-box">
+      <div class="analogy-icon">📈</div>
+      <div class="analogy-text"><strong>Quant application:</strong> If a stock goes up with probability p = 0.55 on any given day, and you track it for n = 10 days, X = number of up days follows Binomial(10, 0.55). The PMF tells you the probability of getting exactly k up-days out of 10.</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Binomial PMF</div>
+      \[ P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad k = 0, 1, 2, \ldots, n \]
+    </div>
+    <p>Where \(\binom{n}{k} = \frac{n!}{k!(n-k)!}\) is "n choose k" — the number of ways to pick k successes from n trials.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Interactive PMF — Adjust n and p</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>n (trials)</label>
+          <input type="range" id="pmfN" min="1" max="20" value="10" oninput="updatePMF()">
+          <div class="val" id="pmfNVal">10</div>
+        </div>
+        <div class="control-group">
+          <label>p (success prob)</label>
+          <input type="range" id="pmfP" min="0.05" max="0.95" step="0.05" value="0.5" oninput="updatePMF()">
+          <div class="val" id="pmfPVal">0.50</div>
+        </div>
+      </div>
+      <canvas id="binomialPMFChart" height="180"></canvas>
+      <div id="pmfStats" style="display:flex;gap:2rem;margin-top:1rem;flex-wrap:wrap;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>How to Read a PMF — Three Rules</h2>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Rule 1: Height = Probability</div>
+        <p>Each bar's height is the exact probability of that outcome. Higher bar = more likely outcome.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Rule 2: All bars sum to 1</div>
+        <p>Add up all bar heights and you always get 1.0. This is non-negotiable — it's the definition of a valid probability distribution.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Rule 3: Computing probabilities of ranges</div>
+      <p>Want P(a ≤ X ≤ b)? Sum the PMF over that range: P(a ≤ X ≤ b) = Σ p(x) for all x between a and b.</p>
+      <div class="formula-box">
+        \[ P(2 \leq X \leq 4) = p(2) + p(3) + p(4) \]
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Common Distributions and Their PMFs</h2>
+    <table>
+      <thead><tr><th>Distribution</th><th>PMF Formula</th><th>Quant Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Bernoulli(p)</strong></td><td>P(X=1)=p, P(X=0)=1-p</td><td>Single yes/no event (default or not)</td></tr>
+        <tr><td><strong>Binomial(n,p)</strong></td><td>C(n,k)·pᵏ·(1-p)ⁿ⁻ᵏ</td><td>Number of up days in n trading days</td></tr>
+        <tr><td><strong>Poisson(λ)</strong></td><td>e⁻ᵡ·λˣ/x!</td><td>Number of trades/orders per time interval</td></tr>
+        <tr><td><strong>Geometric(p)</strong></td><td>(1-p)ˣ⁻¹·p</td><td>Time until first trade/event occurs</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>PMF Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item">
+        <p><strong>E1.</strong> A fair coin is flipped 3 times. Let X = number of heads. Write out the full PMF table for X. (Hint: outcomes are HHH, HHT, HTH, HTT, THH, THT, TTH, TTT.)</p>
+        <div class="exercise-hint">Hint: X can be 0, 1, 2, or 3. Count favorable outcomes for each.</div>
+      </div>
+      <div class="exercise-item">
+        <p><strong>E2.</strong> Is this a valid PMF? p(1)=0.3, p(2)=0.4, p(3)=0.2, p(4)=0.15. Explain why or why not.</p>
+      </div>
+      <div class="exercise-item">
+        <p><strong>E3.</strong> A stock has P(up)=0.6, P(flat)=0.3, P(down)=0.1. What is P(stock moves) i.e. P(X ≠ flat)?</p>
+      </div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item">
+        <p><strong>M1.</strong> X ~ Binomial(5, 0.4). Calculate P(X=2) by hand using the formula. Also find P(X ≥ 3).</p>
+        <div class="exercise-hint">C(5,2) = 10</div>
+      </div>
+      <div class="exercise-item">
+        <p><strong>M2.</strong> The number of trade errors per day follows Poisson(λ=2). What is the probability of exactly 0 errors? More than 2 errors? Use P(X=k) = e⁻²·2ᵏ/k!</p>
+      </div>
+      <div class="exercise-item">
+        <p><strong>M3.</strong> Two traders each have a 70% chance of beating their benchmark on any given day, independently. Define Y = number who beat benchmark. Write the full PMF of Y.</p>
+      </div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item">
+        <p><strong>H1.</strong> Design a PMF for a "simplified stock": it goes up by 1% with prob p, stays flat with prob q, and drops by 1% with prob r = 1-p-q. If p = 0.45 and q = 0.35, find P(positive return over 2 days). (Hint: you need to enumerate all pairs of daily outcomes.)</p>
+      </div>
+      <div class="exercise-item">
+        <p><strong>H2.</strong> A quant model predicts a bond portfolio has 5 bonds that could each default with probability 0.1, independently. What is the probability that 3 or more bonds default? What does this tell you about "black swan" risk?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources for PMF</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://seeing-theory.brown.edu/probability-distributions/index.html" target="_blank">
+        <div class="resource-icon">🎨</div>
+        <div><div class="resource-name">Seeing Theory — Distributions</div><div class="resource-desc">Interactive visual exploration of PMF and distributions</div></div>
+      </a>
+      <a class="resource-card" href="https://www.statmethods.net/advstats/discretedistributions.html" target="_blank">
+        <div class="resource-icon">📊</div>
+        <div><div class="resource-name">Quick-R: Discrete Distributions</div><div class="resource-desc">Reference for computing PMFs in code</div></div>
+      </a>
+      <a class="resource-card" href="https://homepage.divms.uiowa.edu/~mbognar/applets/bin.html" target="_blank">
+        <div class="resource-icon">⚡</div>
+        <div><div class="resource-name">Binomial PMF Applet</div><div class="resource-desc">Interactive Binomial calculator with visualization</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== CDF ============================== -->
+<div class="tab-panel" id="tab-cdf">
+
+  <div class="section">
+    <div class="section-title">Cumulative Distribution Function (CDF) <span class="tag tag-core">Core Topic</span></div>
+    <p class="section-intro">The CDF answers the question "what is the probability that X is at most x?" It's the running total of probabilities, and it works for both discrete AND continuous random variables.</p>
+  </div>
+
+  <div class="section">
+    <h2>Intuition First</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">📊</div>
+      <div class="analogy-text">Imagine your portfolio's daily P&L. The CDF at value x answers: <strong>"On what fraction of days did my P&L end up at or below x?"</strong> If F(0) = 0.45, it means 45% of days you lost money or broke even. This is incredibly useful for risk management — it's exactly what Value-at-Risk (VaR) calculations are based on.</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="card-title">Formal Definition</div>
+      <div class="formula-box">
+        \[ F(x) = P(X \leq x) = \sum_{k \leq x} p(k) \quad \text{(discrete)} \]
+      </div>
+      <p>The CDF F(x) is just the sum of the PMF for all values up to and including x.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>PMF → CDF: Step by Step</h2>
+
+    <div class="two-col">
+      <div>
+        <h3>Starting with: fair die PMF</h3>
+        <table>
+          <thead><tr><th>x</th><th>P(X=x)</th><th>F(x) = P(X≤x)</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>1/6 ≈ 0.167</td><td>1/6 ≈ 0.167</td></tr>
+            <tr><td>2</td><td>1/6 ≈ 0.167</td><td>2/6 ≈ 0.333</td></tr>
+            <tr><td>3</td><td>1/6 ≈ 0.167</td><td>3/6 = 0.500</td></tr>
+            <tr><td>4</td><td>1/6 ≈ 0.167</td><td>4/6 ≈ 0.667</td></tr>
+            <tr><td>5</td><td>1/6 ≈ 0.167</td><td>5/6 ≈ 0.833</td></tr>
+            <tr><td>6</td><td>1/6 ≈ 0.167</td><td>6/6 = 1.000</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.75rem;">The CDF starts near 0 and ends at exactly 1. Each step adds the PMF value.</p>
+      </div>
+      <div class="chart-wrap" style="margin:0;">
+        <div class="chart-title">CDF of a Fair Die (staircase shape)</div>
+        <canvas id="dieCDFChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Properties of the CDF</h2>
+    <div class="card">
+      <div class="card-title">Five Universal Properties</div>
+      <ul>
+        <li><strong>Bounded:</strong> 0 ≤ F(x) ≤ 1 always</li>
+        <li><strong>Limits:</strong> F(-∞) = 0 and F(+∞) = 1</li>
+        <li><strong>Non-decreasing:</strong> if a ≤ b then F(a) ≤ F(b). It never goes down.</li>
+        <li><strong>Right-continuous:</strong> F(x) includes the point x itself (that's why it's "≤" not "&lt;")</li>
+        <li><strong>PMF recovery:</strong> p(x) = F(x) - F(x⁻) (the jump at x equals the probability at x)</li>
+      </ul>
+    </div>
+
+    <div class="success-card">The non-decreasing property makes sense: adding more outcomes never reduces the accumulated probability.</div>
+  </div>
+
+  <div class="section">
+    <h2>Using the CDF to Compute Probabilities</h2>
+
+    <div class="formula-box">
+      <div class="formula-label">Key Probability Computations via CDF</div>
+      \[
+      P(X \leq b) = F(b)
+      \]
+      \[
+      P(X > a) = 1 - F(a)
+      \]
+      \[
+      P(a < X \leq b) = F(b) - F(a)
+      \]
+    </div>
+
+    <div class="card">
+      <div class="card-title">Worked Example</div>
+      <p>X ~ Binomial(10, 0.5). What is P(3 ≤ X ≤ 7)?</p>
+      <p>P(3 ≤ X ≤ 7) = F(7) - F(2) = P(X ≤ 7) - P(X ≤ 2)</p>
+      <p>This is how software computes it — one CDF lookup instead of summing 5 PMF values.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Interactive CDF Explorer</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Binomial CDF — Adjust parameters</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>n (trials)</label>
+          <input type="range" id="cdfN" min="2" max="20" value="10" oninput="updateCDF()">
+          <div class="val" id="cdfNVal">10</div>
+        </div>
+        <div class="control-group">
+          <label>p (success prob)</label>
+          <input type="range" id="cdfP" min="0.05" max="0.95" step="0.05" value="0.5" oninput="updateCDF()">
+          <div class="val" id="cdfPVal">0.50</div>
+        </div>
+        <div class="control-group">
+          <label>Query: P(X ≤ ?)</label>
+          <input type="range" id="cdfQuery" min="0" max="20" value="5" oninput="updateCDF()">
+          <div class="val" id="cdfQueryVal">5</div>
+        </div>
+      </div>
+      <canvas id="binomialCDFChart" height="200"></canvas>
+      <div id="cdfAnswer" style="margin-top:1rem;padding:0.75rem;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);border-radius:6px;font-family:var(--mono-font);font-size:0.9rem;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>CDF for Continuous Variables</h2>
+    <p>For continuous random variables, the CDF is defined using integration (the continuous equivalent of summation):</p>
+    <div class="formula-box">
+      <div class="formula-label">CDF from PDF (continuous case)</div>
+      \[ F(x) = \int_{-\infty}^{x} f(t)\, dt \]
+    </div>
+    <p>Where f(t) is the <strong>Probability Density Function (PDF)</strong> — the continuous analogue of the PMF.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Normal Distribution: PDF (filled area = CDF value at x)</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>Query point x</label>
+          <input type="range" id="normalX" min="-3" max="3" step="0.1" value="0" oninput="updateNormalCDF()">
+          <div class="val" id="normalXVal">0.0</div>
+        </div>
+      </div>
+      <canvas id="normalCDFChart" height="200"></canvas>
+      <div id="normalCDFAnswer" style="margin-top:1rem;padding:0.75rem;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:6px;font-family:var(--mono-font);font-size:0.9rem;"></div>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-icon">💰</div>
+      <div class="analogy-text">For stock returns (often modeled as Normal), the CDF tells you: <strong>"What is the probability my return is below x%?"</strong> F(-0.05) = 0.20 means there's a 20% chance of losing more than 5%. This is literally what <em>Value at Risk (VaR)</em> measures — the percentile (inverse CDF) corresponding to a given loss probability.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>PMF vs CDF — Side by Side</h2>
+    <table>
+      <thead><tr><th>Feature</th><th>PMF p(x)</th><th>CDF F(x)</th></tr></thead>
+      <tbody>
+        <tr><td>Answers</td><td>P(X = exactly x)</td><td>P(X ≤ x)</td></tr>
+        <tr><td>Values</td><td>Between 0 and 1</td><td>Between 0 and 1</td></tr>
+        <tr><td>Shape</td><td>Spikes / bars</td><td>Staircase (discrete) or S-curve (continuous)</td></tr>
+        <tr><td>Sum/Integral</td><td>Sums to 1</td><td>Goes from 0 to 1</td></tr>
+        <tr><td>Works for continuous?</td><td>No (use PDF)</td><td>Yes!</td></tr>
+        <tr><td>Convert to other</td><td>Accumulate → CDF</td><td>Difference → PMF</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>CDF Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> From the fair die PMF, compute F(3) and F(5). Verify P(X > 4) using the CDF.</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> A discrete RV has F(0)=0.1, F(1)=0.4, F(2)=0.7, F(3)=1.0. Recover the PMF (find p(0), p(1), p(2), p(3)).</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> True or False: F(x) can decrease as x increases. Explain.</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> X ~ Binomial(8, 0.3). Using the CDF formula (or a table/code), find P(2 ≤ X ≤ 5) as F(5) - F(1). Calculate each term.</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> Daily stock returns are modeled as Normal(μ=0.001, σ=0.02). Using the 68-95-99.7 rule, what is the CDF value at μ + σ? At μ - 2σ?</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> If F(x) = 1 - e^(-λx) for x ≥ 0 (Exponential distribution), find the PMF/PDF by differentiation. What does F(5) mean if λ=0.2 models time between large trades? What is the probability that the next large trade occurs after 10 minutes?</p></div>
+      <div class="exercise-item"><p><strong>H2.</strong> A risk manager needs to find the 5th percentile of a Binomial(100, 0.5) distribution (the VaR at 95% confidence). Explain the approach and why finding the exact value requires numerical methods.</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources for CDF</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://www.geogebra.org/m/yzwnygxf" target="_blank">
+        <div class="resource-icon">🎯</div>
+        <div><div class="resource-name">GeoGebra CDF Explorer</div><div class="resource-desc">Visualize how CDF relates to PDF interactively</div></div>
+      </a>
+      <a class="resource-card" href="https://seeing-theory.brown.edu/compound-probability/index.html" target="_blank">
+        <div class="resource-icon">🌐</div>
+        <div><div class="resource-name">Seeing Theory — Compound Probability</div><div class="resource-desc">Visual tool for accumulation of probability</div></div>
+      </a>
+      <a class="resource-card" href="https://mathlets.org/mathlets/probability-distributions/" target="_blank">
+        <div class="resource-icon">⚡</div>
+        <div><div class="resource-name">MIT Mathlets</div><div class="resource-desc">Interactive probability distributions from MIT</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== EXPECTATION ============================== -->
+<div class="tab-panel" id="tab-expectation">
+
+  <div class="section">
+    <div class="section-title">Expectation (E[X]) <span class="tag tag-core">Core Topic</span></div>
+    <p class="section-intro">The expected value is the single most important number you can compute from a distribution. It's the weighted average — the long-run average you'd observe over many, many repetitions.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Core Intuition</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">⚖️</div>
+      <div class="analogy-text">Imagine balancing a see-saw. Place weights at each possible value of X, where each weight equals the probability p(x). The <strong>balance point is the expected value</strong>. The heavier (more probable) values pull the balance toward them more than lighter (less probable) values.</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="card-title">Definition — Discrete Case</div>
+      <div class="formula-box">
+        \[ E[X] = \sum_x x \cdot p(x) \]
+      </div>
+      <p>Multiply each value by its probability, then add them all up. It's a probability-weighted average.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Worked Example: Fair Die</h2>
+    <div class="card">
+      <div class="card-title">Computing E[X] step by step</div>
+      <div class="formula-box">
+        \[
+        E[X] = 1 \cdot \frac{1}{6} + 2 \cdot \frac{1}{6} + 3 \cdot \frac{1}{6} + 4 \cdot \frac{1}{6} + 5 \cdot \frac{1}{6} + 6 \cdot \frac{1}{6}
+        \]
+        \[
+        = \frac{1+2+3+4+5+6}{6} = \frac{21}{6} = 3.5
+        \]
+      </div>
+      <p>You'll never roll a 3.5 — but if you roll 1000 times and average the results, you'll get very close to 3.5. That's what expected value means.</p>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Law of Large Numbers: Simulated die rolls converging to E[X]=3.5</div>
+      <canvas id="lolChart" height="150"></canvas>
+      <button onclick="runLLN()" style="margin-top:0.75rem;background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.4);color:var(--accent);font-family:var(--mono-font);font-size:0.75rem;padding:0.5rem 1.25rem;border-radius:4px;cursor:pointer;letter-spacing:0.1em;text-transform:uppercase;">▶ Run Simulation</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Expectation for Continuous Variables</h2>
+    <div class="formula-box">
+      <div class="formula-label">Continuous Case (requires integration)</div>
+      \[ E[X] = \int_{-\infty}^{\infty} x \cdot f(x)\, dx \]
+    </div>
+    <p>Same idea: weight each value x by its density f(x) and integrate (continuous sum). For Normal(μ, σ²), E[X] = μ.</p>
+  </div>
+
+  <div class="section">
+    <h2>Key Properties of Expectation</h2>
+    <div class="card">
+      <div class="card-title">Properties (These save enormous amounts of computation!)</div>
+      <table>
+        <thead><tr><th>Property</th><th>Formula</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Linearity 1</td><td>E[aX] = a·E[X]</td><td>Scaling X scales the mean</td></tr>
+          <tr><td>Linearity 2</td><td>E[X + b] = E[X] + b</td><td>Shifting X shifts the mean</td></tr>
+          <tr><td>Linearity (full)</td><td>E[aX + b] = aE[X] + b</td><td>Linear functions of X</td></tr>
+          <tr><td>Sum of RVs</td><td>E[X + Y] = E[X] + E[Y]</td><td>Always true, regardless of dependence!</td></tr>
+          <tr><td>Constant</td><td>E[c] = c</td><td>A constant has expected value = itself</td></tr>
+          <tr><td>Product (if independent)</td><td>E[XY] = E[X]·E[Y]</td><td>Only when X and Y are independent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warning-card">E[X + Y] = E[X] + E[Y] is ALWAYS true. But E[XY] = E[X]·E[Y] is only true when X and Y are independent. Mixing these up is a common error in quant interviews!</div>
+  </div>
+
+  <div class="section">
+    <h2>Expectation of Functions: E[g(X)]</h2>
+
+    <div class="highlight-card">
+      <div class="card-title">Law of the Unconscious Statistician (LOTUS)</div>
+      <div class="formula-box">
+        \[ E[g(X)] = \sum_x g(x) \cdot p(x) \]
+      </div>
+      <p>You don't need to find the distribution of g(X) first — just apply g to each value and weight by the original probabilities.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Example: Expected squared return</div>
+      <p>Returns: +5% with prob 0.4, 0% with prob 0.3, -3% with prob 0.3.</p>
+      <p>E[R] = 0.05(0.4) + 0(0.3) + (-0.03)(0.3) = 0.02 - 0.009 = <em>0.011 = 1.1%</em></p>
+      <p>E[R²] = (0.05)²(0.4) + 0²(0.3) + (-0.03)²(0.3) = 0.001 + 0 + 0.00027 = <em>0.00127</em></p>
+      <p>This E[R²] is needed to compute variance!</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Quant Finance Applications</h2>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Portfolio Expected Return</div>
+        <p>If portfolio return Rₚ = w₁R₁ + w₂R₂ + ... + wₙRₙ</p>
+        <p>Then: E[Rₚ] = w₁E[R₁] + w₂E[R₂] + ... + wₙE[Rₙ]</p>
+        <p>This is the foundation of Markowitz portfolio theory.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Option Pricing (Risk-Neutral)</div>
+        <p>The price of a call option is:</p>
+        <div class="formula-box" style="margin:0.5rem 0;">
+          \[ C = e^{-rT} \cdot E^Q[\max(S_T - K, 0)] \]
+        </div>
+        <p>Just an expected value under a special probability measure Q!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Interactive Expectation Calculator</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Build your own distribution and see E[X]</div>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:0.75rem;">Drag sliders to set probabilities (they auto-normalize). Watch E[X] update in real time.</p>
+      <div class="controls" style="flex-wrap:wrap;gap:0.75rem;">
+        <div class="control-group"><label>p(-2)</label><input type="range" id="ep1" min="0" max="100" value="15" oninput="updateExpect()"><div class="val" id="ev1">0.15</div></div>
+        <div class="control-group"><label>p(-1)</label><input type="range" id="ep2" min="0" max="100" value="20" oninput="updateExpect()"><div class="val" id="ev2">0.20</div></div>
+        <div class="control-group"><label>p(0)</label><input type="range" id="ep3" min="0" max="100" value="30" oninput="updateExpect()"><div class="val" id="ev3">0.30</div></div>
+        <div class="control-group"><label>p(1)</label><input type="range" id="ep4" min="0" max="100" value="25" oninput="updateExpect()"><div class="val" id="ev4">0.25</div></div>
+        <div class="control-group"><label>p(2)</label><input type="range" id="ep5" min="0" max="100" value="10" oninput="updateExpect()"><div class="val" id="ev5">0.10</div></div>
+      </div>
+      <canvas id="expectChart" height="180"></canvas>
+      <div id="expectResult" style="margin-top:1rem;padding:0.75rem;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:6px;font-family:var(--mono-font);font-size:0.9rem;"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Expectation Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> You pay $3 to play a game. You roll a die: if you get 6, you win $10; otherwise, you get nothing. What is the expected profit per game?</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> X ~ Bernoulli(p=0.3). Show that E[X] = p = 0.3 by applying the formula directly.</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> If E[X] = 5 and Y = 3X - 2, find E[Y] using linearity.</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> A portfolio has 3 stocks with expected returns 8%, 12%, and 5% with weights 0.4, 0.3, 0.3. What is E[Rₚ]?</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> X ~ Binomial(n=10, p=0.6). Prove E[X] = np = 6. (Hint: use linearity and the fact that Binomial is a sum of n Bernoullis.)</p></div>
+      <div class="exercise-item"><p><strong>M3.</strong> X has P(X=1)=0.5, P(X=2)=0.3, P(X=3)=0.2. Compute E[X] and E[X²]. Is E[X²] = (E[X])²? What does the difference tell you?</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> You're an options trader. A stock is at $100. It either goes to $120 (prob 0.45) or $85 (prob 0.55). You hold a call option with strike K=$105. What is E[payoff]? If the option costs $3, is it a positive expected value trade?</p></div>
+      <div class="exercise-item"><p><strong>H2.</strong> Prove that if X and Y are independent, then E[XY] = E[X]·E[Y]. (Hint: use the joint PMF p(x,y) = p_X(x)·p_Y(y) for independent variables.)</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://seeing-theory.brown.edu/basic-probability/index.html#section3" target="_blank">
+        <div class="resource-icon">🎨</div>
+        <div><div class="resource-name">Seeing Theory — Expected Value</div><div class="resource-desc">Visual demonstration of expected value as center of mass</div></div>
+      </a>
+      <a class="resource-card" href="https://www.statlect.com/fundamentals-of-probability/expected-value" target="_blank">
+        <div class="resource-icon">📖</div>
+        <div><div class="resource-name">StatLect — Expected Value</div><div class="resource-desc">Rigorous but accessible mathematical treatment</div></div>
+      </a>
+      <a class="resource-card" href="https://setosa.io/ev/expected-value/" target="_blank">
+        <div class="resource-icon">🌐</div>
+        <div><div class="resource-name">Setosa — Expected Value Visual</div><div class="resource-desc">Beautiful visual explanation of expected value</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== VARIANCE ============================== -->
+<div class="tab-panel" id="tab-variance">
+
+  <div class="section">
+    <div class="section-title">Variance and Standard Deviation <span class="tag tag-core">Core Topic</span></div>
+    <p class="section-intro">Expectation tells you where the distribution is centered. Variance tells you how spread out it is. In finance, spread = risk. This makes variance one of the most fundamental risk measures.</p>
+  </div>
+
+  <div class="section">
+    <h2>Why Expectation Alone Isn't Enough</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">🎯</div>
+      <div class="analogy-text">Two archers both average hitting the bullseye (E[X] = 0 distance from center). But one is extremely consistent, the other is wildly inconsistent. Their <strong>expected value is the same but their variance is very different</strong>. Variance captures the "wobble" or "spread" around the mean.</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Same Mean, Different Variance — Two Return Distributions</div>
+      <canvas id="varianceCompareChart" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Definition of Variance</h2>
+
+    <div class="highlight-card">
+      <div class="card-title">Variance — Two Equivalent Definitions</div>
+      <div class="formula-box">
+        \[ \text{Var}(X) = E\left[(X - \mu)^2\right] = \sum_x (x - \mu)^2 \cdot p(x) \]
+      </div>
+      <div class="formula-box">
+        \[ \text{Var}(X) = E[X^2] - (E[X])^2 \quad \leftarrow \text{Computational shortcut!} \]
+      </div>
+    </div>
+
+    <p>The first formula is the definition: average squared deviation from the mean. The second is the computational shortcut — almost always easier to use.</p>
+
+    <div class="success-card">Variance is always non-negative. Var(X) ≥ 0. It equals zero only if X is a constant (no randomness at all).</div>
+  </div>
+
+  <div class="section">
+    <h2>Worked Example: Computing Variance</h2>
+    <div class="card">
+      <div class="card-title">Step-by-step for a simple distribution</div>
+      <p>X has values: -1 (prob 0.3), 0 (prob 0.4), 2 (prob 0.3)</p>
+      <p><strong>Step 1:</strong> Find the mean: E[X] = (-1)(0.3) + (0)(0.4) + (2)(0.3) = -0.3 + 0 + 0.6 = <em>0.3</em></p>
+      <p><strong>Step 2:</strong> Find E[X²]: E[X²] = (-1)²(0.3) + (0)²(0.4) + (2)²(0.3) = 0.3 + 0 + 1.2 = <em>1.5</em></p>
+      <p><strong>Step 3:</strong> Var(X) = E[X²] - (E[X])² = 1.5 - (0.3)² = 1.5 - 0.09 = <em>1.41</em></p>
+      <p><strong>Step 4:</strong> σ = √Var(X) = √1.41 ≈ <em>1.187</em></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Standard Deviation</h2>
+    <div class="formula-box">
+      \[ \sigma = \text{SD}(X) = \sqrt{\text{Var}(X)} \]
+    </div>
+    <div class="analogy-box">
+      <div class="analogy-icon">📏</div>
+      <div class="analogy-text">Variance is in squared units (like squared dollars or squared percent). Standard deviation brings it back to the <strong>original units</strong>, making it interpretable. If stock returns are in %, σ is in % too. "This strategy has σ = 2% daily" makes intuitive sense. "Var = 0.04%²" is harder to grasp.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Properties of Variance</h2>
+    <div class="card">
+      <div class="card-title">Key Properties</div>
+      <table>
+        <thead><tr><th>Property</th><th>Formula</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Scaling</td><td>Var(aX) = a²·Var(X)</td><td>Scale by a → variance scales by a²</td></tr>
+          <tr><td>Shift</td><td>Var(X + b) = Var(X)</td><td>Adding constant doesn't change spread!</td></tr>
+          <tr><td>Sum (independent)</td><td>Var(X + Y) = Var(X) + Var(Y)</td><td>Only for independent X, Y</td></tr>
+          <tr><td>Sum (general)</td><td>Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)</td><td>Full formula (Cov covered next)</td></tr>
+          <tr><td>Non-negative</td><td>Var(X) ≥ 0</td><td>Always!</td></tr>
+          <tr><td>Var of constant</td><td>Var(c) = 0</td><td>No randomness = zero variance</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warning-card">Var(aX) = a²Var(X), NOT a·Var(X). Standard deviation scales linearly: SD(aX) = |a|·SD(X). Don't confuse the two!</div>
+  </div>
+
+  <div class="section">
+    <h2>The 68-95-99.7 Rule (Normal Distribution)</h2>
+    <p>For a Normal distribution, the standard deviation has a beautiful interpretation:</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Normal Distribution — Standard Deviation Intervals</div>
+      <canvas id="normalSDChart" height="200"></canvas>
+      <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;">
+        <div><span class="pill pill-blue">μ ± 1σ</span> covers <strong>68.3%</strong> of outcomes</div>
+        <div><span class="pill pill-purple">μ ± 2σ</span> covers <strong>95.4%</strong> of outcomes</div>
+        <div><span class="pill pill-green">μ ± 3σ</span> covers <strong>99.7%</strong> of outcomes</div>
+      </div>
+    </div>
+
+    <div class="analogy-box">
+      <div class="analogy-icon">📈</div>
+      <div class="analogy-text">If stock X has daily return μ=0.05%, σ=1.2%, then on ~95% of days, returns are between 0.05% - 2(1.2%) = -2.35% and 0.05% + 2(1.2%) = 2.45%. A "3-sigma event" (outside ±3σ) should happen less than 0.3% of the time. In 2008, "10-sigma events" occurred — reality has fatter tails than Normal assumes.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Interactive Variance Explorer</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Adjust μ and σ — Watch Distribution Change</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>μ (mean)</label>
+          <input type="range" id="varMu" min="-3" max="3" step="0.1" value="0" oninput="updateVarChart()">
+          <div class="val" id="varMuVal">0.0</div>
+        </div>
+        <div class="control-group">
+          <label>σ (std dev)</label>
+          <input type="range" id="varSigma" min="0.2" max="3" step="0.1" value="1" oninput="updateVarChart()">
+          <div class="val" id="varSigmaVal">1.0</div>
+        </div>
+      </div>
+      <canvas id="varChart" height="200"></canvas>
+      <div id="varStats" style="margin-top:1rem;font-family:var(--mono-font);font-size:0.85rem;color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Variance in Finance: Sharpe Ratio</h2>
+    <div class="card">
+      <div class="card-title">Sharpe Ratio — Risk-Adjusted Return</div>
+      <div class="formula-box">
+        \[ \text{Sharpe Ratio} = \frac{E[R] - R_f}{\sigma(R)} = \frac{\text{Excess Return}}{\text{Standard Deviation}} \]
+      </div>
+      <p>This is literally "expected return per unit of risk (σ)". Higher Sharpe = better risk-adjusted performance. A Sharpe of 1.0 is decent, above 2.0 is excellent, above 3.0 is rare and likely backcurve-fitted.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Variance Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> Compute Var(X) for a fair coin (X=0 or X=1 with equal probability). What is σ?</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> If Var(X) = 9, what is Var(3X)? What is Var(X + 5)? What is SD(3X)?</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> A "safe" stock has σ=0.5% daily. A "risky" stock has σ=3% daily. Both have E[R]=0.1% daily. Which would you prefer? What Sharpe ratio does each have?</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> X ~ Binomial(n, p). Use the formula Var(X) = np(1-p). For n=100 trades, p=0.5, what is the variance and std dev of the number of profitable trades?</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> You have a portfolio: 60% in stock A (σ_A=2%) and 40% in stock B (σ_B=3%), and they're independent. What is σ of the portfolio? (Hint: Var(0.6A + 0.4B) = (0.6)²Var(A) + (0.4)²Var(B) if independent.)</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> Prove the computational formula Var(X) = E[X²] - (E[X])² by expanding E[(X-μ)²] using the definition and properties of expectation.</p></div>
+      <div class="exercise-item"><p><strong>H2.</strong> Two strategies: Strategy A returns +20% with prob 0.6 or -10% with prob 0.4. Strategy B always returns +5%. Calculate E[R], Var(R), and Sharpe (assume Rf=0) for each. Which is "better" depends on your objective — argue both sides.</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://www.mathsisfun.com/data/standard-deviation.html" target="_blank">
+        <div class="resource-icon">📐</div>
+        <div><div class="resource-name">Math is Fun — Std Deviation</div><div class="resource-desc">Visual, simple explanation with examples</div></div>
+      </a>
+      <a class="resource-card" href="https://www.desmos.com/calculator/2kmx0enkkz" target="_blank">
+        <div class="resource-icon">📊</div>
+        <div><div class="resource-name">Desmos — Normal Distribution</div><div class="resource-desc">Interactive normal curve, adjust μ and σ live</div></div>
+      </a>
+      <a class="resource-card" href="https://rpsychologist.com/d3/normal/" target="_blank">
+        <div class="resource-icon">🎨</div>
+        <div><div class="resource-name">RPsychologist — Normal Viz</div><div class="resource-desc">Beautiful d3.js visualization of normal and its properties</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== COVARIANCE ============================== -->
+<div class="tab-panel" id="tab-covariance">
+
+  <div class="section">
+    <div class="section-title">Covariance <span class="tag tag-advanced">Two Variables</span></div>
+    <p class="section-intro">Variance measures spread of one variable. Covariance measures how two variables move together. This is the gateway to portfolio theory, factor models, and multivariate statistics.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Fundamental Question</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">🔗</div>
+      <div class="analogy-text">When stock A goes up, does stock B tend to go up too? Or down? Or does it just do its own thing? <strong>Covariance quantifies this tendency</strong>. It's the key number behind "don't put all your eggs in one basket" — diversification only works when assets don't all move together (low or negative covariance).</div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Three Types of Relationships</div>
+      <canvas id="covTypesChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Definition of Covariance</h2>
+
+    <div class="highlight-card">
+      <div class="card-title">Formal Definition</div>
+      <div class="formula-box">
+        \[ \text{Cov}(X, Y) = E\left[(X - \mu_X)(Y - \mu_Y)\right] \]
+      </div>
+      <div class="formula-box">
+        \[ \text{Cov}(X, Y) = E[XY] - E[X] \cdot E[Y] \quad \leftarrow \text{Computational shortcut} \]
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Interpreting the Sign</div>
+      <table>
+        <thead><tr><th>Sign</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent3)"><strong>Cov > 0</strong></td><td>X and Y tend to move in the same direction</td><td>Oil stocks and energy ETFs</td></tr>
+          <tr><td style="color:var(--accent5)"><strong>Cov < 0</strong></td><td>X and Y tend to move in opposite directions</td><td>Bond prices and interest rates</td></tr>
+          <tr><td style="color:var(--text-muted)"><strong>Cov = 0</strong></td><td>No linear relationship (but could be nonlinear)</td><td>Two uncorrelated assets</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warning-card">Cov(X, Y) = 0 does NOT mean X and Y are independent! It only means no linear relationship. There can still be a strong nonlinear relationship (e.g. Y = X²).</div>
+  </div>
+
+  <div class="section">
+    <h2>Computing Covariance — Worked Example</h2>
+    <div class="card">
+      <div class="card-title">Step by Step</div>
+      <p>Scenario: Three equally likely states. Stock A and Stock B returns:</p>
+      <table>
+        <thead><tr><th>State</th><th>Prob</th><th>R_A</th><th>R_B</th></tr></thead>
+        <tbody>
+          <tr><td>Bull</td><td>1/3</td><td>+15%</td><td>+10%</td></tr>
+          <tr><td>Neutral</td><td>1/3</td><td>+2%</td><td>+1%</td></tr>
+          <tr><td>Bear</td><td>1/3</td><td>-10%</td><td>-5%</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Step 1:</strong> E[R_A] = (15 + 2 - 10)/3 = 7/3 ≈ 2.33%</p>
+      <p><strong>Step 2:</strong> E[R_B] = (10 + 1 - 5)/3 = 6/3 = 2%</p>
+      <p><strong>Step 3:</strong> E[R_A · R_B] = (15×10 + 2×1 + (-10)×(-5))/3 = (150 + 2 + 50)/3 = 202/3 ≈ 67.33</p>
+      <p><strong>Step 4:</strong> Cov(R_A, R_B) = E[R_A·R_B] - E[R_A]·E[R_B] = 67.33 - (2.33)(2) = 67.33 - 4.67 ≈ <em>62.67</em></p>
+      <p>Positive covariance: both stocks move in the same direction across states.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Properties of Covariance</h2>
+    <div class="card">
+      <div class="card-title">Key Properties</div>
+      <table>
+        <thead><tr><th>Property</th><th>Formula</th></tr></thead>
+        <tbody>
+          <tr><td>Symmetry</td><td>Cov(X, Y) = Cov(Y, X)</td></tr>
+          <tr><td>Self-covariance</td><td>Cov(X, X) = Var(X)</td></tr>
+          <tr><td>Independent → Cov=0</td><td>If X⊥Y then Cov(X,Y) = 0</td></tr>
+          <tr><td>Linearity</td><td>Cov(aX + b, Y) = a·Cov(X, Y)</td></tr>
+          <tr><td>Portfolio Variance</td><td>Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)</td></tr>
+          <tr><td>Bilinearity</td><td>Cov(X+Y, Z) = Cov(X,Z) + Cov(Y,Z)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Covariance Matrix — The Multivariate Extension</h2>
+    <p>For n assets, pairwise covariances are organized into a covariance matrix Σ:</p>
+    <div class="formula-box">
+      \[
+      \Sigma = \begin{pmatrix}
+      \sigma_1^2 & \text{Cov}(R_1, R_2) & \cdots & \text{Cov}(R_1, R_n) \\
+      \text{Cov}(R_2, R_1) & \sigma_2^2 & \cdots & \text{Cov}(R_2, R_n) \\
+      \vdots & \vdots & \ddots & \vdots \\
+      \text{Cov}(R_n, R_1) & \cdots & \cdots & \sigma_n^2
+      \end{pmatrix}
+      \]
+    </div>
+    <p>Diagonal entries are variances; off-diagonal entries are covariances. Portfolio variance = w^T Σ w where w is the weight vector. This matrix is the <em>core of Markowitz optimization</em>.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Interactive Scatter Plot — Visualize Covariance</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>Covariance type</label>
+          <select id="covSelect" onchange="updateCovScatter()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:0.4rem 0.6rem;border-radius:4px;font-family:var(--mono-font);font-size:0.8rem;">
+            <option value="pos">Positive Covariance</option>
+            <option value="neg">Negative Covariance</option>
+            <option value="zero">Zero Covariance</option>
+          </select>
+        </div>
+      </div>
+      <canvas id="covScatterChart" height="220"></canvas>
+      <div id="covScatterResult" style="margin-top:1rem;font-family:var(--mono-font);font-size:0.85rem;color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Portfolio Application: Diversification</h2>
+    <div class="highlight-card">
+      <div class="card-title">Why Diversification Works — The Math</div>
+      <p>For a 2-asset portfolio with equal weights (w₁ = w₂ = 0.5):</p>
+      <div class="formula-box">
+        \[ \text{Var}(R_p) = \frac{1}{4}\sigma_A^2 + \frac{1}{4}\sigma_B^2 + \frac{1}{2}\text{Cov}(A,B) \]
+      </div>
+      <p>If Cov(A,B) < 0, the last term <em>reduces</em> portfolio variance below the average of individual variances. This is the mathematical foundation of "free lunch" in diversification.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Covariance Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> If X and Y are independent with Var(X)=4 and Var(Y)=9, find Var(X+Y) and Var(X-Y).</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> True or False: Cov(X, Y) = 0 implies X and Y are independent. Provide a counterexample if false.</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> Show that Cov(X, X) = Var(X) using the definition of covariance.</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> Assets A and B: σ_A=15%, σ_B=20%, Cov(A,B)=0.015. Portfolio: 60% A, 40% B. Find σ_portfolio. Compare to the weighted average of individual σ's — which is higher?</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> You have daily return data: (Day 1: A=1%, B=2%), (Day 2: A=3%, B=5%), (Day 3: A=-2%, B=-3%). Compute Cov(A,B) from this sample. (Use sample covariance: divide by n-1=2.)</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> Prove that Var(aX + bY) = a²Var(X) + b²Var(Y) + 2ab·Cov(X,Y). (Expand from the definition of variance.)</p></div>
+      <div class="exercise-item"><p><strong>H2.</strong> You're building a 3-asset portfolio. Given the covariance matrix (σ₁²=0.04, σ₂²=0.09, σ₃²=0.01, Cov₁₂=0.01, Cov₁₃=-0.005, Cov₂₃=0.003) and weights w=(0.5, 0.3, 0.2), compute portfolio variance Var(Rₚ) = wᵀΣw. What happens if Cov₁₂ goes negative — does portfolio variance increase or decrease?</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://seeing-theory.brown.edu/regression-analysis/index.html" target="_blank">
+        <div class="resource-icon">🌐</div>
+        <div><div class="resource-name">Seeing Theory — Regression</div><div class="resource-desc">Visual intuition for covariance through regression</div></div>
+      </a>
+      <a class="resource-card" href="https://www.geogebra.org/m/nRNMGDMs" target="_blank">
+        <div class="resource-icon">🎯</div>
+        <div><div class="resource-name">GeoGebra — Covariance Viz</div><div class="resource-desc">Interactive scatter plots showing covariance</div></div>
+      </a>
+      <a class="resource-card" href="https://corporatefinanceinstitute.com/resources/excel/covariance-matrix/" target="_blank">
+        <div class="resource-icon">📊</div>
+        <div><div class="resource-name">CFI — Covariance Matrix</div><div class="resource-desc">Finance-focused guide with portfolio application</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== CORRELATION ============================== -->
+<div class="tab-panel" id="tab-correlation">
+
+  <div class="section">
+    <div class="section-title">Correlation <span class="tag tag-advanced">Normalized Covariance</span></div>
+    <p class="section-intro">Covariance tells you if two variables move together, but the number itself is hard to interpret — it depends on units. Correlation fixes this by normalizing covariance to a [-1, 1] scale.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Problem with Raw Covariance</h2>
+    <div class="card">
+      <div class="card-title">Unit Problem</div>
+      <p>Cov(returns in %, price in $) = something in "% × $" — meaningless for comparison.</p>
+      <p>Cov(A, B) = 50 and Cov(C, D) = 3. Which pair is more correlated? You can't tell just from the covariance value without knowing the individual variances!</p>
+      <p><strong>Solution:</strong> Normalize by both standard deviations to get a dimensionless [-1, 1] number.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Pearson Correlation Coefficient</h2>
+
+    <div class="highlight-card">
+      <div class="card-title">Definition</div>
+      <div class="formula-box">
+        \[ \rho(X, Y) = \frac{\text{Cov}(X, Y)}{\sigma_X \cdot \sigma_Y} \]
+      </div>
+      <p>Where σ_X = √Var(X) and σ_Y = √Var(Y)</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Interpreting ρ</div>
+      <table>
+        <thead><tr><th>Value</th><th>Interpretation</th><th>Finance Example</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent3)">ρ = +1</td><td>Perfect positive linear relationship</td><td>ETF and its underlying index</td></tr>
+          <tr><td style="color:var(--accent3)">0.7 to 0.9</td><td>Strong positive</td><td>Two stocks in same sector</td></tr>
+          <tr><td style="color:var(--text-muted)">0.3 to 0.6</td><td>Moderate positive</td><td>S&P 500 and international stocks</td></tr>
+          <tr><td style="color:var(--text-muted)">ρ ≈ 0</td><td>No linear relationship</td><td>Gold and tech stocks (historically)</td></tr>
+          <tr><td style="color:var(--accent5)">-0.3 to -0.6</td><td>Moderate negative</td><td>Stocks and VIX</td></tr>
+          <tr><td style="color:var(--accent5)">ρ = -1</td><td>Perfect negative linear relationship</td><td>Long/short pairs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Interactive Correlation Visualizer</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Scatter Plots at Different ρ Values</div>
+      <div class="controls">
+        <div class="control-group">
+          <label>ρ (correlation)</label>
+          <input type="range" id="corrRho" min="-100" max="100" value="0" oninput="updateCorrViz()">
+          <div class="val" id="corrRhoVal">0.00</div>
+        </div>
+        <div class="control-group">
+          <label>n (data points)</label>
+          <input type="range" id="corrN" min="20" max="200" step="10" value="100" oninput="updateCorrViz()">
+          <div class="val" id="corrNVal">100</div>
+        </div>
+      </div>
+      <canvas id="corrScatterChart" height="280"></canvas>
+      <div id="corrStats" style="margin-top:1rem;font-family:var(--mono-font);font-size:0.85rem;color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Correlation ≠ Causation</h2>
+    <div class="warning-card">The most important caveat in all of statistics. High correlation between X and Y does NOT mean X causes Y. They could both be driven by a third variable Z (confounding), or the correlation could be completely spurious.</div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Famous Spurious Correlation</div>
+        <p>US per capita cheese consumption is highly correlated with deaths by bedsheet tangling (ρ ≈ 0.95). Obviously cheese doesn't cause tangling deaths — this is coincidence in data over time.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Quant Finance Example</div>
+        <p>Two stocks can be highly correlated because they're both exposed to the same market factor (e.g., both are cyclical). The correlation is real, but neither causes the other — the market does.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Correlation Properties</h2>
+    <div class="card">
+      <div class="card-title">Key Properties</div>
+      <ul>
+        <li><strong>Bounded:</strong> -1 ≤ ρ(X,Y) ≤ 1 always</li>
+        <li><strong>Symmetric:</strong> ρ(X,Y) = ρ(Y,X)</li>
+        <li><strong>Self-correlation:</strong> ρ(X,X) = 1</li>
+        <li><strong>Scale-invariant:</strong> ρ(aX, bY) = sign(ab)·ρ(X,Y) for a,b ≠ 0</li>
+        <li><strong>ρ = ±1 iff:</strong> Y = aX + b (perfect linear relationship)</li>
+        <li><strong>Independent → ρ=0:</strong> but ρ=0 does NOT imply independence</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Correlation in Crisis: 2008</h2>
+    <div class="analogy-box">
+      <div class="analogy-icon">🔥</div>
+      <div class="analogy-text">Before 2008, different mortgage tranches appeared to have low correlations based on historical data. Portfolio models assumed diversification benefits. In the crisis, correlations between all risky assets <strong>spiked toward 1</strong> — everything crashed together. This is called <strong>"correlation breakdown"</strong> and it's a critical failure mode of models that assume stable correlations. In a crisis, correlations you relied on for diversification vanish exactly when you need them most.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>From Correlation Back to Covariance</h2>
+    <div class="formula-box">
+      \[ \text{Cov}(X, Y) = \rho(X, Y) \cdot \sigma_X \cdot \sigma_Y \]
+    </div>
+    <p>This is the standard way quants set up covariance matrices — estimate individual volatilities (σ) and pairwise correlations (ρ) separately, then combine.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Full Picture: All Concepts Connected</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Concept Map</div>
+      <canvas id="conceptMapCanvas" height="260"></canvas>
+    </div>
+
+    <div class="highlight-card">
+      <div class="card-title">The Connection Chain</div>
+      <p>PMF/PDF → describes the distribution → Expectation E[X] = weighted average → Variance Var(X) = E[(X-μ)²] = spread → Standard Deviation σ = √Var = spread in original units → Covariance Cov(X,Y) = E[(X-μx)(Y-μy)] = joint spread of two variables → Correlation ρ = Cov/σxσy = normalized, unitless relationship strength</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Correlation Exercises</h2>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">Easy</span></div>
+      <div class="exercise-item"><p><strong>E1.</strong> Cov(X,Y)=12, σ_X=4, σ_Y=6. Compute ρ(X,Y). Interpret the result.</p></div>
+      <div class="exercise-item"><p><strong>E2.</strong> ρ(A,B)=0.8, σ_A=5%, σ_B=10%. Find Cov(A,B).</p></div>
+      <div class="exercise-item"><p><strong>E3.</strong> Can ρ(X,Y) = 2? Why or why not? Explain the mathematical reason.</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">Medium</span></div>
+      <div class="exercise-item"><p><strong>M1.</strong> You have two assets with ρ=-0.6, σ_A=20%, σ_B=15%. Equal-weight portfolio. Find Var(Rₚ) and σ_p. Compare to if ρ=+0.6. How much variance does negative correlation reduce?</p></div>
+      <div class="exercise-item"><p><strong>M2.</strong> Daily return data: A: [1, 3, -2, 2], B: [2, 5, -3, 4]. Compute sample correlation (use sample covariance with n-1 denominator).</p></div>
+    </div>
+
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">Hard</span></div>
+      <div class="exercise-item"><p><strong>H1.</strong> Prove that |ρ(X,Y)| ≤ 1. (Hint: use the Cauchy-Schwarz inequality: |E[UV]|² ≤ E[U²]·E[V²] applied to U = X-μx and V = Y-μy.)</p></div>
+      <div class="exercise-item"><p><strong>H2.</strong> Consider a portfolio maximizing expected return subject to σ_p ≤ 15%. You have 3 assets with returns (8%, 12%, 6%), volatilities (10%, 20%, 5%), and pairwise correlations (ρ₁₂=0.7, ρ₁₃=0.1, ρ₂₃=0.3). Set up the optimization problem. Explain qualitatively what weight vector minimizes risk — which assets should be emphasized?</p></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>External Resources</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://seeing-theory.brown.edu/regression-analysis/index.html#section1" target="_blank">
+        <div class="resource-icon">🌐</div>
+        <div><div class="resource-name">Seeing Theory — Correlation</div><div class="resource-desc">Interactive visualization of correlation</div></div>
+      </a>
+      <a class="resource-card" href="https://www.guessthecorrelation.com/" target="_blank">
+        <div class="resource-icon">🎮</div>
+        <div><div class="resource-name">Guess the Correlation (Game!)</div><div class="resource-desc">Build intuition by guessing ρ from scatter plots</div></div>
+      </a>
+      <a class="resource-card" href="https://tylervigen.com/spurious-correlations" target="_blank">
+        <div class="resource-icon">😄</div>
+        <div><div class="resource-name">Spurious Correlations</div><div class="resource-desc">Funny examples of correlation ≠ causation</div></div>
+      </a>
+      <a class="resource-card" href="https://www.risk.net/definition/correlation-risk" target="_blank">
+        <div class="resource-icon">📊</div>
+        <div><div class="resource-name">Risk.net — Correlation Risk</div><div class="resource-desc">Professional treatment of correlation in risk management</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== COLAB ============================== -->
+<div class="tab-panel" id="tab-colab">
+
+  <div class="section">
+    <div class="section-title">Google Colab Experiments <span class="tag tag-core">Hands-On</span></div>
+    <p class="section-intro">Every concept in this guide can be coded and visualized in minutes. These experiments reinforce intuition by letting you see the math come alive with real numbers.</p>
+
+    <div class="resource-grid">
+      <a class="resource-card" href="https://colab.research.google.com" target="_blank">
+        <div class="resource-icon">🚀</div>
+        <div><div class="resource-name">Open Google Colab</div><div class="resource-desc">Free Jupyter notebook environment with Python — no install needed</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 1: Exploring PMFs</h2>
+    <p>Install and import the needed libraries, then build and plot PMFs from scratch.</p>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 1: PMF Exploration</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> binom, poisson
+
+<span class="cm"># ---- 1. Build a fair die PMF manually ----</span>
+outcomes = np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>])
+probs    = np.array([<span class="num">1</span>/<span class="num">6</span>] * <span class="num">6</span>)
+
+fig, axes = plt.subplots(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">14</span>, <span class="num">4</span>))
+
+axes[<span class="num">0</span>].bar(outcomes, probs, color=<span class="str">'steelblue'</span>, edgecolor=<span class="str">'white'</span>)
+axes[<span class="num">0</span>].set_title(<span class="str">'Fair Die PMF'</span>)
+axes[<span class="num">0</span>].set_xlabel(<span class="str">'Outcome x'</span>)
+axes[<span class="num">0</span>].set_ylabel(<span class="str">'P(X = x)'</span>)
+axes[<span class="num">0</span>].axhline(<span class="num">1</span>/<span class="num">6</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'1/6'</span>)
+
+<span class="cm"># ---- 2. Binomial PMF: n=10, p=0.4 ----</span>
+k = np.arange(<span class="num">0</span>, <span class="num">11</span>)
+pmf_vals = binom.pmf(k, n=<span class="num">10</span>, p=<span class="num">0.4</span>)
+axes[<span class="num">1</span>].bar(k, pmf_vals, color=<span class="str">'coral'</span>, edgecolor=<span class="str">'white'</span>)
+axes[<span class="num">1</span>].set_title(<span class="str">'Binomial(10, 0.4) PMF'</span>)
+axes[<span class="num">1</span>].set_xlabel(<span class="str">'k (number of successes)'</span>)
+axes[<span class="num">1</span>].set_ylabel(<span class="str">'P(X = k)'</span>)
+
+<span class="cm"># ---- 3. Poisson PMF: lambda=3 ----</span>
+k2 = np.arange(<span class="num">0</span>, <span class="num">12</span>)
+pmf_pois = poisson.pmf(k2, mu=<span class="num">3</span>)
+axes[<span class="num">2</span>].bar(k2, pmf_pois, color=<span class="str">'seagreen'</span>, edgecolor=<span class="str">'white'</span>)
+axes[<span class="num">2</span>].set_title(<span class="str">'Poisson(λ=3) PMF'</span>)
+axes[<span class="num">2</span>].set_xlabel(<span class="str">'k'</span>)
+axes[<span class="num">2</span>].set_ylabel(<span class="str">'P(X = k)'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Verify normalization</span>
+<span class="fn">print</span>(<span class="str">f"Die PMF sums to: {probs.sum():.6f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Binomial PMF sums to: {pmf_vals.sum():.6f}"</span>)
+</pre>
+    </div>
+    <div class="success-card">Try changing n and p in the Binomial. Notice how the peak shifts to np. This is the expected value!</div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 2: PMF → CDF Conversion</h2>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 2: PMF to CDF</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> binom
+
+n, p = <span class="num">10</span>, <span class="num">0.5</span>
+k = np.arange(<span class="num">0</span>, n+<span class="num">1</span>)
+pmf = binom.pmf(k, n, p)
+cdf = binom.cdf(k, n, p)  <span class="cm"># or: np.cumsum(pmf)</span>
+
+fig, (ax1, ax2) = plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">4</span>))
+
+<span class="cm"># PMF</span>
+ax1.bar(k, pmf, color=<span class="str">'steelblue'</span>)
+ax1.set_title(<span class="str">f'Binomial({n},{p}) PMF'</span>)
+ax1.set_xlabel(<span class="str">'k'</span>); ax1.set_ylabel(<span class="str">'P(X=k)'</span>)
+
+<span class="cm"># CDF as staircase</span>
+ax2.step(k, cdf, where=<span class="str">'post'</span>, color=<span class="str">'coral'</span>, lw=<span class="num">2</span>)
+ax2.scatter(k, cdf, color=<span class="str">'coral'</span>, zorder=<span class="num">5</span>)
+ax2.set_title(<span class="str">f'Binomial({n},{p}) CDF'</span>)
+ax2.set_xlabel(<span class="str">'x'</span>); ax2.set_ylabel(<span class="str">'P(X ≤ x)'</span>)
+ax2.axhline(<span class="num">0.5</span>, color=<span class="str">'gray'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'0.5 (median)'</span>)
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Compute probabilities using CDF</span>
+<span class="fn">print</span>(<span class="str">f"P(X ≤ 5) = {binom.cdf(5,n,p):.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"P(X > 7) = {1 - binom.cdf(7,n,p):.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"P(3 ≤ X ≤ 7) = {binom.cdf(7,n,p) - binom.cdf(2,n,p):.4f}"</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 3: Expectation and the Law of Large Numbers</h2>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 3: LLN — Simulated averages converging to E[X]</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.seed(<span class="num">42</span>)
+
+<span class="cm"># Simulate die rolls</span>
+N = <span class="num">5000</span>
+rolls = np.random.randint(<span class="num">1</span>, <span class="num">7</span>, size=N)
+running_avg = np.cumsum(rolls) / np.arange(<span class="num">1</span>, N+<span class="num">1</span>)
+
+plt.figure(figsize=(<span class="num">10</span>, <span class="num">4</span>))
+plt.plot(running_avg, color=<span class="str">'steelblue'</span>, alpha=<span class="num">0.8</span>, label=<span class="str">'Running average'</span>)
+plt.axhline(<span class="num">3.5</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'E[X] = 3.5'</span>)
+plt.xlabel(<span class="str">'Number of rolls'</span>)
+plt.ylabel(<span class="str">'Average value'</span>)
+plt.title(<span class="str">'Law of Large Numbers: Die Rolls'</span>)
+plt.legend()
+plt.grid(alpha=<span class="num">0.3</span>)
+plt.show()
+
+<span class="cm"># Verify E[X] formula</span>
+x_vals = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>])
+probs = np.array([<span class="num">1</span>/<span class="num">6</span>]*<span class="num">6</span>)
+theoretical_E = np.dot(x_vals, probs)   <span class="cm"># = 3.5</span>
+simulated_E   = rolls.mean()
+
+<span class="fn">print</span>(<span class="str">f"Theoretical E[X] = {theoretical_E}"</span>)
+<span class="fn">print</span>(<span class="str">f"Simulated mean   = {simulated_E:.4f}"</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 4: Variance and Standard Deviation</h2>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 4: Variance Deep Dive</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Generate two return series with same mean, different variance</span>
+np.random.seed(<span class="num">0</span>)
+mu = <span class="num">0.01</span>                          <span class="cm"># 1% daily return</span>
+low_vol  = np.random.normal(mu, <span class="num">0.005</span>, <span class="num">1000</span>)   <span class="cm"># σ=0.5%</span>
+high_vol = np.random.normal(mu, <span class="num">0.03</span>,  <span class="num">1000</span>)   <span class="cm"># σ=3%</span>
+
+fig, axes = plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">12</span>, <span class="num">4</span>))
+
+<span class="kw">for</span> ax, data, label, color <span class="kw">in</span> zip(
+    axes,
+    [low_vol, high_vol],
+    [<span class="str">'Low Volatility (σ=0.5%)'</span>, <span class="str">'High Volatility (σ=3%)'</span>],
+    [<span class="str">'steelblue'</span>, <span class="str">'coral'</span>]
+):
+    ax.hist(data, bins=<span class="num">50</span>, density=<span class="kw">True</span>, color=color, alpha=<span class="num">0.7</span>)
+    ax.axvline(data.mean(), color=<span class="str">'white'</span>, lw=<span class="num">2</span>, label=<span class="str">f'Mean={data.mean():.3f}'</span>)
+    ax.axvline(data.mean()+data.std(), color=<span class="str">'yellow'</span>, lw=<span class="num">1</span>, linestyle=<span class="str">'--'</span>)
+    ax.axvline(data.mean()-data.std(), color=<span class="str">'yellow'</span>, lw=<span class="num">1</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'±1σ'</span>)
+    ax.set_title(label); ax.legend()
+
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Compute stats manually and verify vs numpy</span>
+<span class="kw">for</span> data, name <span class="kw">in</span> [(low_vol, <span class="str">'Low Vol'</span>), (high_vol, <span class="str">'High Vol'</span>)]:
+    manual_var = np.mean((data - data.mean())**<span class="num">2</span>)
+    <span class="fn">print</span>(<span class="str">f"{name}: mean={data.mean():.4f}, σ²={manual_var:.6f}, σ={np.sqrt(manual_var):.4f}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  Shortcut: E[X²] - (E[X])² = {np.mean(data**2):.6f} - {data.mean()**2:.6f} = {np.mean(data**2)-data.mean()**2:.6f}"</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 5: Covariance and Correlation with Stock Data</h2>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 5: Covariance & Correlation — Simulated Stock Returns</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.seed(<span class="num">123</span>)
+N = <span class="num">500</span>   <span class="cm"># 500 trading days</span>
+
+<span class="cm"># Market factor (common component)</span>
+market = np.random.normal(<span class="num">0</span>, <span class="num">0.01</span>, N)
+
+<span class="cm"># Stock A: 80% market + 20% idiosyncratic</span>
+A = <span class="num">0.8</span> * market + <span class="num">0.2</span> * np.random.normal(<span class="num">0</span>, <span class="num">0.01</span>, N)
+
+<span class="cm"># Stock B: 70% market + 30% idiosyncratic  </span>
+B = <span class="num">0.7</span> * market + <span class="num">0.3</span> * np.random.normal(<span class="num">0</span>, <span class="num">0.01</span>, N)
+
+<span class="cm"># Stock C: negatively exposed to market (like VIX)</span>
+C = <span class="op">-</span><span class="num">0.5</span> * market + <span class="num">0.5</span> * np.random.normal(<span class="num">0</span>, <span class="num">0.005</span>, N)
+
+<span class="cm"># Build the covariance matrix</span>
+returns = np.column_stack([A, B, C])
+cov_matrix = np.cov(returns.T)
+corr_matrix = np.corrcoef(returns.T)
+
+<span class="fn">print</span>(<span class="str">"Covariance Matrix:"</span>)
+<span class="fn">print</span>(np.round(cov_matrix * <span class="num">10000</span>, <span class="num">3</span>), <span class="str">"× 10⁻⁴"</span>)
+<span class="fn">print</span>(<span class="str">"\nCorrelation Matrix:"</span>)
+<span class="fn">print</span>(np.round(corr_matrix, <span class="num">3</span>))
+
+<span class="cm"># Plot scatter matrix</span>
+fig, axes = plt.subplots(<span class="num">3</span>, <span class="num">3</span>, figsize=(<span class="num">9</span>, <span class="num">9</span>))
+labels = [<span class="str">'Stock A'</span>, <span class="str">'Stock B'</span>, <span class="str">'Stock C'</span>]
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>):
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>):
+        <span class="kw">if</span> i == j:
+            axes[i,j].hist(returns[:,i], bins=<span class="num">30</span>, color=<span class="str">'steelblue'</span>, alpha=<span class="num">0.7</span>)
+            axes[i,j].set_title(labels[i])
+        <span class="kw">else</span>:
+            axes[i,j].scatter(returns[:,j], returns[:,i], alpha=<span class="num">0.2</span>, s=<span class="num">5</span>, color=<span class="str">'coral'</span>)
+            axes[i,j].set_xlabel(labels[j]); axes[i,j].set_ylabel(labels[i])
+            axes[i,j].set_title(<span class="str">f"ρ = {corr_matrix[i,j]:.2f}"</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Portfolio variance comparison</span>
+w_eq = np.array([<span class="num">1</span>/<span class="num">3</span>, <span class="num">1</span>/<span class="num">3</span>, <span class="num">1</span>/<span class="num">3</span>])
+port_var = w_eq @ cov_matrix @ w_eq
+<span class="fn">print</span>(<span class="str">f"\nEqual-weight portfolio σ = {np.sqrt(port_var)*100:.4f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"Average individual σ    = {np.mean(np.sqrt(np.diag(cov_matrix)))*100:.4f}%"</span>)
+<span class="fn">print</span>(<span class="str">"→ Portfolio σ < average: diversification is working!"</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lab 6: All Topics Together — Portfolio Analysis</h2>
+    <div class="code-block">
+      <span class="code-lang">python</span>
+      <pre><span class="cm"># Lab 6: Complete pipeline — PMF → E[X] → Var → Cov → Corr → Portfolio</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Discrete model: 4 economic scenarios</span>
+scenarios = {
+    <span class="str">'Boom'</span>:    {<span class="str">'prob'</span>: <span class="num">0.25</span>, <span class="str">'A'</span>: <span class="num">0.20</span>, <span class="str">'B'</span>: <span class="num">0.15</span>},
+    <span class="str">'Growth'</span>:  {<span class="str">'prob'</span>: <span class="num">0.35</span>, <span class="str">'A'</span>: <span class="num">0.08</span>, <span class="str">'B'</span>: <span class="num">0.06</span>},
+    <span class="str">'Flat'</span>:    {<span class="str">'prob'</span>: <span class="num">0.25</span>, <span class="str">'A'</span>: <span class="num">0.02</span>, <span class="str">'B'</span>: <span class="num">0.03</span>},
+    <span class="str">'Crash'</span>:   {<span class="str">'prob'</span>: <span class="num">0.15</span>, <span class="str">'A'</span>: <span class="op">-</span><span class="num">0.25</span>, <span class="str">'B'</span>: <span class="op">-</span><span class="num">0.10</span>},
+}
+probs = np.array([s[<span class="str">'prob'</span>] <span class="kw">for</span> s <span class="kw">in</span> scenarios.values()])
+ra    = np.array([s[<span class="str">'A'</span>]    <span class="kw">for</span> s <span class="kw">in</span> scenarios.values()])
+rb    = np.array([s[<span class="str">'B'</span>]    <span class="kw">for</span> s <span class="kw">in</span> scenarios.values()])
+
+<span class="cm"># Compute E[R], Var(R), Cov, Corr</span>
+EA = np.dot(probs, ra)
+EB = np.dot(probs, rb)
+EA2 = np.dot(probs, ra**<span class="num">2</span>)
+EB2 = np.dot(probs, rb**<span class="num">2</span>)
+EAB = np.dot(probs, ra*rb)
+
+varA = EA2 - EA**<span class="num">2</span>
+varB = EB2 - EB**<span class="num">2</span>
+covAB = EAB - EA*EB
+rho = covAB / (np.sqrt(varA) * np.sqrt(varB))
+
+<span class="fn">print</span>(<span class="str">"=== Stock A ==="</span>)
+<span class="fn">print</span>(<span class="str">f"  E[R_A]   = {EA*100:.2f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"  Var(R_A) = {varA*100:.4f}%²"</span>)
+<span class="fn">print</span>(<span class="str">f"  SD(R_A)  = {np.sqrt(varA)*100:.2f}%"</span>)
+<span class="fn">print</span>(<span class="str">"\n=== Stock B ==="</span>)
+<span class="fn">print</span>(<span class="str">f"  E[R_B]   = {EB*100:.2f}%"</span>)
+<span class="fn">print</span>(<span class="str">f"  Var(R_B) = {varB*100:.4f}%²"</span>)
+<span class="fn">print</span>(<span class="str">f"  SD(R_B)  = {np.sqrt(varB)*100:.2f}%"</span>)
+<span class="fn">print</span>(<span class="str">"\n=== Joint ==="</span>)
+<span class="fn">print</span>(<span class="str">f"  Cov(A,B)  = {covAB:.6f}"</span>)
+<span class="fn">print</span>(<span class="str">f"  Corr(A,B) = {rho:.4f}"</span>)
+
+<span class="cm"># Portfolio analysis: sweep weights</span>
+weights = np.linspace(<span class="num">0</span>, <span class="num">1</span>, <span class="num">100</span>)
+port_returns = [w*EA + (<span class="num">1</span>-w)*EB <span class="kw">for</span> w <span class="kw">in</span> weights]
+port_vols    = [np.sqrt(w**<span class="num">2</span>*varA + (<span class="num">1</span>-w)**<span class="num">2</span>*varB + <span class="num">2</span>*w*(<span class="num">1</span>-w)*covAB)
+                <span class="kw">for</span> w <span class="kw">in</span> weights]
+
+plt.figure(figsize=(<span class="num">8</span>, <span class="num">5</span>))
+plt.plot([v*<span class="num">100</span> <span class="kw">for</span> v <span class="kw">in</span> port_vols], [r*<span class="num">100</span> <span class="kw">for</span> r <span class="kw">in</span> port_returns],
+         color=<span class="str">'steelblue'</span>, lw=<span class="num">2</span>)
+plt.scatter(np.sqrt(varA)*<span class="num">100</span>, EA*<span class="num">100</span>, s=<span class="num">100</span>, color=<span class="str">'coral'</span>,
+            zorder=<span class="num">5</span>, label=<span class="str">'Stock A'</span>)
+plt.scatter(np.sqrt(varB)*<span class="num">100</span>, EB*<span class="num">100</span>, s=<span class="num">100</span>, color=<span class="str">'seagreen'</span>,
+            zorder=<span class="num">5</span>, label=<span class="str">'Stock B'</span>)
+plt.xlabel(<span class="str">'Portfolio σ (%)'</span>)
+plt.ylabel(<span class="str">'Portfolio E[R] (%)'</span>)
+plt.title(<span class="str">'Mean-Variance Frontier (The Efficient Frontier!)'</span>)
+plt.legend(); plt.grid(alpha=<span class="num">0.3</span>)
+plt.show()
+</pre>
+    </div>
+    <div class="highlight-card">
+      <div class="card-title">🎉 You just built an efficient frontier!</div>
+      <p>That curve you plotted is the foundation of Modern Portfolio Theory (Markowitz 1952). Every point on it is a portfolio with different weights. The leftmost point is the minimum-variance portfolio. Covariance is what makes the curve bend inward — showing the diversification benefit.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Quick Reference: Key Functions</h2>
+    <table>
+      <thead><tr><th>Concept</th><th>NumPy/SciPy</th></tr></thead>
+      <tbody>
+        <tr><td>PMF — Binomial</td><td><code>scipy.stats.binom.pmf(k, n, p)</code></td></tr>
+        <tr><td>CDF — Binomial</td><td><code>scipy.stats.binom.cdf(k, n, p)</code></td></tr>
+        <tr><td>PMF — Poisson</td><td><code>scipy.stats.poisson.pmf(k, mu)</code></td></tr>
+        <tr><td>Normal CDF</td><td><code>scipy.stats.norm.cdf(x, mu, sigma)</code></td></tr>
+        <tr><td>Expected value</td><td><code>np.dot(probs, values)</code> or <code>np.mean(data)</code></td></tr>
+        <tr><td>Variance</td><td><code>np.var(data)</code> or <code>np.dot(probs, (vals-mean)**2)</code></td></tr>
+        <tr><td>Std deviation</td><td><code>np.std(data)</code></td></tr>
+        <tr><td>Covariance matrix</td><td><code>np.cov(data.T)</code></td></tr>
+        <tr><td>Correlation matrix</td><td><code>np.corrcoef(data.T)</code></td></tr>
+        <tr><td>Covariance (two arrays)</td><td><code>np.cov(x, y)[0,1]</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================== SUMMARY ============================== -->
+<div class="tab-panel" id="tab-summary">
+
+  <div class="section">
+    <div class="section-title">Master Summary & Reference</div>
+    <p class="section-intro">Everything you need in one place. Print this tab or save it as your cheat sheet.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Concept Map</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Full Dependency Map — How All Topics Connect</div>
+      <canvas id="fullMapCanvas" height="280"></canvas>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Formula Reference</h2>
+    <table>
+      <thead><tr><th>Concept</th><th>Formula</th><th>Key Point</th></tr></thead>
+      <tbody>
+        <tr><td><strong>PMF</strong></td><td>p(x) = P(X=x)</td><td>Σp(x)=1, p(x)≥0</td></tr>
+        <tr><td><strong>CDF</strong></td><td>F(x) = P(X≤x) = Σ_{k≤x} p(k)</td><td>Non-decreasing, 0 to 1</td></tr>
+        <tr><td><strong>E[X]</strong></td><td>Σ x·p(x)</td><td>Weighted average; center of mass</td></tr>
+        <tr><td><strong>E[g(X)]</strong></td><td>Σ g(x)·p(x)</td><td>LOTUS — use original probabilities</td></tr>
+        <tr><td><strong>Var(X)</strong></td><td>E[X²] - (E[X])²</td><td>Always ≥ 0; in squared units</td></tr>
+        <tr><td><strong>SD(X)</strong></td><td>√Var(X)</td><td>Same units as X</td></tr>
+        <tr><td><strong>Cov(X,Y)</strong></td><td>E[XY] - E[X]E[Y]</td><td>Can be any real number</td></tr>
+        <tr><td><strong>ρ(X,Y)</strong></td><td>Cov(X,Y) / (σ_X σ_Y)</td><td>Always in [-1, 1]</td></tr>
+        <tr><td><strong>Var(X+Y)</strong></td><td>Var(X) + Var(Y) + 2Cov(X,Y)</td><td>Cov term matters!</td></tr>
+        <tr><td><strong>Portfolio Var</strong></td><td>wᵀΣw</td><td>Matrix form of above</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Key Linearity Properties</h2>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">Expectation (always linear)</div>
+        <ul>
+          <li>E[aX + b] = aE[X] + b</li>
+          <li>E[X + Y] = E[X] + E[Y]</li>
+          <li>E[c] = c</li>
+          <li>E[XY] = E[X]E[Y] ← only if independent!</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Variance (not simply linear)</div>
+        <ul>
+          <li>Var(aX + b) = a²Var(X)</li>
+          <li>Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)</li>
+          <li>Var(X + Y) = Var(X) + Var(Y) ← only if independent!</li>
+          <li>Var(c) = 0</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Common Distributions Quick Reference</h2>
+    <table>
+      <thead><tr><th>Distribution</th><th>E[X]</th><th>Var(X)</th><th>Quant Use</th></tr></thead>
+      <tbody>
+        <tr><td>Bernoulli(p)</td><td>p</td><td>p(1-p)</td><td>Default yes/no</td></tr>
+        <tr><td>Binomial(n,p)</td><td>np</td><td>np(1-p)</td><td>Counts in n trials</td></tr>
+        <tr><td>Poisson(λ)</td><td>λ</td><td>λ</td><td>Event counts per interval</td></tr>
+        <tr><td>Geometric(p)</td><td>1/p</td><td>(1-p)/p²</td><td>Waiting time to first event</td></tr>
+        <tr><td>Uniform(a,b)</td><td>(a+b)/2</td><td>(b-a)²/12</td><td>Equally likely outcomes</td></tr>
+        <tr><td>Normal(μ,σ²)</td><td>μ</td><td>σ²</td><td>Returns, log-prices (CLT)</td></tr>
+        <tr><td>Exponential(λ)</td><td>1/λ</td><td>1/λ²</td><td>Time between events</td></tr>
+        <tr><td>Log-Normal</td><td>e^(μ+σ²/2)</td><td>(e^σ²-1)e^(2μ+σ²)</td><td>Stock prices (always positive)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>Common Pitfalls to Avoid</h2>
+    <div class="warning-card">Var(X+Y) ≠ Var(X) + Var(Y) unless X and Y are independent. Always check for dependence and include the covariance term.</div>
+    <div class="warning-card">E[XY] ≠ E[X]·E[Y] unless X and Y are independent. Independence implies zero covariance, but zero covariance does NOT imply independence.</div>
+    <div class="warning-card">Correlation ≠ Causation. High ρ between two assets may just mean they share a common factor driver, not that one causes the other.</div>
+    <div class="warning-card">PMF is only for discrete RVs. For continuous RVs, P(X = exact value) = 0. Use PDF and CDF instead.</div>
+    <div class="warning-card">Correlation measures LINEAR relationships only. A correlation of 0 doesn't mean "no relationship" — there could be a strong nonlinear one.</div>
+  </div>
+
+  <div class="section">
+    <h2>The Quant Engineering Path</h2>
+    <div class="card">
+      <div class="card-title">What you've learned → Where it leads</div>
+      <table>
+        <thead><tr><th>Concepts Mastered</th><th>Unlocks</th></tr></thead>
+        <tbody>
+          <tr><td>PMF, CDF</td><td>Risk modeling, VaR, stress testing</td></tr>
+          <tr><td>Expectation</td><td>Pricing (risk-neutral valuation), P&L attribution</td></tr>
+          <tr><td>Variance / Std Dev</td><td>Sharpe Ratio, volatility modeling (GARCH), options (Black-Scholes σ)</td></tr>
+          <tr><td>Covariance</td><td>Markowitz portfolio optimization, factor models (CAPM, Fama-French)</td></tr>
+          <tr><td>Correlation</td><td>Copulas, correlation trading, credit risk (CDO pricing)</td></tr>
+          <tr><td>All of the above</td><td>Multivariate statistics, Stochastic calculus, Machine Learning in Finance</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Recommended Next Steps</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="https://www.probabilitycourse.com/" target="_blank">
+        <div class="resource-icon">📚</div>
+        <div><div class="resource-name">Probability Course (Free)</div><div class="resource-desc">Full online textbook — next level after this guide</div></div>
+      </a>
+      <a class="resource-card" href="https://www.coursera.org/learn/probability-theory-statistics" target="_blank">
+        <div class="resource-icon">🎓</div>
+        <div><div class="resource-name">Probability for Statistics (Coursera)</div><div class="resource-desc">Rigorous course building toward multivariate statistics</div></div>
+      </a>
+      <a class="resource-card" href="https://quantlib.org" target="_blank">
+        <div class="resource-icon">💹</div>
+        <div><div class="resource-name">QuantLib</div><div class="resource-desc">Open-source library implementing all of this in real quant code</div></div>
+      </a>
+      <a class="resource-card" href="https://www.amazon.com/Options-Futures-Other-Derivatives-Hull/dp/0136939979" target="_blank">
+        <div class="resource-icon">📖</div>
+        <div><div class="resource-name">Hull — Options, Futures, and Other Derivatives</div><div class="resource-desc">The quant bible that uses everything you just learned</div></div>
+      </a>
+      <a class="resource-card" href="https://pubs.aeaweb.org/doi/pdf/10.1257/jep.28.4.3" target="_blank">
+        <div class="resource-icon">🔬</div>
+        <div><div class="resource-name">Statistical Arbitrage Paper</div><div class="resource-desc">See correlation and covariance applied in real trading strategy</div></div>
+      </a>
+      <a class="resource-card" href="https://numpy.org/doc/stable/reference/routines.statistics.html" target="_blank">
+        <div class="resource-icon">🐍</div>
+        <div><div class="resource-name">NumPy Statistics Reference</div><div class="resource-desc">All the functions you'll use to implement these concepts</div></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== TAB SWITCHING =====
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+  // Re-render MathJax
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===== COLOR PALETTE =====
+const C = {
+  accent: 'rgba(56,189,248,0.8)',
+  accent2: 'rgba(167,139,250,0.8)',
+  accent3: 'rgba(52,211,153,0.8)',
+  accent4: 'rgba(251,191,36,0.8)',
+  accent5: 'rgba(244,114,182,0.8)',
+  accentFill: 'rgba(56,189,248,0.15)',
+  accent2Fill: 'rgba(167,139,250,0.15)',
+  text: '#8899b4',
+  grid: 'rgba(36,48,80,0.6)',
+};
+
+const defaultChartOpts = {
+  responsive: true,
+  plugins: { legend: { labels: { color: C.text, font: { family: 'JetBrains Mono', size: 11 } } } },
+  scales: {
+    x: { ticks: { color: C.text }, grid: { color: C.grid }, border: { color: C.grid } },
+    y: { ticks: { color: C.text }, grid: { color: C.grid }, border: { color: C.grid } }
+  }
+};
+
+// ===== PREREQUISITES: RV Type Chart =====
+new Chart(document.getElementById('rvTypeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Coin flips today', 'Portfolio return', 'Trades per hour', 'Time to next trade', 'Bond rating', 'Stock price'],
+    datasets: [
+      { label: 'Discrete', data: [1,0,1,0,1,0], backgroundColor: C.accent, borderColor: C.accent, borderWidth: 1 },
+      { label: 'Continuous', data: [0,1,0,1,0,1], backgroundColor: C.accent2, borderColor: C.accent2, borderWidth: 1 },
+    ]
+  },
+  options: { ...defaultChartOpts, indexAxis: 'y', plugins: { ...defaultChartOpts.plugins }, scales: { x: { stacked: true, ticks: { color: C.text }, grid: { color: C.grid } }, y: { stacked: true, ticks: { color: C.text, font: {size: 10} }, grid: { color: C.grid } } } }
+});
+
+// ===== PMF: Fair Die =====
+new Chart(document.getElementById('diePMFChart'), {
+  type: 'bar',
+  data: {
+    labels: [1,2,3,4,5,6],
+    datasets: [{ label: 'P(X=x)', data: Array(6).fill(1/6), backgroundColor: C.accent, borderColor: C.accent, borderWidth: 1, borderRadius: 3 }]
+  },
+  options: { ...defaultChartOpts, plugins: { ...defaultChartOpts.plugins }, scales: { x: { ticks: { color: C.text }, grid: { color: C.grid } }, y: { min:0, max:0.4, ticks: { color: C.text }, grid: { color: C.grid } } } }
+});
+
+// ===== PMF: Binomial Interactive =====
+function binom_pmf(k, n, p) {
+  function logfact(n) { let s=0; for(let i=2;i<=n;i++) s+=Math.log(i); return s; }
+  return Math.exp(logfact(n)-logfact(k)-logfact(n-k) + k*Math.log(p) + (n-k)*Math.log(1-p));
+}
+
+let binomPMFChart = null;
+function updatePMF() {
+  const n = +document.getElementById('pmfN').value;
+  const p = +document.getElementById('pmfP').value;
+  document.getElementById('pmfNVal').textContent = n;
+  document.getElementById('pmfPVal').textContent = p.toFixed(2);
+  const ks = Array.from({length:n+1},(_,i)=>i);
+  const pmf = ks.map(k => binom_pmf(k, n, p));
+  if (binomPMFChart) binomPMFChart.destroy();
+  binomPMFChart = new Chart(document.getElementById('binomialPMFChart'), {
+    type: 'bar',
+    data: { labels: ks, datasets: [{ label: 'P(X=k)', data: pmf, backgroundColor: C.accent, borderColor: C.accent, borderWidth: 1, borderRadius: 2 }] },
+    options: { ...defaultChartOpts, scales: { x: { ticks:{color:C.text}, grid:{color:C.grid} }, y: { min:0, ticks:{color:C.text}, grid:{color:C.grid} } } }
+  });
+  const mean = (n*p).toFixed(2), varV = (n*p*(1-p)).toFixed(3), sd = Math.sqrt(n*p*(1-p)).toFixed(3);
+  document.getElementById('pmfStats').innerHTML = `
+    <div style="text-align:center"><span class="number-highlight">${mean}</span><span class="number-label">E[X] = np</span></div>
+    <div style="text-align:center"><span class="number-highlight">${varV}</span><span class="number-label">Var(X)</span></div>
+    <div style="text-align:center"><span class="number-highlight">${sd}</span><span class="number-label">SD(X) = σ</span></div>`;
+}
+updatePMF();
+
+// ===== CDF: Fair Die =====
+const dieCDFData = [1/6,2/6,3/6,4/6,5/6,1].map(v=>+v.toFixed(4));
+new Chart(document.getElementById('dieCDFChart'), {
+  type: 'line',
+  data: {
+    labels: [0,1,2,3,4,5,6,7],
+    datasets: [{ label:'F(x) = P(X≤x)', data:[0,...dieCDFData,1], stepped:true, borderColor:C.accent2, backgroundColor:C.accent2Fill, pointBackgroundColor:C.accent2, pointRadius:5, fill:true }]
+  },
+  options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text},grid:{color:C.grid}}, y:{min:0,max:1,ticks:{color:C.text},grid:{color:C.grid}} } }
+});
+
+// ===== CDF: Binomial Interactive =====
+let binomCDFChart = null;
+function updateCDF() {
+  const n = +document.getElementById('cdfN').value;
+  const p = +document.getElementById('cdfP').value;
+  const q = +document.getElementById('cdfQuery').value;
+  document.getElementById('cdfNVal').textContent = n;
+  document.getElementById('cdfPVal').textContent = p.toFixed(2);
+  document.getElementById('cdfQueryVal').textContent = q;
+  const ks = Array.from({length:n+2},(_,i)=>i);
+  let cum = 0;
+  const cdf = ks.map(k => { if(k>n) return 1; let s=0; for(let i=0;i<=k;i++) s+=binom_pmf(i,n,p); return Math.min(s,1); });
+  const colors = ks.map(k => k<=q ? C.accent2 : C.accentFill);
+  if (binomCDFChart) binomCDFChart.destroy();
+  binomCDFChart = new Chart(document.getElementById('binomialCDFChart'), {
+    type: 'line',
+    data: { labels: ks, datasets: [{ label:'F(x)', data:cdf, stepped:true, borderColor:C.accent2, backgroundColor:C.accent2Fill, pointBackgroundColor:colors, pointRadius:5, fill:true }] },
+    options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text},grid:{color:C.grid}}, y:{min:0,max:1,ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  const cdfVal = cdf[Math.min(q,n)].toFixed(4);
+  document.getElementById('cdfAnswer').textContent = `P(X ≤ ${q}) = F(${q}) = ${cdfVal}   |   P(X > ${q}) = ${(1-cdfVal).toFixed(4)}`;
+}
+updateCDF();
+
+// ===== Normal CDF =====
+function normalPDF(x) { return Math.exp(-0.5*x*x)/Math.sqrt(2*Math.PI); }
+function normalCDF(x) {
+  const t=1/(1+0.2316419*Math.abs(x));
+  const d=0.3989423*Math.exp(-x*x/2);
+  const p=d*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));
+  return x>0 ? 1-p : p;
+}
+let normalChart = null;
+function updateNormalCDF() {
+  const xq = +document.getElementById('normalX').value;
+  document.getElementById('normalXVal').textContent = xq.toFixed(1);
+  const xs = Array.from({length:121},(_,i)=>(i-60)/20);
+  const pdf = xs.map(x=>normalPDF(x));
+  const fillBelow = xs.map((x,i) => x<=xq ? normalPDF(x) : null);
+  if (normalChart) normalChart.destroy();
+  normalChart = new Chart(document.getElementById('normalCDFChart'), {
+    type: 'line',
+    data: { labels: xs.map(x=>x.toFixed(1)), datasets: [
+      { label:'PDF f(x)', data:pdf, borderColor:C.accent, pointRadius:0, tension:0.4, fill:false },
+      { label:`Area = F(${xq.toFixed(1)})`, data:fillBelow, borderColor:'transparent', backgroundColor:C.accent2Fill, fill:'origin', pointRadius:0, tension:0.4 }
+    ]},
+    options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text,maxTicksLimit:7},grid:{color:C.grid}}, y:{min:0,ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  const cdfVal = normalCDF(xq).toFixed(4);
+  document.getElementById('normalCDFAnswer').textContent = `P(Z ≤ ${xq.toFixed(1)}) = F(${xq.toFixed(1)}) = ${cdfVal}   |   P(Z > ${xq.toFixed(1)}) = ${(1-cdfVal).toFixed(4)}`;
+}
+updateNormalCDF();
+
+// ===== LLN Simulation =====
+let llnChart = null;
+function runLLN() {
+  const N = 500;
+  const rolls = Array.from({length:N}, () => Math.ceil(Math.random()*6));
+  let cum=0;
+  const avgs = rolls.map((r,i) => { cum+=r; return cum/(i+1); });
+  const labels = Array.from({length:N},(_,i)=>i+1);
+  if (llnChart) llnChart.destroy();
+  llnChart = new Chart(document.getElementById('lolChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Running average', data:avgs, borderColor:C.accent, borderWidth:1.5, pointRadius:0, tension:0 },
+      { label:'E[X] = 3.5', data:Array(N).fill(3.5), borderColor:'rgba(244,114,182,0.8)', borderWidth:1.5, borderDash:[5,5], pointRadius:0 }
+    ]},
+    options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text,maxTicksLimit:8},grid:{color:C.grid}}, y:{min:1,max:6,ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+}
+runLLN();
+
+// ===== Variance Compare Chart =====
+function gaussianPDF(x, mu, sigma) { return Math.exp(-0.5*((x-mu)/sigma)**2)/(sigma*Math.sqrt(2*Math.PI)); }
+const xRange = Array.from({length:200},(_,i)=>-5+i*0.05);
+new Chart(document.getElementById('varianceCompareChart'), {
+  type: 'line',
+  data: { labels: xRange.map(x=>x.toFixed(1)), datasets: [
+    { label:'Low variance σ=0.5', data:xRange.map(x=>gaussianPDF(x,0,0.5)), borderColor:C.accent, pointRadius:0, fill:false, tension:0.4 },
+    { label:'High variance σ=2', data:xRange.map(x=>gaussianPDF(x,0,2)), borderColor:C.accent5, pointRadius:0, fill:false, tension:0.4 }
+  ]},
+  options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text,maxTicksLimit:7},grid:{color:C.grid}}, y:{ticks:{color:C.text},grid:{color:C.grid}} } }
+});
+
+// ===== Normal SD Chart (68-95-99.7) =====
+const xSD = Array.from({length:200},(_,i)=>(i-100)/33.3);
+const pdfSD = xSD.map(x=>gaussianPDF(x,0,1));
+const fill1 = xSD.map((x,i) => Math.abs(x)<=1 ? pdfSD[i] : null);
+const fill2 = xSD.map((x,i) => Math.abs(x)<=2 && Math.abs(x)>1 ? pdfSD[i] : null);
+const fill3 = xSD.map((x,i) => Math.abs(x)<=3 && Math.abs(x)>2 ? pdfSD[i] : null);
+new Chart(document.getElementById('normalSDChart'), {
+  type: 'line',
+  data: { labels: xSD.map(x=>x.toFixed(1)), datasets: [
+    { data:pdfSD, borderColor:C.text, pointRadius:0, fill:false, tension:0.4, label:'PDF' },
+    { data:fill1, backgroundColor:'rgba(56,189,248,0.35)', borderColor:'transparent', pointRadius:0, fill:'origin', label:'±1σ (68%)' },
+    { data:fill2, backgroundColor:'rgba(167,139,250,0.35)', borderColor:'transparent', pointRadius:0, fill:'origin', label:'±2σ (95%)' },
+    { data:fill3, backgroundColor:'rgba(52,211,153,0.35)', borderColor:'transparent', pointRadius:0, fill:'origin', label:'±3σ (99.7%)' },
+  ]},
+  options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text,maxTicksLimit:7},grid:{color:C.grid}}, y:{min:0,ticks:{color:C.text},grid:{color:C.grid}} } }
+});
+
+// ===== Variance Interactive =====
+let varChart = null;
+function updateVarChart() {
+  const mu = +document.getElementById('varMu').value;
+  const sigma = +document.getElementById('varSigma').value;
+  document.getElementById('varMuVal').textContent = mu.toFixed(1);
+  document.getElementById('varSigmaVal').textContent = sigma.toFixed(1);
+  const xs = Array.from({length:200},(_,i)=>(i-100)*0.07);
+  if (varChart) varChart.destroy();
+  varChart = new Chart(document.getElementById('varChart'), {
+    type: 'line',
+    data: { labels: xs.map(x=>x.toFixed(1)), datasets: [
+      { data:xs.map(x=>gaussianPDF(x,mu,sigma)), borderColor:C.accent2, backgroundColor:C.accent2Fill, pointRadius:0, fill:true, tension:0.4, label:`Normal(μ=${mu}, σ=${sigma})` }
+    ]},
+    options: { ...defaultChartOpts, scales: { x:{ticks:{color:C.text,maxTicksLimit:7},grid:{color:C.grid}}, y:{min:0,ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  document.getElementById('varStats').textContent = `E[X] = ${mu.toFixed(2)}   |   Var(X) = σ² = ${(sigma**2).toFixed(3)}   |   SD(X) = σ = ${sigma.toFixed(2)}   |   Sharpe (Rf=0) = ${(mu/sigma).toFixed(3)}`;
+}
+updateVarChart();
+
+// ===== Expect Interactive =====
+let expectChart = null;
+function updateExpect() {
+  const raws = [+document.getElementById('ep1').value,+document.getElementById('ep2').value,+document.getElementById('ep3').value,+document.getElementById('ep4').value,+document.getElementById('ep5').value];
+  const total = raws.reduce((a,b)=>a+b,0);
+  const probs = raws.map(r=>r/total);
+  ['ev1','ev2','ev3','ev4','ev5'].forEach((id,i) => document.getElementById(id).textContent = probs[i].toFixed(2));
+  const vals = [-2,-1,0,1,2];
+  const ex = vals.reduce((s,v,i)=>s+v*probs[i],0);
+  const ex2 = vals.reduce((s,v,i)=>s+v*v*probs[i],0);
+  const varX = ex2-ex**2;
+  if (expectChart) expectChart.destroy();
+  expectChart = new Chart(document.getElementById('expectChart'), {
+    type: 'bar',
+    data: { labels: vals.map(v=>`x=${v}`), datasets: [{ label:'P(X=x)', data:probs, backgroundColor:probs.map((_,i)=>vals[i]<ex?C.accent5:C.accent3), borderRadius:4 }] },
+    options: { ...defaultChartOpts, plugins:{ ...defaultChartOpts.plugins, annotation:{} }, scales:{ x:{ticks:{color:C.text},grid:{color:C.grid}}, y:{min:0,max:1,ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  document.getElementById('expectResult').textContent = `E[X] = ${ex.toFixed(3)}   |   Var(X) = ${varX.toFixed(3)}   |   SD(X) = ${Math.sqrt(varX).toFixed(3)}`;
+}
+updateExpect();
+
+// ===== Covariance Types Chart =====
+function scatter3(canvas, sets) {
+  new Chart(canvas, {
+    type:'scatter',
+    data:{ datasets: sets },
+    options:{ ...defaultChartOpts, plugins:{ legend:{ labels:{ color:C.text, font:{family:'JetBrains Mono',size:10} } } }, scales:{ x:{ticks:{color:C.text},grid:{color:C.grid}}, y:{ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+}
+function genCorrelated(n, rho) {
+  const pts = [];
+  for (let i=0;i<n;i++) {
+    const u=randn(), v=randn();
+    const x=u, y=rho*u+Math.sqrt(1-rho**2)*v;
+    pts.push({x,y});
+  }
+  return pts;
+}
+function randn() { return Math.sqrt(-2*Math.log(Math.random()))*Math.cos(2*Math.PI*Math.random()); }
+
+new Chart(document.getElementById('covTypesChart'), {
+  type:'scatter',
+  data:{ datasets:[
+    { label:'Positive Cov (ρ≈0.8)', data:genCorrelated(80,0.8), backgroundColor:'rgba(52,211,153,0.5)', pointRadius:3 },
+    { label:'Zero Cov (ρ≈0)', data:genCorrelated(80,0).map(p=>({x:p.x+7,y:p.y})), backgroundColor:'rgba(56,189,248,0.5)', pointRadius:3 },
+    { label:'Negative Cov (ρ≈-0.8)', data:genCorrelated(80,-0.8).map(p=>({x:p.x+14,y:p.y})), backgroundColor:'rgba(244,114,182,0.5)', pointRadius:3 },
+  ]},
+  options:{ ...defaultChartOpts, scales:{ x:{ticks:{color:C.text,maxTicksLimit:6},grid:{color:C.grid}}, y:{ticks:{color:C.text},grid:{color:C.grid}} } }
+});
+
+// ===== Covariance Scatter Interactive =====
+let covChart = null;
+function updateCovScatter() {
+  const type = document.getElementById('covSelect').value;
+  const rho = type==='pos' ? 0.8 : type==='neg' ? -0.8 : 0.0;
+  const pts = genCorrelated(150, rho);
+  if (covChart) covChart.destroy();
+  covChart = new Chart(document.getElementById('covScatterChart'), {
+    type:'scatter',
+    data:{ datasets:[{ label:`ρ ≈ ${rho}`, data:pts, backgroundColor:type==='pos'?C.accent3:type==='neg'?C.accent5:C.accent, pointRadius:3 }] },
+    options:{ ...defaultChartOpts, scales:{ x:{ticks:{color:C.text},grid:{color:C.grid}}, y:{ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  // Compute actual correlation
+  const xs = pts.map(p=>p.x), ys = pts.map(p=>p.y);
+  const mx=xs.reduce((a,b)=>a+b,0)/xs.length, my=ys.reduce((a,b)=>a+b,0)/ys.length;
+  const cov=xs.reduce((s,x,i)=>s+(x-mx)*(ys[i]-my),0)/xs.length;
+  const sx=Math.sqrt(xs.reduce((s,x)=>s+(x-mx)**2,0)/xs.length);
+  const sy=Math.sqrt(ys.reduce((s,y)=>s+(y-my)**2,0)/ys.length);
+  document.getElementById('covScatterResult').textContent = `Computed ρ = ${(cov/(sx*sy)).toFixed(3)}   |   Cov = ${cov.toFixed(3)}   |   σX = ${sx.toFixed(3)}   |   σY = ${sy.toFixed(3)}`;
+}
+updateCovScatter();
+
+// ===== Correlation Interactive =====
+let corrChart = null;
+function updateCorrViz() {
+  const rho = +document.getElementById('corrRho').value / 100;
+  const N = +document.getElementById('corrN').value;
+  document.getElementById('corrRhoVal').textContent = rho.toFixed(2);
+  document.getElementById('corrNVal').textContent = N;
+  const pts = genCorrelated(N, rho);
+  if (corrChart) corrChart.destroy();
+  corrChart = new Chart(document.getElementById('corrScatterChart'), {
+    type:'scatter',
+    data:{ datasets:[{ label:`ρ = ${rho.toFixed(2)}`, data:pts, backgroundColor:C.accent, pointRadius:3 }] },
+    options:{ ...defaultChartOpts, scales:{ x:{title:{display:true,text:'Asset X Return',color:C.text},ticks:{color:C.text},grid:{color:C.grid}}, y:{title:{display:true,text:'Asset Y Return',color:C.text},ticks:{color:C.text},grid:{color:C.grid}} } }
+  });
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const mx=xs.reduce((a,b)=>a+b,0)/N, my=ys.reduce((a,b)=>a+b,0)/N;
+  const cov=xs.reduce((s,x,i)=>s+(x-mx)*(ys[i]-my),0)/N;
+  const sx=Math.sqrt(xs.reduce((s,x)=>s+(x-mx)**2,0)/N);
+  const sy=Math.sqrt(ys.reduce((s,y)=>s+(y-my)**2,0)/N);
+  document.getElementById('corrStats').textContent = `Computed ρ = ${(cov/(sx*sy)).toFixed(3)}   |   Cov(X,Y) = ${cov.toFixed(4)}   |   σX = ${sx.toFixed(4)}   |   σY = ${sy.toFixed(4)}`;
+}
+updateCorrViz();
+
+// ===== Concept Map (Correlation tab) =====
+function drawConceptMap(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.parentElement.clientWidth - 48;
+  canvas.width = W; canvas.height = 260;
+  ctx.clearRect(0,0,W,260);
+
+  const nodes = [
+    { x:0.06, y:0.5, label:'Sample\nSpace', color:'#fbbf24' },
+    { x:0.22, y:0.5, label:'Random\nVariable', color:'#fbbf24' },
+    { x:0.38, y:0.15, label:'PMF', color:'#38bdf8' },
+    { x:0.38, y:0.85, label:'CDF', color:'#38bdf8' },
+    { x:0.56, y:0.3, label:'E[X]', color:'#34d399' },
+    { x:0.56, y:0.7, label:'Var(X)', color:'#34d399' },
+    { x:0.74, y:0.3, label:'Cov(X,Y)', color:'#a78bfa' },
+    { x:0.74, y:0.7, label:'SD(X)=σ', color:'#f472b6' },
+    { x:0.92, y:0.5, label:'Corr(X,Y)\nρ', color:'#a78bfa' },
+  ];
+
+  const edges = [
+    [0,1],[1,2],[1,3],[2,4],[2,5],[3,5],[4,5],[4,6],[5,7],[5,6],[6,8],[7,8]
+  ];
+
+  ctx.strokeStyle = 'rgba(36,48,80,0.8)';
+  ctx.lineWidth = 1.5;
+  edges.forEach(([a,b]) => {
+    const na = nodes[a], nb = nodes[b];
+    ctx.beginPath();
+    ctx.moveTo(na.x*W, na.y*260);
+    ctx.lineTo(nb.x*W, nb.y*260);
+    ctx.stroke();
+  });
+
+  nodes.forEach(n => {
+    const x = n.x*W, y = n.y*260;
+    ctx.beginPath();
+    ctx.arc(x, y, 28, 0, 2*Math.PI);
+    ctx.fillStyle = n.color + '22';
+    ctx.fill();
+    ctx.strokeStyle = n.color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = n.color;
+    ctx.font = 'bold 11px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lines = n.label.split('\n');
+    lines.forEach((l,i) => ctx.fillText(l, x, y + (i - (lines.length-1)/2)*14));
+  });
+}
+
+setTimeout(() => { drawConceptMap('conceptMapCanvas'); drawConceptMap('fullMapCanvas'); }, 300);
+
+// MathJax config
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  startup: { typeset: true }
+};
+</script>
+</body>
+</html>

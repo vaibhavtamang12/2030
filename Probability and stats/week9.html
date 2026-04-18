@@ -1,0 +1,2837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Study Guide — Markov Chains, Random Walks & Brownian Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c14;
+    --surface: #111520;
+    --surface2: #161b2e;
+    --surface3: #1e2540;
+    --border: #2a3355;
+    --accent: #4f8ef7;
+    --accent2: #f7a44f;
+    --accent3: #5ef7a4;
+    --accent4: #f74f8e;
+    --text: #e8ecf8;
+    --text-dim: #8892b0;
+    --text-muted: #4a5580;
+    --gold: #f7c44f;
+    --purple: #a44ff7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, #0d1022 0%, #111828 50%, #0a0e1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .header-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .site-title span { color: var(--accent2); }
+
+  .badge {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--accent3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── TAB NAV ── */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-list {
+    display: flex;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    gap: 0;
+    list-style: none;
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 1.1rem 1.4rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab-btn:hover { color: var(--text-dim); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-btn.t0.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-btn.t1.active { color: var(--accent3); border-bottom-color: var(--accent3); }
+  .tab-btn.t2.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn.t3.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  .tab-btn.t4.active { color: var(--accent4); border-bottom-color: var(--accent4); }
+  .tab-btn.t5.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  /* ── CONTENT ── */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin: 3rem 0 1.2rem;
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 2rem 0 0.8rem;
+  }
+  h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 1.5rem 0 0.6rem;
+    color: var(--text-dim);
+  }
+  p { margin-bottom: 1.2rem; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .lead {
+    font-size: 1.25rem;
+    color: var(--text-dim);
+    margin-bottom: 2.5rem;
+    font-style: italic;
+    max-width: 80ch;
+  }
+
+  /* ── CARDS & BOXES ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.8rem 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .callout {
+    border-left: 4px solid var(--accent);
+    background: linear-gradient(90deg, rgba(79,142,247,0.07) 0%, transparent 100%);
+    border-radius: 0 8px 8px 0;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .callout.gold { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(247,196,79,0.07) 0%, transparent 100%); }
+  .callout.green { border-left-color: var(--accent3); background: linear-gradient(90deg, rgba(94,247,164,0.07) 0%, transparent 100%); }
+  .callout.pink { border-left-color: var(--accent4); background: linear-gradient(90deg, rgba(247,79,142,0.07) 0%, transparent 100%); }
+  .callout.purple { border-left-color: var(--purple); background: linear-gradient(90deg, rgba(164,79,247,0.07) 0%, transparent 100%); }
+
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+  .callout.gold .callout-label { color: var(--gold); }
+  .callout.green .callout-label { color: var(--accent3); }
+  .callout.pink .callout-label { color: var(--accent4); }
+  .callout.purple .callout-label { color: var(--purple); }
+
+  /* ── CODE ── */
+  pre {
+    background: #080b14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #c9d1f0;
+  }
+  p code, li code {
+    background: var(--surface3);
+    border-radius: 4px;
+    padding: 0.15em 0.4em;
+    font-size: 0.82em;
+  }
+  .kw { color: #f74f8e; }
+  .fn { color: #4f8ef7; }
+  .st { color: #5ef7a4; }
+  .cm { color: #4a5580; font-style: italic; }
+  .nm { color: #f7a44f; }
+  .op { color: #a44ff7; }
+
+  /* ── MATH DISPLAY ── */
+  .math-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.8rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+    overflow-x: auto;
+  }
+
+  /* ── MATRIX VIZ ── */
+  .matrix-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+  .matrix {
+    border-left: 3px solid var(--accent);
+    border-right: 3px solid var(--accent);
+    padding: 0.5rem 1rem;
+  }
+  .matrix table { border-collapse: collapse; }
+  .matrix td {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent3);
+  }
+
+  /* ── GRID LAYOUTS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; margin: 1.5rem 0; }
+  @media(max-width: 768px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+  }
+
+  /* ── LISTS ── */
+  ul, ol {
+    padding-left: 1.8rem;
+    margin-bottom: 1.2rem;
+  }
+  li { margin-bottom: 0.4rem; }
+
+  /* ── CANVAS VIZ ── */
+  .viz-container {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+  .viz-container canvas {
+    border-radius: 8px;
+    max-width: 100%;
+  }
+  .viz-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+  .viz-controls {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.55rem 1.2rem;
+    text-transform: uppercase;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .btn:hover { background: var(--border); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #3a7aee; }
+  .btn.green { background: rgba(94,247,164,0.12); border-color: var(--accent3); color: var(--accent3); }
+  .btn.green:hover { background: rgba(94,247,164,0.22); }
+
+  /* ── EXERCISE TIERS ── */
+  .tier-section { margin: 2rem 0; }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+  }
+  .tier-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+  .tier-badge.easy { background: rgba(94,247,164,0.15); color: var(--accent3); border: 1px solid var(--accent3); }
+  .tier-badge.medium { background: rgba(247,164,79,0.15); color: var(--accent2); border: 1px solid var(--accent2); }
+  .tier-badge.hard { background: rgba(247,79,142,0.15); color: var(--accent4); border: 1px solid var(--accent4); }
+
+  .exercise-list {
+    list-style: none;
+    padding: 0;
+  }
+  .exercise-list li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .ex-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 2rem;
+    padding-top: 0.2rem;
+  }
+
+  /* ── RESOURCE LINKS ── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .resource-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    transition: border-color 0.2s;
+  }
+  .resource-card:hover { border-color: var(--accent); }
+  .resource-card a { color: var(--text); display: block; }
+  .resource-card a:hover { text-decoration: none; }
+  .resource-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+  .resource-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  .resource-desc {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ── STEP FLOW ── */
+  .step-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 2rem 0;
+    position: relative;
+  }
+  .step-flow::before {
+    content: '';
+    position: absolute;
+    left: 1.4rem;
+    top: 2rem;
+    bottom: 2rem;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent3));
+  }
+  .step-item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    padding: 1rem 0;
+  }
+  .step-num {
+    width: 2.8rem;
+    height: 2.8rem;
+    min-width: 2.8rem;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    z-index: 1;
+  }
+  .step-body h4 { margin: 0 0 0.4rem; font-size: 0.95rem; color: var(--text); }
+  .step-body p { margin: 0; font-size: 0.95rem; color: var(--text-dim); }
+
+  /* ── SECTION DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+
+  /* ── TABLE ── */
+  .styled-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+  .styled-table th {
+    background: var(--surface3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.2rem;
+    text-align: left;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+  }
+  .styled-table td {
+    padding: 0.75rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table tr:hover td { background: var(--surface2); }
+
+  /* ── PAGE COLOR ACCENTS ── */
+  .page-0 h1, .page-0 h2 { color: var(--gold); }
+  .page-1 h1, .page-1 h2 { color: var(--accent3); }
+  .page-2 h1, .page-2 h2 { color: var(--accent); }
+  .page-3 h1, .page-3 h2 { color: var(--accent2); }
+  .page-4 h1, .page-4 h2 { color: var(--accent4); }
+  .page-5 h1, .page-5 h2 { color: var(--purple); }
+
+  /* ── STATE DIAGRAM ── */
+  .state-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+    padding: 2rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .state-node {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--surface3);
+    position: relative;
+  }
+  .state-node.active-node { border-color: var(--accent3); color: var(--accent3); }
+  .state-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  .arrow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+  }
+  .arrow-line {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+  }
+
+  /* ── HIGHLIGHT ── */
+  mark {
+    background: rgba(79,142,247,0.2);
+    color: var(--text);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    margin: 0.15rem;
+  }
+
+  /* ── SCROLL ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+  /* ── RANDOM WALK CANVAS ── */
+  #rw-canvas { background: #080b14; border-radius: 8px; }
+
+  /* ── PROGRESS BAR ── */
+  .topic-progress {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .topic-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .topic-chip:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div>
+      <div class="site-title">Quant Engineer <span>Study Guide</span></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-muted);margin-top:0.3rem;">
+        Markov Chains · Random Walks · Brownian Motion
+      </div>
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <span class="badge">First-Time Learners</span>
+      <span class="badge">100% Offline</span>
+      <span class="badge">v1.0</span>
+    </div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <ul class="tab-list">
+    <li><button class="tab-btn t0 active" onclick="switchTab(0)">00 · Prerequisites</button></li>
+    <li><button class="tab-btn t1" onclick="switchTab(1)">01 · Probability Basics</button></li>
+    <li><button class="tab-btn t2" onclick="switchTab(2)">02 · Markov Chains</button></li>
+    <li><button class="tab-btn t3" onclick="switchTab(3)">03 · Random Walks</button></li>
+    <li><button class="tab-btn t4" onclick="switchTab(4)">04 · Brownian Motion</button></li>
+    <li><button class="tab-btn t5" onclick="switchTab(5)">05 · Colab Labs</button></li>
+  </ul>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 0 — PREREQUISITES                                   -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-0">
+<div class="page page-0">
+
+  <h1>Before You Begin: The Prerequisite Map</h1>
+  <p class="lead">Every great structure needs a foundation. These are the building blocks you need before the main topics make complete sense. Don't skip them — they're short, intuitive, and essential.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">🗺️ Reading Order</div>
+    This tab → Tab 01 (Probability Basics) → Tab 02 (Markov Chains) → Tab 03 (Random Walks) → Tab 04 (Brownian Motion) → Tab 05 (Colab Labs). Each tab builds directly on the previous one.
+  </div>
+
+  <h2>Prerequisite Topics at a Glance</h2>
+
+  <div class="three-col">
+    <div class="card">
+      <h4 style="color:var(--gold)">📐 Linear Algebra Basics</h4>
+      <p style="font-size:0.95rem;">Vectors, matrices, matrix multiplication, eigenvectors & eigenvalues. You need this for Transition Matrices.</p>
+      <div><span class="tag">vectors</span><span class="tag">matrices</span><span class="tag">eigenvalues</span></div>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--gold)">📊 Basic Probability</h4>
+      <p style="font-size:0.95rem;">Sample spaces, events, probability rules, conditional probability, independence. Core to everything here.</p>
+      <div><span class="tag">P(A)</span><span class="tag">P(A|B)</span><span class="tag">distributions</span></div>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--gold)">📈 Basic Calculus (light)</h4>
+      <p style="font-size:0.95rem;">Limits, what a derivative means intuitively, sums as areas. Used in Brownian motion intuition.</p>
+      <div><span class="tag">limits</span><span class="tag">continuity</span><span class="tag">sums</span></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Prerequisite 1: Vectors & Matrices — The Essentials</h2>
+
+  <p>Think of a <strong>vector</strong> as a list of numbers. In our context, it will represent a probability distribution — i.e., "what's the chance of being in each state right now?"</p>
+
+  <div class="math-block">
+    π = [0.3,  0.5,  0.2]  ← probability of being in State A, B, C
+  </div>
+
+  <p>A <strong>matrix</strong> is a grid (table) of numbers. In our context, it will represent transition probabilities — "if I'm in state X, what's the probability of moving to state Y?"</p>
+
+  <div class="matrix-wrap">
+    <span style="font-family:'JetBrains Mono',monospace;color:var(--text-dim)">P =</span>
+    <div class="matrix">
+      <table>
+        <tr><td>0.7</td><td>0.2</td><td>0.1</td></tr>
+        <tr><td>0.3</td><td>0.4</td><td>0.3</td></tr>
+        <tr><td>0.1</td><td>0.6</td><td>0.3</td></tr>
+      </table>
+    </div>
+    <div style="font-family:'Crimson Pro',serif;color:var(--text-dim);font-size:0.9rem;max-width:200px;text-align:left;">
+      Row i, Column j = probability of going from state i to state j
+    </div>
+  </div>
+
+  <h3>Matrix Multiplication (in 60 seconds)</h3>
+  <p>When we multiply a row vector (a distribution) by a matrix, we get a new row vector — the distribution at the next time step. This is the core engine of Markov Chains.</p>
+
+  <div class="math-block">
+    π_next = π_current × P
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">Concrete Example</div>
+    If today there's a 60% chance I'm in State A and 40% in State B, and P says "from A, go to B with prob 0.3" and "from B, go to A with prob 0.5", then tomorrow's distribution is: <br><br>
+    P(A tomorrow) = 0.6 × (stay in A) + 0.4 × (B→A) = 0.6 × 0.7 + 0.4 × 0.5 = 0.42 + 0.20 = 0.62
+  </div>
+
+  <h3>Eigenvectors & Eigenvalues (Intuition Only)</h3>
+  <p>A special vector <strong>v</strong> is called an <em>eigenvector</em> of matrix M if multiplying M by v just scales v — it doesn't change its direction. The scaling factor is the <em>eigenvalue</em> λ.</p>
+
+  <div class="math-block">
+    M × v  =  λ × v
+  </div>
+
+  <p>For Markov Chains, the <strong>stationary distribution</strong> is essentially the eigenvector of the transition matrix corresponding to eigenvalue 1. You don't need to compute it by hand — just know this geometric fact: <em>multiplying by P doesn't change the stationary distribution.</em></p>
+
+  <hr class="divider">
+
+  <h2>Prerequisite 2: Probability — The Language</h2>
+
+  <h3>Sample Space & Events</h3>
+  <p>A <strong>sample space Ω</strong> is the set of all possible outcomes. An <strong>event</strong> is any subset of Ω. A <strong>probability measure P</strong> assigns a number between 0 and 1 to every event.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Rolling a die</h4>
+      <p>Ω = {1, 2, 3, 4, 5, 6}<br>
+      Event "roll even" = {2, 4, 6}<br>
+      P(even) = 3/6 = 0.5</p>
+    </div>
+    <div class="card">
+      <h4>Rules of Probability</h4>
+      <p>P(Ω) = 1 &nbsp;&nbsp; (something always happens)<br>
+      P(A∪B) = P(A) + P(B) – P(A∩B)<br>
+      P(A) + P(Aᶜ) = 1 &nbsp;&nbsp; (complement rule)</p>
+    </div>
+  </div>
+
+  <h3>Conditional Probability — The Most Important Concept Here</h3>
+  <p><strong>P(B | A)</strong> means "the probability of B, <em>given that</em> A already happened." It's the most natural thing in the world — your estimates change when you learn new information.</p>
+
+  <div class="math-block">
+    P(B | A)  =  P(A ∩ B) / P(A)
+  </div>
+
+  <div class="callout green">
+    <div class="callout-label">Intuition</div>
+    Imagine you're standing in a room. P(it will rain) might be 0.3. But P(it will rain | I see dark clouds) = 0.85. Conditioning narrows the world to only those scenarios where A happened, then asks: in that narrowed world, how often does B happen?
+  </div>
+
+  <h3>Independence</h3>
+  <p>Events A and B are <strong>independent</strong> if knowing A happened tells you nothing about B. Mathematically: P(A ∩ B) = P(A) × P(B).</p>
+
+  <h3>Random Variables</h3>
+  <p>A <strong>random variable X</strong> is a function that assigns a number to each outcome in the sample space. The <strong>expected value E[X]</strong> is the probability-weighted average.</p>
+
+  <div class="math-block">
+    E[X]  =  Σ  x · P(X = x)  &nbsp;&nbsp;&nbsp;  (for discrete X)
+  </div>
+
+  <h3>Variance and Standard Deviation</h3>
+  <div class="math-block">
+    Var(X) = E[(X - E[X])²]  =  E[X²] - (E[X])²
+    σ = √Var(X)
+  </div>
+  <p>Variance measures <em>spread</em>. Low variance = values cluster near mean. High variance = values spread widely. This is crucial for understanding how random walks spread over time.</p>
+
+  <hr class="divider">
+
+  <h2>Prerequisite 3: Key Probability Distributions</h2>
+
+  <div class="two-col">
+    <div class="card">
+      <h4 style="color:var(--accent3)">Bernoulli Distribution</h4>
+      <p>A single coin flip. Takes value 1 with prob p, and 0 with prob (1-p).</p>
+      <div class="math-block" style="margin:0.8rem 0;padding:0.8rem;">E[X] = p &nbsp;&nbsp; Var(X) = p(1-p)</div>
+      <p style="font-size:0.9rem;">Each step of a simple random walk is a Bernoulli: +1 or -1.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent3)">Normal (Gaussian) Distribution</h4>
+      <p>The famous bell curve. Described by mean μ and variance σ². Most naturally occurring averages follow this.</p>
+      <div class="math-block" style="margin:0.8rem 0;padding:0.8rem;">X ~ N(μ, σ²)</div>
+      <p style="font-size:0.9rem;">Brownian motion has normally distributed increments — this is its defining feature.</p>
+    </div>
+  </div>
+
+  <h3>The Central Limit Theorem (CLT) — A Preview</h3>
+  <p>The CLT says: <em>add up many independent random variables and the sum approaches a normal distribution</em>, regardless of what the individual distributions look like. This is WHY Brownian motion (the sum/integral of infinitely many tiny steps) is normal. We'll revisit this in Tab 04.</p>
+
+  <div class="callout purple">
+    <div class="callout-label">Connection Map</div>
+    Bernoulli steps → sum many → CLT → Normal distribution → Random Walk limit → Brownian Motion. This is the entire thread connecting Tab 01 through Tab 04.
+  </div>
+
+  <hr class="divider">
+
+  <h2>Prerequisite 4: Logarithms & Exponentials (Brief)</h2>
+  <p>In finance and quant work, prices often move in percentage terms (multiplicative), not additive terms. We use <code>log(price)</code> to convert multiplicative changes into additive ones — which is necessary for applying all our additive tools (like Brownian motion) to stock prices.</p>
+
+  <div class="math-block">
+    log-return  =  ln(S_t / S_{t-1})  =  ln(S_t) - ln(S_{t-1})
+  </div>
+
+  <p>When stock prices are log-normally distributed, their log-returns are normally distributed. This is the foundation of the Black-Scholes model you'll encounter later.</p>
+
+  <hr class="divider">
+
+  <h2>Self-Check: Are You Ready?</h2>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Concept</th><th>Can You Do This?</th><th>Go to Tab</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Matrix multiplication (vector × matrix)</td><td>Compute π × P for a 3×3 matrix</td><td>Tab 02</td></tr>
+      <tr><td>Conditional probability</td><td>Calculate P(A|B) given a joint table</td><td>Tab 02</td></tr>
+      <tr><td>Expected value</td><td>Compute E[X] for a discrete distribution</td><td>Tab 03</td></tr>
+      <tr><td>Normal distribution shape</td><td>Sketch a bell curve, label μ and σ</td><td>Tab 04</td></tr>
+      <tr><td>Python basics</td><td>Write a for-loop and use numpy arrays</td><td>Tab 05</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <div class="callout-label">External Resources for Prerequisites</div>
+    <ul style="margin:0;">
+      <li><a href="https://www.khanacademy.org/math/linear-algebra" target="_blank">Khan Academy — Linear Algebra</a> (free, excellent for matrix multiplication)</li>
+      <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy — Probability & Statistics</a></li>
+      <li><a href="https://seeing-theory.brown.edu/" target="_blank">Seeing Theory (Brown University)</a> — beautiful visual intro to probability</li>
+      <li><a href="https://www.3blue1brown.com/topics/linear-algebra" target="_blank">3Blue1Brown — Essence of Linear Algebra</a> (YouTube, visually stunning)</li>
+      <li><a href="https://www.probabilitycourse.com/" target="_blank">Introduction to Probability — Textbook (free)</a></li>
+    </ul>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 1 — PROBABILITY FOUNDATIONS                        -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-1">
+<div class="page page-1">
+
+  <h1>Probability Foundations for Stochastic Processes</h1>
+  <p class="lead">Before chains, walks, and motion — we need to deeply understand how randomness works over <em>time</em>. This tab bridges basic probability to dynamic, evolving random systems.</p>
+
+  <h2>Stochastic Processes: Randomness That Evolves</h2>
+
+  <p>A <strong>stochastic process</strong> is a collection of random variables indexed by time: {X_t, t ∈ T}. At each time t, X_t is a random variable. Together, they describe how a random quantity <em>evolves</em>.</p>
+
+  <div class="callout green">
+    <div class="callout-label">Real-World Examples</div>
+    <ul style="margin:0;">
+      <li>Stock price S_t at each minute (continuous time)</li>
+      <li>Number of customers in a queue at each hour (discrete time)</li>
+      <li>Credit rating of a company each month (discrete states)</li>
+      <li>Temperature at a weather station over time (continuous states)</li>
+    </ul>
+  </div>
+
+  <h2>State Space: Where Can the Process Be?</h2>
+  <p>The <strong>state space</strong> is the set of all values the process can take. This is crucial for categorizing processes:</p>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Time</th><th>State Space</th><th>Example</th><th>Our Focus</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Discrete</td><td>Discrete</td><td>Board game position per turn</td><td>✅ Markov Chains (Tab 02)</td></tr>
+      <tr><td>Discrete</td><td>Continuous</td><td>Stock price at end of each day</td><td>✅ Random Walk (Tab 03)</td></tr>
+      <tr><td>Continuous</td><td>Continuous</td><td>Temperature at any instant</td><td>✅ Brownian Motion (Tab 04)</td></tr>
+      <tr><td>Continuous</td><td>Discrete</td><td>Poisson process (event counts)</td><td>Advanced topics</td></tr>
+    </tbody>
+  </table>
+
+  <h2>The Markov Property: Memory and Memorylessness</h2>
+
+  <p>This is THE most important concept for everything in this course. The <strong>Markov Property</strong> states:</p>
+
+  <div class="callout">
+    <div class="callout-label">Markov Property (Formal)</div>
+    P(X_{n+1} = j | X_0 = i_0, X_1 = i_1, ..., X_n = i)  =  P(X_{n+1} = j | X_n = i)
+  </div>
+
+  <p>In plain English: <em>given where you are right now, where you go next is independent of your entire history of how you got here.</em></p>
+
+  <div class="two-col">
+    <div class="card" style="border-color:var(--accent3);">
+      <h4 style="color:var(--accent3)">✅ Markov Process</h4>
+      <p>The weather today only depends on yesterday's weather. Not last week, not last month. Only <em>the current state</em> determines the future.</p>
+      <p style="font-size:0.88rem;color:var(--text-dim);">The future is a function of the present alone.</p>
+    </div>
+    <div class="card" style="border-color:var(--accent4);">
+      <h4 style="color:var(--accent4)">❌ Non-Markov Process</h4>
+      <p>A person's health depends on their entire medical history: what diseases they had years ago, their cumulative diet, etc.</p>
+      <p style="font-size:0.88rem;color:var(--text-dim);">The future depends on the entire past.</p>
+    </div>
+  </div>
+
+  <h3>Is the Random Walk Markov?</h3>
+  <p>Yes! At each step, we flip a coin: +1 or -1. The next position only depends on <em>where we are now</em>, not on the path we took to get here. This is why all our processes in this guide are Markov.</p>
+
+  <h2>Conditional Expectation: The Key Tool</h2>
+
+  <p><strong>E[X | Y = y]</strong> is the expected value of X, given that Y takes value y. It's a number that summarizes the average of X in the world where Y = y.</p>
+
+  <div class="math-block">
+    E[X_{n+1} | X_n = x]  =  Σ_j  j · P(X_{n+1} = j | X_n = x)
+  </div>
+
+  <p>For a fair random walk (equal prob of +1 and -1):</p>
+  <div class="math-block">
+    E[X_{n+1} | X_n = x]  =  x · (+1) · (1/2)  +  x · (-1) · (1/2)  =  x
+  </div>
+
+  <p>The expected next position equals the current position. This makes the random walk a <strong>martingale</strong> — a fair game where there's no drift.</p>
+
+  <h2>Martingales: Fair Games</h2>
+
+  <p>A stochastic process {M_n} is a <strong>martingale</strong> if E[M_{n+1} | M_0, ..., M_n] = M_n. The best prediction of tomorrow is today's value — no systematic trend up or down.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">Quant Connection</div>
+    In financial mathematics, stock prices under the "risk-neutral measure" are martingales. This is the foundational idea behind derivatives pricing. You'll see this concept everywhere in quant finance!
+  </div>
+
+  <h2>Distributions We'll Use — Deeper Look</h2>
+
+  <h3>The Binomial Distribution</h3>
+  <p>If we take n independent Bernoulli steps (each +1 or -1 with equal probability), the sum S_n follows a scaled binomial distribution. After n steps, S_n takes values: -n, -n+2, ..., n-2, n.</p>
+
+  <div class="math-block">
+    P(S_n = k)  =  C(n, (n+k)/2) · (1/2)^n  &nbsp;&nbsp;  for k and n of the same parity
+  </div>
+
+  <h3>The Gaussian / Normal Distribution — Deep Dive</h3>
+
+  <div class="viz-container">
+    <div class="viz-title">Interactive: Normal Distribution Visualization</div>
+    <canvas id="normal-canvas" width="620" height="260"></canvas>
+    <div class="viz-controls">
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">μ =</label>
+        <input type="range" id="mu-slider" min="-3" max="3" step="0.5" value="0" style="width:100px;">
+        <span id="mu-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent3);width:2rem;">0</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">σ =</label>
+        <input type="range" id="sigma-slider" min="0.3" max="3" step="0.2" value="1" style="width:100px;">
+        <span id="sigma-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent3);width:2rem;">1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>The Fundamental Bridge: Sums Become Normals</h2>
+
+  <p>The <strong>Central Limit Theorem</strong> is the bridge from everything discrete in Tabs 02-03 to the continuous world of Tab 04.</p>
+
+  <div class="step-flow">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Start with many independent, identically distributed random variables</h4>
+        <p>X_1, X_2, ..., X_n — each with mean μ and variance σ²</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Form the sum S_n = X_1 + X_2 + ... + X_n</h4>
+        <p>Each random walk position IS this sum, where X_i = ±1 at each step</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>As n → ∞, the standardized sum converges to N(0,1)</h4>
+        <p>(S_n - nμ) / (σ√n) → Normal(0,1). This is the CLT!</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Scale time continuously → Brownian Motion</h4>
+        <p>When we let the step size shrink as steps get infinitesimally small, the limit is Brownian Motion B(t)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <div class="callout-label">External Resources</div>
+    <ul style="margin:0;">
+      <li><a href="https://seeing-theory.brown.edu/probability-distributions/index.html" target="_blank">Seeing Theory — Interactive Probability Distributions</a></li>
+      <li><a href="https://www.youtube.com/watch?v=zeJD6dqJ5lo" target="_blank">3Blue1Brown — Central Limit Theorem (YouTube)</a></li>
+      <li><a href="https://distill.pub/2019/visual-exploration-gaussian-processes/" target="_blank">Distill.pub — Visual Exploration of Gaussian Processes</a></li>
+      <li><a href="https://statlect.com/probability-distributions/normal-distribution" target="_blank">StatLect — Normal Distribution Deep Dive</a></li>
+    </ul>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 2 — MARKOV CHAINS                                  -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-2">
+<div class="page page-2">
+
+  <h1>Markov Chains</h1>
+  <p class="lead">A Markov Chain is a random process that jumps between states, where the next state depends only on the current state — not on any history. Simple rules, surprisingly deep consequences.</p>
+
+  <div class="callout">
+    <div class="callout-label">One-Sentence Summary</div>
+    A Markov Chain is a random walk through a set of discrete states, governed by a matrix of transition probabilities, and — under mild conditions — always eventually settles into a steady-state distribution.
+  </div>
+
+  <h2>Building Intuition: The Weather Model</h2>
+
+  <p>Imagine a city with just two types of weather: Sunny (S) and Rainy (R). From observing historical data, we know:</p>
+  <ul>
+    <li>If today is <strong>Sunny</strong>: 70% chance tomorrow is Sunny, 30% chance it's Rainy</li>
+    <li>If today is <strong>Rainy</strong>: 40% chance tomorrow is Sunny, 60% chance it's Rainy</li>
+  </ul>
+
+  <div class="state-diagram">
+    <div class="state-node active-node">S<br><span style="font-size:0.65rem">Sunny</span></div>
+    <div style="display:flex;flex-direction:column;gap:0.8rem;align-items:center;">
+      <div class="state-arrow">
+        <span class="arrow-label">0.30</span>
+        <span class="arrow-line">→</span>
+      </div>
+      <div class="state-arrow">
+        <span class="arrow-label">0.40</span>
+        <span class="arrow-line">←</span>
+      </div>
+    </div>
+    <div class="state-node">R<br><span style="font-size:0.65rem">Rainy</span></div>
+    <div style="position:absolute;bottom:0.8rem;left:2rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-muted);">
+      S→S: 0.70 &nbsp;|&nbsp; R→R: 0.60
+    </div>
+  </div>
+
+  <p>This is a Markov Chain! Notice: to predict tomorrow's weather, you only need to know <em>today's</em> weather. What the weather was last week is irrelevant.</p>
+
+  <h2>The Transition Matrix P</h2>
+
+  <p>We encode all probabilities in the <strong>Transition Matrix P</strong>. Each entry P[i][j] = probability of moving from state i to state j.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">Critical Property</div>
+    Every row of a transition matrix must sum to 1. Why? Because from any state, you must go somewhere — including staying in the same state.
+  </div>
+
+  <div class="matrix-wrap">
+    <span style="font-family:'JetBrains Mono',monospace;color:var(--text-dim);">P =</span>
+    <div class="matrix">
+      <table>
+        <thead>
+          <tr>
+            <td style="color:var(--text-muted);font-size:0.75rem;"></td>
+            <td style="color:var(--text-muted);font-size:0.75rem;">→S</td>
+            <td style="color:var(--text-muted);font-size:0.75rem;">→R</td>
+          </tr>
+        </thead>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.75rem;">S→</td>
+          <td>0.7</td><td>0.3</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.75rem;">R→</td>
+          <td>0.4</td><td>0.6</td>
+        </tr>
+      </table>
+    </div>
+    <div style="font-size:0.9rem;color:var(--text-dim);max-width:240px;">
+      Row sums: 0.7+0.3=1 ✓<br>Row sums: 0.4+0.6=1 ✓<br><br>
+      This is called a <em>stochastic matrix</em>.
+    </div>
+  </div>
+
+  <h3>Multi-Step Transitions: Powers of P</h3>
+  <p>What's the probability of being in Sunny weather in 2 days, given it's Sunny today? We use P², the matrix squared:</p>
+
+  <div class="math-block">
+    P(State after n steps)  =  P^n
+    P² = P × P  →  P^n = P × P × ... × P  (n times)
+  </div>
+
+  <div class="card">
+    <h4>Computing P² for our weather example</h4>
+    <p>P²[S][S] = P[S][S]×P[S][S] + P[S][R]×P[R][S] = 0.7×0.7 + 0.3×0.4 = 0.49 + 0.12 = <strong>0.61</strong></p>
+    <p>P²[S][R] = P[S][S]×P[S][R] + P[S][R]×P[R][R] = 0.7×0.3 + 0.3×0.6 = 0.21 + 0.18 = <strong>0.39</strong></p>
+    <p style="color:var(--text-dim);font-size:0.9rem;">So if today is Sunny, in 2 days: 61% chance Sunny, 39% chance Rainy.</p>
+  </div>
+
+  <h2>State Classification</h2>
+
+  <p>Before we can find the long-run behavior, we need to classify states:</p>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>State Type</th><th>Definition</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Transient</strong></td>
+        <td>Probability of returning to this state is less than 1. You'll eventually leave and never come back.</td>
+        <td>Starting position in a biased random walk near an absorbing barrier</td>
+      </tr>
+      <tr>
+        <td><strong>Recurrent</strong></td>
+        <td>You're guaranteed to return to this state eventually (return probability = 1)</td>
+        <td>All states in a finite, irreducible Markov Chain</td>
+      </tr>
+      <tr>
+        <td><strong>Absorbing</strong></td>
+        <td>Once you enter, you can never leave. P[i][i] = 1.</td>
+        <td>Bankruptcy in a company credit model</td>
+      </tr>
+      <tr>
+        <td><strong>Periodic</strong></td>
+        <td>You can only return in multiples of d steps (period d)</td>
+        <td>A 2-state chain where S→R and R→S always (period 2)</td>
+      </tr>
+      <tr>
+        <td><strong>Aperiodic</strong></td>
+        <td>You can return in any number of steps (period = 1)</td>
+        <td>Most real-world Markov chains</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Irreducibility</h3>
+  <p>A Markov Chain is <strong>irreducible</strong> if every state can be reached from every other state (possibly in multiple steps). This means the chain forms one connected component.</p>
+
+  <div class="callout">
+    <div class="callout-label">Why It Matters</div>
+    An irreducible + aperiodic + finite Markov Chain is guaranteed to converge to a unique stationary distribution. These conditions are the checklist for "nice" long-run behavior.
+  </div>
+
+  <h2>The Stationary Distribution π</h2>
+
+  <p>As we run the chain for many, many steps, the probability distribution over states converges to a fixed vector π called the <strong>stationary distribution</strong>. This is the long-run fraction of time spent in each state.</p>
+
+  <h3>The Defining Equation</h3>
+
+  <div class="math-block">
+    π · P  =  π  &nbsp;&nbsp;&nbsp;  (matrix equation)
+    Equivalently:  π_j  =  Σ_i  π_i · P[i][j]
+    Subject to:  Σ_j  π_j  =  1  (probabilities sum to 1)
+  </div>
+
+  <p>In words: the stationary distribution is unchanged when you multiply by the transition matrix. The distribution reproduces itself — it's in "equilibrium."</p>
+
+  <h3>Solving for π — Weather Example</h3>
+  <p>We need to solve π · P = π with π_S + π_R = 1:</p>
+
+  <div class="card">
+    <p><strong>System of equations:</strong></p>
+    <p>π_S = 0.7·π_S + 0.4·π_R &nbsp;&nbsp; (from column S)</p>
+    <p>π_R = 0.3·π_S + 0.6·π_R &nbsp;&nbsp; (from column R)</p>
+    <p>π_S + π_R = 1</p>
+    <p><strong>From equation 1:</strong> 0.3·π_S = 0.4·π_R → π_S = (4/3)·π_R</p>
+    <p><strong>Substituting:</strong> (4/3)·π_R + π_R = 1 → (7/3)·π_R = 1 → π_R = 3/7 ≈ 0.429</p>
+    <p><strong>Answer:</strong> π = [π_S, π_R] = [<mark>4/7 ≈ 0.571</mark>, <mark>3/7 ≈ 0.429</mark>]</p>
+    <p style="color:var(--text-dim);font-size:0.9rem;margin-top:0.8rem;">Long run: ~57% of days are Sunny, ~43% are Rainy, regardless of today's weather.</p>
+  </div>
+
+  <h2>Interactive: Markov Chain Simulation</h2>
+
+  <div class="viz-container">
+    <div class="viz-title">Markov Chain — Distribution Convergence Simulator</div>
+    <canvas id="markov-canvas" width="660" height="300"></canvas>
+    <div id="markov-info" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-dim);margin-top:0.8rem;text-align:center;"></div>
+    <div class="viz-controls">
+      <button class="btn green" onclick="runMarkovSim()">▶ Run Simulation</button>
+      <button class="btn" onclick="resetMarkovSim()">↺ Reset</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">Steps:</label>
+        <select id="markov-steps" style="background:var(--surface3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+          <option value="50">50</option>
+          <option value="200" selected>200</option>
+          <option value="1000">1000</option>
+          <option value="5000">5000</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <h2>Detailed Example: Credit Rating Transitions</h2>
+
+  <p>A credit rating agency models company ratings (AAA, BBB, CCC, Default) as a Markov Chain. Here's a simplified transition matrix:</p>
+
+  <div class="matrix-wrap">
+    <span style="font-family:'JetBrains Mono',monospace;color:var(--text-dim);font-size:0.85rem;">P =</span>
+    <div class="matrix">
+      <table>
+        <thead>
+          <tr>
+            <td style="color:var(--text-muted);font-size:0.7rem;"></td>
+            <td style="color:var(--text-muted);font-size:0.7rem;">AAA</td>
+            <td style="color:var(--text-muted);font-size:0.7rem;">BBB</td>
+            <td style="color:var(--text-muted);font-size:0.7rem;">CCC</td>
+            <td style="color:var(--text-muted);font-size:0.7rem;">Def</td>
+          </tr>
+        </thead>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.7rem;">AAA</td>
+          <td>0.92</td><td>0.07</td><td>0.01</td><td>0.00</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.7rem;">BBB</td>
+          <td>0.05</td><td>0.85</td><td>0.09</td><td>0.01</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.7rem;">CCC</td>
+          <td>0.01</td><td>0.10</td><td>0.70</td><td>0.19</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted);font-size:0.7rem;">Def</td>
+          <td>0.00</td><td>0.00</td><td>0.00</td><td>1.00</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <p>Notice "Default" is an <strong>absorbing state</strong> (row = [0, 0, 0, 1]). Once defaulted, always defaulted. This is a classic application in fixed-income quant work.</p>
+
+  <h3>Mean First Passage Time</h3>
+  <p>A key quantity: <em>how many steps on average does it take to first reach state j, starting from state i?</em> This is the <strong>Mean First Passage Time</strong> m_{ij}.</p>
+
+  <div class="math-block">
+    m_{ij}  =  1  +  Σ_{k ≠ j}  P[i][k] · m_{kj}  &nbsp;&nbsp;  for i ≠ j
+    m_{jj}  =  1 / π_j  (mean recurrence time for state j)
+  </div>
+
+  <p>Practical use: "On average, how long does it take for a BBB-rated company to default?" — directly answerable with this formula.</p>
+
+  <h2>Detailed Worked Example: 3-State Random Walk</h2>
+
+  <p>Consider states {0, 1, 2, 3} where 0 and 3 are absorbing (barriers), and at each interior state we go left (−1) or right (+1) with equal probability.</p>
+
+  <div class="callout purple">
+    <div class="callout-label">Gambler's Ruin</div>
+    This is the famous <strong>Gambler's Ruin Problem</strong>. A gambler starts with $i, plays a fair game, stops when broke (state 0) or reaches $3 goal. What's the probability of ruin?
+    <br><br>
+    <strong>Answer:</strong> P(ruin | start at i) = 1 - i/3.
+    Starting with $1: 67% ruin. Starting with $2: 33% ruin.
+  </div>
+
+  <h2>Key Theorems (Intuition, No Proof)</h2>
+
+  <div class="three-col">
+    <div class="card">
+      <h4 style="color:var(--accent)">Ergodic Theorem</h4>
+      <p style="font-size:0.9rem;">For an irreducible, aperiodic Markov chain, the time-average equals the ensemble average. The long-run fraction of time in state j is π_j.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent)">Convergence Theorem</h4>
+      <p style="font-size:0.9rem;">For ergodic chains: lim_{n→∞} P^n[i][j] = π_j for all i. The starting state becomes irrelevant!</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent)">Perron-Frobenius</h4>
+      <p style="font-size:0.9rem;">For positive stochastic matrices, the largest eigenvalue is 1, and the corresponding eigenvector is the stationary distribution.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Practice Exercises</h2>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge easy">Easy</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-dim);">Fundamentals</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">E1</span><span>Write down the 2×2 transition matrix for a chain with states {H, T} where P(H→H) = 0.6, P(T→T) = 0.7. Verify all rows sum to 1.</span></li>
+      <li><span class="ex-num">E2</span><span>Given the weather Markov chain in this tab, if today is Rainy, what's the probability it's Rainy tomorrow? In 2 days? Compute by hand or in Python.</span></li>
+      <li><span class="ex-num">E3</span><span>For the weather chain, compute π (the stationary distribution) by solving πP = π. Verify your answer by computing P^{100} and checking all rows are approximately equal.</span></li>
+      <li><span class="ex-num">E4</span><span>Is the credit rating chain with "Default" as an absorbing state irreducible? Why or why not? What are the implications?</span></li>
+      <li><span class="ex-num">E5</span><span>Simulate the weather Markov chain for 1000 steps starting from Sunny. Count the fraction of days that are Sunny. Compare to π_S = 4/7.</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge medium">Medium</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-dim);">Going Deeper</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">M1</span><span>Construct a 3-state Markov chain for a stock that's either "Bull," "Bear," or "Sideways." Assign realistic transition probabilities, compute the stationary distribution, and interpret what it means for long-run market dynamics.</span></li>
+      <li><span class="ex-num">M2</span><span>For the Gambler's Ruin with states {0,1,2,3,4}, compute the probability of reaching 4 (winning) starting from state 2. Now compute the mean time to absorption. [Hint: set up and solve the system of linear equations]</span></li>
+      <li><span class="ex-num">M3</span><span>Prove (or verify numerically) that for the weather chain, π_S / π_R = P[R→S] / P[S→R] = 0.4/0.3. This is the detailed balance equation — find what it says geometrically about flow between states.</span></li>
+      <li><span class="ex-num">M4</span><span>Simulate the credit rating chain starting from BBB. Run 10,000 independent chains for 20 years (steps). What fraction end in Default? Compare to the 20-step absorption probability computed from P^20.</span></li>
+      <li><span class="ex-num">M5</span><span>Plot the eigenvalues of the transition matrix P for the weather chain. Confirm the largest eigenvalue is 1. How does the second eigenvalue relate to the speed of convergence to stationarity?</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge hard">Hard</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-dim);">Quant-Level</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">H1</span><span>Implement the Metropolis-Hastings algorithm: design a Markov chain whose stationary distribution is a given target distribution π. Run it on a non-trivial target (e.g., a bimodal distribution) and verify convergence.</span></li>
+      <li><span class="ex-num">H2</span><span>Model a simplified order book as a Markov chain: states represent the best bid-ask spread {1, 2, 3, 4} ticks. Assign transition probabilities, find the stationary distribution, and compute expected time for the spread to widen from 1 to 4 ticks.</span></li>
+      <li><span class="ex-num">H3</span><span>Implement a hidden Markov model (HMM): the state (Bull/Bear regime) is hidden, but you observe noisy returns. Write the forward algorithm to compute P(observations | model). Use the Viterbi algorithm to infer the most likely regime sequence.</span></li>
+    </ul>
+  </div>
+
+  <h2>External Resources</h2>
+  <div class="resource-grid">
+    <div class="resource-card"><a href="https://setosa.io/ev/markov-chains/" target="_blank"><div class="resource-type">Interactive</div><div class="resource-name">Setosa — Markov Chains Visual</div><div class="resource-desc">Best visual introduction to Markov chains on the internet. Drag states, change transitions, watch convergence live.</div></a></div>
+    <div class="resource-card"><a href="https://www.youtube.com/watch?v=i3AkTO9HLXo" target="_blank"><div class="resource-type">Video</div><div class="resource-name">Statquest — Markov Chains</div><div class="resource-desc">Clear explanation with biological/ML applications. Great for building intuition.</div></a></div>
+    <div class="resource-card"><a href="http://www.math.dartmouth.edu/~prob/prob/prob.pdf" target="_blank"><div class="resource-type">Textbook</div><div class="resource-name">Grinstead & Snell (Free)</div><div class="resource-desc">Introduction to Probability — Chapter 11 covers Markov chains completely with exercises.</div></a></div>
+    <div class="resource-card"><a href="https://brilliant.org/courses/probability/" target="_blank"><div class="resource-type">Course</div><div class="resource-name">Brilliant — Probability</div><div class="resource-desc">Interactive problem-based learning including Markov chain problems with instant feedback.</div></a></div>
+    <div class="resource-card"><a href="https://probability.yfiles.com/" target="_blank"><div class="resource-type">Simulator</div><div class="resource-name">Markov Chain Simulator</div><div class="resource-desc">Online tool to build custom chains, visualize state diagrams, and compute stationary distributions.</div></a></div>
+    <div class="resource-card"><a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html" target="_blank"><div class="resource-type">Docs</div><div class="resource-name">NumPy linalg.eig</div><div class="resource-desc">Reference for computing eigenvalues/eigenvectors — needed to find stationary distributions programmatically.</div></a></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 3 — RANDOM WALKS                                   -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-3">
+<div class="page page-3">
+
+  <h1>Random Walks</h1>
+  <p class="lead">A random walk is the simplest model of a process that moves randomly over time — one step at a time, each step unpredictable. It's the discrete ancestor of Brownian motion and the conceptual heart of most financial models.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">Connection to Markov Chains</div>
+    A random walk IS a special Markov chain. The state is the current position (an integer), and the transition probabilities are: P(move right) = p, P(move left) = 1-p. The Markov property holds — next position only depends on current position, not history.
+  </div>
+
+  <h2>The Simple Symmetric Random Walk</h2>
+
+  <p>Start at position 0. At each time step n = 1, 2, 3, ..., flip a fair coin:</p>
+  <ul>
+    <li>Heads: move +1 (step right)</li>
+    <li>Tails: move −1 (step left)</li>
+  </ul>
+
+  <p>Let X_i be the i-th step (X_i = +1 or -1 with equal probability). The position after n steps is:</p>
+
+  <div class="math-block">
+    S_n  =  X_1 + X_2 + ... + X_n  =  Σ_{i=1}^{n}  X_i
+  </div>
+
+  <h3>Properties of S_n</h3>
+
+  <div class="two-col">
+    <div class="card">
+      <h4 style="color:var(--accent2)">Expected Position</h4>
+      <div class="math-block" style="margin:0.8rem 0;padding:0.8rem;">E[S_n]  =  0</div>
+      <p style="font-size:0.9rem;">Since each step has expected value 0 (equal chance of ±1), the expected position is always 0. No drift.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent2)">Variance Grows Linearly</h4>
+      <div class="math-block" style="margin:0.8rem 0;padding:0.8rem;">Var(S_n)  =  n &nbsp;&nbsp; σ = √n</div>
+      <p style="font-size:0.9rem;">Since the X_i are independent: Var(S_n) = n × Var(X_i) = n × 1. The walk spreads out at rate √n.</p>
+    </div>
+  </div>
+
+  <div class="callout green">
+    <div class="callout-label">The √n Rule — Crucial Insight!</div>
+    After n steps, the typical distance from the origin is √n, NOT n. This sublinear spread is one of the most important facts in probability. After 100 steps, you're typically ~10 units away. After 10,000 steps, ~100 units. The walk spreads, but slowly.
+  </div>
+
+  <h2>Interactive: Random Walk Simulator</h2>
+
+  <div class="viz-container">
+    <div class="viz-title">Live Random Walk Simulation</div>
+    <canvas id="rw-canvas" width="660" height="320"></canvas>
+    <div id="rw-info" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-dim);margin-top:0.6rem;text-align:center;"></div>
+    <div class="viz-controls">
+      <button class="btn green" onclick="runRandomWalk()">▶ New Walk</button>
+      <button class="btn" onclick="runMultipleWalks()">▶ Run 20 Walks</button>
+      <button class="btn" onclick="clearRWCanvas()">✕ Clear</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">N steps:</label>
+        <select id="rw-steps" style="background:var(--surface3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+          <option value="100">100</option>
+          <option value="500" selected>500</option>
+          <option value="2000">2000</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">p:</label>
+        <input type="range" id="rw-p" min="0.3" max="0.7" step="0.05" value="0.5" style="width:80px;">
+        <span id="rw-p-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent2);width:3rem;">0.5</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>The Asymmetric Random Walk (Biased Walk)</h2>
+
+  <p>If p ≠ 1/2, we have a biased random walk. Each step is +1 with probability p and −1 with probability q = 1 − p.</p>
+
+  <div class="math-block">
+    E[X_i]  =  p·(+1) + q·(-1)  =  p - q  =  μ (drift)
+    Var(X_i)  =  1 - (p-q)²  =  4pq
+    
+    E[S_n]  =  n·(p-q)  =  n·μ
+    Var(S_n)  =  n·4pq
+  </div>
+
+  <p>A biased walk drifts in one direction. Set p = 0.55 in the simulator above and watch the walk trend upward! This models a stock with positive expected return.</p>
+
+  <div class="callout pink">
+    <div class="callout-label">Financial Analogy</div>
+    In finance, (p-q) is analogous to the <strong>drift</strong> of an asset (expected return above risk-free rate). The variance 4pq is related to <strong>volatility</strong>. The Biased Random Walk is the discrete version of Brownian motion with drift — the building block of the Black-Scholes model!
+  </div>
+
+  <h2>Return to Origin: A Surprising Result</h2>
+
+  <p>For the symmetric random walk in 1D, the probability of ever returning to the origin is exactly 1. The walk is <strong>recurrent</strong>. You'll always come back — it just might take an incredibly long time.</p>
+
+  <div class="callout">
+    <div class="callout-label">Pólya's Theorem</div>
+    <ul style="margin:0;">
+      <li><strong>1D walk:</strong> Recurrent (returns to origin with probability 1)</li>
+      <li><strong>2D walk:</strong> Recurrent (returns to origin with probability 1)</li>
+      <li><strong>3D+ walk:</strong> Transient (returns to origin with probability < 1 ≈ 0.34 for 3D)</li>
+    </ul>
+    The famous quote: <em>"A drunk man will find his way home, but a drunk bird may get lost forever."</em>
+  </div>
+
+  <h2>The Arc-Sine Law: Where You Spend Time</h2>
+
+  <p>This is one of the most counterintuitive results in probability theory. Consider a fair random walk for 2n steps. The fraction of time the walk spends on the positive side follows an <strong>arc-sine distribution</strong>.</p>
+
+  <p>Intuition: The probability that you spend roughly half the time positive is actually <em>the smallest value</em> — not the largest! You're most likely to spend almost ALL the time on one side or the other. The walk "commits" to a side for long stretches.</p>
+
+  <div class="callout gold">
+    <div class="callout-label">Quant Implication</div>
+    This means momentum is natural in random processes! A fair random walk is more likely to stay above zero for 90% of the time (or below for 90% of the time) than to spend equal time on both sides. Don't mistake random momentum for predictability.
+  </div>
+
+  <h2>2D Random Walks — Visualization</h2>
+
+  <div class="viz-container">
+    <div class="viz-title">2D Random Walk on a Grid</div>
+    <canvas id="rw2d-canvas" width="500" height="400"></canvas>
+    <div class="viz-controls">
+      <button class="btn green" onclick="run2DWalk()">▶ New 2D Walk</button>
+      <button class="btn" onclick="clear2DCanvas()">✕ Clear</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">Steps:</label>
+        <select id="rw2d-steps" style="background:var(--surface3);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:0.3rem 0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">
+          <option value="200">200</option>
+          <option value="1000" selected>1000</option>
+          <option value="5000">5000</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <h2>Scaling Limit: Random Walk → Brownian Motion</h2>
+
+  <p>This is the most profound connection in this entire guide. As we make the steps smaller and more frequent — shrinking both time and space — the random walk converges to Brownian motion.</p>
+
+  <div class="step-flow">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Start with a simple random walk S_n</h4>
+        <p>Steps at times 1, 2, 3, ..., n. Each step ±1.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Rescale time: compress n steps into [0, 1]</h4>
+        <p>Let t ∈ [0,1] and look at S_{⌊nt⌋}. This is a continuous-time process.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Rescale space: shrink step size by 1/√n</h4>
+        <p>Define B_n(t) = S_{⌊nt⌋} / √n. This keeps variance = 1 at time t = 1.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Take the limit n → ∞</h4>
+        <p>By Donsker's theorem (the functional CLT), B_n(t) → B(t) = Brownian Motion!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="math-block">
+    Donsker's Theorem:  B_n(t)  =  S_{⌊nt⌋} / √n   →   B(t)   as n → ∞
+  </div>
+
+  <hr class="divider">
+
+  <h2>Practice Exercises</h2>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge easy">Easy</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">E1</span><span>Simulate a symmetric random walk for 1000 steps in Python. Plot the trajectory. What is the final position? Run it 10 times and report the average of |S_1000|. Compare to √1000 ≈ 31.6.</span></li>
+      <li><span class="ex-num">E2</span><span>Compute E[S_n] and Var(S_n) for a biased walk with p = 0.6 at n = 100 steps. What direction does the walk drift? How does the drift compare to the typical fluctuation (√n)?</span></li>
+      <li><span class="ex-num">E3</span><span>Simulate 1000 random walks each of length 100. Plot a histogram of final positions S_100. Does it look like a normal distribution? Compute the sample mean and variance and compare to theory.</span></li>
+      <li><span class="ex-num">E4</span><span>Implement and plot a 2D random walk (moving N/S/E/W with equal probability) for 5000 steps. Does the walk return to the origin?</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge medium">Medium</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">M1</span><span>Verify the arc-sine law empirically. Simulate 10,000 random walks of 100 steps each. For each, compute the fraction of time S_n > 0. Plot the histogram and compare to the arc-sine density f(x) = 1/(π√(x(1-x))).</span></li>
+      <li><span class="ex-num">M2</span><span>Implement the Gambler's Ruin simulation: start with $50 out of $100 total. Play a fair game. Estimate (by simulation) the probability of ruin and compare to theory: P(ruin | start at i) = 1 - i/N.</span></li>
+      <li><span class="ex-num">M3</span><span>Model a stock price as S_n = S_0 · exp(random walk). With S_0 = 100, step distribution N(0.0005, 0.01²), simulate 252 days (1 year). Plot the price path. What's the distribution of S_252?</span></li>
+      <li><span class="ex-num">M4</span><span>Demonstrate Donsker's theorem visually: for n = 10, 100, 1000, plot the rescaled random walk B_n(t) = S_{⌊nt⌋}/√n over [0,1]. Show how it "looks more like" a smooth curve (Brownian motion) as n grows.</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge hard">Hard</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">H1</span><span>Derive the reflection principle: prove that P(max_{0≤k≤n} S_k ≥ a) = 2·P(S_n ≥ a) for a symmetric random walk. Use this to compute the distribution of the maximum of a random walk. Verify numerically.</span></li>
+      <li><span class="ex-num">H2</span><span>Implement a SELF-AVOIDING random walk (each step cannot revisit a previously visited site). Simulate in 2D and measure: (a) what fraction of n-step walks get "stuck"? (b) How does the end-to-end distance scale with n? (Expected: ~n^(3/4) in 2D)</span></li>
+      <li><span class="ex-num">H3</span><span>Implement the local time L_n(x) = number of times the walk visits position x in n steps. Plot L_n as a function of x. Verify Ray-Knight theorem: L_n(x) has a Markovian structure in x.</span></li>
+    </ul>
+  </div>
+
+  <h2>External Resources</h2>
+  <div class="resource-grid">
+    <div class="resource-card"><a href="http://random-walks.org" target="_blank"><div class="resource-type">Interactive</div><div class="resource-name">Random Walks (random-walks.org)</div><div class="resource-desc">Beautiful interactive explorer of 1D, 2D, 3D random walks. Click to see Pólya recurrence in action.</div></a></div>
+    <div class="resource-card"><a href="https://mathworld.wolfram.com/RandomWalk1-Dimensional.html" target="_blank"><div class="resource-type">Reference</div><div class="resource-name">MathWorld — 1D Random Walk</div><div class="resource-desc">Comprehensive reference with formulas, properties, and connections to other topics.</div></a></div>
+    <div class="resource-card"><a href="https://www.youtube.com/watch?v=stgYW6M5o4k" target="_blank"><div class="resource-type">Video</div><div class="resource-name">Random Walks in 2D — Visualization</div><div class="resource-desc">Visual demonstration showing recurrence and the √n scaling rule.</div></a></div>
+    <div class="resource-card"><a href="https://galton.uchicago.edu/faculty/lalley/Courses/385/RW.pdf" target="_blank"><div class="resource-type">Lecture Notes</div><div class="resource-name">U. Chicago — Random Walk Notes</div><div class="resource-desc">Rigorous lecture notes with proofs of all major theorems including Pólya and arc-sine laws.</div></a></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 4 — BROWNIAN MOTION                                -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-4">
+<div class="page page-4">
+
+  <h1>Brownian Motion</h1>
+  <p class="lead">Brownian motion is the continuous-time limit of the random walk. It is the mathematical foundation of modern quantitative finance — underlying options pricing, interest rate models, and virtually every model of financial risk.</p>
+
+  <div class="callout pink">
+    <div class="callout-label">The Big Picture — Where We Are</div>
+    Markov Chains → (continuous states) → Random Walk → (continuous time + space, CLT limit) → <strong>Brownian Motion</strong>. Every concept we've built leads here. Brownian motion is where discrete probability meets continuous analysis.
+  </div>
+
+  <h2>Historical Background: From Physics to Finance</h2>
+
+  <div class="two-col">
+    <div class="card">
+      <h4 style="color:var(--accent4)">1827 — Robert Brown</h4>
+      <p style="font-size:0.9rem;">Botanist Robert Brown observed pollen grains suspended in water moving in irregular, unpredictable zigzag patterns under a microscope. This "Brownian motion" puzzled scientists for 80 years.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">1905 — Albert Einstein</h4>
+      <p style="font-size:0.9rem;">Einstein explained the motion: it results from countless collisions with water molecules. He predicted the variance would grow as 2Dt (where D is the diffusion coefficient). This proved atoms exist!</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">1923 — Norbert Wiener</h4>
+      <p style="font-size:0.9rem;">Wiener gave the first rigorous mathematical construction of Brownian motion as a continuous stochastic process. It's also called the <em>Wiener process</em> in his honor.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">1973 — Black, Scholes & Merton</h4>
+      <p style="font-size:0.9rem;">Used Brownian motion to model stock prices, leading to the Black-Scholes options pricing formula. This earned Scholes and Merton the 1997 Nobel Prize in Economics.</p>
+    </div>
+  </div>
+
+  <h2>Formal Definition: What Makes B(t) Brownian Motion?</h2>
+
+  <p>A stochastic process {B(t), t ≥ 0} is a <strong>standard Brownian motion</strong> (Wiener process) if it satisfies these four properties:</p>
+
+  <div class="step-flow">
+    <div class="step-item">
+      <div class="step-num">①</div>
+      <div class="step-body">
+        <h4>Starts at zero: B(0) = 0 (almost surely)</h4>
+        <p>Every path starts at the origin.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">②</div>
+      <div class="step-body">
+        <h4>Independent increments</h4>
+        <p>For any 0 ≤ s < t ≤ u < v, the increment B(t)-B(s) is independent of B(v)-B(u). Non-overlapping time periods produce independent changes. This is the continuous Markov property.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">③</div>
+      <div class="step-body">
+        <h4>Stationary Gaussian increments</h4>
+        <p>For any 0 ≤ s < t: B(t) - B(s) ~ Normal(0, t-s). The increment over any interval is normally distributed with variance = length of interval. This is Donsker's theorem in the limit!</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">④</div>
+      <div class="step-body">
+        <h4>Continuous paths</h4>
+        <p>Almost surely, B(t) is a continuous function of t. No jumps! (But the paths are nowhere differentiable — infinitely rough.)</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Interactive: Brownian Motion Simulator</h2>
+
+  <div class="viz-container">
+    <div class="viz-title">Brownian Motion Path Simulator</div>
+    <canvas id="bm-canvas" width="660" height="320"></canvas>
+    <div id="bm-info" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-dim);margin-top:0.6rem;text-align:center;"></div>
+    <div class="viz-controls">
+      <button class="btn green" onclick="runBM()">▶ New Path</button>
+      <button class="btn" onclick="runMultipleBM()">▶ 10 Paths</button>
+      <button class="btn" onclick="clearBMCanvas()">✕ Clear</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">μ (drift):</label>
+        <input type="range" id="bm-mu" min="-2" max="2" step="0.1" value="0" style="width:80px;">
+        <span id="bm-mu-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4);width:3rem;">0.0</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">σ:</label>
+        <input type="range" id="bm-sigma" min="0.2" max="3" step="0.1" value="1" style="width:80px;">
+        <span id="bm-sigma-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4);width:3rem;">1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Key Properties of Brownian Motion</h2>
+
+  <h3>1. Scaling (Self-Similarity)</h3>
+  <p>For any constant c > 0, the process {c⁻¹ · B(c²t)} has the same distribution as {B(t)}. Brownian motion looks the same at any time scale — it's a <strong>fractal</strong>.</p>
+
+  <div class="math-block">
+    c⁻¹ · B(c²t)  ≡  B(t)  in distribution
+  </div>
+
+  <p>Zoom in on a Brownian path — it looks as irregular as the original. Zoom out — same irregularity. This scale-free property makes it both beautiful and mathematically tractable.</p>
+
+  <h3>2. Nowhere Differentiable Paths</h3>
+  <p>Despite being continuous, Brownian motion is differentiable nowhere with probability 1. The "velocity" B'(t) does not exist! You can never speak of the instantaneous rate of change of Brownian motion in the classical sense.</p>
+
+  <div class="callout">
+    <div class="callout-label">Why? Intuition</div>
+    Think of the random walk: the slope between consecutive steps is ±(1/Δt) for step size Δx = 1 and time step Δt → 0. This ratio → ±∞. In the limit, the path oscillates infinitely fast — it has infinite total variation over any finite interval.
+  </div>
+
+  <h3>3. Quadratic Variation</h3>
+  <p>This is where Brownian motion departs from classical calculus. The quadratic variation of B(t) over [0, T] equals T, not zero (as it would for smooth functions).</p>
+
+  <div class="math-block">
+    [B, B]_T  =  Σ (B(t_{i+1}) - B(t_i))²  →  T   as mesh → 0
+  </div>
+
+  <p>For comparison, any smooth function f has quadratic variation 0. This fact — (dB)² = dt — is what makes Itô calculus different from ordinary calculus. (We won't go into Itô calculus here, but this is the gateway concept.)</p>
+
+  <h3>4. The Reflection Principle</h3>
+  <p>For any level a > 0 and time T:</p>
+  <div class="math-block">
+    P(max_{0≤t≤T} B(t) ≥ a)  =  2·P(B(T) ≥ a)  =  2·(1 - Φ(a/√T))
+  </div>
+  <p>where Φ is the standard normal CDF. This is used extensively for computing barrier option prices and first passage times in finance.</p>
+
+  <h3>5. The 2D and 3D Brownian Motion</h3>
+  <p>In 2D, Brownian motion is recurrent (like the 2D random walk). In 3D, it's transient — with probability 1, a 3D Brownian particle never returns to the origin. Same result as Pólya's theorem, in the continuous limit.</p>
+
+  <h2>Brownian Motion with Drift (The Finance Model)</h2>
+
+  <p>Standard BM has no trend. We add <strong>drift</strong> μ and <strong>diffusion coefficient</strong> σ to model real assets:</p>
+
+  <div class="math-block">
+    X(t)  =  μt  +  σ·B(t)
+    where  X(t) - X(s)  ~  Normal(μ(t-s),  σ²(t-s))
+  </div>
+
+  <p>This is <strong>Brownian motion with drift</strong>. The μt term is deterministic drift (trend), and σB(t) is the random part.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4 style="color:var(--accent4)">μ > 0: Upward Drift</h4>
+      <p>The process trends upward on average. Models a stock with positive expected return (bull market).</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">σ: Volatility</h4>
+      <p>Controls the "noisiness" of the path. High σ = wide price swings. Low σ = smooth trend. In finance, σ is called <strong>volatility</strong>.</p>
+    </div>
+  </div>
+
+  <h2>Geometric Brownian Motion: The Stock Price Model</h2>
+
+  <p>One problem: real stock prices can't go negative. If we model log(S_t) as BM with drift:</p>
+
+  <div class="math-block">
+    log(S_t)  =  log(S_0) + μt + σ·B(t)
+    ⟺  S_t  =  S_0 · exp(μt + σ·B(t))
+  </div>
+
+  <p>This is <strong>Geometric Brownian Motion (GBM)</strong>. It ensures prices stay positive, has log-normal marginal distributions, and produces the Black-Scholes model when combined with Itô's formula.</p>
+
+  <div class="viz-container">
+    <div class="viz-title">Geometric Brownian Motion — Stock Price Simulator</div>
+    <canvas id="gbm-canvas" width="660" height="300"></canvas>
+    <div class="viz-controls">
+      <button class="btn green" onclick="runGBM()">▶ Simulate Prices</button>
+      <button class="btn" onclick="runMultipleGBM()">▶ 20 Scenarios</button>
+      <button class="btn" onclick="clearGBMCanvas()">✕ Clear</button>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">μ:</label>
+        <input type="range" id="gbm-mu" min="-0.5" max="0.5" step="0.05" value="0.1" style="width:80px;">
+        <span id="gbm-mu-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4);width:3rem;">0.10</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);">σ:</label>
+        <input type="range" id="gbm-sigma" min="0.05" max="1" step="0.05" value="0.2" style="width:80px;">
+        <span id="gbm-sigma-val" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent4);width:3rem;">0.20</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Connections: The Full Picture</h2>
+
+  <table class="styled-table">
+    <thead>
+      <tr><th>Concept</th><th>Discrete Analog</th><th>Brownian Analog</th><th>Finance Application</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>State evolution</td><td>Markov chain transition</td><td>Stochastic differential equation</td><td>Option pricing</td></tr>
+      <tr><td>Stationary distribution</td><td>π for Markov chain</td><td>Invariant measure</td><td>Long-run interest rates</td></tr>
+      <tr><td>Step distribution</td><td>Bernoulli ±1</td><td>Gaussian increment N(0,dt)</td><td>Return distribution</td></tr>
+      <tr><td>Variance growth</td><td>Var(S_n) = n</td><td>Var(B_t) = t</td><td>Volatility scales as √T</td></tr>
+      <tr><td>Absorbing state</td><td>Default in credit model</td><td>Absorbing boundary</td><td>Barrier options</td></tr>
+      <tr><td>No-drift condition</td><td>Symmetric RW (p=1/2)</td><td>Standard BM (μ=0)</td><td>Risk-neutral pricing</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What Comes Next: The Road to Itô Calculus</h2>
+
+  <p>We stopped here to avoid heavy Itô calculus. But to complete the quant engineer toolkit, you'll eventually need:</p>
+
+  <div class="three-col">
+    <div class="card">
+      <h4 style="color:var(--accent4)">Stochastic Integrals</h4>
+      <p style="font-size:0.9rem;">∫₀ᵀ f(t) dB(t) — integrating with respect to BM. Different from ordinary calculus because of quadratic variation.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">Itô's Lemma</h4>
+      <p style="font-size:0.9rem;">The chain rule for stochastic processes. If X follows BM with drift, what does f(X) follow? Used to derive Black-Scholes.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent4)">SDEs</h4>
+      <p style="font-size:0.9rem;">dX = μ(X,t)dt + σ(X,t)dB. Stochastic Differential Equations model complex dynamics: interest rates (Vasicek, CIR), volatility (Heston), etc.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Practice Exercises</h2>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge easy">Easy</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">E1</span><span>Simulate a standard Brownian motion using the formula B(t_i) = B(t_{i-1}) + √(Δt) · Z_i, where Z_i ~ N(0,1). Use 1000 steps over [0,1]. Plot the path. Compute the sample variance at t=0.5 and t=1 — do they match theory?</span></li>
+      <li><span class="ex-num">E2</span><span>Verify the scaling property empirically. Simulate B(t) for t ∈ [0,1]. Then simulate B(4t)/2 (the scaled version). Show both have the same distributional properties by comparing histograms of the two processes at t=0.5.</span></li>
+      <li><span class="ex-num">E3</span><span>Simulate GBM with S_0 = 100, μ = 0.1/year, σ = 0.2/year, T = 1 year, 252 steps. Run 1000 scenarios. Plot a histogram of S_T. What is the mean and standard deviation of S_T?</span></li>
+      <li><span class="ex-num">E4</span><span>For BM with drift μ = 0.5, σ = 1 over [0,1], compute P(B(1) > 0) analytically and verify with simulation. [Hint: B(1) ~ N(μ, σ²)]</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge medium">Medium</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">M1</span><span>Estimate the quadratic variation of a simulated Brownian motion: compute Σ(B(t_i+1) - B(t_i))² for partitions of [0,1] with mesh sizes 1/n for n = 10, 100, 1000. Verify this converges to 1 (= T). Compare to what happens for a smooth function like sin(t).</span></li>
+      <li><span class="ex-num">M2</span><span>Compute the "first passage time" T_a = inf{t : B(t) = a} for a = 1.0. Simulate 10,000 paths. Plot the histogram of T_a. Compare to the inverse Gaussian / Lévy distribution f(t) = a/(√(2πt³)) · exp(-a²/(2t)).</span></li>
+      <li><span class="ex-num">M3</span><span>Simulate a two-dimensional Brownian motion (B₁(t), B₂(t)) with correlation ρ = 0.7 for T = 1. [Hint: generate two independent BMs, then use B₂ = ρ·B₁ + √(1-ρ²)·W where W is independent BM.] Verify the correlation of increments.</span></li>
+      <li><span class="ex-num">M4</span><span>Price a European call option using Monte Carlo simulation of GBM: S_0=100, K=105, T=1yr, μ=0.05, σ=0.2, r=0.03. Compare your Monte Carlo price to the Black-Scholes formula. How many simulations are needed for 1% accuracy?</span></li>
+    </ul>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-header">
+      <span class="tier-badge hard">Hard</span>
+    </div>
+    <ul class="exercise-list">
+      <li><span class="ex-num">H1</span><span>Implement the Karhunen-Loève expansion of Brownian motion: B(t) = Σₙ Zₙ · φₙ(t) where Zₙ ~ N(0,1) and φₙ are eigenfunctions. Generate BM using K=10, 50, 200 terms. Visually compare to direct simulation and compute the L² approximation error.</span></li>
+      <li><span class="ex-num">H2</span><span>Implement a simulation of the Ornstein-Uhlenbeck process (mean-reverting Brownian motion) used for interest rate modeling: dX = θ(μ-X)dt + σdB. Estimate the stationary distribution from simulation. Show it converges to N(μ, σ²/(2θ)) regardless of initial conditions.</span></li>
+      <li><span class="ex-num">H3</span><span>Empirically verify the law of the iterated logarithm for BM: limsup_{t→∞} B(t)/√(2t·log(log(t))) = 1 a.s. Simulate long BM paths and plot B(t)/√(2t·log(log(t))). Does it seem bounded by 1?</span></li>
+    </ul>
+  </div>
+
+  <h2>External Resources</h2>
+  <div class="resource-grid">
+    <div class="resource-card"><a href="https://www.youtube.com/watch?v=PPl-7_RL0Ko" target="_blank"><div class="resource-type">Video</div><div class="resource-name">Brownian Motion Explained (3Blue1Brown style)</div><div class="resource-desc">Visual intuition for BM paths, properties, and why it's special.</div></a></div>
+    <div class="resource-card"><a href="https://demonstrations.wolfram.com/BrownianMotion/" target="_blank"><div class="resource-type">Interactive</div><div class="resource-name">Wolfram — Brownian Motion Demo</div><div class="resource-desc">Adjust parameters and watch BM paths in real-time. Download Wolfram Player (free) to run.</div></a></div>
+    <div class="resource-card"><a href="https://www.coursera.org/learn/financial-engineering-1" target="_blank"><div class="resource-type">Course</div><div class="resource-name">Financial Engineering I (Columbia/Coursera)</div><div class="resource-desc">Covers BM, GBM, and Black-Scholes rigorously. First few modules are free to audit.</div></a></div>
+    <div class="resource-card"><a href="https://shreve.math.cmu.edu/" target="_blank"><div class="resource-type">Textbook</div><div class="resource-name">Shreve — Stochastic Calculus for Finance I</div><div class="resource-desc">The standard quant finance reference. Volume I covers BM and its properties beautifully.</div></a></div>
+    <div class="resource-card"><a href="https://stochasticlifestyle.com/analysis-of-financial-time-series-with-brownian-motion/" target="_blank"><div class="resource-type">Blog</div><div class="resource-name">Stochastic Lifestyle — BM in Finance</div><div class="resource-desc">Applied perspective on BM: calibrating parameters from real market data.</div></a></div>
+    <div class="resource-card"><a href="https://www.investment-and-finance.net/quantitative-finance/b/brownian-motion.html" target="_blank"><div class="resource-type">Reference</div><div class="resource-name">Quantitative Finance — BM Properties</div><div class="resource-desc">Quick reference for all key formulas and properties used in derivatives pricing.</div></a></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!--  TAB 5 — COLAB LABS                                     -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-5">
+<div class="page page-5">
+
+  <h1>Google Colab Labs</h1>
+  <p class="lead">Hands-on experiments. Copy each code block into a new Colab notebook and run it. Each lab builds on the previous one — they're designed to be run in order.</p>
+
+  <div class="callout purple">
+    <div class="callout-label">Setup</div>
+    Open <a href="https://colab.research.google.com" target="_blank">colab.research.google.com</a> → New Notebook. All labs use standard Python libraries: <code>numpy</code>, <code>matplotlib</code>, <code>scipy</code>. These are pre-installed in Colab.
+  </div>
+
+  <h2>Lab 0: Setup & Prerequisites Check</h2>
+<pre><code><span class="cm"># Lab 0: Setup — Run this first in every session</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> matplotlib.animation <span class="kw">as</span> animation
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+<span class="kw">import</span> warnings
+warnings.filterwarnings(<span class="st">'ignore'</span>)
+
+<span class="cm"># Set random seed for reproducibility</span>
+np.random.seed(<span class="nm">42</span>)
+
+<span class="cm"># Nice plotting style</span>
+plt.style.use(<span class="st">'dark_background'</span>)
+plt.rcParams[<span class="st">'figure.figsize'</span>] = [<span class="nm">12</span>, <span class="nm">5</span>]
+plt.rcParams[<span class="st">'axes.facecolor'</span>] = <span class="st">'#111520'</span>
+plt.rcParams[<span class="st">'figure.facecolor'</span>] = <span class="st">'#0a0c14'</span>
+plt.rcParams[<span class="st">'grid.color'</span>] = <span class="st">'#2a3355'</span>
+plt.rcParams[<span class="st">'lines.linewidth'</span>] = <span class="nm">1.5</span>
+
+<span class="fn">print</span>(<span class="st">"✅ Setup complete. Ready to explore stochastic processes!"</span>)
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 1: Markov Chains — Simulation & Convergence</h2>
+<pre><code><span class="cm"># Lab 1: Markov Chain Simulation</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+
+<span class="cm"># Define transition matrix (Weather: 0=Sunny, 1=Rainy)</span>
+P = np.array([
+    [<span class="nm">0.7</span>, <span class="nm">0.3</span>],   <span class="cm"># from Sunny: 70% stay, 30% → Rainy</span>
+    [<span class="nm">0.4</span>, <span class="nm">0.6</span>]    <span class="cm"># from Rainy: 40% → Sunny, 60% stay</span>
+])
+
+<span class="kw">def</span> <span class="fn">simulate_markov</span>(P, n_steps, start_state=<span class="nm">0</span>):
+    <span class="st">"""Simulate a Markov chain for n_steps steps."""</span>
+    states = [start_state]
+    current = start_state
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_steps - <span class="nm">1</span>):
+        <span class="cm"># np.random.choice picks next state based on row probabilities</span>
+        current = np.random.choice(<span class="fn">len</span>(P), p=P[current])
+        states.append(current)
+    <span class="kw">return</span> np.array(states)
+
+<span class="cm"># Simulate 5000 steps starting from Sunny</span>
+chain = simulate_markov(P, n_steps=<span class="nm">5000</span>, start_state=<span class="nm">0</span>)
+
+<span class="cm"># ── Plot 1: Raw chain path ──────────────────────────────────────</span>
+fig, axes = plt.subplots(<span class="nm">1</span>, <span class="nm">3</span>, figsize=(<span class="nm">18</span>, <span class="nm">4</span>))
+
+axes[<span class="nm">0</span>].plot(chain[:<span class="nm">200</span>], color=<span class="st">'#4f8ef7'</span>, drawstyle=<span class="st">'steps-post'</span>)
+axes[<span class="nm">0</span>].set_yticks([<span class="nm">0</span>, <span class="nm">1</span>])
+axes[<span class="nm">0</span>].set_yticklabels([<span class="st">'Sunny'</span>, <span class="st">'Rainy'</span>])
+axes[<span class="nm">0</span>].set_title(<span class="st">'Chain Path (first 200 steps)'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">0</span>].set_xlabel(<span class="st">'Step'</span>)
+axes[<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># ── Plot 2: Empirical distribution convergence ─────────────────</span>
+sunny_fraction = [np.mean(chain[:k+<span class="nm">1</span>] == <span class="nm">0</span>) <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">5000</span>, <span class="nm">10</span>)]
+axes[<span class="nm">1</span>].plot(sunny_fraction, color=<span class="st">'#5ef7a4'</span>)
+axes[<span class="nm">1</span>].axhline(y=<span class="nm">4</span>/<span class="nm">7</span>, color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>,
+               label=f<span class="st">'Stationary π_S = {4/7:.4f}'</span>)
+axes[<span class="nm">1</span>].set_title(<span class="st">'Convergence to Stationary Distribution'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>].set_xlabel(<span class="st">'Step'</span>)
+axes[<span class="nm">1</span>].set_ylabel(<span class="st">'Fraction Sunny'</span>)
+axes[<span class="nm">1</span>].legend()
+axes[<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># ── Plot 3: Power of P matrix convergence ─────────────────────</span>
+<span class="cm"># P^n[0][0] should converge to π_S = 4/7</span>
+Pn = np.eye(<span class="nm">2</span>)
+p00_values = []
+<span class="kw">for</span> n <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">50</span>):
+    Pn = Pn @ P
+    p00_values.append(Pn[<span class="nm">0</span>, <span class="nm">0</span>])
+axes[<span class="nm">2</span>].plot(p00_values, color=<span class="st">'#f7a44f'</span>)
+axes[<span class="nm">2</span>].axhline(y=<span class="nm">4</span>/<span class="nm">7</span>, color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>,
+               label=f<span class="st">'π_S = {4/7:.4f}'</span>)
+axes[<span class="nm">2</span>].set_title(<span class="st">'P^n[0,0] Convergence to π_S'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">2</span>].set_xlabel(<span class="st">'n (matrix power)'</span>)
+axes[<span class="nm">2</span>].legend()
+axes[<span class="nm">2</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># ── Compute stationary distribution via eigenvalues ────────────</span>
+eigenvalues, eigenvectors = np.linalg.eig(P.T)
+<span class="fn">print</span>(<span class="st">"\nEigenvalues of P^T:"</span>, eigenvalues)
+
+<span class="cm"># Find eigenvector for eigenvalue ≈ 1</span>
+idx = np.argmin(np.abs(eigenvalues - <span class="nm">1.0</span>))
+stationary = np.real(eigenvectors[:, idx])
+stationary = stationary / stationary.<span class="fn">sum</span>()
+<span class="fn">print</span>(f<span class="st">"Stationary distribution: {stationary}"</span>)
+<span class="fn">print</span>(f<span class="st">"Theory: [{4/7:.4f}, {3/7:.4f}]"</span>)
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 2: Random Walk — The √n Law</h2>
+<pre><code><span class="cm"># Lab 2: Random Walk Properties</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+
+<span class="kw">def</span> <span class="fn">random_walk</span>(n_steps, p=<span class="nm">0.5</span>):
+    <span class="st">"""Generate a 1D random walk."""</span>
+    steps = np.where(np.random.random(n_steps) &lt; p, <span class="nm">1</span>, -<span class="nm">1</span>)
+    <span class="kw">return</span> np.concatenate([[<span class="nm">0</span>], np.cumsum(steps)])
+
+n_steps = <span class="nm">1000</span>
+n_walks = <span class="nm">500</span>
+
+<span class="cm"># Simulate many walks</span>
+walks = np.array([random_walk(n_steps) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_walks)])
+
+fig, axes = plt.subplots(<span class="nm">2</span>, <span class="nm">2</span>, figsize=(<span class="nm">16</span>, <span class="nm">10</span>))
+
+<span class="cm"># Plot 1: Multiple walk paths</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">30</span>):
+    axes[<span class="nm">0</span>,<span class="nm">0</span>].plot(walks[i], alpha=<span class="nm">0.4</span>, linewidth=<span class="nm">0.8</span>, color=<span class="st">'#4f8ef7'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].axhline(y=<span class="nm">0</span>, color=<span class="st">'white'</span>, alpha=<span class="nm">0.5</span>, linewidth=<span class="nm">1</span>)
+sqrt_n = np.sqrt(np.arange(n_steps+<span class="nm">1</span>))
+axes[<span class="nm">0</span>,<span class="nm">0</span>].plot(sqrt_n, color=<span class="st">'#f74f8e'</span>, linewidth=<span class="nm">2</span>, label=<span class="st">'+√n envelope'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].plot(-sqrt_n, color=<span class="st">'#f74f8e'</span>, linewidth=<span class="nm">2</span>, label=<span class="st">'-√n envelope'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].set_title(<span class="st">'30 Random Walk Paths with ±√n Envelope'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].legend(fontsize=<span class="nm">8</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 2: Distribution of final positions → Normal</span>
+final = walks[:, -<span class="nm">1</span>]
+x = np.linspace(final.min(), final.max(), <span class="nm">200</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].hist(final, bins=<span class="nm">40</span>, density=<span class="nm">True</span>, color=<span class="st">'#4f8ef7'</span>, alpha=<span class="nm">0.7</span>)
+normal_fit = stats.norm.pdf(x, <span class="nm">0</span>, np.sqrt(n_steps))
+axes[<span class="nm">0</span>,<span class="nm">1</span>].plot(x, normal_fit, <span class="st">'r-'</span>, linewidth=<span class="nm">2</span>,
+              label=f<span class="st">'N(0,√{n_steps}) = N(0,{np.sqrt(n_steps):.1f})'</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].set_title(<span class="st">'Distribution of S_n (CLT in action!)'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].legend(fontsize=<span class="nm">8</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 3: Variance grows linearly with n</span>
+ns = np.arange(<span class="nm">1</span>, n_steps+<span class="nm">1</span>, <span class="nm">10</span>)
+emp_var = np.var(walks[:, ::<span class="nm">10</span>], axis=<span class="nm">0</span>)[:<span class="fn">len</span>(ns)]
+axes[<span class="nm">1</span>,<span class="nm">0</span>].plot(ns, emp_var, color=<span class="st">'#5ef7a4'</span>, label=<span class="st">'Empirical Var(S_n)'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].plot(ns, ns, color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">'Theory: Var = n'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].set_title(<span class="st">'Variance Grows Linearly: Var(S_n) = n'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].legend()
+axes[<span class="nm">1</span>,<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 4: Arc-Sine Law — fraction of time > 0</span>
+frac_positive = np.mean(walks[:, <span class="nm">1</span>:] > <span class="nm">0</span>, axis=<span class="nm">1</span>)
+x_arcsine = np.linspace(<span class="nm">0.01</span>, <span class="nm">0.99</span>, <span class="nm">200</span>)
+arcsine_pdf = <span class="nm">1</span> / (np.pi * np.sqrt(x_arcsine * (<span class="nm">1</span> - x_arcsine)))
+axes[<span class="nm">1</span>,<span class="nm">1</span>].hist(frac_positive, bins=<span class="nm">40</span>, density=<span class="nm">True</span>, color=<span class="st">'#a44ff7'</span>, alpha=<span class="nm">0.7</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].plot(x_arcsine, arcsine_pdf, <span class="st">'r-'</span>, linewidth=<span class="nm">2</span>, label=<span class="st">'Arc-Sine Law'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].set_title(<span class="st">'Arc-Sine Law: Fraction of Time S_n > 0'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].set_xlabel(<span class="st">'Fraction of time above zero'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].legend()
+axes[<span class="nm">1</span>,<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+<span class="fn">print</span>(<span class="st">"💡 Notice: Arc-Sine is U-shaped! You're MOST likely to spend</span>
+<span class="st">        almost ALL time on one side, not split evenly."</span>)
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 3: Brownian Motion Simulation</h2>
+<pre><code><span class="cm"># Lab 3: Brownian Motion from First Principles</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+
+<span class="kw">def</span> <span class="fn">brownian_motion</span>(T=<span class="nm">1.0</span>, n=<span class="nm">1000</span>, mu=<span class="nm">0.0</span>, sigma=<span class="nm">1.0</span>):
+    <span class="st">"""
+    Simulate Brownian motion with drift.
+    dX = mu*dt + sigma*dB
+    """</span>
+    dt = T / n
+    t = np.linspace(<span class="nm">0</span>, T, n+<span class="nm">1</span>)
+    <span class="cm"># Each increment ~ N(0, dt)</span>
+    increments = np.random.normal(<span class="nm">0</span>, np.sqrt(dt), n)
+    B = np.concatenate([[<span class="nm">0</span>], np.cumsum(increments)])
+    <span class="cm"># Add drift: X(t) = mu*t + sigma*B(t)</span>
+    X = mu * t + sigma * B
+    <span class="kw">return</span> t, X
+
+fig, axes = plt.subplots(<span class="nm">2</span>, <span class="nm">2</span>, figsize=(<span class="nm">16</span>, <span class="nm">10</span>))
+
+<span class="cm"># Plot 1: Multiple BM paths (standard)</span>
+colors = plt.cm.plasma(np.linspace(<span class="nm">0.1</span>, <span class="nm">0.9</span>, <span class="nm">20</span>))
+<span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(colors):
+    t, X = brownian_motion(T=<span class="nm">1</span>, n=<span class="nm">1000</span>)
+    axes[<span class="nm">0</span>,<span class="nm">0</span>].plot(t, X, alpha=<span class="nm">0.6</span>, linewidth=<span class="nm">0.8</span>, color=c)
+t_env = np.linspace(<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">100</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].fill_between(t_env, -<span class="nm">2</span>*np.sqrt(t_env), <span class="nm">2</span>*np.sqrt(t_env),
+                        alpha=<span class="nm">0.15</span>, color=<span class="st">'white'</span>, label=<span class="st">'±2σ=±2√t band'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].set_title(<span class="st">'Standard Brownian Motion B(t), t∈[0,1]'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].legend(fontsize=<span class="nm">8</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 2: Effect of drift μ</span>
+<span class="kw">for</span> mu, color <span class="kw">in</span> [(-<span class="nm">1</span>,<span class="st">'#f74f8e'</span>),(<span class="nm">0</span>,<span class="st">'#4f8ef7'</span>),(<span class="nm">1</span>,<span class="st">'#5ef7a4'</span>)]:
+    t, X = brownian_motion(T=<span class="nm">1</span>, n=<span class="nm">1000</span>, mu=mu, sigma=<span class="nm">1</span>)
+    axes[<span class="nm">0</span>,<span class="nm">1</span>].plot(t, X, label=f<span class="st">'μ={mu}'</span>, color=color)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].set_title(<span class="st">'BM with Different Drift Values'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].legend()
+axes[<span class="nm">0</span>,<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 3: Verify quadratic variation = T</span>
+ns = [<span class="nm">10</span>, <span class="nm">100</span>, <span class="nm">500</span>, <span class="nm">1000</span>, <span class="nm">5000</span>]
+qv_means, qv_stds = [], []
+<span class="kw">for</span> n <span class="kw">in</span> ns:
+    qvs = []
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">200</span>):
+        t, B = brownian_motion(T=<span class="nm">1</span>, n=n)
+        diffs = np.diff(B)
+        qvs.append(np.sum(diffs**<span class="nm">2</span>))
+    qv_means.append(np.mean(qvs))
+    qv_stds.append(np.std(qvs))
+
+axes[<span class="nm">1</span>,<span class="nm">0</span>].errorbar(ns, qv_means, yerr=qv_stds, fmt=<span class="st">'o-'</span>, color=<span class="st">'#f7a44f'</span>, capsize=<span class="nm">5</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].axhline(y=<span class="nm">1.0</span>, color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">'Theory: QV = T = 1'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].set_xscale(<span class="st">'log'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].set_title(<span class="st">'Quadratic Variation → T as mesh→0'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].set_xlabel(<span class="st">'Number of steps n'</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].legend()
+axes[<span class="nm">1</span>,<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Plot 4: Geometric Brownian Motion (Stock Prices)</span>
+<span class="kw">def</span> <span class="fn">gbm</span>(S0=<span class="nm">100</span>, mu=<span class="nm">0.1</span>, sigma=<span class="nm">0.2</span>, T=<span class="nm">1</span>, n=<span class="nm">252</span>):
+    dt = T / n
+    t = np.linspace(<span class="nm">0</span>, T, n+<span class="nm">1</span>)
+    log_returns = (mu - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*dt + sigma*np.sqrt(dt)*np.random.randn(n)
+    log_price = np.concatenate([[np.log(S0)], np.log(S0) + np.cumsum(log_returns)])
+    <span class="kw">return</span> t, np.exp(log_price)
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">30</span>):
+    t, S = gbm(S0=<span class="nm">100</span>, mu=<span class="nm">0.1</span>, sigma=<span class="nm">0.3</span>, T=<span class="nm">1</span>, n=<span class="nm">252</span>)
+    axes[<span class="nm">1</span>,<span class="nm">1</span>].plot(t, S, alpha=<span class="nm">0.5</span>, linewidth=<span class="nm">0.8</span>)
+<span class="cm"># Theoretical mean E[S_T] = S0 * exp(mu*T)</span>
+axes[<span class="nm">1</span>,<span class="nm">1</span>].axhline(<span class="nm">100</span>*np.exp(<span class="nm">0.1</span>), color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>,
+                   linewidth=<span class="nm">2</span>, label=f<span class="st">'E[S_T] = {100*np.exp(0.1):.1f}'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].set_title(<span class="st">'Geometric Brownian Motion: Stock Price Simulation'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].set_xlabel(<span class="st">'Time (years)'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].set_ylabel(<span class="st">'Price ($)'</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].legend()
+axes[<span class="nm">1</span>,<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 4: From Random Walk to Brownian Motion (Donsker)</h2>
+<pre><code><span class="cm"># Lab 4: Donsker's Theorem — The Scaling Limit</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+<span class="cm"># Show that B_n(t) = S_{⌊nt⌋} / √n → B(t) as n → ∞</span>
+
+fig, axes = plt.subplots(<span class="nm">1</span>, <span class="nm">4</span>, figsize=(<span class="nm">20</span>, <span class="nm">4</span>))
+ns = [<span class="nm">10</span>, <span class="nm">50</span>, <span class="nm">500</span>, <span class="nm">5000</span>]
+
+<span class="kw">for</span> ax, n <span class="kw">in</span> <span class="fn">zip</span>(axes, ns):
+    <span class="cm"># Simulate 10 rescaled random walks</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>):
+        steps = np.random.choice([-<span class="nm">1</span>, <span class="nm">1</span>], size=n)
+        S = np.concatenate([[<span class="nm">0</span>], np.cumsum(steps)])
+        <span class="cm"># Rescale: time → [0,1], space → /√n</span>
+        t_disc = np.linspace(<span class="nm">0</span>, <span class="nm">1</span>, n+<span class="nm">1</span>)
+        B_n = S / np.sqrt(n)
+        ax.plot(t_disc, B_n, alpha=<span class="nm">0.6</span>, linewidth=<span class="nm">0.7</span>)
+    
+    <span class="cm"># Overlay true BM for reference</span>
+    t_bm = np.linspace(<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">1000</span>)
+    bm_path = np.concatenate([[<span class="nm">0</span>], np.cumsum(np.random.normal(<span class="nm">0</span>, np.sqrt(<span class="nm">1</span>/<span class="nm">1000</span>), <span class="nm">999</span>))])
+    ax.plot(t_bm, bm_path, color=<span class="st">'white'</span>, linewidth=<span class="nm">1.5</span>, alpha=<span class="nm">0.8</span>, label=<span class="st">'True BM'</span>)
+    
+    ax.set_title(f<span class="st">'n = {n} steps'</span>, color=<span class="st">'white'</span>, fontsize=<span class="nm">12</span>)
+    ax.grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+    ax.legend(fontsize=<span class="nm">7</span>)
+
+fig.suptitle(<span class="st">"Donsker's Theorem: S_{⌊nt⌋}/√n → B(t) as n→∞"</span>,
+             color=<span class="st">'white'</span>, fontsize=<span class="nm">14</span>, y=<span class="nm">1.02</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="fn">print</span>(<span class="st">"💡 Notice: As n increases, the rescaled random walk looks</span>
+<span class="st">        increasingly like a smooth Brownian motion path!"</span>)
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 5: Monte Carlo Option Pricing</h2>
+<pre><code><span class="cm"># Lab 5: Quant Application — Monte Carlo Option Pricing</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+<span class="cm"># Price a European Call using GBM simulations, compare to Black-Scholes</span>
+
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+
+<span class="kw">def</span> <span class="fn">black_scholes_call</span>(S0, K, T, r, sigma):
+    <span class="st">"""Black-Scholes formula for European call option price."""</span>
+    d1 = (np.log(S0/K) + (r + <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="kw">return</span> S0*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+
+<span class="kw">def</span> <span class="fn">mc_call_price</span>(S0, K, T, r, sigma, n_simulations=<span class="nm">100000</span>, n_steps=<span class="nm">252</span>):
+    <span class="st">"""Monte Carlo pricing of European call option."""</span>
+    dt = T / n_steps
+    <span class="cm"># Simulate final prices directly (log-normal shortcut)</span>
+    Z = np.random.standard_normal(n_simulations)
+    ST = S0 * np.exp((r - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T + sigma*np.sqrt(T)*Z)
+    <span class="cm"># Call payoff: max(S_T - K, 0)</span>
+    payoff = np.maximum(ST - K, <span class="nm">0</span>)
+    <span class="cm"># Discount back to present value</span>
+    price = np.exp(-r*T) * np.mean(payoff)
+    stderr = np.exp(-r*T) * np.std(payoff) / np.sqrt(n_simulations)
+    <span class="kw">return</span> price, stderr
+
+<span class="cm"># Parameters</span>
+S0 = <span class="nm">100</span>    <span class="cm"># Current stock price</span>
+K  = <span class="nm">105</span>    <span class="cm"># Strike price  </span>
+T  = <span class="nm">1.0</span>    <span class="cm"># Time to expiry (years)</span>
+r  = <span class="nm">0.05</span>   <span class="cm"># Risk-free rate</span>
+sigma = <span class="nm">0.2</span>  <span class="cm"># Volatility</span>
+
+bs_price = black_scholes_call(S0, K, T, r, sigma)
+mc_price, mc_err = mc_call_price(S0, K, T, r, sigma)
+
+<span class="fn">print</span>(f<span class="st">"Black-Scholes Price:   ${bs_price:.4f}"</span>)
+<span class="fn">print</span>(f<span class="st">"Monte Carlo Price:     ${mc_price:.4f} ± {1.96*mc_err:.4f} (95% CI)"</span>)
+<span class="fn">print</span>(f<span class="st">"Error:                 {abs(mc_price-bs_price):.4f}"</span>)
+
+<span class="cm"># Convergence analysis: how many simulations do we need?</span>
+n_sims_list = [<span class="nm">100</span>, <span class="nm">500</span>, <span class="nm">1000</span>, <span class="nm">5000</span>, <span class="nm">10000</span>, <span class="nm">50000</span>, <span class="nm">100000</span>]
+mc_prices = []
+<span class="kw">for</span> n <span class="kw">in</span> n_sims_list:
+    p, _ = mc_call_price(S0, K, T, r, sigma, n_simulations=n)
+    mc_prices.append(p)
+
+plt.figure(figsize=(<span class="nm">10</span>, <span class="nm">5</span>))
+plt.semilogx(n_sims_list, mc_prices, <span class="st">'o-'</span>, color=<span class="st">'#4f8ef7'</span>, label=<span class="st">'MC Price'</span>)
+plt.axhline(bs_price, color=<span class="st">'#f74f8e'</span>, linestyle=<span class="st">'--'</span>, linewidth=<span class="nm">2</span>,
+            label=f<span class="st">'Black-Scholes = ${bs_price:.4f}'</span>)
+plt.xlabel(<span class="st">'Number of Simulations'</span>)
+plt.ylabel(<span class="st">'Call Price ($)'</span>)
+plt.title(<span class="st">'Monte Carlo Convergence to Black-Scholes'</span>, color=<span class="st">'white'</span>)
+plt.legend()
+plt.grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+plt.tight_layout()
+plt.show()
+<span class="fn">print</span>(<span class="st">"💡 Key insight: MC error scales as 1/√N — doubling accuracy</span>
+<span class="st">        requires 4x simulations!"</span>)
+</code></pre>
+
+  <hr class="divider">
+
+  <h2>Lab 6: Full Integration — Markov Chain Regime Model</h2>
+<pre><code><span class="cm"># Lab 6: Markov Chain + GBM = Regime-Switching Model</span>
+<span class="cm"># ─────────────────────────────────────────────────────────────────</span>
+<span class="cm"># A stock's volatility switches between Bull/Bear regimes (Markov)</span>
+<span class="cm"># This integrates ALL our topics in one model!</span>
+
+<span class="cm"># Regime transition matrix</span>
+<span class="cm"># State 0 = Bull market, State 1 = Bear market</span>
+P_regime = np.array([
+    [<span class="nm">0.97</span>, <span class="nm">0.03</span>],   <span class="cm"># Bull: 97% stay Bull, 3% → Bear</span>
+    [<span class="nm">0.08</span>, <span class="nm">0.92</span>]    <span class="cm"># Bear: 8% → Bull, 92% stay Bear</span>
+])
+
+<span class="cm"># GBM parameters per regime</span>
+regime_params = {
+    <span class="nm">0</span>: {<span class="st">'mu'</span>: <span class="nm">0.20</span>/252,  <span class="st">'sigma'</span>: <span class="nm">0.12</span>/np.sqrt(<span class="nm">252</span>)},   <span class="cm"># Bull: positive drift, low vol</span>
+    <span class="nm">1</span>: {<span class="st">'mu'</span>: -<span class="nm">0.30</span>/252, <span class="st">'sigma'</span>: <span class="nm">0.35</span>/np.sqrt(<span class="nm">252</span>)}    <span class="cm"># Bear: negative drift, high vol</span>
+}
+
+<span class="kw">def</span> <span class="fn">regime_switching_gbm</span>(S0=<span class="nm">100</span>, n_days=<span class="nm">1260</span>, start_regime=<span class="nm">0</span>):
+    S = [S0]
+    regimes = [start_regime]
+    current_regime = start_regime
+    <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, n_days):
+        <span class="cm"># Step 1: Update regime (Markov Chain step)</span>
+        current_regime = np.random.choice(<span class="nm">2</span>, p=P_regime[current_regime])
+        regimes.append(current_regime)
+        <span class="cm"># Step 2: Update price (GBM step with regime's parameters)</span>
+        p = regime_params[current_regime]
+        log_ret = p[<span class="st">'mu'</span>] + p[<span class="st">'sigma'</span>] * np.random.randn()
+        S.append(S[-<span class="nm">1</span>] * np.exp(log_ret))
+    <span class="kw">return</span> np.array(S), np.array(regimes)
+
+fig, axes = plt.subplots(<span class="nm">2</span>, <span class="nm">1</span>, figsize=(<span class="nm">16</span>, <span class="nm">10</span>), gridspec_kw={<span class="st">'height_ratios'</span>: [<span class="nm">3</span>, <span class="nm">1</span>]})
+
+prices, regimes = regime_switching_gbm(n_days=<span class="nm">1260</span>)  <span class="cm"># 5 years</span>
+t = np.arange(<span class="nm">1260</span>)
+
+<span class="cm"># Color price path by regime</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">1260</span>):
+    color = <span class="st">'#5ef7a4'</span> <span class="kw">if</span> regimes[i] == <span class="nm">0</span> <span class="kw">else</span> <span class="st">'#f74f8e'</span>
+    axes[<span class="nm">0</span>].plot([t[i-<span class="nm">1</span>], t[i]], [prices[i-<span class="nm">1</span>], prices[i]], 
+              color=color, linewidth=<span class="nm">0.8</span>, alpha=<span class="nm">0.8</span>)
+
+axes[<span class="nm">0</span>].set_title(<span class="st">'Regime-Switching GBM: Green=Bull, Red=Bear'</span>, color=<span class="st">'white'</span>, fontsize=<span class="nm">13</span>)
+axes[<span class="nm">0</span>].set_ylabel(<span class="st">'Price ($)'</span>)
+axes[<span class="nm">0</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+<span class="cm"># Show the regime path</span>
+axes[<span class="nm">1</span>].fill_between(t, regimes, color=<span class="st">'#f74f8e'</span>, alpha=<span class="nm">0.7</span>, label=<span class="st">'Bear Regime'</span>)
+axes[<span class="nm">1</span>].set_yticks([<span class="nm">0</span>, <span class="nm">1</span>])
+axes[<span class="nm">1</span>].set_yticklabels([<span class="st">'Bull'</span>, <span class="st">'Bear'</span>])
+axes[<span class="nm">1</span>].set_xlabel(<span class="st">'Trading Days'</span>)
+axes[<span class="nm">1</span>].set_title(<span class="st">'Regime (Markov Chain State)'</span>, color=<span class="st">'white'</span>)
+axes[<span class="nm">1</span>].grid(<span class="nm">True</span>, alpha=<span class="nm">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Compute stationary distribution for regime chain</span>
+evals, evecs = np.linalg.eig(P_regime.T)
+stat_idx = np.argmin(np.abs(evals - <span class="nm">1</span>))
+pi_regime = np.real(evecs[:, stat_idx])
+pi_regime /= pi_regime.sum()
+<span class="fn">print</span>(f<span class="st">"Theoretical stationary: Bull={pi_regime[0]:.3f}, Bear={pi_regime[1]:.3f}"</span>)
+<span class="fn">print</span>(f<span class="st">"Simulated fraction:     Bull={np.mean(regimes==0):.3f}, Bear={np.mean(regimes==1):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">"</span>
+<span class="st">🎉 You just combined Markov Chains + Random Walks + Brownian Motion into one model!"</span>)
+</code></pre>
+
+  <div class="callout purple">
+    <div class="callout-label">What You've Built in Lab 6</div>
+    The regime-switching model unifies <strong>all three topics</strong>: (1) a Markov Chain governs which "regime" (Bull/Bear) the market is in, (2) within each regime, the stock price follows Geometric Brownian Motion (Random Walk → BM), and (3) the stationary distribution of the Markov Chain determines long-run market fractions in each regime. This is a real model used in quantitative asset management!
+  </div>
+
+  <hr class="divider">
+
+  <h2>Colab Notebook Links (External)</h2>
+  <div class="resource-grid">
+    <div class="resource-card"><a href="https://colab.research.google.com/github/probml/pyprobml/blob/master/notebooks/book1/11/markov_chain_demo.ipynb" target="_blank"><div class="resource-type">Colab</div><div class="resource-name">Probabilistic ML — Markov Chain Demo</div><div class="resource-desc">Ready-to-run Colab notebook from Kevin Murphy's Probabilistic ML book.</div></a></div>
+    <div class="resource-card"><a href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/18_reinforcement_learning.ipynb" target="_blank"><div class="resource-type">Colab</div><div class="resource-name">Markov Decision Processes (Reinforcement Learning)</div><div class="resource-desc">Practical MDPs using Markov chains — the next step after this guide.</div></a></div>
+    <div class="resource-card"><a href="https://www.quantlib.org/quantlib-python.shtml" target="_blank"><div class="resource-type">Library</div><div class="resource-name">QuantLib-Python</div><div class="resource-desc">Industry-standard library for derivatives pricing. Uses BM/GBM under the hood everywhere.</div></a></div>
+    <div class="resource-card"><a href="https://www.theconceptcheck.com/brownian" target="_blank"><div class="resource-type">Interactive</div><div class="resource-name">BM Path Simulator (Web)</div><div class="resource-desc">Browser-based Brownian motion visualizer — no install needed.</div></a></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ── JAVASCRIPT ────────────────────────────────────────────── -->
+<script>
+// ── TAB SWITCHING ─────────────────────────────────────────────
+function switchTab(idx) {
+  document.querySelectorAll('.tab-content').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.tab-btn').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  window.scrollTo(0, 0);
+}
+
+// ── NORMAL DISTRIBUTION CANVAS (Tab 1) ──────────────────────
+function drawNormal() {
+  const canvas = document.getElementById('normal-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const mu = parseFloat(document.getElementById('mu-slider').value);
+  const sigma = parseFloat(document.getElementById('sigma-slider').value);
+  document.getElementById('mu-val').textContent = mu;
+  document.getElementById('sigma-val').textContent = sigma.toFixed(1);
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#2a3355';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= W; x += W/10) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y <= H; y += H/5) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  const xMin = -7, xMax = 7;
+  const toCanvasX = x => (x - xMin) / (xMax - xMin) * W;
+  const toCanvasY = p => H - p * H * 0.9 / (1 / (sigma * Math.sqrt(2 * Math.PI)));
+
+  function pdf(x) {
+    return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
+  }
+
+  // Fill under curve
+  ctx.beginPath();
+  ctx.moveTo(toCanvasX(xMin), H);
+  for (let x = xMin; x <= xMax; x += 0.02) {
+    ctx.lineTo(toCanvasX(x), toCanvasY(pdf(x)));
+  }
+  ctx.lineTo(toCanvasX(xMax), H);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(94,247,164,0.4)');
+  grad.addColorStop(1, 'rgba(94,247,164,0.02)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Curve line
+  ctx.beginPath();
+  ctx.strokeStyle = '#5ef7a4';
+  ctx.lineWidth = 2.5;
+  for (let x = xMin; x <= xMax; x += 0.02) {
+    x === xMin ? ctx.moveTo(toCanvasX(x), toCanvasY(pdf(x))) : ctx.lineTo(toCanvasX(x), toCanvasY(pdf(x)));
+  }
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#4f8ef7';
+  ctx.font = '13px JetBrains Mono, monospace';
+  ctx.fillText(`μ = ${mu}`, toCanvasX(mu) + 8, H * 0.15);
+  ctx.fillStyle = '#f7a44f';
+  ctx.fillText(`σ = ${sigma}`, toCanvasX(mu + sigma) + 4, toCanvasY(pdf(mu + sigma)) - 8);
+
+  // Mean line
+  ctx.strokeStyle = '#4f8ef7';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.moveTo(toCanvasX(mu), 0);
+  ctx.lineTo(toCanvasX(mu), H);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+// ── MARKOV CHAIN CANVAS (Tab 2) ───────────────────────────────
+let markovStates = [];
+let markovRunning = false;
+
+function resetMarkovSim() {
+  markovStates = [];
+  markovRunning = false;
+  const canvas = document.getElementById('markov-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('markov-info').textContent = 'Click "Run Simulation" to start';
+}
+
+function runMarkovSim() {
+  const P = [[0.7, 0.3], [0.4, 0.6]];
+  const steps = parseInt(document.getElementById('markov-steps').value);
+  let state = 0;
+  const states = [state];
+  for (let i = 0; i < steps - 1; i++) {
+    state = Math.random() < P[state][0] ? 0 : 1;
+    states.push(state);
+  }
+  markovStates = states;
+  drawMarkovSim();
+}
+
+function drawMarkovSim() {
+  const canvas = document.getElementById('markov-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14'; ctx.fillRect(0, 0, W, H);
+
+  // Draw running fraction of time in Sunny
+  const runFrac = markovStates.map((_, i) => markovStates.slice(0, i+1).filter(s => s===0).length / (i+1));
+  const stationary = 4/7;
+
+  // Grid
+  ctx.strokeStyle = '#2a3355'; ctx.lineWidth = 0.8;
+  [0.25, 0.5, 0.75, 1].forEach(f => {
+    ctx.beginPath(); ctx.moveTo(0, H*(1-f*0.85)-10); ctx.lineTo(W, H*(1-f*0.85)-10); ctx.stroke();
+    ctx.fillStyle = '#4a5580';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(f.toFixed(2), 2, H*(1-f*0.85)-12);
+  });
+
+  // Running fraction line
+  ctx.beginPath();
+  ctx.strokeStyle = '#5ef7a4'; ctx.lineWidth = 1.5;
+  runFrac.forEach((f, i) => {
+    const x = i / markovStates.length * W;
+    const y = H * 0.95 - f * H * 0.85;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Stationary line
+  ctx.strokeStyle = '#f74f8e'; ctx.lineWidth = 2;
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.moveTo(0, H*0.95 - stationary*H*0.85);
+  ctx.lineTo(W, H*0.95 - stationary*H*0.85);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#f74f8e';
+  ctx.font = '11px JetBrains Mono, monospace';
+  ctx.fillText(`π_S = ${stationary.toFixed(4)}`, W - 120, H*0.95 - stationary*H*0.85 - 5);
+
+  const finalFrac = runFrac[runFrac.length - 1];
+  const infoEl = document.getElementById('markov-info');
+  if (infoEl) infoEl.textContent = `Steps: ${markovStates.length} | Empirical fraction: ${finalFrac.toFixed(4)} | Theory: ${stationary.toFixed(4)} | Error: ${Math.abs(finalFrac - stationary).toFixed(5)}`;
+}
+
+// ── RANDOM WALK CANVAS (Tab 3) ────────────────────────────────
+let rwPaths = [];
+
+function clearRWCanvas() {
+  rwPaths = [];
+  const canvas = document.getElementById('rw-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('rw-info').textContent = '';
+}
+
+function generateWalk(n, p) {
+  let pos = 0;
+  const path = [0];
+  for (let i = 0; i < n; i++) {
+    pos += Math.random() < p ? 1 : -1;
+    path.push(pos);
+  }
+  return path;
+}
+
+function drawRWPaths() {
+  const canvas = document.getElementById('rw-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14'; ctx.fillRect(0, 0, W, H);
+  if (rwPaths.length === 0) return;
+
+  const n = rwPaths[0].length - 1;
+  const allVals = rwPaths.flat();
+  const mn = Math.min(...allVals), mx = Math.max(...allVals);
+  const pad = Math.max(Math.abs(mx), Math.abs(mn)) * 0.15 || 5;
+  const yMin = mn - pad, yMax = mx + pad;
+
+  const toX = i => i / n * W;
+  const toY = v => H - (v - yMin) / (yMax - yMin) * H * 0.95 - H * 0.025;
+
+  // Zero line
+  ctx.strokeStyle = '#2a3355'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(0, toY(0)); ctx.lineTo(W, toY(0)); ctx.stroke();
+
+  // √n envelope
+  ctx.strokeStyle = 'rgba(247,79,142,0.5)';
+  ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    i === 0 ? ctx.moveTo(toX(i), toY(Math.sqrt(i))) : ctx.lineTo(toX(i), toY(Math.sqrt(i)));
+  }
+  ctx.stroke();
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    i === 0 ? ctx.moveTo(toX(i), toY(-Math.sqrt(i))) : ctx.lineTo(toX(i), toY(-Math.sqrt(i)));
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const colors = ['#4f8ef7','#5ef7a4','#f7a44f','#f74f8e','#a44ff7','#f7c44f'];
+  rwPaths.forEach((path, pi) => {
+    ctx.beginPath();
+    ctx.strokeStyle = colors[pi % colors.length];
+    ctx.lineWidth = rwPaths.length === 1 ? 2 : 1;
+    ctx.globalAlpha = rwPaths.length > 5 ? 0.5 : 0.9;
+    path.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  const last = rwPaths[rwPaths.length - 1];
+  const finalPos = last[last.length - 1];
+  document.getElementById('rw-info').textContent =
+    `${rwPaths.length} walk(s) | n=${n} | Last final position: ${finalPos} | √n ≈ ${Math.sqrt(n).toFixed(1)}`;
+}
+
+function runRandomWalk() {
+  const n = parseInt(document.getElementById('rw-steps').value);
+  const p = parseFloat(document.getElementById('rw-p').value);
+  document.getElementById('rw-p-val').textContent = p.toFixed(2);
+  rwPaths = [generateWalk(n, p)];
+  drawRWPaths();
+}
+
+function runMultipleWalks() {
+  const n = parseInt(document.getElementById('rw-steps').value);
+  const p = parseFloat(document.getElementById('rw-p').value);
+  rwPaths = Array.from({length: 20}, () => generateWalk(n, p));
+  drawRWPaths();
+}
+
+// ── 2D RANDOM WALK (Tab 3) ────────────────────────────────────
+let rw2dPath = null;
+
+function clear2DCanvas() {
+  rw2dPath = null;
+  const canvas = document.getElementById('rw2d-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function run2DWalk() {
+  const n = parseInt(document.getElementById('rw2d-steps').value);
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  let x = 0, y = 0;
+  const path = [[0, 0]];
+  for (let i = 0; i < n; i++) {
+    const d = dirs[Math.floor(Math.random() * 4)];
+    x += d[0]; y += d[1];
+    path.push([x, y]);
+  }
+  rw2dPath = path;
+  draw2DWalk();
+}
+
+function draw2DWalk() {
+  const canvas = document.getElementById('rw2d-canvas');
+  if (!canvas || !rw2dPath) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14'; ctx.fillRect(0, 0, W, H);
+
+  const xs = rw2dPath.map(p => p[0]), ys = rw2dPath.map(p => p[1]);
+  const xRange = Math.max(...xs) - Math.min(...xs) || 1;
+  const yRange = Math.max(...ys) - Math.min(...ys) || 1;
+  const scale = Math.min((W - 40) / xRange, (H - 40) / yRange) * 0.9;
+  const cx = W/2 - (Math.max(...xs) + Math.min(...xs)) / 2 * scale;
+  const cy = H/2 + (Math.max(...ys) + Math.min(...ys)) / 2 * scale;
+
+  const toX = x => cx + x * scale;
+  const toY = y => cy - y * scale;
+
+  // Grid
+  ctx.strokeStyle = '#1e2540'; ctx.lineWidth = 0.5;
+  for (let gx = Math.min(...xs); gx <= Math.max(...xs); gx++) {
+    ctx.beginPath(); ctx.moveTo(toX(gx), 0); ctx.lineTo(toX(gx), H); ctx.stroke();
+  }
+  for (let gy = Math.min(...ys); gy <= Math.max(...ys); gy++) {
+    ctx.beginPath(); ctx.moveTo(0, toY(gy)); ctx.lineTo(W, toY(gy)); ctx.stroke();
+  }
+
+  // Path with gradient color
+  const n = rw2dPath.length;
+  for (let i = 1; i < n; i++) {
+    const t = i / n;
+    const r = Math.floor(79 + (247-79)*t);
+    const g = Math.floor(142 + (79-142)*t);
+    const b = Math.floor(247 + (142-247)*t);
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.8)`;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(toX(rw2dPath[i-1][0]), toY(rw2dPath[i-1][1]));
+    ctx.lineTo(toX(rw2dPath[i][0]), toY(rw2dPath[i][1]));
+    ctx.stroke();
+  }
+
+  // Start/end markers
+  ctx.fillStyle = '#5ef7a4';
+  ctx.beginPath();
+  ctx.arc(toX(0), toY(0), 6, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#f74f8e';
+  const last = rw2dPath[rw2dPath.length-1];
+  ctx.beginPath();
+  ctx.arc(toX(last[0]), toY(last[1]), 6, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = '#5ef7a4'; ctx.font = '11px JetBrains Mono, monospace';
+  ctx.fillText('START', toX(0)+8, toY(0)+4);
+  ctx.fillStyle = '#f74f8e';
+  ctx.fillText('END', toX(last[0])+8, toY(last[1])+4);
+
+  const dist = Math.sqrt(last[0]**2 + last[1]**2).toFixed(2);
+  const sqrtN = Math.sqrt(rw2dPath.length-1).toFixed(2);
+  ctx.fillStyle = '#8892b0'; ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillText(`Distance from origin: ${dist} | √n = ${sqrtN}`, 10, H-10);
+}
+
+// ── BROWNIAN MOTION CANVAS (Tab 4) ────────────────────────────
+let bmPaths = [];
+let bmColors = ['#f74f8e','#4f8ef7','#5ef7a4','#f7a44f','#a44ff7','#f7c44f','#5ef7f7','#f75ef7','#7ef74f','#f7c44f'];
+
+function clearBMCanvas() {
+  bmPaths = [];
+  const canvas = document.getElementById('bm-canvas');
+  if (!canvas) return;
+  document.getElementById('bm-canvas').getContext('2d').clearRect(0, 0, 660, 320);
+  document.getElementById('bm-info').textContent = '';
+}
+
+function generateBM(mu, sigma, n=1000) {
+  const dt = 1 / n;
+  const path = [0];
+  for (let i = 0; i < n; i++) {
+    const Z = Math.sqrt(-2*Math.log(Math.random())) * Math.cos(2*Math.PI*Math.random());
+    path.push(path[path.length-1] + mu*dt + sigma*Math.sqrt(dt)*Z);
+  }
+  return path;
+}
+
+function drawBMPaths() {
+  const canvas = document.getElementById('bm-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14'; ctx.fillRect(0, 0, W, H);
+  if (bmPaths.length === 0) return;
+
+  const allVals = bmPaths.flat();
+  const mn = Math.min(...allVals), mx = Math.max(...allVals);
+  const pad = Math.max(Math.abs(mx), Math.abs(mn)) * 0.12 || 0.5;
+  const yMin = mn - pad, yMax = mx + pad;
+  const n = bmPaths[0].length - 1;
+
+  const toX = i => i / n * W;
+  const toY = v => H - (v - yMin) / (yMax - yMin) * H * 0.95 - H * 0.025;
+
+  ctx.strokeStyle = '#2a3355'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, toY(0)); ctx.lineTo(W, toY(0)); ctx.stroke();
+
+  const mu = parseFloat(document.getElementById('bm-mu').value);
+  const sigma = parseFloat(document.getElementById('bm-sigma').value);
+
+  // Draw 2σ√t band
+  ctx.fillStyle = 'rgba(247,164,79,0.06)';
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const x = toX(i), t = i/n;
+    i === 0 ? ctx.moveTo(x, toY(mu*t + 2*sigma*Math.sqrt(t))) : ctx.lineTo(x, toY(mu*t + 2*sigma*Math.sqrt(t)));
+  }
+  for (let i = n; i >= 0; i--) {
+    const x = toX(i), t = i/n;
+    ctx.lineTo(x, toY(mu*t - 2*sigma*Math.sqrt(t)));
+  }
+  ctx.closePath(); ctx.fill();
+
+  bmPaths.forEach((path, pi) => {
+    ctx.beginPath();
+    ctx.strokeStyle = bmColors[pi % bmColors.length];
+    ctx.lineWidth = bmPaths.length === 1 ? 2 : 1;
+    ctx.globalAlpha = bmPaths.length > 5 ? 0.6 : 1;
+    path.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  const last = bmPaths[bmPaths.length-1];
+  document.getElementById('bm-info').textContent =
+    `${bmPaths.length} path(s) | μ=${mu}, σ=${sigma} | Final B(1): ${last[last.length-1].toFixed(4)} | Theory: N(${mu.toFixed(2)}, ${sigma.toFixed(2)}²)`;
+}
+
+function runBM() {
+  const mu = parseFloat(document.getElementById('bm-mu').value);
+  const sigma = parseFloat(document.getElementById('bm-sigma').value);
+  document.getElementById('bm-mu-val').textContent = mu.toFixed(1);
+  document.getElementById('bm-sigma-val').textContent = sigma.toFixed(1);
+  bmPaths = [generateBM(mu, sigma)];
+  drawBMPaths();
+}
+
+function runMultipleBM() {
+  const mu = parseFloat(document.getElementById('bm-mu').value);
+  const sigma = parseFloat(document.getElementById('bm-sigma').value);
+  document.getElementById('bm-mu-val').textContent = mu.toFixed(1);
+  document.getElementById('bm-sigma-val').textContent = sigma.toFixed(1);
+  bmPaths = Array.from({length: 10}, () => generateBM(mu, sigma));
+  drawBMPaths();
+}
+
+// ── GBM CANVAS (Tab 4) ─────────────────────────────────────────
+let gbmPaths = [];
+
+function clearGBMCanvas() {
+  gbmPaths = [];
+  const canvas = document.getElementById('gbm-canvas');
+  if (!canvas) return;
+  canvas.getContext('2d').clearRect(0, 0, 660, 300);
+}
+
+function generateGBM(mu=0.1, sigma=0.2, S0=100, n=252) {
+  const dt = 1/n;
+  const path = [S0];
+  for (let i = 0; i < n; i++) {
+    const Z = Math.sqrt(-2*Math.log(Math.random())) * Math.cos(2*Math.PI*Math.random());
+    path.push(path[path.length-1] * Math.exp((mu - 0.5*sigma**2)*dt + sigma*Math.sqrt(dt)*Z));
+  }
+  return path;
+}
+
+function drawGBMPaths() {
+  const canvas = document.getElementById('gbm-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#080b14'; ctx.fillRect(0, 0, W, H);
+  if (gbmPaths.length === 0) return;
+
+  const allVals = gbmPaths.flat();
+  const mn = Math.min(...allVals) * 0.95, mx = Math.max(...allVals) * 1.05;
+  const n = gbmPaths[0].length - 1;
+  const toX = i => i / n * W;
+  const toY = v => H - (v - mn) / (mx - mn) * H * 0.9 - H * 0.05;
+
+  const mu = parseFloat(document.getElementById('gbm-mu').value);
+  ctx.strokeStyle = '#2a3355'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, toY(100)); ctx.lineTo(W, toY(100)); ctx.stroke();
+
+  gbmPaths.forEach((path, pi) => {
+    ctx.beginPath();
+    ctx.strokeStyle = bmColors[pi % bmColors.length];
+    ctx.lineWidth = gbmPaths.length === 1 ? 2.5 : 1;
+    ctx.globalAlpha = gbmPaths.length > 5 ? 0.5 : 0.9;
+    path.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  // Expected value line: E[S_T] = S0 * exp(mu*T)
+  const S0 = 100;
+  ctx.strokeStyle = '#f74f8e'; ctx.lineWidth = 2; ctx.setLineDash([8,5]);
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const t = i/n;
+    const EV = S0 * Math.exp(mu * t);
+    i === 0 ? ctx.moveTo(toX(i), toY(EV)) : ctx.lineTo(toX(i), toY(EV));
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#f74f8e'; ctx.font = '11px JetBrains Mono, monospace';
+  ctx.fillText(`E[S_T] = ${(S0*Math.exp(mu)).toFixed(1)}`, W-140, toY(S0*Math.exp(mu))-6);
+
+  const lastVals = gbmPaths.map(p => p[p.length-1]);
+  const meanFinal = (lastVals.reduce((a,b)=>a+b,0)/lastVals.length).toFixed(2);
+  const label = document.getElementById('bm-info');
+  // reuse info slot or create one
+}
+
+function runGBM() {
+  const mu = parseFloat(document.getElementById('gbm-mu').value);
+  const sigma = parseFloat(document.getElementById('gbm-sigma').value);
+  document.getElementById('gbm-mu-val').textContent = mu.toFixed(2);
+  document.getElementById('gbm-sigma-val').textContent = sigma.toFixed(2);
+  gbmPaths = [generateGBM(mu, sigma)];
+  drawGBMPaths();
+}
+
+function runMultipleGBM() {
+  const mu = parseFloat(document.getElementById('gbm-mu').value);
+  const sigma = parseFloat(document.getElementById('gbm-sigma').value);
+  document.getElementById('gbm-mu-val').textContent = mu.toFixed(2);
+  document.getElementById('gbm-sigma-val').textContent = sigma.toFixed(2);
+  gbmPaths = Array.from({length: 20}, () => generateGBM(mu, sigma));
+  drawGBMPaths();
+}
+
+// ── SLIDER LISTENERS ─────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Normal curve sliders
+  const muSlider = document.getElementById('mu-slider');
+  const sigmaSlider = document.getElementById('sigma-slider');
+  if (muSlider) { muSlider.addEventListener('input', drawNormal); }
+  if (sigmaSlider) { sigmaSlider.addEventListener('input', drawNormal); }
+
+  // BM sliders
+  const bmMuSlider = document.getElementById('bm-mu');
+  const bmSigmaSlider = document.getElementById('bm-sigma');
+  if (bmMuSlider) bmMuSlider.addEventListener('input', () => {
+    document.getElementById('bm-mu-val').textContent = parseFloat(bmMuSlider.value).toFixed(1);
+  });
+  if (bmSigmaSlider) bmSigmaSlider.addEventListener('input', () => {
+    document.getElementById('bm-sigma-val').textContent = parseFloat(bmSigmaSlider.value).toFixed(1);
+  });
+
+  // GBM sliders
+  const gbmMuSlider = document.getElementById('gbm-mu');
+  const gbmSigmaSlider = document.getElementById('gbm-sigma');
+  if (gbmMuSlider) gbmMuSlider.addEventListener('input', () => {
+    document.getElementById('gbm-mu-val').textContent = parseFloat(gbmMuSlider.value).toFixed(2);
+  });
+  if (gbmSigmaSlider) gbmSigmaSlider.addEventListener('input', () => {
+    document.getElementById('gbm-sigma-val').textContent = parseFloat(gbmSigmaSlider.value).toFixed(2);
+  });
+
+  // RW slider
+  const rwPSlider = document.getElementById('rw-p');
+  if (rwPSlider) rwPSlider.addEventListener('input', () => {
+    document.getElementById('rw-p-val').textContent = parseFloat(rwPSlider.value).toFixed(2);
+  });
+
+  // Initial draws
+  drawNormal();
+  resetMarkovSim();
+});
+</script>
+</body>
+</html>

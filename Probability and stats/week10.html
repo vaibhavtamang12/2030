@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Study Guide: Monte Carlo & Variance Reduction</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #2a3a55;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #a855f7;
+    --gold: #f5c842;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #e8edf5;
+    --muted: #7a8eaa;
+    --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1e3a 50%, #0a0e1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 60px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 20%;
+    width: 400px; height: 200px;
+    background: radial-gradient(ellipse, rgba(168,85,247,0.06) 0%, transparent 70%);
+  }
+  .header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .site-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    max-width: 800px;
+  }
+  .site-header h1 span { color: var(--accent); }
+  .subtitle {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 15px;
+    font-style: italic;
+    max-width: 600px;
+  }
+  .badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    letter-spacing: 1px;
+  }
+  .badge-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .badge-orange { background: rgba(255,107,53,0.12); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
+  .badge-purple { background: rgba(168,85,247,0.12); color: var(--accent3); border: 1px solid rgba(168,85,247,0.3); }
+  .badge-gold { background: rgba(245,200,66,0.12); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+
+  /* ── TABS ── */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 30px;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px 22px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-panel { display: none; padding: 50px 60px; max-width: 1200px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* ── TYPOGRAPHY ── */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3vw, 38px);
+    font-weight: 700;
+    color: #fff;
+    margin: 40px 0 18px;
+    line-height: 1.2;
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 32px 0 12px;
+  }
+  h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin: 24px 0 10px;
+  }
+  p { margin-bottom: 16px; color: #c8d3e0; }
+  strong { color: var(--text); font-weight: 600; }
+  em { color: var(--gold); font-style: italic; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,0.3); }
+  a:hover { border-bottom-color: var(--accent); }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-left: 4px solid;
+    padding: 18px 22px;
+    border-radius: 0 8px 8px 0;
+    margin: 24px 0;
+    font-size: 15.5px;
+  }
+  .callout-info { border-color: var(--accent); background: rgba(0,212,255,0.06); }
+  .callout-tip { border-color: var(--green); background: rgba(34,197,94,0.06); }
+  .callout-warn { border-color: var(--gold); background: rgba(245,200,66,0.06); }
+  .callout-key { border-color: var(--accent3); background: rgba(168,85,247,0.06); }
+  .callout-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout-info .callout-title { color: var(--accent); }
+  .callout-tip .callout-title { color: var(--green); }
+  .callout-warn .callout-title { color: var(--gold); }
+  .callout-key .callout-title { color: var(--accent3); }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 22px 24px;
+    overflow-x: auto;
+    margin: 20px 0;
+    position: relative;
+  }
+  pre::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 0; right: 0;
+    background: var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    color: var(--muted);
+    border-radius: 0 8px 0 6px;
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #a8c0d8;
+  }
+  code .kw { color: #c792ea; }
+  code .fn { color: #82aaff; }
+  code .str { color: #c3e88d; }
+  code .num { color: #f78c6c; }
+  code .cm { color: #546e7a; font-style: italic; }
+  code .var { color: #eeffff; }
+  code .op { color: var(--accent); }
+  inline-code, .ic {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    background: rgba(255,255,255,0.07);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── FORMULA BOX ── */
+  .formula-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 0 0 10px 10px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    text-align: center;
+  }
+  .formula-box .formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .formula-box .formula-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* ── INTERACTIVE CANVAS ── */
+  .demo-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 28px 0;
+  }
+  .demo-box h4 { margin-top: 0; }
+  canvas {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: block;
+    background: #050810;
+  }
+  .ctrl-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .ctrl-row label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); }
+  .btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 8px 20px;
+    border: 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: none;
+  }
+  .btn-accent { border-color: var(--accent); color: var(--accent); }
+  .btn-accent:hover { background: rgba(0,212,255,0.1); }
+  .btn-orange { border-color: var(--accent2); color: var(--accent2); }
+  .btn-orange:hover { background: rgba(255,107,53,0.1); }
+  .btn-purple { border-color: var(--accent3); color: var(--accent3); }
+  .btn-purple:hover { background: rgba(168,85,247,0.1); }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-val { font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--accent); font-weight: 600; }
+  .stat-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: #c8d3e0; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── ROADMAP / STEPS ── */
+  .steps { list-style: none; counter-reset: step-counter; }
+  .steps li {
+    counter-increment: step-counter;
+    padding: 18px 18px 18px 64px;
+    position: relative;
+    border-left: 2px solid var(--border);
+    margin-left: 24px;
+    margin-bottom: 8px;
+  }
+  .steps li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: -20px;
+    top: 14px;
+    width: 38px; height: 38px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .steps li:last-child { border-left-color: transparent; }
+
+  /* ── EXERCISE CARDS ── */
+  .exercise-tier { margin: 30px 0; }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .tier-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-weight: 600;
+  }
+  .tier-easy { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.4); }
+  .tier-medium { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.4); }
+  .tier-hard { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.4); }
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+  }
+  .exercise-card .ex-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .exercise-card p { margin-bottom: 0; }
+  .hint-toggle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent3);
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+    border-bottom: 1px dashed var(--accent3);
+  }
+  .hint-content { display: none; margin-top: 10px; padding: 12px; background: rgba(168,85,247,0.06); border-radius: 6px; font-size: 14.5px; color: var(--muted); }
+  .hint-content.open { display: block; }
+
+  /* ── RESOURCE CARDS ── */
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+  .resource-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .resource-card:hover { border-color: var(--accent); }
+  .resource-card .rc-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .resource-card .rc-title { color: var(--text); font-weight: 600; margin-bottom: 6px; font-size: 16px; }
+  .resource-card .rc-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 12px; }
+  .resource-card a { font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+
+  /* ── CONCEPT MAP ── */
+  .concept-map { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin: 28px 0; }
+
+  /* ── SLIDER ── */
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 180px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  select {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+  /* ── COMPARISON TABLE HIGHLIGHT ── */
+  .highlight-row td { background: rgba(0,212,255,0.05); }
+  .best { color: var(--green); font-weight: 600; }
+  .worst { color: var(--red); }
+
+  /* ── FLOWCHART ── */
+  .flowchart { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 28px;
+    text-align: center;
+    font-size: 14px;
+    max-width: 340px;
+    width: 100%;
+  }
+  .flow-node.start { border-top: 3px solid var(--green); }
+  .flow-node.process { border-top: 3px solid var(--accent); }
+  .flow-node.decision { border-top: 3px solid var(--gold); }
+  .flow-node.output { border-top: 3px solid var(--accent3); }
+  .flow-arrow { font-size: 22px; color: var(--muted); line-height: 1.4; }
+
+  @media (max-width: 768px) {
+    .site-header { padding: 28px 20px 22px; }
+    .tab-panel { padding: 30px 20px; }
+    .tab-btn { padding: 12px 14px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-tag">◆ Quant Engineer Foundations · Study Guide</div>
+  <h1>Monte Carlo Methods &amp;<br><span>Variance Reduction</span></h1>
+  <p class="subtitle">A complete self-contained guide for first-time learners targeting quantitative engineering — from random numbers to importance sampling.</p>
+  <div class="badge-row">
+    <span class="badge badge-blue">Generating Random Numbers</span>
+    <span class="badge badge-orange">Antithetic Variates</span>
+    <span class="badge badge-gold">Control Variates</span>
+    <span class="badge badge-purple">Importance Sampling</span>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('prereq', this)">0 · Prerequisites</button>
+  <button class="tab-btn" onclick="switchTab('rng', this)">1 · Random Numbers</button>
+  <button class="tab-btn" onclick="switchTab('montecarlo', this)">2 · Monte Carlo</button>
+  <button class="tab-btn" onclick="switchTab('antithetic', this)">3 · Antithetic Variates</button>
+  <button class="tab-btn" onclick="switchTab('control', this)">4 · Control Variates</button>
+  <button class="tab-btn" onclick="switchTab('importance', this)">5 · Importance Sampling</button>
+  <button class="tab-btn" onclick="switchTab('compare', this)">6 · Comparison</button>
+  <button class="tab-btn" onclick="switchTab('colab', this)">7 · Colab Labs</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 0: PREREQUISITES
+══════════════════════════════════════════════════ -->
+<div id="tab-prereq" class="tab-panel active">
+
+  <h2>Before We Begin: Essential Foundations</h2>
+  <p>These are the building blocks you must understand before the main topics make sense. We explain each concept in plain language — no prior knowledge assumed beyond high-school algebra.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">📖 How to use this guide</div>
+    This tab is your foundation. Read it fully before moving on. Every term introduced here will appear repeatedly in later sections — understanding it deeply now means you'll never feel lost later.
+  </div>
+
+  <h3>1. What is a Random Variable?</h3>
+  <p>A <strong>random variable</strong> is simply a quantity whose value is uncertain — it could take different values in different "runs" of an experiment. Think of it like a dice roll. Before you roll, you don't know the outcome. The set of all possible outcomes (1–6) and how likely each one is constitutes the <em>distribution</em> of the random variable.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">🎲 Analogy: Stock Prices</div>
+    In finance, tomorrow's stock price is a random variable. We don't know exactly what it will be, but we can model it with a distribution based on historical data and assumptions. This is the heart of quantitative finance.
+  </div>
+
+  <h3>2. Probability Distributions</h3>
+  <p>A <strong>probability distribution</strong> tells you how likely each possible value of a random variable is.</p>
+  <table>
+    <tr><th>Distribution</th><th>What it models</th><th>Example in Finance</th></tr>
+    <tr><td>Uniform [0,1]</td><td>Equal likelihood everywhere</td><td>Random seed generation</td></tr>
+    <tr><td>Normal (Gaussian)</td><td>Bell-shaped, symmetric</td><td>Daily stock returns</td></tr>
+    <tr><td>Log-Normal</td><td>Skewed right, always positive</td><td>Stock prices (never go below 0)</td></tr>
+    <tr><td>Exponential</td><td>Time between random events</td><td>Time between trades</td></tr>
+    <tr><td>Poisson</td><td>Count of rare events in a window</td><td>Number of defaults in a portfolio</td></tr>
+  </table>
+
+  <h3>3. Expected Value (Mean)</h3>
+  <p>The <strong>expected value</strong> E[X] is the long-run average of a random variable. If you ran an experiment a million times and averaged the results, you'd get (approximately) E[X].</p>
+
+  <div class="formula-box">
+    <div class="formula">E[X] = Σ x · P(X = x)  &nbsp; (discrete)<br><br>E[X] = ∫ x · f(x) dx  &nbsp;&nbsp; (continuous)</div>
+    <div class="formula-label">Expected Value — the weighted average of all possible outcomes</div>
+  </div>
+
+  <h3>4. Variance and Standard Deviation</h3>
+  <p><strong>Variance</strong> Var(X) measures how spread out a distribution is. A high variance means the outcomes are very unpredictable. <strong>Standard deviation</strong> σ is just the square root of variance — it's in the same units as the original variable, making it more interpretable.</p>
+
+  <div class="formula-box">
+    <div class="formula">Var(X) = E[(X - E[X])²] = E[X²] - (E[X])²<br><br>σ = √Var(X)</div>
+    <div class="formula-label">Variance & Standard Deviation — measuring uncertainty</div>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ Why Variance Matters to Quants</div>
+    As a quant, when you estimate something (like an option price) using simulation, your estimate has its own variance. <strong>Smaller variance = more accurate estimate = you need fewer simulations = cheaper computation.</strong> This is why "variance reduction" is such a big deal.
+  </div>
+
+  <h3>5. The Law of Large Numbers</h3>
+  <p>If you repeat an experiment many times and average the results, the average converges to the true expected value. This is the mathematical justification for why simulation (Monte Carlo) works at all.</p>
+  <p>Formally: as n → ∞,&nbsp; <span class="ic">(X₁ + X₂ + ... + Xₙ) / n → E[X]</span></p>
+
+  <h3>6. The Central Limit Theorem (CLT)</h3>
+  <p>Even if individual outcomes have any distribution, when you average many of them, <strong>the distribution of that average approaches a Normal (Gaussian) distribution</strong>. This is why the normal distribution is everywhere in statistics and finance.</p>
+
+  <div class="callout callout-key">
+    <div class="callout-title">🔑 CLT in Practice</div>
+    The CLT tells us that our Monte Carlo estimate's error follows a normal distribution, which means we can compute confidence intervals. The standard error of a Monte Carlo estimate is σ/√n — to halve the error, you need 4× more samples. This is the core limitation that variance reduction techniques try to overcome.
+  </div>
+
+  <h3>7. What is Monte Carlo Simulation? (Big Picture)</h3>
+  <p>Monte Carlo simulation is the idea of using random sampling to estimate quantities that are hard (or impossible) to compute analytically. The name comes from the famous Monte Carlo casino — because randomness is central to the approach.</p>
+
+  <div class="flowchart">
+    <div class="flow-node start"><strong>Define the problem</strong><br>e.g. "What is the price of this option?"</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-node process"><strong>Generate random scenarios</strong><br>Simulate thousands of possible future paths</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-node process"><strong>Compute the outcome</strong><br>For each scenario, compute the payoff</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-node process"><strong>Average the results</strong><br>By LLN, this converges to the true expected value</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-node output"><strong>Report with uncertainty</strong><br>Mean ± standard error (confidence interval)</div>
+  </div>
+
+  <h3>8. Pseudo-Random vs. True Random Numbers</h3>
+  <p>Computers can't generate truly random numbers — they use <strong>deterministic algorithms</strong> that produce sequences which <em>look</em> random (they pass statistical tests). These are called <strong>pseudo-random number generators (PRNGs)</strong>. They're completely predictable if you know the "seed" — the starting value. This is actually useful: by fixing the seed, you get <strong>reproducible simulations</strong>.</p>
+
+  <h3>9. Probability Density Function (PDF) vs. Cumulative Distribution (CDF)</h3>
+  <p>The <strong>PDF</strong> f(x) tells you the relative likelihood of a value being near x. The <strong>CDF</strong> F(x) = P(X ≤ x) tells you the probability of being at most x. The CDF is always between 0 and 1 and is crucial for the "inverse transform" method of generating random numbers.</p>
+
+  <hr class="divider">
+  <div class="callout callout-tip">
+    <div class="callout-title">✅ Prerequisite Checklist</div>
+    Before moving on, make sure you can answer: (1) What does E[X] mean? (2) Why does a smaller variance in our estimator matter? (3) What does the CLT say about averages? (4) What is a seed in a PRNG? If you can answer these, you're ready!
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 1: RANDOM NUMBER GENERATION
+══════════════════════════════════════════════════ -->
+<div id="tab-rng" class="tab-panel">
+
+  <h2>Generating Random Numbers</h2>
+  <p>Before you can run any simulation, you need a source of randomness. This section explains exactly how computers generate "random" numbers, and how to transform uniform random numbers into any distribution you need.</p>
+
+  <h3>Why Uniform [0,1] is the Starting Point</h3>
+  <p>Everything in random number generation starts with the <strong>uniform distribution on [0,1]</strong>. A uniform random number U has equal probability of being anywhere between 0 and 1. From this single primitive, we can generate random numbers from <em>any</em> distribution — the key methods are described below.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">💡 The Key Insight</div>
+    Once you can generate U ~ Uniform[0,1], you can generate <em>anything</em>. The uniform distribution is the "master key" to all random sampling. Every technique below is just a transformation of uniform samples.
+  </div>
+
+  <h3>The Linear Congruential Generator (LCG)</h3>
+  <p>The most famous PRNG algorithm — still used inside many software packages. It generates a sequence of integers using the recurrence relation:</p>
+
+  <div class="formula-box">
+    <div class="formula">X_{n+1} = (a · X_n + c) mod m</div>
+    <div class="formula-label">Linear Congruential Generator · where a = multiplier, c = increment, m = modulus, X₀ = seed</div>
+  </div>
+
+  <p>To get a uniform [0,1] number: U_n = X_n / m. The quality of the generator depends critically on the choice of a, c, and m. Bad choices lead to short periods or structured patterns.</p>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: LCG Visualizer</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Watch how the LCG generates numbers. Try the "Bad Parameters" preset to see patterns emerge in a poorly-configured generator.</p>
+    <div class="ctrl-row">
+      <label>Preset:</label>
+      <select id="lcg-preset" onchange="applyLCGPreset()">
+        <option value="good">Good Parameters (a=1664525, c=1013904223, m=2³²)</option>
+        <option value="bad">Bad Parameters (a=7, c=0, m=32) — see the pattern!</option>
+        <option value="minimal">Minimal Good (a=65539, c=0, m=2³¹)</option>
+      </select>
+    </div>
+    <div class="ctrl-row">
+      <label>Seed X₀:</label>
+      <input type="range" id="lcg-seed" min="1" max="100" value="42" oninput="document.getElementById('lcg-seed-val').textContent=this.value">
+      <span id="lcg-seed-val" style="font-family:monospace;color:var(--accent)">42</span>
+      <button class="btn btn-accent" onclick="runLCG()">Generate &amp; Plot</button>
+    </div>
+    <canvas id="lcg-canvas" width="700" height="280"></canvas>
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="stat-card"><div class="stat-val" id="lcg-mean">—</div><div class="stat-lbl">Sample Mean</div></div>
+      <div class="stat-card"><div class="stat-val" id="lcg-var">—</div><div class="stat-lbl">Sample Variance</div></div>
+      <div class="stat-card"><div class="stat-val" id="lcg-period">—</div><div class="stat-lbl">Observed Period</div></div>
+    </div>
+  </div>
+
+  <h3>The Mersenne Twister</h3>
+  <p>Python's <span class="ic">random</span> module and NumPy both use the <strong>Mersenne Twister</strong> — a far more sophisticated PRNG with period 2¹⁹⁹³⁷ − 1 (astronomically large). It passes rigorous statistical tests and is the industry standard for simulations. You'll use it without thinking about it via <span class="ic">np.random.uniform()</span>.</p>
+
+  <h3>Method 1: Inverse Transform Sampling</h3>
+  <p>The most fundamental technique. Given a CDF F(x), we use the fact that if U ~ Uniform[0,1], then <strong>X = F⁻¹(U)</strong> has distribution F. In plain English: generate a uniform number, then "look up" the corresponding value on the inverse CDF curve.</p>
+
+  <div class="formula-box">
+    <div class="formula">If U ~ Uniform[0,1], then X = F⁻¹(U) has CDF F</div>
+    <div class="formula-label">Inverse Transform Theorem — works for any distribution with an invertible CDF</div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">📐 Example: Exponential Distribution</div>
+    CDF: F(x) = 1 - e^(-λx). Inverse: F⁻¹(U) = -ln(1-U)/λ.
+    So to generate Exp(λ): generate U ~ U[0,1], return X = -ln(1-U)/λ. That's it!
+  </div>
+
+  <h3>Method 2: Box-Muller Transform (Generating Normal RVs)</h3>
+  <p>There's no closed-form inverse CDF for the normal distribution, so we need a different trick. Box-Muller converts two uniform samples into two independent normal samples:</p>
+
+  <div class="formula-box">
+    <div class="formula">Z₁ = √(-2 ln U₁) · cos(2π U₂)<br>Z₂ = √(-2 ln U₁) · sin(2π U₂)</div>
+    <div class="formula-label">Box-Muller Transform · Z₁, Z₂ ~ N(0,1) independently</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: Sampling Method Comparison</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Generate samples using different methods and see the resulting histograms. All should converge to the target distribution.</p>
+    <div class="ctrl-row">
+      <label>Distribution:</label>
+      <select id="dist-select" onchange="updateDistDemo()">
+        <option value="uniform">Uniform [0,1]</option>
+        <option value="normal">Normal N(0,1) — Box-Muller</option>
+        <option value="exponential">Exponential (λ=1) — Inverse Transform</option>
+      </select>
+      <label>Samples:</label>
+      <input type="range" id="dist-n" min="100" max="5000" value="1000" step="100" oninput="document.getElementById('dist-n-val').textContent=this.value;updateDistDemo()">
+      <span id="dist-n-val" style="font-family:monospace;color:var(--accent)">1000</span>
+    </div>
+    <canvas id="dist-canvas" width="700" height="280"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="dist-mean">—</div><div class="stat-lbl">Sample Mean</div></div>
+      <div class="stat-card"><div class="stat-val" id="dist-std">—</div><div class="stat-lbl">Sample Std Dev</div></div>
+      <div class="stat-card"><div class="stat-val" id="dist-n-stat">—</div><div class="stat-lbl">Samples Used</div></div>
+    </div>
+  </div>
+
+  <h3>Method 3: Acceptance-Rejection Sampling</h3>
+  <p>When inverse transform is hard and Box-Muller doesn't apply, we use acceptance-rejection. The idea: sample from a simpler "proposal" distribution g(x), then accept or reject based on a ratio involving the target f(x).</p>
+  <ol class="steps">
+    <li>Find a "cover" distribution g(x) and constant M such that f(x) ≤ M·g(x) for all x.</li>
+    <li>Generate a candidate X ~ g and U ~ Uniform[0,1].</li>
+    <li>Accept X if U ≤ f(X) / (M·g(X)), else reject and repeat.</li>
+    <li>The accepted X values follow distribution f.</li>
+  </ol>
+
+  <h3>Quasi-Random (Low-Discrepancy) Numbers</h3>
+  <p>Standard PRNGs are "random" but can have <strong>clumping</strong> — areas with many samples and areas with few. <strong>Quasi-random sequences</strong> (like the Halton or Sobol sequences) are deterministically designed to fill space more uniformly. This can dramatically improve convergence in high-dimensional problems.</p>
+
+  <div class="demo-box">
+    <h4>🔬 Pseudo-Random vs. Quasi-Random Coverage</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:14px">Notice how quasi-random (Sobol) points fill the square more evenly, leaving fewer gaps and clusters.</p>
+    <div class="ctrl-row">
+      <button class="btn btn-accent" onclick="drawQMC('pseudo')">Pseudo-Random</button>
+      <button class="btn btn-orange" onclick="drawQMC('quasi')">Quasi-Random (Halton)</button>
+      <label>N points:</label>
+      <input type="range" id="qmc-n" min="50" max="500" value="200" step="50" oninput="document.getElementById('qmc-n-val').textContent=this.value">
+      <span id="qmc-n-val" style="font-family:monospace;color:var(--accent)">200</span>
+    </div>
+    <canvas id="qmc-canvas" width="700" height="300"></canvas>
+  </div>
+
+  <hr class="divider">
+  <h3>Practice Exercises</h3>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-easy">🟢 Easy</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.E1</div>
+      <p>Using Python and NumPy, generate 1000 uniform random numbers between 0 and 1. Compute the sample mean and variance. Compare to the theoretical values (mean = 0.5, variance = 1/12). How close are you?</p>
+      <span class="hint-toggle" onclick="toggleHint(this)">▶ Show Hint</span>
+      <div class="hint-content">Use <span class="ic">np.random.uniform(0,1,1000)</span>, then <span class="ic">np.mean()</span> and <span class="ic">np.var()</span>.</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.E2</div>
+      <p>Set a seed of 42 and generate 5 random numbers. Then set the same seed and generate 5 more. Are they the same? What does this tell you about PRNGs?</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.E3</div>
+      <p>Use the inverse transform method to generate 1000 samples from an Exponential distribution with λ = 2. Verify by checking that the sample mean is approximately 1/λ = 0.5.</p>
+      <span class="hint-toggle" onclick="toggleHint(this)">▶ Show Hint</span>
+      <div class="hint-content">Formula: X = -ln(1-U)/λ. Use U = np.random.uniform(0,1,1000)</div>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-medium">🟡 Medium</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.M1</div>
+      <p>Implement the Box-Muller transform from scratch using only uniform samples. Generate 10,000 normal samples, then verify using a Q-Q plot that they are approximately standard normal.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.M2</div>
+      <p>Implement a simple LCG with a=1664525, c=1013904223, m=2³². Generate 1000 samples and plot them as consecutive pairs (x_n, x_{n+1}). Do they look uniformly distributed in the unit square? Now try bad parameters (a=7, c=0, m=32) and observe the structure.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.M3</div>
+      <p>Implement acceptance-rejection sampling to draw from f(x) = 6x(1-x) on [0,1] (a Beta(2,2) distribution). Use Uniform[0,1] as the proposal with M=1.5. Estimate the acceptance rate and compare to theoretical 1/M.</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-hard">🔴 Hard</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.H1</div>
+      <p>Generate correlated bivariate normal samples (X,Y) with means (0,0), variances (1,1), and correlation ρ=0.8 using Cholesky decomposition. Verify the sample correlation is close to 0.8. This technique is crucial for simulating correlated asset returns.</p>
+      <span class="hint-toggle" onclick="toggleHint(this)">▶ Show Hint</span>
+      <div class="hint-content">If Z1,Z2 are iid N(0,1), then X=Z1, Y=ρ·Z1+√(1-ρ²)·Z2 are bivariate normal with correlation ρ.</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 1.H2</div>
+      <p>Compare convergence rates of pseudo-random vs. Halton quasi-random sequences for estimating π using the unit circle method. Plot the estimation error vs. number of samples on a log-log scale. The slope tells you the convergence rate (-0.5 for MC, closer to -1 for QMC).</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>External Resources</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <div class="rc-type">📺 Video</div>
+      <div class="rc-title">3Blue1Brown: But what is a Neural Network?</div>
+      <div class="rc-desc">While not specifically about RNGs, understanding probability visually is key. Great for intuition building.</div>
+      <a href="https://www.youtube.com/c/3blue1brown" target="_blank">youtube.com/3blue1brown →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📖 Documentation</div>
+      <div class="rc-title">NumPy Random Module</div>
+      <div class="rc-desc">Official docs for all NumPy random sampling functions — your primary tool for generating random numbers in Python.</div>
+      <a href="https://numpy.org/doc/stable/reference/random/" target="_blank">numpy.org/doc/random →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">🌐 Interactive</div>
+      <div class="rc-title">Seeing Theory: Probability</div>
+      <div class="rc-desc">Beautiful visual, interactive guide to probability theory covering distributions, expected value, variance, and more.</div>
+      <a href="https://seeing-theory.brown.edu" target="_blank">seeing-theory.brown.edu →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📊 Tool</div>
+      <div class="rc-title">SciPy Stats Distributions</div>
+      <div class="rc-desc">Every statistical distribution you could want, with sampling, PDF/CDF functions and more.</div>
+      <a href="https://docs.scipy.org/doc/scipy/reference/stats.html" target="_blank">scipy.org/stats →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 2: MONTE CARLO
+══════════════════════════════════════════════════ -->
+<div id="tab-montecarlo" class="tab-panel">
+
+  <h2>Monte Carlo Simulation</h2>
+  <p>With random number generation covered, we now have everything we need to perform Monte Carlo simulation — the most powerful tool in the quant's toolbox.</p>
+
+  <h3>The Core Idea</h3>
+  <p>Monte Carlo simulation uses repeated random sampling to numerically approximate quantities that are difficult or impossible to calculate analytically. The name honors the famous Monte Carlo Casino in Monaco — a nod to the role of chance.</p>
+
+  <div class="callout callout-key">
+    <div class="callout-title">🔑 The Monte Carlo Principle</div>
+    To estimate E[f(X)]: generate many samples X₁, X₂, ..., Xₙ from the distribution of X, compute f(Xᵢ) for each, and average them. By the Law of Large Numbers, this average converges to E[f(X)].
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">μ̂ = (1/n) Σᵢ f(Xᵢ) → E[f(X)] as n → ∞</div>
+    <div class="formula-label">Monte Carlo Estimator · unbiased and consistent</div>
+  </div>
+
+  <h3>The Error of Monte Carlo</h3>
+  <p>Our estimate μ̂ has an error. The <strong>standard error</strong> (SE) tells us how far off our estimate is likely to be:</p>
+
+  <div class="formula-box">
+    <div class="formula">SE = σ / √n</div>
+    <div class="formula-label">Standard Error of MC Estimator · σ = std dev of f(X), n = number of samples</div>
+  </div>
+
+  <p>This is the fundamental limitation: <strong>to halve the error, you need 4× more samples</strong> (since √4 = 2). This O(n⁻¹/²) convergence is slow. It's the reason variance reduction techniques exist.</p>
+
+  <h3>Classic Example: Estimating π</h3>
+  <p>Throw random darts at a unit square. The circle inscribed in the square has area π/4. The fraction of darts inside the circle approaches π/4. So π ≈ 4 × (darts inside) / (total darts).</p>
+
+  <div class="demo-box">
+    <h4>🎯 Interactive: Monte Carlo π Estimator</h4>
+    <div class="ctrl-row">
+      <button class="btn btn-accent" onclick="mcPiStep(100)">+100 darts</button>
+      <button class="btn btn-accent" onclick="mcPiStep(1000)">+1000 darts</button>
+      <button class="btn btn-orange" onclick="mcPiReset()">Reset</button>
+    </div>
+    <canvas id="pi-canvas" width="340" height="340" style="display:inline-block;vertical-align:top"></canvas>
+    <canvas id="pi-conv-canvas" width="340" height="340" style="display:inline-block;vertical-align:top;margin-left:10px"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="pi-est">—</div><div class="stat-lbl">π Estimate</div></div>
+      <div class="stat-card"><div class="stat-val" id="pi-error">—</div><div class="stat-lbl">Abs Error</div></div>
+      <div class="stat-card"><div class="stat-val" id="pi-n">0</div><div class="stat-lbl">Darts Thrown</div></div>
+      <div class="stat-card"><div class="stat-val" id="pi-se">—</div><div class="stat-lbl">Std Error</div></div>
+    </div>
+  </div>
+
+  <h3>Monte Carlo in Quantitative Finance: Option Pricing</h3>
+  <p>The most important application for quant engineers. An <strong>option</strong> is a contract giving the right to buy/sell an asset at a fixed price (strike K) at expiry T. Under the Black-Scholes model, the asset price follows:</p>
+
+  <div class="formula-box">
+    <div class="formula">S_T = S₀ · exp((r - σ²/2)T + σ√T · Z)<br><br>Z ~ N(0,1)</div>
+    <div class="formula-label">Asset price at expiry T under risk-neutral measure · S₀=spot, r=rate, σ=volatility</div>
+  </div>
+
+  <p>The payoff of a European call option is max(S_T - K, 0). The option price is:</p>
+  <div class="formula-box">
+    <div class="formula">C = e^(-rT) · E[max(S_T - K, 0)]</div>
+    <div class="formula-label">Call Option Price · discounted expected payoff under risk-neutral measure</div>
+  </div>
+
+  <div class="demo-box">
+    <h4>📈 Interactive: European Call Option Pricer</h4>
+    <div class="ctrl-row">
+      <label>S₀:</label><input type="range" id="bs-s0" min="50" max="200" value="100" oninput="document.getElementById('bs-s0-v').textContent=this.value;runOptionMC()"><span id="bs-s0-v" style="font-family:monospace;color:var(--accent)">100</span>
+      <label>K:</label><input type="range" id="bs-k" min="50" max="200" value="105" oninput="document.getElementById('bs-k-v').textContent=this.value;runOptionMC()"><span id="bs-k-v" style="font-family:monospace;color:var(--accent)">105</span>
+    </div>
+    <div class="ctrl-row">
+      <label>σ:</label><input type="range" id="bs-sigma" min="0.05" max="0.80" step="0.05" value="0.20" oninput="document.getElementById('bs-sigma-v').textContent=(+this.value).toFixed(2);runOptionMC()"><span id="bs-sigma-v" style="font-family:monospace;color:var(--accent)">0.20</span>
+      <label>T (yrs):</label><input type="range" id="bs-T" min="0.1" max="2" step="0.1" value="1" oninput="document.getElementById('bs-T-v').textContent=(+this.value).toFixed(1);runOptionMC()"><span id="bs-T-v" style="font-family:monospace;color:var(--accent)">1.0</span>
+      <label>Paths:</label><input type="range" id="bs-n" min="100" max="10000" step="100" value="2000" oninput="document.getElementById('bs-n-v').textContent=this.value;runOptionMC()"><span id="bs-n-v" style="font-family:monospace;color:var(--accent)">2000</span>
+    </div>
+    <canvas id="option-canvas" width="700" height="260"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="opt-mc">—</div><div class="stat-lbl">MC Price</div></div>
+      <div class="stat-card"><div class="stat-val" id="opt-bs">—</div><div class="stat-lbl">BS Exact Price</div></div>
+      <div class="stat-card"><div class="stat-val" id="opt-se">—</div><div class="stat-lbl">Std Error</div></div>
+      <div class="stat-card"><div class="stat-val" id="opt-err">—</div><div class="stat-lbl">Error</div></div>
+    </div>
+  </div>
+
+  <h3>Why Standard MC is Sometimes Not Enough</h3>
+  <p>Monte Carlo works, but it can be slow. The standard error decreases as 1/√n — you need 100× more samples to get 10× more accuracy. For complex financial products (exotic options, multi-asset portfolios), each simulation can be expensive, so reducing the variance of the estimator is crucial for practical use.</p>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ The Variance Problem</div>
+    Suppose your MC option pricer has a std error of ±$0.50 with 10,000 paths. To get ±$0.05 accuracy, you'd need 1,000,000 paths — 100× more computation. Variance reduction techniques can achieve the same accuracy with much fewer paths.
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 3: ANTITHETIC VARIATES
+══════════════════════════════════════════════════ -->
+<div id="tab-antithetic" class="tab-panel">
+
+  <h2>Variance Reduction: Antithetic Variates</h2>
+  <p>Antithetic variates is the simplest and most elegant variance reduction technique. Once you understand the intuition, it feels almost obvious — yet it can halve variance with virtually no extra cost.</p>
+
+  <h3>The Intuition: Fighting Randomness with Its Mirror</h3>
+  <p>Standard MC samples can "all go the same way by chance" — sometimes you get unlucky and all your samples cluster on one side, giving a biased estimate. The antithetic variates idea: <strong>for every random sample you generate, also generate its "mirror" — the scenario that goes the other way.</strong></p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">💡 The Intuition with a Dice Example</div>
+    Imagine estimating the mean of a fair die (true answer = 3.5). Instead of rolling once and getting "5", roll and also "mirror" it: if you rolled 5, also include 7-5=2. Now your pair averages to 3.5 exactly — no variance! This is the idea behind antithetic variates.
+  </div>
+
+  <h3>How It Works Mathematically</h3>
+  <p>If U is Uniform[0,1], then <strong>1-U is also Uniform[0,1]</strong> — and they are <em>negatively correlated</em>. This is the key: negatively correlated samples partially cancel each other's errors.</p>
+
+  <p>Generate paired samples: (U₁, 1-U₁), (U₂, 1-U₂), etc. For each pair, average the two outcomes:</p>
+
+  <div class="formula-box">
+    <div class="formula">Ŷ = [f(X(U)) + f(X(1-U))] / 2</div>
+    <div class="formula-label">Antithetic Estimator for a single pair</div>
+  </div>
+
+  <p>The variance of this pair-estimator:</p>
+  <div class="formula-box">
+    <div class="formula">Var(Ŷ) = [Var(f(U)) + Var(f(1-U)) + 2·Cov(f(U), f(1-U))] / 4</div>
+    <div class="formula-label">If f is monotone, Cov is negative → Var(Ŷ) &lt; Var(f(U))/2</div>
+  </div>
+
+  <p>When f is a monotone function (which payoff functions often are), the covariance term is <em>negative</em>, making the variance smaller than using two independent samples. The variance reduction compared to standard MC:</p>
+  <div class="formula-box">
+    <div class="formula">Var(AV) / Var(MC) = (1 + ρ) / 2  &nbsp; where ρ = Corr(f(U), f(1-U))</div>
+    <div class="formula-label">The more negative ρ, the greater the variance reduction</div>
+  </div>
+
+  <h3>In Practice: Normal Samples</h3>
+  <p>For normal random variables: if Z ~ N(0,1), then -Z ~ N(0,1) too, and they're perfectly negatively correlated (ρ = -1 for Z vs -Z themselves). So for each Z you generate, also use -Z as the antithetic.</p>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: Antithetic vs. Standard MC</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:12px">Estimating E[e^X] where X~N(0,1). True value = e^(0.5) ≈ 1.6487. Watch how antithetic samples stay closer to the true value.</p>
+    <div class="ctrl-row">
+      <button class="btn btn-accent" onclick="runAntithetic()">Run Comparison</button>
+      <label>Num Pairs (n):</label>
+      <input type="range" id="av-n" min="10" max="500" value="100" step="10" oninput="document.getElementById('av-n-v').textContent=this.value">
+      <span id="av-n-v" style="font-family:monospace;color:var(--accent)">100</span>
+      <label>Trials:</label>
+      <input type="range" id="av-trials" min="20" max="500" value="200" step="20" oninput="document.getElementById('av-trials-v').textContent=this.value">
+      <span id="av-trials-v" style="font-family:monospace;color:var(--accent)">200</span>
+    </div>
+    <canvas id="av-canvas" width="700" height="300"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="av-mc-var">—</div><div class="stat-lbl">MC Variance</div></div>
+      <div class="stat-card"><div class="stat-val" id="av-av-var">—</div><div class="stat-lbl">AV Variance</div></div>
+      <div class="stat-card"><div class="stat-val" id="av-reduction">—</div><div class="stat-lbl">% Reduction</div></div>
+      <div class="stat-card"><div class="stat-val" id="av-speedup">—</div><div class="stat-lbl">Effective Speedup</div></div>
+    </div>
+  </div>
+
+  <h3>Application: Option Pricing with Antithetic Variates</h3>
+  <p>For a European call under Black-Scholes: instead of generating just Z ~ N(0,1) for each path, generate Z and -Z:</p>
+  <ul style="padding-left:28px;margin:10px 0 16px;color:#c8d3e0">
+    <li style="margin-bottom:8px">Path 1: S_T⁺ = S₀ · exp((r - σ²/2)T + σ√T · Z) → payoff₁</li>
+    <li style="margin-bottom:8px">Path 2 (antithetic): S_T⁻ = S₀ · exp((r - σ²/2)T - σ√T · Z) → payoff₂</li>
+    <li>Estimate: (payoff₁ + payoff₂) / 2 for this pair</li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">✅ When Antithetic Works Well</div>
+    Antithetic variates work best when the integrand f is <strong>monotone</strong> in the random inputs. For call options (monotone in S_T, which is monotone in Z), it works beautifully. For non-monotone payoffs (e.g., butterfly spreads), it may not help or could even hurt.
+  </div>
+
+  <h3>The Cost: None!</h3>
+  <p>A huge advantage: antithetic variates add <em>virtually no computational cost</em>. You generate n/2 base samples and n/2 mirror samples — the same total sample count n, but with lower variance. It's essentially free variance reduction.</p>
+
+  <hr class="divider">
+  <h3>Practice Exercises</h3>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-easy">🟢 Easy</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.E1</div>
+      <p>Estimate E[e^X] where X~N(0,1) using (a) standard MC with 1000 samples, and (b) antithetic variates with 500 pairs (= 1000 total samples). Repeat 500 times and compute the empirical variance of each estimator. What reduction do you observe?</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.E2</div>
+      <p>Why does antithetic variates work? Explain in plain English the mechanism — why do negatively correlated samples reduce variance? Sketch the intuition with a diagram on paper.</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-medium">🟡 Medium</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.M1</div>
+      <p>Price a European call option (S₀=100, K=100, r=0.05, σ=0.20, T=1) using both standard MC and antithetic variates. Use n=10,000 total samples (so 5,000 pairs for AV). Compare the standard errors. How many MC paths would you need to match AV's standard error?</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.M2</div>
+      <p>Test antithetic variates on a <strong>straddle payoff</strong>: max(S_T - K, 0) + max(K - S_T, 0). Does antithetic work as well here as for a plain call? Why or why not? Hint: is this payoff monotone in Z?</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-hard">🔴 Hard</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.H1</div>
+      <p>For a path-dependent Asian option (payoff based on average price over T time steps), implement antithetic variates where you mirror the entire path (use -Z for all time steps). Compare with standard MC. Analyze: does the variance reduction hold for path-dependent options?</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 3.H2</div>
+      <p>Derive the optimal variance reduction ratio for antithetic variates as a function of ρ = Corr(f(U), f(1-U)). For a call option, estimate ρ empirically and compare the theoretical and observed variance reduction.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 4: CONTROL VARIATES
+══════════════════════════════════════════════════ -->
+<div id="tab-control" class="tab-panel">
+
+  <h2>Variance Reduction: Control Variates</h2>
+  <p>Control variates is arguably the most powerful and versatile variance reduction technique. The idea is to use <em>known information</em> — something you already know the exact expected value of — to correct and improve your estimate.</p>
+
+  <h3>The Intuition: Using a Friend Who Knows the Answer</h3>
+  <p>Imagine you're estimating something hard (price of an exotic option). But there's a simpler version of the problem for which you know the exact answer. You can use the difference between your estimate of the simple problem and the known exact answer to <em>correct</em> your estimate of the hard problem.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">💡 Everyday Analogy: Estimating Commute Time</div>
+    You want to estimate tomorrow's commute, but traffic is uncertain. You know <em>exactly</em> how long the drive takes with zero traffic (20 min). You observe today's drive took 27 min, and with zero traffic it would have been 21 min. So extra time today = 6 min. Your estimate for tomorrow = 20 min (baseline) + expected extra time. You're using the "zero-traffic drive" as a control variate.
+  </div>
+
+  <h3>The Mathematics</h3>
+  <p>We want to estimate μ = E[Y]. We have a <strong>control variate</strong> C, a random variable with <strong>known expectation</strong> E[C] = μ_C. The control variate estimator is:</p>
+
+  <div class="formula-box">
+    <div class="formula">Ŷ_CV = Ȳ - b·(C̄ - μ_C)</div>
+    <div class="formula-label">Control Variate Estimator · b = control coefficient, C̄ = sample mean of control</div>
+  </div>
+
+  <p>Note that E[Ŷ_CV] = E[Ȳ] - b·(E[C̄] - μ_C) = μ - b·0 = μ. So the estimator is still unbiased for any b!</p>
+
+  <p>The variance of this estimator:</p>
+  <div class="formula-box">
+    <div class="formula">Var(Ŷ_CV) = Var(Y) + b²·Var(C) - 2b·Cov(Y, C)</div>
+    <div class="formula-label">Variance of CV estimator</div>
+  </div>
+
+  <h3>Optimal Control Coefficient b*</h3>
+  <p>Minimize with respect to b by taking the derivative and setting to zero:</p>
+  <div class="formula-box">
+    <div class="formula">b* = Cov(Y, C) / Var(C)</div>
+    <div class="formula-label">Optimal control coefficient · same formula as OLS regression coefficient!</div>
+  </div>
+
+  <p>With this optimal b*, the variance becomes:</p>
+  <div class="formula-box">
+    <div class="formula">Var(Ŷ_CV) = Var(Y) · (1 - ρ²_{YC})</div>
+    <div class="formula-label">Variance reduction factor · ρ_{YC} = correlation between Y and C</div>
+  </div>
+
+  <div class="callout callout-key">
+    <div class="callout-title">🔑 The Correlation is Everything</div>
+    The variance reduction is (1 - ρ²). If Y and C are 90% correlated (ρ=0.9), variance drops by 81%! If ρ=0.5, variance drops by 25%. The control variate works best when you can find a variable C that is <strong>highly correlated</strong> with the target Y and has a <strong>known exact mean</strong>.
+  </div>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: Control Variates Demonstration</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:12px">Estimating E[sin(X)²] where X~U[0,π]. Control variate: C=sin(X), E[C]=2/π ≈ 0.6366.</p>
+    <div class="ctrl-row">
+      <button class="btn btn-accent" onclick="runControlVariate()">Run Comparison</button>
+      <label>n (per trial):</label>
+      <input type="range" id="cv-n" min="10" max="1000" value="100" step="10" oninput="document.getElementById('cv-n-v').textContent=this.value">
+      <span id="cv-n-v" style="font-family:monospace;color:var(--accent)">100</span>
+      <label>Num Trials:</label>
+      <input type="range" id="cv-trials" min="50" max="1000" value="300" step="50" oninput="document.getElementById('cv-trials-v').textContent=this.value">
+      <span id="cv-trials-v" style="font-family:monospace;color:var(--accent)">300</span>
+    </div>
+    <canvas id="cv-canvas" width="700" height="300"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="cv-mc-var">—</div><div class="stat-lbl">MC Variance</div></div>
+      <div class="stat-card"><div class="stat-val" id="cv-cv-var">—</div><div class="stat-lbl">CV Variance</div></div>
+      <div class="stat-card"><div class="stat-val" id="cv-b-star">—</div><div class="stat-lbl">Optimal b*</div></div>
+      <div class="stat-card"><div class="stat-val" id="cv-reduction">—</div><div class="stat-lbl">% Reduction</div></div>
+    </div>
+  </div>
+
+  <h3>Application: Option Pricing with Control Variates</h3>
+  <p>The most famous application in quant finance: use the <strong>Black-Scholes European option price</strong> as a control variate for pricing <strong>exotic options</strong>.</p>
+  <p>To price an Asian option (whose exact price isn't known analytically):</p>
+  <ol class="steps">
+    <li>Simulate paths for the Asian option payoff Y_Asian and simultaneously compute the European option payoff Y_Euro on the same paths.</li>
+    <li>The European option has a known exact price (Black-Scholes formula) → this is our E[C].</li>
+    <li>Estimate b* = Cov(Y_Asian, Y_Euro) / Var(Y_Euro) from a pilot run.</li>
+    <li>Apply: Ŷ_Asian = Ȳ_Asian - b*(Ȳ_Euro - BS_price)</li>
+  </ol>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">✅ Great Control Variates in Finance</div>
+    European call/put (for exotics) · Geometric Asian option (for arithmetic Asian) · Delta-hedging strategy · Underlying asset itself (E[S_T] = S₀·e^(rT) is known)
+  </div>
+
+  <h3>Multiple Control Variates</h3>
+  <p>You can use multiple control variates simultaneously. If C₁, C₂, ..., Cₖ all have known means, you get a system of equations for optimal coefficients. This is exactly <strong>multiple linear regression</strong> of Y on C₁,...,Cₖ. The variance reduction is 1 - R², where R² is the coefficient of determination from the regression.</p>
+
+  <hr class="divider">
+  <h3>Practice Exercises</h3>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-easy">🟢 Easy</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.E1</div>
+      <p>Estimate E[X²] where X ~ U[0,1] (true value = 1/3) using control variate C = X (since E[X] = 0.5 is known). Compute b* from a pilot run of 1000 samples. Then estimate with 10,000 samples and compare variance to plain MC.</p>
+      <span class="hint-toggle" onclick="toggleHint(this)">▶ Show Hint</span>
+      <div class="hint-content">b* = Cov(X², X) / Var(X). Note Cov(X², X) = E[X³] - E[X²]·E[X] = 1/4 - (1/3)(1/2) = 1/12. Var(X) = 1/12. So b* = 1!</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.E2</div>
+      <p>What property must a control variate have? List the two requirements and explain why each is necessary for the technique to work.</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-medium">🟡 Medium</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.M1</div>
+      <p>Price an arithmetic Asian call option using the geometric Asian option as a control variate. The geometric Asian has a known analytical price (look up the formula). With S₀=100, K=100, r=0.05, σ=0.20, T=1, 12 monitoring points: compare standard MC vs CV standard errors.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.M2</div>
+      <p>Show that using the underlying asset S_T as a control variate (with E[S_T] = S₀e^(rT)) improves European call option pricing. Empirically estimate ρ between payoff and S_T. Is this a good control variate?</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-hard">🔴 Hard</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.H1</div>
+      <p>Implement multiple control variates for Asian option pricing: use both S_T and the geometric Asian option. Estimate optimal coefficients via OLS regression. Compare the variance reduction to using each control variate individually.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 4.H2</div>
+      <p>Derive the optimal b* for the case of k control variates. Show that the optimal solution is the vector b* = Σ_{CC}⁻¹ · σ_{YC} where Σ_{CC} is the covariance matrix of controls and σ_{YC} is the vector of covariances with Y. Verify numerically.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 5: IMPORTANCE SAMPLING
+══════════════════════════════════════════════════ -->
+<div id="tab-importance" class="tab-panel">
+
+  <h2>Variance Reduction: Importance Sampling</h2>
+  <p>Importance sampling is the most sophisticated of the three techniques, and arguably the most powerful when applied correctly. The idea: instead of sampling uniformly (wasting samples on "unimportant" regions), <strong>sample more heavily from the regions that matter most</strong>.</p>
+
+  <h3>The Problem With Standard MC in Rare Events</h3>
+  <p>Consider estimating the probability of a very rare event — say, a stock portfolio losing more than 30% in a day. Standard MC would require an astronomically large number of paths to even observe a single such event. Most samples are "wasted" on normal days that don't contribute to our estimate.</p>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ The Rare Event Problem</div>
+    If P(loss > 30%) = 0.001 (one in a thousand), you'd need ~100,000 paths to get 100 observations of the rare event. This is expensive! Importance sampling can reduce this to ~1,000 paths by "zooming in" on the dangerous region.
+  </div>
+
+  <h3>The Mathematical Foundation</h3>
+  <p>We want to compute E_p[f(X)] = ∫ f(x) · p(x) dx. We can rewrite this as an expectation under a different distribution q(x):</p>
+
+  <div class="formula-box">
+    <div class="formula">E_p[f(X)] = ∫ f(x) · p(x)/q(x) · q(x) dx = E_q[f(X) · w(X)]</div>
+    <div class="formula-label">Importance Sampling Identity · w(x) = p(x)/q(x) is the likelihood ratio (weight)</div>
+  </div>
+
+  <p>The IS estimator:</p>
+  <div class="formula-box">
+    <div class="formula">μ̂_IS = (1/n) Σᵢ f(Xᵢ) · w(Xᵢ)  where Xᵢ ~ q, w(x) = p(x)/q(x)</div>
+    <div class="formula-label">Importance Sampling Estimator — still unbiased, but with different variance</div>
+  </div>
+
+  <h3>Choosing the Proposal Distribution q</h3>
+  <p>The variance of the IS estimator:</p>
+  <div class="formula-box">
+    <div class="formula">Var(μ̂_IS) = (1/n) · [E_q[(f(X)·w(X))²] - μ²]</div>
+    <div class="formula-label">IS variance depends on choice of q</div>
+  </div>
+
+  <p>The <strong>optimal proposal</strong> q*(x) = f(x)·p(x) / μ would give <strong>zero variance</strong> — but this requires knowing μ, which is what we're trying to estimate! In practice, we choose a q that approximates this optimal distribution.</p>
+
+  <div class="callout callout-key">
+    <div class="callout-title">🔑 The Heuristic Rule</div>
+    Choose q(x) to be large where f(x)·p(x) is large — i.e., where the integrand is large. For rare event estimation (f = 1 for rare event), shift the distribution toward the rare region. For option pricing, shift the distribution so that the option pays off more often.
+  </div>
+
+  <h3>A Concrete Example: Tail Probability</h3>
+  <p>Estimate P(X > 4) where X ~ N(0,1). True value ≈ 3.17 × 10⁻⁵. Standard MC needs millions of samples. Instead, use q = N(4, 1) — centered at the tail:</p>
+
+  <div class="demo-box">
+    <h4>🔬 Interactive: Importance Sampling for Rare Events</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:12px">Estimating P(X > threshold) for X~N(0,1). Move the threshold right to make it rarer. Watch IS dominate standard MC.</p>
+    <div class="ctrl-row">
+      <label>Threshold:</label>
+      <input type="range" id="is-thresh" min="1" max="4" step="0.1" value="2.5" oninput="document.getElementById('is-thresh-v').textContent=(+this.value).toFixed(1);runIS()">
+      <span id="is-thresh-v" style="font-family:monospace;color:var(--accent)">2.5</span>
+      <label>n:</label>
+      <input type="range" id="is-n" min="100" max="5000" step="100" value="1000" oninput="document.getElementById('is-n-v').textContent=this.value;runIS()">
+      <span id="is-n-v" style="font-family:monospace;color:var(--accent)">1000</span>
+      <button class="btn btn-purple" onclick="runIS()">Re-run</button>
+    </div>
+    <canvas id="is-canvas" width="700" height="280"></canvas>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val" id="is-true">—</div><div class="stat-lbl">True Prob</div></div>
+      <div class="stat-card"><div class="stat-val" id="is-mc-est">—</div><div class="stat-lbl">MC Estimate</div></div>
+      <div class="stat-card"><div class="stat-val" id="is-is-est">—</div><div class="stat-lbl">IS Estimate</div></div>
+      <div class="stat-card"><div class="stat-val" id="is-reduction">—</div><div class="stat-lbl">Variance Reduction</div></div>
+    </div>
+  </div>
+
+  <h3>Pitfall: When IS Breaks Down</h3>
+  <p>If q(x) = 0 somewhere that p(x)·f(x) > 0, the weights w(x) become infinite — and the estimator can have <em>infinite variance</em>. This is the main danger of IS: a poorly chosen proposal can make things much worse than standard MC.</p>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ The Cardinal Rule of IS</div>
+    The support of q must include the support of p·f. Never let q assign zero probability to regions where the integrand is nonzero. "Cover more than you need, never cover less."
+  </div>
+
+  <h3>Self-Normalized IS (SNIS)</h3>
+  <p>When the normalizing constant of p is unknown (common in Bayesian inference), use the self-normalized estimator:</p>
+  <div class="formula-box">
+    <div class="formula">μ̂_SNIS = Σᵢ f(Xᵢ) · w̃(Xᵢ) / Σᵢ w̃(Xᵢ)  where w̃(x) = p̃(x)/q(x)</div>
+    <div class="formula-label">Self-Normalized IS — biased but consistent; more robust in practice</div>
+  </div>
+
+  <h3>Application: Option Pricing with IS (Drift Shifting)</h3>
+  <p>For deep out-of-the-money options, most paths yield zero payoff. We shift the drift of the underlying process toward the strike to generate more in-the-money paths, then reweight:</p>
+  <ol class="steps">
+    <li>Choose a new drift μ̃ = r + θ·σ (shifted toward in-the-money)</li>
+    <li>Generate paths under the new measure Q̃</li>
+    <li>Compute the Radon-Nikodym derivative w = dQ/dQ̃ = exp(-θZ - θ²/2)</li>
+    <li>Estimator: e^(-rT) · (1/n) Σ payoff(S_T) · w</li>
+  </ol>
+
+  <hr class="divider">
+  <h3>Practice Exercises</h3>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-easy">🟢 Easy</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.E1</div>
+      <p>Estimate P(X > 3) for X ~ N(0,1) (true ≈ 0.00135) using (a) standard MC with 10,000 samples and (b) IS with proposal N(3,1) and 1,000 samples. Compute the mean and variance of each estimator over 500 repetitions.</p>
+      <span class="hint-toggle" onclick="toggleHint(this)">▶ Show Hint</span>
+      <div class="hint-content">For IS: sample X ~ N(3,1), compute weight w = N(0,1).pdf(x) / N(3,1).pdf(x), indicator 1(x>3) · w is the weighted sample.</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.E2</div>
+      <p>What happens to the IS estimator if you choose a proposal q that places zero probability in the region where the integrand is nonzero? Demonstrate this numerically.</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-medium">🟡 Medium</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.M1</div>
+      <p>Price a deep out-of-the-money European call (S₀=100, K=130, r=0.05, σ=0.20, T=1) using IS with drift shifting. Find the optimal θ (the amount to shift the drift) by minimizing the IS estimator's variance. Compare to standard MC at equal computational cost.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.M2</div>
+      <p>Implement the effective sample size (ESS) diagnostic: ESS = (Σw)² / Σw² where w are the IS weights. A low ESS (say, below 10% of n) indicates a poor proposal. For the N(0,1) tail probability problem with different thresholds, plot ESS vs threshold for various proposal centers.</p>
+    </div>
+  </div>
+
+  <div class="exercise-tier">
+    <div class="tier-header"><span class="tier-badge tier-hard">🔴 Hard</span></div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.H1</div>
+      <p>Implement Sequential Importance Sampling (particle filter) for a simple state-space model: X_t = 0.9·X_{t-1} + ε_t, Y_t = X_t² + η_t where ε,η ~ N(0,1). Track 1000 particles and visualize the posterior distribution of X_t given observations Y_1,...,Y_t.</p>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num">Exercise 5.H2</div>
+      <p>Derive the optimal IS proposal for estimating P(X > t) for X ~ N(0,1) as t → ∞ using exponential tilting. Show that the optimal proposal is N(t,1), and prove that the resulting IS estimator has finite variance while the standard MC estimator has variance scaling as P(X>t) (going to zero).</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 6: COMPARISON
+══════════════════════════════════════════════════ -->
+<div id="tab-compare" class="tab-panel">
+
+  <h2>Putting It All Together: Method Comparison</h2>
+  <p>Now that you understand each technique, let's compare them systematically — when to use each, their relative strengths, and how to combine them.</p>
+
+  <h3>The Relationship Between Methods</h3>
+
+  <div class="concept-map">
+    <svg width="100%" height="320" viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" style="font-family:'IBM Plex Mono',monospace">
+      <!-- Central node -->
+      <rect x="290" y="130" width="180" height="60" rx="10" fill="#1a2235" stroke="#00d4ff" stroke-width="2"/>
+      <text x="380" y="155" fill="#00d4ff" font-size="12" text-anchor="middle" font-weight="600">Monte Carlo</text>
+      <text x="380" y="173" fill="#7a8eaa" font-size="10" text-anchor="middle">Standard Estimator</text>
+
+      <!-- Antithetic -->
+      <rect x="30" y="20" width="180" height="70" rx="10" fill="#1a2235" stroke="#ff6b35" stroke-width="2"/>
+      <text x="120" y="45" fill="#ff6b35" font-size="12" text-anchor="middle" font-weight="600">Antithetic Variates</text>
+      <text x="120" y="62" fill="#7a8eaa" font-size="10" text-anchor="middle">Exploit U ↔ (1-U)</text>
+      <text x="120" y="78" fill="#7a8eaa" font-size="10" text-anchor="middle">symmetry</text>
+
+      <!-- Control Variates -->
+      <rect x="290" y="20" width="180" height="70" rx="10" fill="#1a2235" stroke="#f5c842" stroke-width="2"/>
+      <text x="380" y="45" fill="#f5c842" font-size="12" text-anchor="middle" font-weight="600">Control Variates</text>
+      <text x="380" y="62" fill="#7a8eaa" font-size="10" text-anchor="middle">Use known E[C]</text>
+      <text x="380" y="78" fill="#7a8eaa" font-size="10" text-anchor="middle">to correct estimates</text>
+
+      <!-- Importance Sampling -->
+      <rect x="550" y="20" width="180" height="70" rx="10" fill="#1a2235" stroke="#a855f7" stroke-width="2"/>
+      <text x="640" y="45" fill="#a855f7" font-size="12" text-anchor="middle" font-weight="600">Importance Sampling</text>
+      <text x="640" y="62" fill="#7a8eaa" font-size="10" text-anchor="middle">Change sampling</text>
+      <text x="640" y="78" fill="#7a8eaa" font-size="10" text-anchor="middle">distribution + reweight</text>
+
+      <!-- Combinations -->
+      <rect x="160" y="230" width="180" height="60" rx="10" fill="#111827" stroke="#2a3a55" stroke-width="1" stroke-dasharray="5,3"/>
+      <text x="250" y="255" fill="#7a8eaa" font-size="11" text-anchor="middle">AV + CV Combined</text>
+      <text x="250" y="272" fill="#546e7a" font-size="10" text-anchor="middle">multiplicative gains</text>
+
+      <rect x="420" y="230" width="180" height="60" rx="10" fill="#111827" stroke="#2a3a55" stroke-width="1" stroke-dasharray="5,3"/>
+      <text x="510" y="255" fill="#7a8eaa" font-size="11" text-anchor="middle">IS + CV Combined</text>
+      <text x="510" y="272" fill="#546e7a" font-size="10" text-anchor="middle">shift + correction</text>
+
+      <!-- Arrows from MC to each -->
+      <line x1="290" y1="155" x2="210" y2="90" stroke="#2a3a55" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="380" y1="130" x2="380" y2="90" stroke="#2a3a55" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="470" y1="155" x2="550" y2="90" stroke="#2a3a55" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Arrows to combinations -->
+      <line x1="210" y1="90" x2="250" y2="230" stroke="#2a3a55" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="380" y1="90" x2="280" y2="230" stroke="#2a3a55" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="380" y1="90" x2="480" y2="230" stroke="#2a3a55" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="550" y1="90" x2="510" y2="230" stroke="#2a3a55" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#2a3a55"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3>Side-by-Side Comparison</h3>
+  <table>
+    <tr>
+      <th>Property</th>
+      <th style="color:var(--accent2)">Antithetic Variates</th>
+      <th style="color:var(--gold)">Control Variates</th>
+      <th style="color:var(--accent3)">Importance Sampling</th>
+    </tr>
+    <tr>
+      <td><strong>Core Idea</strong></td>
+      <td>Use U and 1-U symmetry</td>
+      <td>Correct with known E[C]</td>
+      <td>Shift sampling distribution</td>
+    </tr>
+    <tr>
+      <td><strong>Extra Info Needed</strong></td>
+      <td class="best">None</td>
+      <td>Known E[C] for a related variable</td>
+      <td>Good proposal distribution q</td>
+    </tr>
+    <tr>
+      <td><strong>Implementation Effort</strong></td>
+      <td class="best">Very low</td>
+      <td>Low-Medium</td>
+      <td class="worst">Medium-High</td>
+    </tr>
+    <tr>
+      <td><strong>Potential Variance Reduction</strong></td>
+      <td>Up to 50%+</td>
+      <td class="best">Up to 99%+ (if high ρ)</td>
+      <td class="best">Unlimited (theoretically)</td>
+    </tr>
+    <tr>
+      <td><strong>Risk of Backfire</strong></td>
+      <td class="best">Low (non-monotone f)</td>
+      <td class="best">Low (always non-negative)</td>
+      <td class="worst">High (infinite variance if bad q)</td>
+    </tr>
+    <tr>
+      <td><strong>Best For</strong></td>
+      <td>Simple options, monotone payoffs</td>
+      <td>Exotic options with European analog</td>
+      <td>Rare events, deep OTM options</td>
+    </tr>
+    <tr>
+      <td><strong>Works for Path-Dependent?</strong></td>
+      <td>Yes (mirror entire path)</td>
+      <td>Yes (geometric Asian as CV)</td>
+      <td>Yes (measure change over path)</td>
+    </tr>
+    <tr>
+      <td><strong>Computational Overhead</strong></td>
+      <td class="best">~0%</td>
+      <td>~5-10% (regression)</td>
+      <td>~10-20% (weight computation)</td>
+    </tr>
+  </table>
+
+  <h3>Which to Use When?</h3>
+
+  <div class="demo-box">
+    <h4>📊 Decision Framework</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:8px">
+      <div style="background:rgba(255,107,53,0.07);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:8px">USE ANTITHETIC WHEN:</div>
+        <ul style="padding-left:20px;font-size:14px;color:#c8d3e0;line-height:2">
+          <li>Quick improvement needed</li>
+          <li>Payoff is monotone in inputs</li>
+          <li>No domain knowledge available</li>
+          <li>Prototyping or first pass</li>
+        </ul>
+      </div>
+      <div style="background:rgba(245,200,66,0.07);border:1px solid rgba(245,200,66,0.3);border-radius:8px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);margin-bottom:8px">USE CONTROL VARIATES WHEN:</div>
+        <ul style="padding-left:20px;font-size:14px;color:#c8d3e0;line-height:2">
+          <li>Related simpler problem has known answer</li>
+          <li>High correlation with target is expected</li>
+          <li>Pricing exotic options</li>
+          <li>Consistent high accuracy needed</li>
+        </ul>
+      </div>
+      <div style="background:rgba(168,85,247,0.07);border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:16px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent3);margin-bottom:8px">USE IMPORTANCE SAMPLING WHEN:</div>
+        <ul style="padding-left:20px;font-size:14px;color:#c8d3e0;line-height:2">
+          <li>Estimating rare event probabilities</li>
+          <li>Pricing deep out-of-the-money options</li>
+          <li>Standard MC yields mostly zero samples</li>
+          <li>Can design a good proposal</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Combined: All Three Together</h3>
+  <p>These methods are <em>complementary</em> and can be combined for multiplicative gains. For example, when pricing an Asian option:</p>
+  <ol class="steps">
+    <li>Use <strong>Importance Sampling</strong> to shift the drift toward in-the-money paths</li>
+    <li>Apply <strong>Antithetic Variates</strong> by mirroring each simulated path</li>
+    <li>Use the <strong>geometric Asian option</strong> (known analytically) as a control variate</li>
+    <li>Result: variance reduction of 100× or more vs. plain MC</li>
+  </ol>
+
+  <div class="demo-box">
+    <h4>🏁 Head-to-Head: European Call Option Pricing</h4>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:12px">All methods use the same total computational budget (n paths). Compare precision (inverse of std error) relative to standard MC.</p>
+    <div class="ctrl-row">
+      <button class="btn btn-accent" onclick="runComparison()">Run Comparison (S₀=100, K=105, σ=0.20, T=1)</button>
+      <label>n paths:</label>
+      <input type="range" id="cmp-n" min="500" max="10000" step="500" value="5000" oninput="document.getElementById('cmp-n-v').textContent=this.value">
+      <span id="cmp-n-v" style="font-family:monospace;color:var(--accent)">5000</span>
+    </div>
+    <canvas id="cmp-canvas" width="700" height="340"></canvas>
+    <div class="stat-grid" id="cmp-stats"></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     TAB 7: COLAB LABS
+══════════════════════════════════════════════════ -->
+<div id="tab-colab" class="tab-panel">
+
+  <h2>Google Colab Experiments</h2>
+  <p>These are step-by-step coding experiments you can run in Google Colab (free, no setup needed). Each experiment is self-contained and builds on the theory from the study guide.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">🚀 Getting Started with Colab</div>
+    Go to <a href="https://colab.research.google.com" target="_blank">colab.research.google.com</a>, click "New Notebook", and paste the code below. All required libraries (numpy, matplotlib, scipy) are pre-installed.
+  </div>
+
+  <h3>Lab 1: The Basics — Generating Every Distribution from Uniform</h3>
+  <pre data-label="COLAB LAB 1"><code><span class="cm"># ── LAB 1: Random Number Generation ──────────────────────────</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+<span class="kw">from</span> <span class="var">scipy</span> <span class="kw">import</span> <span class="var">stats</span>
+
+<span class="var">np</span>.<span class="fn">random</span>.<span class="fn">seed</span>(<span class="num">42</span>)
+<span class="var">n</span> = <span class="num">10000</span>
+
+<span class="cm"># 1. Uniform [0,1] — the master distribution</span>
+<span class="var">U</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">uniform</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="var">n</span>)
+
+<span class="cm"># 2. Exponential via inverse transform: X = -ln(1-U)/λ</span>
+<span class="var">lam</span> = <span class="num">2.0</span>
+<span class="var">X_exp</span> = -<span class="var">np</span>.<span class="fn">log</span>(<span class="num">1</span> - <span class="var">U</span>) / <span class="var">lam</span>
+
+<span class="cm"># 3. Normal via Box-Muller</span>
+<span class="var">U1</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">uniform</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="var">n</span><span class="op">//</span><span class="num">2</span>)
+<span class="var">U2</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">uniform</span>(<span class="num">0</span>, <span class="num">1</span>, <span class="var">n</span><span class="op">//</span><span class="num">2</span>)
+<span class="var">Z1</span> = <span class="var">np</span>.<span class="fn">sqrt</span>(-<span class="num">2</span> <span class="op">*</span> <span class="var">np</span>.<span class="fn">log</span>(<span class="var">U1</span>)) <span class="op">*</span> <span class="var">np</span>.<span class="fn">cos</span>(<span class="num">2</span> <span class="op">*</span> <span class="var">np</span>.<span class="fn">pi</span> <span class="op">*</span> <span class="var">U2</span>)  <span class="cm"># Box-Muller</span>
+
+<span class="cm"># 4. Log-Normal: Y = exp(μ + σ·Z)</span>
+<span class="var">mu</span>, <span class="var">sigma</span> = <span class="num">0</span>, <span class="num">0.5</span>
+<span class="var">Y_lognorm</span> = <span class="var">np</span>.<span class="fn">exp</span>(<span class="var">mu</span> + <span class="var">sigma</span> <span class="op">*</span> <span class="var">Z1</span>)
+
+<span class="cm"># --- Plot all four ---</span>
+<span class="var">fig</span>, <span class="var">axes</span> = <span class="var">plt</span>.<span class="fn">subplots</span>(<span class="num">2</span>, <span class="num">2</span>, <span class="var">figsize</span>=(<span class="num">12</span>, <span class="num">8</span>))
+<span class="var">fig</span>.<span class="fn">suptitle</span>(<span class="str">'Distributions from Uniform Samples'</span>, <span class="var">fontsize</span>=<span class="num">14</span>)
+
+<span class="kw">for</span> <span class="var">ax</span>, (<span class="var">data</span>, <span class="var">title</span>, <span class="var">color</span>) <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">axes</span>.<span class="fn">flat</span>, [
+    (<span class="var">U</span>,          <span class="str">'Uniform[0,1]'</span>,  <span class="str">'#00d4ff'</span>),
+    (<span class="var">X_exp</span>,      <span class="str">'Exponential(λ=2)'</span>, <span class="str">'#ff6b35'</span>),
+    (<span class="var">Z1</span>,          <span class="str">'Normal N(0,1) — Box-Muller'</span>, <span class="str">'#a855f7'</span>),
+    (<span class="var">Y_lognorm</span>,  <span class="str">'Log-Normal(μ=0,σ=0.5)'</span>, <span class="str">'#f5c842'</span>),
+]):
+    <span class="var">ax</span>.<span class="fn">hist</span>(<span class="var">data</span>, <span class="var">bins</span>=<span class="num">80</span>, <span class="var">color</span>=<span class="var">color</span>, <span class="var">alpha</span>=<span class="num">0.8</span>, <span class="var">density</span>=<span class="kw">True</span>)
+    <span class="var">ax</span>.<span class="fn">set_title</span>(<span class="var">title</span>)
+    <span class="var">ax</span>.<span class="fn">set_xlabel</span>(<span class="str">'Value'</span>)
+    <span class="var">ax</span>.<span class="fn">set_ylabel</span>(<span class="str">'Density'</span>)
+
+<span class="var">plt</span>.<span class="fn">tight_layout</span>()
+<span class="var">plt</span>.<span class="fn">show</span>()
+
+<span class="cm"># Verify statistics</span>
+<span class="fn">print</span>(<span class="str">f"Exp mean: {X_exp.mean():.4f} (theoretical: {1/lam:.4f})"</span>)
+<span class="fn">print</span>(<span class="str">f"Normal mean: {Z1.mean():.4f} (theoretical: 0)"</span>)
+<span class="fn">print</span>(<span class="str">f"Normal std: {Z1.std():.4f} (theoretical: 1)"</span>)
+</code></pre>
+
+  <h3>Lab 2: Monte Carlo Option Pricing</h3>
+  <pre data-label="COLAB LAB 2"><code><span class="cm"># ── LAB 2: Monte Carlo European Option Pricer ─────────────────</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span>.<span class="var">stats</span> <span class="kw">import</span> <span class="var">norm</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="kw">def</span> <span class="fn">black_scholes_call</span>(<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span>):
+    <span class="cm">"""Analytical Black-Scholes call price"""</span>
+    <span class="var">d1</span> = (<span class="var">np</span>.<span class="fn">log</span>(<span class="var">S0</span><span class="op">/</span><span class="var">K</span>) + (<span class="var">r</span> + <span class="num">0.5</span><span class="op">*</span><span class="var">sigma</span><span class="op">**</span><span class="num">2</span>)<span class="op">*</span><span class="var">T</span>) / (<span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>))
+    <span class="var">d2</span> = <span class="var">d1</span> - <span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>)
+    <span class="kw">return</span> <span class="var">S0</span><span class="op">*</span><span class="var">norm</span>.<span class="fn">cdf</span>(<span class="var">d1</span>) - <span class="var">K</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(-<span class="var">r</span><span class="op">*</span><span class="var">T</span>)<span class="op">*</span><span class="var">norm</span>.<span class="fn">cdf</span>(<span class="var">d2</span>)
+
+<span class="kw">def</span> <span class="fn">mc_call</span>(<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span>, <span class="var">n</span>):
+    <span class="cm">"""Standard Monte Carlo"""</span>
+    <span class="var">Z</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">standard_normal</span>(<span class="var">n</span>)
+    <span class="var">ST</span> = <span class="var">S0</span> <span class="op">*</span> <span class="var">np</span>.<span class="fn">exp</span>((<span class="var">r</span> - <span class="num">0.5</span><span class="op">*</span><span class="var">sigma</span><span class="op">**</span><span class="num">2</span>)<span class="op">*</span><span class="var">T</span> + <span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>)<span class="op">*</span><span class="var">Z</span>)
+    <span class="var">payoffs</span> = <span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST</span> - <span class="var">K</span>, <span class="num">0</span>) <span class="op">*</span> <span class="var">np</span>.<span class="fn">exp</span>(-<span class="var">r</span><span class="op">*</span><span class="var">T</span>)
+    <span class="kw">return</span> <span class="var">payoffs</span>.<span class="fn">mean</span>(), <span class="var">payoffs</span>.<span class="fn">std</span>() <span class="op">/</span> <span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">n</span>)
+
+<span class="cm"># Parameters</span>
+<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span> = <span class="num">100</span>, <span class="num">105</span>, <span class="num">0.05</span>, <span class="num">0.20</span>, <span class="num">1.0</span>
+<span class="var">true_price</span> = <span class="fn">black_scholes_call</span>(<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span>)
+<span class="fn">print</span>(<span class="str">f"True BS price: ${true_price:.4f}"</span>)
+
+<span class="cm"># Convergence study</span>
+<span class="var">sample_sizes</span> = [<span class="num">100</span>, <span class="num">500</span>, <span class="num">1000</span>, <span class="num">5000</span>, <span class="num">10000</span>, <span class="num">50000</span>]
+<span class="var">estimates</span>, <span class="var">std_errors</span> = [], []
+
+<span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="var">sample_sizes</span>:
+    <span class="var">est</span>, <span class="var">se</span> = <span class="fn">mc_call</span>(<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span>, <span class="var">n</span>)
+    <span class="var">estimates</span>.<span class="fn">append</span>(<span class="var">est</span>)
+    <span class="var">std_errors</span>.<span class="fn">append</span>(<span class="var">se</span>)
+    <span class="fn">print</span>(<span class="str">f"n={n:6d}: price=${est:.4f}, SE={se:.4f}, error={abs(est-true_price):.4f}"</span>)
+
+<span class="cm"># Plot convergence</span>
+<span class="var">fig</span>, (<span class="var">ax1</span>, <span class="var">ax2</span>) = <span class="var">plt</span>.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="var">figsize</span>=(<span class="num">12</span>, <span class="num">4</span>))
+
+<span class="var">ax1</span>.<span class="fn">semilogx</span>(<span class="var">sample_sizes</span>, <span class="var">estimates</span>, <span class="str">'o-'</span>, <span class="var">color</span>=<span class="str">'#00d4ff'</span>)
+<span class="var">ax1</span>.<span class="fn">axhline</span>(<span class="var">true_price</span>, <span class="var">color</span>=<span class="str">'#ff6b35'</span>, <span class="var">linestyle</span>=<span class="str">'--'</span>, <span class="var">label</span>=<span class="str">'True Price'</span>)
+<span class="var">ax1</span>.<span class="fn">set_title</span>(<span class="str">'MC Estimate vs Sample Size'</span>)
+<span class="var">ax1</span>.<span class="fn">set_xlabel</span>(<span class="str">'n (log scale)'</span>); <span class="var">ax1</span>.<span class="fn">legend</span>()
+
+<span class="var">ax2</span>.<span class="fn">loglog</span>(<span class="var">sample_sizes</span>, <span class="var">std_errors</span>, <span class="str">'s-'</span>, <span class="var">color</span>=<span class="str">'#a855f7'</span>, <span class="var">label</span>=<span class="str">'Std Error'</span>)
+<span class="var">ax2</span>.<span class="fn">loglog</span>(<span class="var">sample_sizes</span>, [<span class="var">std_errors</span>[<span class="num">0</span>]<span class="op">/</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">n</span><span class="op">/</span><span class="var">sample_sizes</span>[<span class="num">0</span>]) <span class="kw">for</span> <span class="var">n</span> <span class="kw">in</span> <span class="var">sample_sizes</span>], 
+           <span class="str">'--'</span>, <span class="var">color</span>=<span class="str">'#f5c842'</span>, <span class="var">label</span>=<span class="str">'O(1/√n) reference'</span>)
+<span class="var">ax2</span>.<span class="fn">set_title</span>(<span class="str">'Standard Error Convergence'</span>)
+<span class="var">ax2</span>.<span class="fn">set_xlabel</span>(<span class="str">'n (log scale)'</span>); <span class="var">ax2</span>.<span class="fn">legend</span>()
+
+<span class="var">plt</span>.<span class="fn">tight_layout</span>()
+<span class="var">plt</span>.<span class="fn">show</span>()
+</code></pre>
+
+  <h3>Lab 3: All Three Variance Reduction Methods</h3>
+  <pre data-label="COLAB LAB 3"><code><span class="cm"># ── LAB 3: Variance Reduction Comparison ─────────────────────</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span>.<span class="var">stats</span> <span class="kw">import</span> <span class="var">norm</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="var">S0</span>, <span class="var">K</span>, <span class="var">r</span>, <span class="var">sigma</span>, <span class="var">T</span> = <span class="num">100</span>, <span class="num">105</span>, <span class="num">0.05</span>, <span class="num">0.20</span>, <span class="num">1.0</span>
+<span class="var">n_trials</span> = <span class="num">500</span>   <span class="cm"># number of independent runs</span>
+<span class="var">n_paths</span>  = <span class="num">1000</span>  <span class="cm"># paths per run</span>
+<span class="var">disc</span> = <span class="var">np</span>.<span class="fn">exp</span>(-<span class="var">r</span><span class="op">*</span><span class="var">T</span>)
+<span class="var">drift</span> = (<span class="var">r</span> - <span class="num">0.5</span><span class="op">*</span><span class="var">sigma</span><span class="op">**</span><span class="num">2</span>)<span class="op">*</span><span class="var">T</span>
+<span class="var">vol</span> = <span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>)
+
+<span class="kw">def</span> <span class="fn">true_price</span>():
+    <span class="var">d1</span> = (<span class="var">np</span>.<span class="fn">log</span>(<span class="var">S0</span><span class="op">/</span><span class="var">K</span>)+(<span class="var">r</span>+<span class="num">0.5</span><span class="op">*</span><span class="var">sigma</span><span class="op">**</span><span class="num">2</span>)<span class="op">*</span><span class="var">T</span>)<span class="op">/</span>(<span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>))
+    <span class="kw">return</span> <span class="var">S0</span><span class="op">*</span><span class="var">norm</span>.<span class="fn">cdf</span>(<span class="var">d1</span>)-<span class="var">K</span><span class="op">*</span><span class="fn">disc</span><span class="op">*</span><span class="var">norm</span>.<span class="fn">cdf</span>(<span class="var">d1</span>-<span class="var">vol</span>)
+<span class="var">C_true</span> = <span class="fn">true_price</span>()
+
+<span class="var">mc_estimates</span>, <span class="var">av_estimates</span>, <span class="var">cv_estimates</span>, <span class="var">is_estimates</span> = [], [], [], []
+
+<span class="kw">for</span> <span class="var">_</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">n_trials</span>):
+    <span class="var">Z</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">standard_normal</span>(<span class="var">n_paths</span>)
+
+    <span class="cm"># 1. Standard MC</span>
+    <span class="var">ST</span> = <span class="var">S0</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(<span class="var">drift</span>+<span class="var">vol</span><span class="op">*</span><span class="var">Z</span>)
+    <span class="var">mc</span> = <span class="var">disc</span><span class="op">*</span><span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST</span>-<span class="var">K</span>,<span class="num">0</span>).<span class="fn">mean</span>()
+    <span class="var">mc_estimates</span>.<span class="fn">append</span>(<span class="var">mc</span>)
+
+    <span class="cm"># 2. Antithetic Variates (n/2 pairs)</span>
+    <span class="var">Z_av</span> = <span class="var">Z</span>[:<span class="var">n_paths</span><span class="op">//</span><span class="num">2</span>]
+    <span class="var">ST_p</span> = <span class="var">S0</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(<span class="var">drift</span>+<span class="var">vol</span><span class="op">*</span><span class="var">Z_av</span>)
+    <span class="var">ST_m</span> = <span class="var">S0</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(<span class="var">drift</span>-<span class="var">vol</span><span class="op">*</span><span class="var">Z_av</span>)  <span class="cm"># antithetic</span>
+    <span class="var">av</span> = <span class="var">disc</span><span class="op">*</span>((<span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST_p</span>-<span class="var">K</span>,<span class="num">0</span>)+<span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST_m</span>-<span class="var">K</span>,<span class="num">0</span>))<span class="op">/</span><span class="num">2</span>).<span class="fn">mean</span>()
+    <span class="var">av_estimates</span>.<span class="fn">append</span>(<span class="var">av</span>)
+
+    <span class="cm"># 3. Control Variates (control = S_T, E[S_T] = S0*e^(rT))</span>
+    <span class="var">E_ST</span> = <span class="var">S0</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(<span class="var">r</span><span class="op">*</span><span class="var">T</span>)
+    <span class="var">payoffs</span> = <span class="var">disc</span><span class="op">*</span><span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST</span>-<span class="var">K</span>,<span class="num">0</span>)
+    <span class="var">b_star</span> = <span class="var">np</span>.<span class="fn">cov</span>(<span class="var">payoffs</span>,<span class="var">ST</span>)[<span class="num">0</span>,<span class="num">1</span>]<span class="op">/</span><span class="var">np</span>.<span class="fn">var</span>(<span class="var">ST</span>)
+    <span class="var">cv</span> = <span class="var">payoffs</span>.<span class="fn">mean</span>() - <span class="var">b_star</span><span class="op">*</span>(<span class="var">ST</span>.<span class="fn">mean</span>()-<span class="var">E_ST</span>)
+    <span class="var">cv_estimates</span>.<span class="fn">append</span>(<span class="var">cv</span>)
+
+    <span class="cm"># 4. Importance Sampling (drift shift toward K)</span>
+    <span class="var">theta</span> = <span class="var">np</span>.<span class="fn">log</span>(<span class="var">K</span><span class="op">/</span><span class="var">S0</span>)<span class="op">/</span>(<span class="var">sigma</span><span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>)) - (<span class="var">r</span><span class="op">/</span><span class="var">sigma</span>-<span class="var">sigma</span><span class="op">/</span><span class="num">2</span>)<span class="op">*</span><span class="var">np</span>.<span class="fn">sqrt</span>(<span class="var">T</span>)
+    <span class="var">Z_is</span> = <span class="var">Z</span> + <span class="var">theta</span>                 <span class="cm"># shifted draws</span>
+    <span class="var">ST_is</span> = <span class="var">S0</span><span class="op">*</span><span class="var">np</span>.<span class="fn">exp</span>(<span class="var">drift</span>+<span class="var">vol</span><span class="op">*</span><span class="var">Z_is</span>)
+    <span class="var">weights</span> = <span class="var">np</span>.<span class="fn">exp</span>(-<span class="var">theta</span><span class="op">*</span><span class="var">Z</span>-<span class="num">0.5</span><span class="op">*</span><span class="var">theta</span><span class="op">**</span><span class="num">2</span>)  <span class="cm"># Radon-Nikodym</span>
+    <span class="var">is_est</span> = <span class="var">disc</span><span class="op">*</span>(<span class="var">np</span>.<span class="fn">maximum</span>(<span class="var">ST_is</span>-<span class="var">K</span>,<span class="num">0</span>)<span class="op">*</span><span class="var">weights</span>).<span class="fn">mean</span>()
+    <span class="var">is_estimates</span>.<span class="fn">append</span>(<span class="var">is_est</span>)
+
+<span class="cm"># ── Results ──</span>
+<span class="kw">results</span> = {
+    <span class="str">'Standard MC'</span>: <span class="var">mc_estimates</span>,
+    <span class="str">'Antithetic Variates'</span>: <span class="var">av_estimates</span>,
+    <span class="str">'Control Variates'</span>: <span class="var">cv_estimates</span>,
+    <span class="str">'Importance Sampling'</span>: <span class="var">is_estimates</span>,
+}
+<span class="fn">print</span>(<span class="str">f"True Price: ${C_true:.4f}\n"</span>)
+<span class="kw">for</span> <span class="var">name</span>, <span class="var">ests</span> <span class="kw">in</span> <span class="var">results</span>.<span class="fn">items</span>():
+    <span class="var">v</span> = <span class="var">np</span>.<span class="fn">var</span>(<span class="var">ests</span>)
+    <span class="var">base_v</span> = <span class="var">np</span>.<span class="fn">var</span>(<span class="var">mc_estimates</span>)
+    <span class="fn">print</span>(<span class="str">f"{name:25s}: mean={np.mean(ests):.4f}, var={v:.6f}, reduction={100*(1-v/base_v):.1f}%"</span>)
+</code></pre>
+
+  <h3>Lab 4: Importance Sampling for Rare Events</h3>
+  <pre data-label="COLAB LAB 4"><code><span class="cm"># ── LAB 4: IS for Rare Event Probability Estimation ──────────</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">from</span> <span class="var">scipy</span>.<span class="var">stats</span> <span class="kw">import</span> <span class="var">norm</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="cm"># Estimate P(X > t) for X~N(0,1) as t gets large</span>
+<span class="var">thresholds</span> = [<span class="num">1.0</span>, <span class="num">1.5</span>, <span class="num">2.0</span>, <span class="num">2.5</span>, <span class="num">3.0</span>, <span class="num">3.5</span>, <span class="num">4.0</span>]
+<span class="var">n</span> = <span class="num">10000</span>
+<span class="var">n_rep</span> = <span class="num">200</span>  <span class="cm"># repetitions to estimate variance</span>
+
+<span class="kw">def</span> <span class="fn">estimate_mc</span>(<span class="var">t</span>, <span class="var">n</span>):
+    <span class="var">X</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">standard_normal</span>(<span class="var">n</span>)
+    <span class="kw">return</span> (<span class="var">X</span> > <span class="var">t</span>).<span class="fn">mean</span>()
+
+<span class="kw">def</span> <span class="fn">estimate_is</span>(<span class="var">t</span>, <span class="var">n</span>):
+    <span class="cm"># Optimal IS proposal for tail: N(t, 1)</span>
+    <span class="var">X</span> = <span class="var">np</span>.<span class="fn">random</span>.<span class="fn">normal</span>(<span class="var">t</span>, <span class="num">1</span>, <span class="var">n</span>)
+    <span class="cm"># Likelihood ratio: p(X)/q(X) = N(0,1)/N(t,1)</span>
+    <span class="var">w</span> = <span class="var">norm</span>.<span class="fn">pdf</span>(<span class="var">X</span>, <span class="num">0</span>, <span class="num">1</span>) <span class="op">/</span> <span class="var">norm</span>.<span class="fn">pdf</span>(<span class="var">X</span>, <span class="var">t</span>, <span class="num">1</span>)
+    <span class="kw">return</span> ((<span class="var">X</span> > <span class="var">t</span>) <span class="op">*</span> <span class="var">w</span>).<span class="fn">mean</span>()
+
+<span class="fn">print</span>(<span class="str">"t\t\tTrue Prob\tMC Std Err\tIS Std Err\tSpeedup"</span>)
+<span class="fn">print</span>(<span class="str">"-"*70</span>)
+<span class="kw">for</span> <span class="var">t</span> <span class="kw">in</span> <span class="var">thresholds</span>:
+    <span class="var">true_p</span> = <span class="num">1</span> - <span class="var">norm</span>.<span class="fn">cdf</span>(<span class="var">t</span>)
+    <span class="var">mc_ests</span>  = [<span class="fn">estimate_mc</span>(<span class="var">t</span>,  <span class="var">n</span><span class="op">//</span><span class="num">10</span>) <span class="kw">for</span> <span class="var">_</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">n_rep</span>)]  <span class="cm"># cheaper MC</span>
+    <span class="var">is_ests</span>  = [<span class="fn">estimate_is</span>(<span class="var">t</span>, <span class="var">n</span><span class="op">//</span><span class="num">10</span>) <span class="kw">for</span> <span class="var">_</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="var">n_rep</span>)]
+    <span class="var">mc_se</span>   = <span class="var">np</span>.<span class="fn">std</span>(<span class="var">mc_ests</span>)
+    <span class="var">is_se</span>   = <span class="var">np</span>.<span class="fn">std</span>(<span class="var">is_ests</span>)
+    <span class="var">speedup</span> = (<span class="var">mc_se</span><span class="op">/</span><span class="var">is_se</span>)<span class="op">**</span><span class="num">2</span> <span class="kw">if</span> <span class="var">is_se</span> > <span class="num">0</span> <span class="kw">else</span> <span class="var">np</span>.<span class="var">inf</span>
+    <span class="fn">print</span>(<span class="str">f"t={t:.1f}\t{true_p:.2e}\t{mc_se:.2e}\t{is_se:.2e}\t{speedup:.0f}x"</span>)
+</code></pre>
+
+  <hr class="divider">
+  <h3>Useful Links for Colab Work</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <div class="rc-type">🚀 Platform</div>
+      <div class="rc-title">Google Colab</div>
+      <div class="rc-desc">Free Jupyter notebooks with GPU access. All standard scientific Python libraries pre-installed.</div>
+      <a href="https://colab.research.google.com" target="_blank">colab.research.google.com →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📦 Library</div>
+      <div class="rc-title">QuantLib Python</div>
+      <div class="rc-desc">Industry-grade quantitative finance library. Install with pip install QuantLib for advanced option pricing.</div>
+      <a href="https://quantlib-python-docs.readthedocs.io" target="_blank">quantlib docs →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📚 Reference</div>
+      <div class="rc-title">Monte Carlo Methods in Finance</div>
+      <div class="rc-desc">Glasserman's "Monte Carlo Methods in Financial Engineering" — the definitive textbook on this subject.</div>
+      <a href="https://link.springer.com/book/10.1007/978-0-387-21617-1" target="_blank">Springer →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">🌐 Interactive</div>
+      <div class="rc-title">Quantitative Finance Stackexchange</div>
+      <div class="rc-desc">Active community for quant questions. Great for understanding practical aspects of variance reduction.</div>
+      <a href="https://quant.stackexchange.com" target="_blank">quant.stackexchange.com →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📺 Course</div>
+      <div class="rc-title">MIT OpenCourseWare: Computational Finance</div>
+      <div class="rc-desc">Free MIT course materials on simulation methods in finance, covering all topics in this guide.</div>
+      <a href="https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/" target="_blank">ocw.mit.edu →</a>
+    </div>
+    <div class="resource-card">
+      <div class="rc-type">📖 Free Book</div>
+      <div class="rc-title">Python for Finance (GitHub)</div>
+      <div class="rc-desc">Yves Hilpisch's notebooks — free code examples for option pricing, Monte Carlo, and more.</div>
+      <a href="https://github.com/yhilpisch/py4fi2nd" target="_blank">github.com/yhilpisch →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ JS ══ -->
+<script>
+// ── Tab switching ─────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Hint toggles ──────────────────────────────────────────────
+function toggleHint(el) {
+  const content = el.nextElementSibling;
+  content.classList.toggle('open');
+  el.textContent = content.classList.contains('open') ? '▼ Hide Hint' : '▶ Show Hint';
+}
+
+// ── Utils ─────────────────────────────────────────────────────
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function normPDF(x, mu=0, sigma=1) {
+  return Math.exp(-0.5*((x-mu)/sigma)**2) / (sigma * Math.sqrt(2*Math.PI));
+}
+function normCDF(x) {
+  const t = 1/(1+0.2316419*Math.abs(x));
+  const d = 0.3989423*Math.exp(-x*x/2);
+  const p = d*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));
+  return x>=0 ? 1-p : p;
+}
+
+// ── LCG Demo ──────────────────────────────────────────────────
+let lcgParams = {a:1664525, c:1013904223, m:Math.pow(2,32)};
+function applyLCGPreset() {
+  const preset = document.getElementById('lcg-preset').value;
+  if (preset==='good') lcgParams={a:1664525,c:1013904223,m:Math.pow(2,32)};
+  else if (preset==='bad') lcgParams={a:7,c:0,m:32};
+  else lcgParams={a:65539,c:0,m:Math.pow(2,31)};
+  runLCG();
+}
+function runLCG() {
+  const seed = parseInt(document.getElementById('lcg-seed').value);
+  const n = 400;
+  const {a,c,m} = lcgParams;
+  let x = seed, samples = [];
+  const seen = new Set();
+  let period = 0;
+  for (let i = 0; i < n; i++) {
+    x = (a*x + c) % m;
+    const u = x / m;
+    samples.push(u);
+    if (seen.has(x) && period === 0) period = i;
+    seen.add(x);
+  }
+  const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+  const variance = samples.reduce((a,b)=>a+(b-mean)**2,0)/samples.length;
+  document.getElementById('lcg-mean').textContent = mean.toFixed(4);
+  document.getElementById('lcg-var').textContent = variance.toFixed(4);
+  document.getElementById('lcg-period').textContent = period > 0 ? period : '>' + n;
+  const canvas = document.getElementById('lcg-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#050810'; ctx.fillRect(0,0,W,H);
+  // scatter plot of consecutive pairs
+  const halfN = Math.min(samples.length-1, 200);
+  for (let i = 0; i < halfN; i++) {
+    const px = samples[i]*W, py = H - samples[i+1]*H;
+    ctx.beginPath(); ctx.arc(px, py, 2, 0, 2*Math.PI);
+    ctx.fillStyle = `hsl(${200+i/halfN*60},70%,60%)`;
+    ctx.fill();
+  }
+  ctx.fillStyle='#7a8eaa'; ctx.font='11px IBM Plex Mono';
+  ctx.fillText('Consecutive pairs (Uₙ, Uₙ₊₁) — should look uniform if generator is good', 12, H-8);
+}
+window.addEventListener('load', () => { runLCG(); updateDistDemo(); drawQMC('pseudo'); });
+
+// ── Distribution Demo ─────────────────────────────────────────
+function updateDistDemo() {
+  const dist = document.getElementById('dist-select').value;
+  const n = parseInt(document.getElementById('dist-n').value);
+  let samples = [];
+  if (dist === 'uniform') { for (let i=0;i<n;i++) samples.push(Math.random()); }
+  else if (dist === 'normal') { for (let i=0;i<n;i++) samples.push(randn()); }
+  else { for (let i=0;i<n;i++) { const u=Math.random(); samples.push(-Math.log(1-u)); } }
+  const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+  const std = Math.sqrt(samples.reduce((a,b)=>a+(b-mean)**2,0)/samples.length);
+  document.getElementById('dist-mean').textContent = mean.toFixed(4);
+  document.getElementById('dist-std').textContent = std.toFixed(4);
+  document.getElementById('dist-n-stat').textContent = n;
+  const canvas = document.getElementById('dist-canvas');
+  drawHistogram(canvas, samples, '#00d4ff');
+}
+function drawHistogram(canvas, data, color) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#050810'; ctx.fillRect(0,0,W,H);
+  const min = Math.min(...data), max = Math.max(...data);
+  const bins = 60;
+  const binW = (max-min)/bins;
+  const counts = new Array(bins).fill(0);
+  data.forEach(v => { const b = Math.min(Math.floor((v-min)/binW), bins-1); counts[b]++; });
+  const maxCount = Math.max(...counts);
+  const pad = 30;
+  counts.forEach((c,i) => {
+    const x = pad + i*(W-2*pad)/bins;
+    const h = (c/maxCount)*(H-pad-10);
+    ctx.fillStyle = color + '99';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.5;
+    ctx.fillRect(x, H-pad-h, (W-2*pad)/bins-1, h);
+    ctx.strokeRect(x, H-pad-h, (W-2*pad)/bins-1, h);
+  });
+}
+
+// ── QMC Demo ──────────────────────────────────────────────────
+function drawQMC(type) {
+  const n = parseInt(document.getElementById('qmc-n').value);
+  const canvas = document.getElementById('qmc-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  let pts = [];
+  if (type === 'pseudo') {
+    for (let i=0;i<n;i++) pts.push([Math.random(), Math.random()]);
+  } else {
+    // Halton sequence base 2 and 3
+    function halton(i,b) { let f=1,r=0; while(i>0){f/=b;r+=f*(i%b);i=Math.floor(i/b);} return r; }
+    for (let i=1;i<=n;i++) pts.push([halton(i,2), halton(i,3)]);
+  }
+  pts.forEach(([x,y],i) => {
+    const px = 20 + x*(W-40), py = 20 + y*(H-40);
+    ctx.beginPath(); ctx.arc(px, py, 2.5, 0, 2*Math.PI);
+    ctx.fillStyle = type==='pseudo' ? '#00d4ff88' : '#ff6b3588';
+    ctx.fill();
+  });
+  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,H-24,W,24);
+  ctx.fillStyle='#7a8eaa'; ctx.font='11px IBM Plex Mono';
+  ctx.fillText(type==='pseudo' ? 'Pseudo-Random (uniform random)' : 'Quasi-Random / Halton (fills space more evenly)', 12, H-8);
+}
+
+// ── Monte Carlo π ─────────────────────────────────────────────
+let piState = {n:0, inside:0, history:[]};
+function mcPiReset() { piState={n:0,inside:0,history:[]}; drawPi(); }
+function mcPiStep(k) {
+  for (let i=0;i<k;i++) {
+    const x=Math.random()*2-1, y=Math.random()*2-1;
+    if (x*x+y*y<=1) piState.inside++;
+    piState.n++;
+  }
+  piState.history.push({n:piState.n, est:4*piState.inside/piState.n});
+  drawPi();
+}
+function drawPi() {
+  const {n,inside,history} = piState;
+  const c1 = document.getElementById('pi-canvas'), ctx1 = c1.getContext('2d');
+  const W=c1.width, H=c1.height;
+  if (n===0) { ctx1.fillStyle='#050810'; ctx1.fillRect(0,0,W,H); return; }
+  const est = 4*inside/n;
+  const se = Math.sqrt(est*(4-est)/n);
+  document.getElementById('pi-est').textContent = est.toFixed(5);
+  document.getElementById('pi-error').textContent = Math.abs(est-Math.PI).toFixed(5);
+  document.getElementById('pi-n').textContent = n.toLocaleString();
+  document.getElementById('pi-se').textContent = se.toFixed(5);
+  // redraw last 2000 points in scatter
+  ctx1.fillStyle='#050810'; ctx1.fillRect(0,0,W,H);
+  ctx1.beginPath(); ctx1.arc(W/2,H/2,W/2-2,0,2*Math.PI);
+  ctx1.strokeStyle='#2a3a55'; ctx1.lineWidth=1; ctx1.stroke();
+  // convergence chart
+  const c2=document.getElementById('pi-conv-canvas'), ctx2=c2.getContext('2d');
+  ctx2.fillStyle='#050810'; ctx2.fillRect(0,0,W,H);
+  if (history.length>1) {
+    ctx2.beginPath();
+    ctx2.moveTo(10, H/2);
+    ctx2.lineTo(W-10, H/2);
+    ctx2.strokeStyle='rgba(239,68,68,0.5)'; ctx2.lineWidth=1; ctx2.stroke();
+    ctx2.beginPath();
+    history.forEach((p,i) => {
+      const x = 10+i/(history.length-1)*(W-20);
+      const y = H/2 - (p.est-Math.PI)/(4*0.1)*H/2;
+      i===0 ? ctx2.moveTo(x,y) : ctx2.lineTo(x,y);
+    });
+    ctx2.strokeStyle='#00d4ff'; ctx2.lineWidth=1.5; ctx2.stroke();
+    ctx2.fillStyle='#7a8eaa'; ctx2.font='11px IBM Plex Mono';
+    ctx2.fillText('Estimation error over time (red=0)', 12, 20);
+  }
+}
+
+// ── Option Pricing MC ─────────────────────────────────────────
+function bsCall(S0,K,r,sigma,T) {
+  const d1=(Math.log(S0/K)+(r+0.5*sigma**2)*T)/(sigma*Math.sqrt(T));
+  const d2=d1-sigma*Math.sqrt(T);
+  return S0*normCDF(d1)-K*Math.exp(-r*T)*normCDF(d2);
+}
+function runOptionMC() {
+  const S0=parseFloat(document.getElementById('bs-s0').value);
+  const K=parseFloat(document.getElementById('bs-k').value);
+  const sigma=parseFloat(document.getElementById('bs-sigma').value);
+  const T=parseFloat(document.getElementById('bs-T').value);
+  const n=parseInt(document.getElementById('bs-n').value);
+  const r=0.05, disc=Math.exp(-r*T);
+  const drift=(r-0.5*sigma**2)*T, vol=sigma*Math.sqrt(T);
+  let payoffs=[], sTs=[];
+  for (let i=0;i<n;i++) {
+    const z=randn(), sT=S0*Math.exp(drift+vol*z);
+    sTs.push(sT); payoffs.push(disc*Math.max(sT-K,0));
+  }
+  const mean=payoffs.reduce((a,b)=>a+b,0)/n;
+  const std=Math.sqrt(payoffs.reduce((a,b)=>a+(b-mean)**2,0)/n);
+  const se=std/Math.sqrt(n);
+  const bs=bsCall(S0,K,r,sigma,T);
+  document.getElementById('opt-mc').textContent='$'+mean.toFixed(4);
+  document.getElementById('opt-bs').textContent='$'+bs.toFixed(4);
+  document.getElementById('opt-se').textContent='±$'+se.toFixed(4);
+  document.getElementById('opt-err').textContent='$'+Math.abs(mean-bs).toFixed(4);
+  const canvas=document.getElementById('option-canvas'), ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  const minST=Math.min(...sTs), maxST=Math.max(...sTs);
+  const bins=80, bw=(maxST-minST)/bins;
+  const counts=new Array(bins).fill(0);
+  sTs.forEach(v=>counts[Math.min(Math.floor((v-minST)/bw),bins-1)]++);
+  const maxC=Math.max(...counts);
+  const pad=40;
+  counts.forEach((c,i)=>{
+    const x=pad+i*(W-2*pad)/bins;
+    const h=(c/maxC)*(H-2*pad);
+    const sVal=minST+i*bw;
+    ctx.fillStyle=sVal>K ? 'rgba(34,197,94,0.6)' : 'rgba(0,212,255,0.3)';
+    ctx.fillRect(x,H-pad-h,(W-2*pad)/bins-1,h);
+  });
+  ctx.strokeStyle='rgba(239,68,68,0.8)'; ctx.lineWidth=2;
+  const kx=pad+(K-minST)/(maxST-minST)*(W-2*pad);
+  ctx.beginPath(); ctx.moveTo(kx,20); ctx.lineTo(kx,H-pad); ctx.stroke();
+  ctx.fillStyle='#ef4444'; ctx.font='11px IBM Plex Mono';
+  ctx.fillText('K='+K, kx+4, 32);
+  ctx.fillStyle='#22c55e'; ctx.fillText('← in the money (payoff > 0)', kx+8, 55);
+}
+window.addEventListener('load', runOptionMC);
+
+// ── Antithetic Demo ───────────────────────────────────────────
+function runAntithetic() {
+  const n=parseInt(document.getElementById('av-n').value);
+  const trials=parseInt(document.getElementById('av-trials').value);
+  const TRUE_VAL=Math.exp(0.5);
+  let mcEsts=[], avEsts=[];
+  for (let t=0;t<trials;t++) {
+    // Standard MC: 2n samples
+    let mc=0; for (let i=0;i<2*n;i++) mc+=Math.exp(randn()); mc/=(2*n);
+    mcEsts.push(mc);
+    // AV: n pairs
+    let av=0; for (let i=0;i<n;i++) { const z=randn(); av+=(Math.exp(z)+Math.exp(-z))/2; } av/=n;
+    avEsts.push(av);
+  }
+  const vMC=mcEsts.reduce((a,b)=>a+(b-TRUE_VAL)**2,0)/trials;
+  const vAV=avEsts.reduce((a,b)=>a+(b-TRUE_VAL)**2,0)/trials;
+  const reduction=100*(1-vAV/vMC);
+  document.getElementById('av-mc-var').textContent=vMC.toFixed(6);
+  document.getElementById('av-av-var').textContent=vAV.toFixed(6);
+  document.getElementById('av-reduction').textContent=reduction.toFixed(1)+'%';
+  document.getElementById('av-speedup').textContent=(vMC/vAV).toFixed(1)+'×';
+  const canvas=document.getElementById('av-canvas'), ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  function drawDist(ests, color, label, yOff) {
+    const mean=ests.reduce((a,b)=>a+b,0)/ests.length;
+    const mn=Math.min(...ests), mx=Math.max(...ests);
+    const bins=60, bw=(mx-mn)/bins, counts=new Array(bins).fill(0);
+    ests.forEach(v=>counts[Math.min(Math.floor((v-mn)/bw),bins-1)]++);
+    const maxC=Math.max(...counts), hScale=(H/2-20)/maxC, pad=40;
+    counts.forEach((c,i)=>{
+      const x=pad+i*(W-2*pad)/bins, h=c*hScale;
+      ctx.fillStyle=color+'44'; ctx.fillRect(x,yOff+H/2-20-h,(W-2*pad)/bins-1,h);
+      ctx.strokeStyle=color; ctx.lineWidth=0.5;
+      ctx.strokeRect(x,yOff+H/2-20-h,(W-2*pad)/bins-1,h);
+    });
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1;
+    const tx=pad+(TRUE_VAL-mn)/(mx-mn)*(W-2*pad);
+    ctx.beginPath(); ctx.moveTo(tx,yOff+10); ctx.lineTo(tx,yOff+H/2-20); ctx.stroke();
+    ctx.fillStyle=color; ctx.font='bold 12px IBM Plex Mono';
+    ctx.fillText(label, 12, yOff+20);
+  }
+  drawDist(mcEsts, '#00d4ff', 'Standard MC', -H/2+2);
+  drawDist(avEsts, '#ff6b35', 'Antithetic Variates', 0);
+  ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px IBM Plex Mono';
+  ctx.fillText('← true value', W/2+20, H/2-4);
+}
+
+// ── Control Variate Demo ──────────────────────────────────────
+function runControlVariate() {
+  const n=parseInt(document.getElementById('cv-n').value);
+  const trials=parseInt(document.getElementById('cv-trials').value);
+  const TRUE_VAL=0.5; // E[sin²(X)] for X~U[0,π] — actually π/4 ≈ 0.785? No, let's use E[X²] for X~U[0,1] = 1/3
+  // E[X²] for X~U[0,1] = 1/3, control C=X, E[C]=1/2
+  const CTRL_MEAN=0.5; // E[X] = 0.5
+  const TRUE_Y=1/3;
+  let mcEsts=[], cvEsts=[], bStars=[];
+  for (let t=0;t<trials;t++) {
+    const X=Array.from({length:n},()=>Math.random());
+    const Y=X.map(x=>x*x);
+    const C=X;
+    const meanY=Y.reduce((a,b)=>a+b,0)/n;
+    const meanC=C.reduce((a,b)=>a+b,0)/n;
+    const covYC=Y.reduce((s,y,i)=>s+(y-meanY)*(C[i]-meanC),0)/n;
+    const varC=C.reduce((s,c)=>s+(c-meanC)**2,0)/n;
+    const bStar=covYC/varC;
+    const cv=meanY-bStar*(meanC-CTRL_MEAN);
+    mcEsts.push(meanY); cvEsts.push(cv); bStars.push(bStar);
+  }
+  const vMC=mcEsts.reduce((a,b)=>a+(b-TRUE_Y)**2,0)/trials;
+  const vCV=cvEsts.reduce((a,b)=>a+(b-TRUE_Y)**2,0)/trials;
+  document.getElementById('cv-mc-var').textContent=vMC.toFixed(6);
+  document.getElementById('cv-cv-var').textContent=vCV.toFixed(6);
+  document.getElementById('cv-b-star').textContent=(bStars.reduce((a,b)=>a+b,0)/trials).toFixed(4);
+  document.getElementById('cv-reduction').textContent=(100*(1-vCV/vMC)).toFixed(1)+'%';
+  const canvas=document.getElementById('cv-canvas'), ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  function plotDist(ests, color, label, row) {
+    const mn=Math.min(...ests), mx=Math.max(...ests);
+    const bins=60, bw=(mx-mn)/bins, counts=new Array(bins).fill(0);
+    ests.forEach(v=>counts[Math.min(Math.floor((v-mn)/bw),bins-1)]++);
+    const maxC=Math.max(...counts), yBase=row===0?H/2-4:H-4, hScale=(H/2-24)/maxC, pad=40;
+    counts.forEach((c,i)=>{
+      const x=pad+i*(W-2*pad)/bins, h=c*hScale;
+      ctx.fillStyle=color+'55'; ctx.fillRect(x,yBase-h,(W-2*pad)/bins-1,h);
+    });
+    const tx=pad+(TRUE_Y-mn)/(mx-mn)*(W-2*pad);
+    ctx.strokeStyle='#ffffff55'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(tx,yBase-H/2+20); ctx.lineTo(tx,yBase); ctx.stroke();
+    ctx.fillStyle=color; ctx.font='bold 12px IBM Plex Mono';
+    ctx.fillText(label+' (Var='+( row===0?vMC:vCV).toExponential(2)+')', 12, yBase-H/2+32);
+  }
+  plotDist(mcEsts,'#00d4ff','Standard MC',0);
+  plotDist(cvEsts,'#f5c842','Control Variates',1);
+}
+
+// ── Importance Sampling Demo ──────────────────────────────────
+function runIS() {
+  const t=parseFloat(document.getElementById('is-thresh').value);
+  const n=parseInt(document.getElementById('is-n').value);
+  const true_p=1-normCDF(t);
+  // MC estimate
+  let mcSum=0; for(let i=0;i<n;i++){const z=randn();if(z>t)mcSum++;}
+  const mcEst=mcSum/n;
+  // IS estimate: proposal N(t,1)
+  let isSum=0;
+  for(let i=0;i<n;i++){
+    const x=randn()+t;
+    const w=normPDF(x,0,1)/normPDF(x,t,1);
+    if(x>t) isSum+=w;
+  }
+  const isEst=isSum/n;
+  document.getElementById('is-true').textContent=true_p.toExponential(3);
+  document.getElementById('is-mc-est').textContent=mcEst.toExponential(3);
+  document.getElementById('is-is-est').textContent=isEst.toExponential(3);
+  // Variance reduction (approximate from theory: IS var ~ true_p² for good proposal)
+  const mcVar=true_p*(1-true_p)/n;
+  const isVar=true_p**2/n; // approx
+  document.getElementById('is-reduction').textContent=(mcVar/isVar).toFixed(0)+'×';
+  // Draw
+  const canvas=document.getElementById('is-canvas'), ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  const xMin=-4, xMax=t+3, pad=40;
+  function toCanvasX(x){return pad+(x-xMin)/(xMax-xMin)*(W-2*pad);}
+  function toCanvasY(y,yMax){return H-pad-y/yMax*(H-2*pad);}
+  const yMax=0.5;
+  // draw normal PDF
+  ctx.beginPath();
+  for(let x=xMin;x<=xMax;x+=0.05){
+    const y=normPDF(x);
+    const px=toCanvasX(x), py=toCanvasY(y,yMax);
+    x===xMin?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2; ctx.stroke();
+  // shade tail
+  ctx.beginPath(); ctx.moveTo(toCanvasX(t),H-pad);
+  for(let x=t;x<=xMax;x+=0.05){
+    ctx.lineTo(toCanvasX(x),toCanvasY(normPDF(x),yMax));
+  }
+  ctx.lineTo(toCanvasX(xMax),H-pad); ctx.closePath();
+  ctx.fillStyle='rgba(239,68,68,0.3)'; ctx.fill();
+  // draw proposal PDF
+  ctx.beginPath();
+  for(let x=xMin;x<=xMax;x+=0.05){
+    const y=normPDF(x,t,1);
+    const px=toCanvasX(x), py=toCanvasY(y,yMax);
+    x===xMin?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.strokeStyle='#a855f7'; ctx.lineWidth=2; ctx.stroke();
+  // threshold line
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(toCanvasX(t),20); ctx.lineTo(toCanvasX(t),H-pad); ctx.stroke();
+  // labels
+  ctx.fillStyle='#00d4ff'; ctx.font='11px IBM Plex Mono';
+  ctx.fillText('p(x) = N(0,1)', 12, 20);
+  ctx.fillStyle='#a855f7';
+  ctx.fillText('q(x) = N(t,1) — IS Proposal', 12, 36);
+  ctx.fillStyle='#ef4444';
+  ctx.fillText('threshold t='+t, toCanvasX(t)+4, 50);
+}
+window.addEventListener('load', ()=>{runIS(); setTimeout(runAntithetic,200); setTimeout(runControlVariate,400);});
+
+// ── Comparison Chart ──────────────────────────────────────────
+function runComparison() {
+  const n=parseInt(document.getElementById('cmp-n').value);
+  const S0=100,K=105,r=0.05,sigma=0.20,T=1;
+  const disc=Math.exp(-r*T), drift=(r-0.5*sigma**2)*T, vol=sigma*Math.sqrt(T);
+  const TRUE_PRICE=bsCall(S0,K,r,sigma,T);
+  const REPS=300;
+  function runMethod(fn) {
+    let ests=[];
+    for(let t=0;t<REPS;t++) ests.push(fn());
+    return { mean:ests.reduce((a,b)=>a+b,0)/REPS, variance:ests.reduce((a,b)=>a+(b-TRUE_PRICE)**2,0)/REPS };
+  }
+  const mc = runMethod(()=>{
+    let s=0; for(let i=0;i<n;i++){const z=randn(),sT=S0*Math.exp(drift+vol*z);s+=disc*Math.max(sT-K,0);} return s/n;
+  });
+  const av = runMethod(()=>{
+    let s=0; for(let i=0;i<n/2;i++){const z=randn();const p=disc*Math.max(S0*Math.exp(drift+vol*z)-K,0);const m=disc*Math.max(S0*Math.exp(drift-vol*z)-K,0);s+=(p+m)/2;} return s/(n/2);
+  });
+  const cv = runMethod(()=>{
+    const Zs=[],STs=[],payoffs=[];
+    for(let i=0;i<n;i++){const z=randn(),sT=S0*Math.exp(drift+vol*z);STs.push(sT);payoffs.push(disc*Math.max(sT-K,0));}
+    const mY=payoffs.reduce((a,b)=>a+b,0)/n, mC=STs.reduce((a,b)=>a+b,0)/n;
+    const cov=payoffs.reduce((s,y,i)=>s+(y-mY)*(STs[i]-mC),0)/n;
+    const varC=STs.reduce((s,c)=>s+(c-mC)**2,0)/n;
+    return mY-(cov/varC)*(mC-S0*Math.exp(r*T));
+  });
+  const methods=[{name:'Standard MC',val:mc,color:'#00d4ff'},{name:'Antithetic',val:av,color:'#ff6b35'},{name:'Control Variate',val:cv,color:'#f5c842'}];
+  const canvas=document.getElementById('cmp-canvas'), ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  ctx.fillStyle='#050810'; ctx.fillRect(0,0,W,H);
+  const barH=60, gap=20, startY=50;
+  const maxVar=mc.variance;
+  methods.forEach((m,i)=>{
+    const y=startY+i*(barH+gap);
+    const barW=(m.val.variance/maxVar)*(W-200);
+    ctx.fillStyle=m.color+'33'; ctx.fillRect(180,y,barW,barH);
+    ctx.strokeStyle=m.color; ctx.lineWidth=1.5;
+    ctx.strokeRect(180,y,barW,barH);
+    ctx.fillStyle='#e8edf5'; ctx.font='13px IBM Plex Mono';
+    ctx.fillText(m.name, 10, y+barH/2+4);
+    ctx.fillStyle=m.color; ctx.font='bold 12px IBM Plex Mono';
+    const reduc=i===0?'baseline':(100*(1-m.val.variance/maxVar)).toFixed(1)+'% reduction';
+    ctx.fillText(reduc, 185+barW+8, y+barH/2+4);
+  });
+  ctx.fillStyle='#7a8eaa'; ctx.font='11px IBM Plex Mono';
+  ctx.fillText('← smaller bar = lower variance = better estimate', 180, startY-16);
+  const statsEl=document.getElementById('cmp-stats');
+  statsEl.innerHTML=methods.map(m=>`<div class="stat-card"><div class="stat-val" style="color:${m.color}">${(m.val.variance*1e6).toFixed(2)}</div><div class="stat-lbl">${m.name}<br>Var × 10⁶</div></div>`).join('');
+}
+</script>
+</body>
+</html>

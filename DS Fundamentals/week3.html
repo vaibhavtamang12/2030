@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python for Quant Engineering — Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c10;--surface:#0f1219;--card:#141824;--border:#1e2535;
+  --accent:#00e5ff;--accent2:#7c3aed;--accent3:#f59e0b;--accent4:#10b981;
+  --text:#e2e8f0;--muted:#64748b;--code-bg:#0d1117;
+  --easy:#10b981;--med:#f59e0b;--hard:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px}
+
+/* NAV */
+#topnav{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1.5rem}
+.nav-inner{display:flex;align-items:center;gap:.5rem;overflow-x:auto;height:52px;scrollbar-width:none}
+.nav-inner::-webkit-scrollbar{display:none}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--accent);white-space:nowrap;margin-right:1rem;letter-spacing:-.5px}
+.tab-btn{background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:.78rem;font-weight:500;padding:.35rem .8rem;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .2s;letter-spacing:.3px}
+.tab-btn:hover{color:var(--text);background:var(--card)}
+.tab-btn.active{color:var(--accent);background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2)}
+
+/* HERO */
+.hero{padding:4rem 2rem 3rem;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(124,58,237,.15) 0%,transparent 70%)}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,5vw,3.5rem);line-height:1.1;letter-spacing:-1px;margin-bottom:1rem}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted);max-width:620px;margin:0 auto 2rem;font-size:1rem}
+.pill-row{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-bottom:2rem}
+.pill{background:var(--card);border:1px solid var(--border);border-radius:999px;font-size:.72rem;font-weight:500;padding:.25rem .8rem;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+
+/* CONTENT */
+.tab-panel{display:none;padding:2rem 1.5rem;max-width:960px;margin:0 auto}
+.tab-panel.active{display:block}
+
+/* SECTION */
+.section{margin-bottom:3rem}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem}
+.section-title .tag{font-size:.65rem;background:rgba(0,229,255,.1);color:var(--accent);border:1px solid rgba(0,229,255,.25);border-radius:4px;padding:.1rem .5rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.5px}
+.section-desc{color:var(--muted);margin-bottom:1.5rem;font-size:.92rem}
+h3{font-family:'Syne',sans-serif;font-size:1.05rem;color:var(--accent3);margin:1.5rem 0 .6rem}
+h4{font-size:.88rem;font-weight:600;color:var(--accent);margin:.8rem 0 .3rem;text-transform:uppercase;letter-spacing:.8px;font-family:'IBM Plex Mono',monospace}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem}
+.concept-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;position:relative;overflow:hidden;transition:border-color .2s}
+.concept-card:hover{border-color:var(--accent2)}
+.concept-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
+.concept-card h4{margin:0 0 .4rem}
+.concept-card p{font-size:.82rem;color:var(--muted);line-height:1.5}
+.concept-card .emoji{font-size:1.4rem;margin-bottom:.5rem;display:block}
+
+/* CODE BLOCKS */
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:1.25rem;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:.8rem;line-height:1.7;margin:1rem 0;position:relative}
+pre .label{position:absolute;top:.5rem;right:.75rem;font-size:.65rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.5px}
+code{font-family:'IBM Plex Mono',monospace;font-size:.82em;background:rgba(0,229,255,.06);padding:.1rem .35rem;border-radius:4px;color:#93c5fd}
+pre code{background:none;padding:0;color:#e2e8f0}
+.kw{color:#c084fc}.fn{color:#60a5fa}.st{color:#34d399}.cm{color:#475569;font-style:italic}.nm{color:#fbbf24}.op{color:#f472b6}
+
+/* CALLOUTS */
+.callout{border-radius:10px;padding:1rem 1.25rem;margin:1rem 0;border-left:3px solid;font-size:.88rem}
+.callout.info{background:rgba(0,229,255,.05);border-color:var(--accent)}
+.callout.tip{background:rgba(16,185,129,.05);border-color:var(--accent4)}
+.callout.warn{background:rgba(245,158,11,.05);border-color:var(--accent3)}
+.callout.danger{background:rgba(239,68,68,.05);border-color:var(--hard)}
+.callout-title{font-weight:600;font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem;font-family:'IBM Plex Mono',monospace}
+.callout.info .callout-title{color:var(--accent)}
+.callout.tip .callout-title{color:var(--accent4)}
+.callout.warn .callout-title{color:var(--accent3)}
+.callout.danger .callout-title{color:var(--hard)}
+
+/* EXERCISES */
+.exercise-tier{margin-bottom:1.5rem}
+.tier-label{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:.25rem .75rem;border-radius:999px;margin-bottom:.8rem;font-family:'IBM Plex Mono',monospace}
+.tier-easy{background:rgba(16,185,129,.12);color:var(--easy);border:1px solid rgba(16,185,129,.3)}
+.tier-med{background:rgba(245,158,11,.12);color:var(--med);border:1px solid rgba(245,158,11,.3)}
+.tier-hard{background:rgba(239,68,68,.12);color:var(--hard);border:1px solid rgba(239,68,68,.3)}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.ex-list li{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.7rem 1rem;font-size:.85rem;display:flex;gap:.6rem;align-items:flex-start}
+.ex-list li::before{content:'→';color:var(--muted);flex-shrink:0;margin-top:.05rem}
+
+/* EXPERIMENT BOXES */
+.experiment{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(0,229,255,.05));border:1px solid rgba(124,58,237,.25);border-radius:12px;padding:1.25rem 1.5rem;margin:1rem 0}
+.experiment-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem}
+.experiment-header .badge{background:var(--accent2);color:white;font-size:.65rem;padding:.2rem .6rem;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.5px}
+.experiment-header strong{font-family:'Syne',sans-serif;font-size:.95rem}
+.colab-btn{display:inline-flex;align-items:center;gap:.4rem;background:#f9ab00;color:#000;font-size:.72rem;font-weight:700;padding:.35rem .8rem;border-radius:6px;text-decoration:none;margin-top:.75rem;font-family:'IBM Plex Mono',monospace}
+
+/* VISUAL DIAGRAMS */
+.diagram{background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:1rem 0;overflow-x:auto}
+svg text{font-family:'IBM Plex Mono',monospace}
+
+/* RESOURCES */
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin-top:.75rem}
+.resource-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-decoration:none;color:var(--text);transition:all .2s;display:block}
+.resource-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.resource-card .rc-type{font-size:.65rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem}
+.resource-card .rc-title{font-size:.85rem;font-weight:600;color:var(--accent);margin-bottom:.2rem}
+.resource-card .rc-desc{font-size:.75rem;color:var(--muted)}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0}
+th{background:var(--border);color:var(--accent);text-align:left;padding:.6rem .85rem;font-family:'IBM Plex Mono',monospace;font-size:.75rem;letter-spacing:.5px}
+td{padding:.55rem .85rem;border-bottom:1px solid var(--border);color:var(--text)}
+tr:hover td{background:var(--card)}
+
+/* ANALOGY BOX */
+.analogy{background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:10px;padding:1rem 1.25rem;margin:.75rem 0}
+.analogy-label{font-size:.7rem;color:var(--accent3);font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem}
+
+/* PROGRESS MAP */
+.roadmap{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0}
+.roadmap-item{display:flex;gap:1rem;align-items:flex-start}
+.roadmap-item .step{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;font-family:'IBM Plex Mono',monospace}
+.roadmap-item .step.prereq{background:rgba(124,58,237,.2);color:var(--accent2);border:1px solid rgba(124,58,237,.4)}
+.roadmap-item .step.main{background:rgba(0,229,255,.15);color:var(--accent);border:1px solid rgba(0,229,255,.3)}
+.roadmap-item .step-content{padding-top:.2rem}
+.roadmap-item .step-title{font-weight:600;font-size:.9rem}
+.roadmap-item .step-sub{font-size:.78rem;color:var(--muted)}
+.roadmap-line{width:2px;height:20px;background:var(--border);margin-left:13px}
+
+/* COMPARISON */
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+.vs-col{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.vs-col h5{font-size:.78rem;font-family:'IBM Plex Mono',monospace;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.75rem}
+.vs-col.good h5{color:var(--easy)}
+.vs-col.bad h5{color:var(--hard)}
+.vs-col ul{list-style:none;font-size:.82rem;display:flex;flex-direction:column;gap:.35rem}
+.vs-col ul li::before{margin-right:.4rem}
+.vs-col.good ul li::before{content:'✓';color:var(--easy)}
+.vs-col.bad ul li::before{content:'✗';color:var(--hard)}
+
+/* INTERACTIVE SVG DIAGRAMS */
+.interactive-note{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.4rem;font-family:'IBM Plex Mono',monospace}
+
+/* FOOTER */
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);margin-top:3rem}
+footer span{color:var(--accent)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+
+@media(max-width:640px){.vs-grid{grid-template-columns:1fr}.card-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="nav-inner">
+    <div class="nav-logo">⚡ QuantPy</div>
+    <button class="tab-btn active" onclick="showTab('home')">🗺 Roadmap</button>
+    <button class="tab-btn" onclick="showTab('prereq')">📐 Prerequisites</button>
+    <button class="tab-btn" onclick="showTab('numpy')">🔢 NumPy</button>
+    <button class="tab-btn" onclick="showTab('scipy')">🔬 SciPy</button>
+    <button class="tab-btn" onclick="showTab('pandas')">🐼 Pandas</button>
+    <button class="tab-btn" onclick="showTab('timeseries')">📈 Time-Series</button>
+    <button class="tab-btn" onclick="showTab('vectorization')">⚡ Vectorization</button>
+    <button class="tab-btn" onclick="showTab('perf')">🚀 Performance</button>
+    <button class="tab-btn" onclick="showTab('exercises')">🧪 All Exercises</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ HOME / ROADMAP ═══════════════════════════════════ -->
+<div id="tab-home" class="tab-panel active">
+<div class="hero">
+  <h1>Python for <span>Quant Engineering</span></h1>
+  <p>A complete, self-contained study guide for first-time learners targeting quantitative engineering roles. Zero assumed knowledge — everything from the ground up.</p>
+  <div class="pill-row">
+    <span class="pill">NumPy / SciPy</span>
+    <span class="pill">pandas</span>
+    <span class="pill">Time-Series</span>
+    <span class="pill">Vectorization</span>
+    <span class="pill">Performance Tuning</span>
+    <span class="pill">Colab Experiments</span>
+    <span class="pill">Tiered Exercises</span>
+  </div>
+</div>
+
+<div class="tab-panel active" style="display:block">
+
+<div class="section">
+<div class="section-title">What is a Quant Engineer? <span class="tag">CONTEXT</span></div>
+<div class="section-desc">Before touching a single line of code, understand what you're building toward.</div>
+<div class="card">
+  <p>A <strong>Quantitative Engineer (Quant)</strong> sits at the intersection of mathematics, statistics, and software engineering. They build systems that:</p>
+  <ul style="margin:.6rem 0 .6rem 1.2rem;font-size:.88rem;display:flex;flex-direction:column;gap:.35rem">
+    <li>Analyze massive financial datasets (prices, volumes, order books)</li>
+    <li>Model risk, price derivatives, and build trading signals</li>
+    <li>Run simulations (Monte Carlo, stochastic processes)</li>
+    <li>Optimize portfolios and execution algorithms</li>
+    <li>Do all of this at <strong>machine speed</strong> — not human speed</li>
+  </ul>
+  <p style="font-size:.85rem;color:var(--muted)">This is why <strong>performance matters</strong>. A 10ms advantage in a trading signal can be worth millions. The tools in this guide are your weapons.</p>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Learning Roadmap <span class="tag">START HERE</span></div>
+<div class="section-desc">Topics are ordered by dependency. Never skip a step.</div>
+
+<div class="roadmap">
+  <div class="roadmap-item"><div class="step prereq">P1</div><div class="step-content"><div class="step-title">Python Basics</div><div class="step-sub">Variables, loops, functions, lists, dicts — covered in Prerequisites tab</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step prereq">P2</div><div class="step-content"><div class="step-title">Linear Algebra Intuition</div><div class="step-sub">Vectors, matrices, dot products — visual explanations in Prerequisites tab</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step prereq">P3</div><div class="step-content"><div class="step-title">Statistics Basics</div><div class="step-sub">Mean, std, distributions — covered in Prerequisites tab</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">1</div><div class="step-content"><div class="step-title">NumPy — The Foundation</div><div class="step-sub">Arrays, operations, broadcasting — the engine under everything</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">2</div><div class="step-content"><div class="step-title">SciPy — Scientific Computing</div><div class="step-sub">Stats, optimization, linear algebra, integration built on NumPy</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">3</div><div class="step-content"><div class="step-title">pandas — Data Manipulation</div><div class="step-sub">DataFrames, indexing, groupby — built on NumPy arrays</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">4</div><div class="step-content"><div class="step-title">Time-Series Analysis</div><div class="step-sub">DatetimeIndex, resampling, rolling windows, OHLCV — built on pandas</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">5</div><div class="step-content"><div class="step-title">Vectorization</div><div class="step-sub">Replace loops with array ops — requires NumPy + pandas mastery</div></div></div>
+  <div class="roadmap-line"></div>
+  <div class="roadmap-item"><div class="step main">6</div><div class="step-content"><div class="step-title">Performance Optimization</div><div class="step-sub">Profiling, Numba, memory layout — the final boss</div></div></div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">How to Use This Guide <span class="tag">META</span></div>
+<div class="card">
+  <p style="font-size:.88rem">📖 <strong>Read:</strong> Each tab is self-contained. Start with Prerequisites if you're new.<br>
+  🧪 <strong>Experiment:</strong> Every section has a Google Colab experiment. Open it, run it, break it.<br>
+  💪 <strong>Practice:</strong> Three tiers of exercises — Easy (understand), Medium (apply), Hard (build).<br>
+  🔗 <strong>Resources:</strong> Curated external links for each topic — docs, visuals, videos.</p>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">External Learning Resources <span class="tag">LINKS</span></div>
+<div class="resource-grid">
+  <a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank" class="resource-card"><div class="rc-type">📘 Docs</div><div class="rc-title">NumPy Quickstart</div><div class="rc-desc">Official guide from the NumPy team</div></a>
+  <a href="https://scipy-lectures.org" target="_blank" class="resource-card"><div class="rc-type">📚 Book</div><div class="rc-title">SciPy Lecture Notes</div><div class="rc-desc">Free, excellent end-to-end reference</div></a>
+  <a href="https://pandas.pydata.org/docs/user_guide/index.html" target="_blank" class="resource-card"><div class="rc-type">📘 Docs</div><div class="rc-title">pandas User Guide</div><div class="rc-desc">Complete official documentation</div></a>
+  <a href="https://colab.research.google.com" target="_blank" class="resource-card"><div class="rc-type">💻 Tool</div><div class="rc-title">Google Colab</div><div class="rc-desc">Free GPU Jupyter notebooks in browser</div></a>
+  <a href="https://www.youtube.com/watch?v=QUT1VHiLmmI" target="_blank" class="resource-card"><div class="rc-type">🎥 Video</div><div class="rc-title">NumPy Full Course</div><div class="rc-desc">freeCodeCamp — 1hr visual tutorial</div></a>
+  <a href="https://jakevdp.github.io/PythonDataScienceHandbook/" target="_blank" class="resource-card"><div class="rc-type">📚 Book</div><div class="rc-title">Python Data Science Handbook</div><div class="rc-desc">Free online — Jake VanderPlas</div></a>
+  <a href="https://www.quantopian.com/lectures" target="_blank" class="resource-card"><div class="rc-type">🎓 Course</div><div class="rc-title">Quantopian Lectures</div><div class="rc-desc">Quant-specific Python tutorials</div></a>
+  <a href="https://numba.readthedocs.io/en/stable/user/5minguide.html" target="_blank" class="resource-card"><div class="rc-type">📘 Docs</div><div class="rc-title">Numba 5-min Guide</div><div class="rc-desc">JIT compilation for Python speed</div></a>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ PREREQUISITES ═══════════════════════════════════ -->
+<div id="tab-prereq" class="tab-panel">
+<div class="section">
+<div class="section-title">Prerequisites <span class="tag">FOUNDATION</span></div>
+<div class="section-desc">These concepts underpin everything. We explain them simply — no assumed knowledge.</div>
+
+<h3>P1 — Python Fundamentals You Must Know</h3>
+<div class="card-grid">
+  <div class="concept-card"><span class="emoji">📦</span><h4>Variables & Types</h4><p>A variable is a named box that holds a value. Types: <code>int</code> (whole numbers), <code>float</code> (decimals), <code>str</code> (text), <code>bool</code> (True/False).</p></div>
+  <div class="concept-card"><span class="emoji">📋</span><h4>Lists</h4><p>An ordered collection: <code>[1, 2, 3]</code>. You can put anything inside. Key: they're slow for math — that's why we use NumPy arrays instead.</p></div>
+  <div class="concept-card"><span class="emoji">🗂</span><h4>Dictionaries</h4><p>Key-value pairs: <code>{'price': 100.5, 'ticker': 'AAPL'}</code>. Think of it as a lookup table. Basis for pandas DataFrames conceptually.</p></div>
+  <div class="concept-card"><span class="emoji">🔄</span><h4>Loops</h4><p><code>for item in list:</code> — repeats code. The enemy of performance in quant work. You'll learn to replace most loops with vectorized operations.</p></div>
+  <div class="concept-card"><span class="emoji">⚙️</span><h4>Functions</h4><p><code>def my_func(x): return x*2</code>. Reusable blocks of code. Think of them as mini-machines: input goes in, output comes out.</p></div>
+  <div class="concept-card"><span class="emoji">📥</span><h4>Imports</h4><p><code>import numpy as np</code> — loads an external library. The <code>as np</code> part gives it a short alias so you type <code>np.array()</code> instead of <code>numpy.array()</code>.</p></div>
+</div>
+
+<pre><span class="cm"># Python basics in 30 lines — run this first</span>
+<span class="kw">import</span> math
+
+<span class="cm"># Variables</span>
+price = <span class="nm">150.25</span>    <span class="cm"># float</span>
+shares = <span class="nm">100</span>       <span class="cm"># int</span>
+ticker = <span class="st">'AAPL'</span>   <span class="cm"># string</span>
+value = price * shares  <span class="cm"># 15025.0</span>
+
+<span class="cm"># List (ordered, slow for math)</span>
+prices = [<span class="nm">100</span>, <span class="nm">102</span>, <span class="nm">98</span>, <span class="nm">105</span>, <span class="nm">103</span>]
+<span class="fn">print</span>(<span class="fn">len</span>(prices))   <span class="cm"># 5</span>
+
+<span class="cm"># Loop — calculates returns (we'll vectorize this later!)</span>
+returns = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="fn">len</span>(prices)):
+    r = (prices[i] - prices[i<span class="op">-</span><span class="nm">1</span>]) / prices[i<span class="op">-</span><span class="nm">1</span>]
+    returns.append(r)
+
+<span class="cm"># Dictionary</span>
+stock = {<span class="st">'ticker'</span>: <span class="st">'AAPL'</span>, <span class="st">'price'</span>: <span class="nm">150.25</span>, <span class="st">'pe_ratio'</span>: <span class="nm">28.4</span>}
+<span class="fn">print</span>(stock[<span class="st">'ticker'</span>])  <span class="cm"># AAPL</span>
+
+<span class="cm"># Function</span>
+<span class="kw">def</span> <span class="fn">calc_return</span>(p_old, p_new):
+    <span class="kw">return</span> (p_new <span class="op">-</span> p_old) / p_old
+
+<span class="fn">print</span>(<span class="fn">calc_return</span>(<span class="nm">100</span>, <span class="nm">105</span>))  <span class="cm"># 0.05 = 5%</span><div class="label">python</div></pre>
+
+<h3>P2 — Linear Algebra Intuition (Visual)</h3>
+<div class="analogy"><div class="analogy-label">🧠 The Real-World Analogy</div>
+<p style="font-size:.88rem">A <strong>vector</strong> is a list of numbers that represents a point in space — or in finance, a portfolio's weights across assets. A <strong>matrix</strong> is a table of numbers — think of it as a spreadsheet. <strong>Matrix multiplication</strong> is like applying a transformation: rotating, scaling, or mixing data.</p></div>
+
+<div class="diagram">
+<svg viewBox="0 0 700 260" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <!-- Vector -->
+  <text x="30" y="30" fill="#64748b" font-size="11" font-family="IBM Plex Mono">VECTOR (1D)</text>
+  <rect x="30" y="45" width="60" height="35" rx="6" fill="#141824" stroke="#1e2535"/>
+  <text x="60" y="68" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">0.3</text>
+  <rect x="95" y="45" width="60" height="35" rx="6" fill="#141824" stroke="#1e2535"/>
+  <text x="125" y="68" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">0.5</text>
+  <rect x="160" y="45" width="60" height="35" rx="6" fill="#141824" stroke="#1e2535"/>
+  <text x="190" y="68" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">0.2</text>
+  <text x="60" y="105" fill="#475569" font-size="10" text-anchor="middle">AAPL wt</text>
+  <text x="125" y="105" fill="#475569" font-size="10" text-anchor="middle">GOOG wt</text>
+  <text x="190" y="105" fill="#475569" font-size="10" text-anchor="middle">MSFT wt</text>
+  <text x="30" y="130" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">→ Portfolio weights vector: shape (3,)</text>
+
+  <!-- Matrix -->
+  <text x="320" y="30" fill="#64748b" font-size="11" font-family="IBM Plex Mono">MATRIX (2D) — Returns Data</text>
+  <text x="320" y="55" fill="#475569" font-size="10" font-family="IBM Plex Mono">       Day1  Day2  Day3</text>
+  <rect x="320" y="60" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="345" y="78" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">0.01</text>
+  <rect x="374" y="60" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="399" y="78" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">-0.02</text>
+  <rect x="428" y="60" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="453" y="78" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">0.03</text>
+  <rect x="320" y="89" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="345" y="107" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">0.02</text>
+  <rect x="374" y="89" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="399" y="107" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">0.01</text>
+  <rect x="428" y="89" width="50" height="25" rx="4" fill="#141824" stroke="#7c3aed"/>
+  <text x="453" y="107" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">-0.01</text>
+  <text x="300" y="80" fill="#475569" font-size="10" font-family="IBM Plex Mono">AAPL</text>
+  <text x="300" y="107" fill="#475569" font-size="10" font-family="IBM Plex Mono">GOOG</text>
+  <text x="320" y="135" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">→ Returns matrix: shape (2, 3)  [assets × days]</text>
+
+  <!-- DOT PRODUCT -->
+  <text x="30" y="175" fill="#64748b" font-size="11" font-family="IBM Plex Mono">DOT PRODUCT — Portfolio Return</text>
+  <text x="30" y="200" fill="#e2e8f0" font-size="11" font-family="IBM Plex Mono">weights · returns = (0.3×0.01) + (0.5×0.02) + (0.2×0.03) = 0.019</text>
+  <text x="30" y="220" fill="#10b981" font-size="11" font-family="IBM Plex Mono">→ Portfolio gained 1.9% today</text>
+  <text x="30" y="250" fill="#475569" font-size="10" font-family="IBM Plex Mono">This is the core operation in quant finance — done millions of times per second</text>
+</svg>
+</div>
+
+<h3>P3 — Statistics Essentials</h3>
+<div class="card-grid">
+  <div class="concept-card"><span class="emoji">📊</span><h4>Mean (Average)</h4><p>Sum of all values ÷ count. The "center" of your data. In finance: average daily return.</p></div>
+  <div class="concept-card"><span class="emoji">📏</span><h4>Standard Deviation (Std)</h4><p>How spread out values are from the mean. In finance: <strong>volatility</strong>. High std = risky asset.</p></div>
+  <div class="concept-card"><span class="emoji">🔔</span><h4>Normal Distribution</h4><p>Bell curve. Many financial models assume returns are normally distributed (a simplification, but useful starting point).</p></div>
+  <div class="concept-card"><span class="emoji">🔗</span><h4>Correlation</h4><p>How two assets move together. Range: -1 to +1. Diversification = combining low-correlation assets.</p></div>
+</div>
+
+<div class="callout info"><div class="callout-title">🔗 Visual Resource</div>
+  <p>Explore the normal distribution interactively: <a href="https://seeing-theory.brown.edu/probability-distributions/index.html" target="_blank" style="color:var(--accent)">Seeing Theory — Brown University</a> — one of the best visual stat sites ever made.</p>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ NUMPY ═══════════════════════════════════ -->
+<div id="tab-numpy" class="tab-panel">
+<div class="section">
+<div class="section-title">NumPy — The Engine <span class="tag">TOPIC 1</span></div>
+<div class="section-desc">NumPy is the foundation of numerical computing in Python. Everything else in this guide is built on it.</div>
+
+<div class="analogy"><div class="analogy-label">🧠 The Analogy</div>
+<p style="font-size:.88rem">Python lists are like carrying groceries one bag at a time. NumPy arrays are like a conveyor belt — they move <em>all items at once</em>. This is why NumPy is 100–500× faster than pure Python for mathematical operations.</p></div>
+
+<h3>1.1 — Why NumPy Exists</h3>
+<div class="vs-grid">
+  <div class="vs-col bad"><h5>❌ Python Lists (Slow)</h5><ul><li>Dynamic typing — Python checks types at runtime</li><li>Stored as pointers (memory jumps)</li><li>No parallel CPU operations (SIMD)</li><li>Loops in Python = slow</li></ul></div>
+  <div class="vs-col good"><h5>✅ NumPy Arrays (Fast)</h5><ul><li>Fixed dtype — C-level operations</li><li>Contiguous memory (cache-friendly)</li><li>BLAS/LAPACK optimized</li><li>Vectorized: operates on whole arrays</li></ul></div>
+</div>
+
+<div class="diagram">
+<svg viewBox="0 0 680 160" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="22" fill="#64748b" font-size="11" font-family="IBM Plex Mono">Python List — scattered memory (slow)</text>
+  <rect x="20" y="35" width="40" height="30" rx="4" fill="#7c3aed" opacity=".3" stroke="#7c3aed"/>
+  <text x="40" y="55" fill="#c084fc" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ptr</text>
+  <line x1="60" y1="50" x2="100" y2="80" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+  <rect x="100" y="70" width="35" height="25" rx="3" fill="#141824" stroke="#475569"/>
+  <text x="117" y="87" fill="#e2e8f0" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">1</text>
+
+  <rect x="65" y="35" width="40" height="30" rx="4" fill="#7c3aed" opacity=".3" stroke="#7c3aed"/>
+  <text x="85" y="55" fill="#c084fc" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ptr</text>
+  <line x1="85" y1="65" x2="200" y2="80" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+  <rect x="200" y="70" width="35" height="25" rx="3" fill="#141824" stroke="#475569"/>
+  <text x="217" y="87" fill="#e2e8f0" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">2</text>
+
+  <rect x="110" y="35" width="40" height="30" rx="4" fill="#7c3aed" opacity=".3" stroke="#7c3aed"/>
+  <text x="130" y="55" fill="#c084fc" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">ptr</text>
+  <line x1="130" y1="65" x2="310" y2="80" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+  <rect x="310" y="70" width="35" height="25" rx="3" fill="#141824" stroke="#475569"/>
+  <text x="327" y="87" fill="#e2e8f0" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">3</text>
+  <text x="20" y="140" fill="#ef4444" font-size="10" font-family="IBM Plex Mono">Memory jumps = CPU cache misses = SLOW</text>
+
+  <text x="400" y="22" fill="#64748b" font-size="11" font-family="IBM Plex Mono">NumPy Array — contiguous memory (fast)</text>
+  <rect x="400" y="35" width="45" height="40" rx="4" fill="#00e5ff" opacity=".15" stroke="#00e5ff"/>
+  <text x="422" y="60" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">1</text>
+  <rect x="449" y="35" width="45" height="40" rx="4" fill="#00e5ff" opacity=".15" stroke="#00e5ff"/>
+  <text x="471" y="60" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">2</text>
+  <rect x="498" y="35" width="45" height="40" rx="4" fill="#00e5ff" opacity=".15" stroke="#00e5ff"/>
+  <text x="520" y="60" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">3</text>
+  <rect x="547" y="35" width="45" height="40" rx="4" fill="#00e5ff" opacity=".15" stroke="#00e5ff"/>
+  <text x="569" y="60" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">4</text>
+  <rect x="596" y="35" width="45" height="40" rx="4" fill="#00e5ff" opacity=".15" stroke="#00e5ff"/>
+  <text x="618" y="60" fill="#00e5ff" font-size="13" text-anchor="middle" font-family="IBM Plex Mono">5</text>
+  <text x="400" y="100" fill="#10b981" font-size="10" font-family="IBM Plex Mono">All values adjacent in RAM</text>
+  <text x="400" y="115" fill="#10b981" font-size="10" font-family="IBM Plex Mono">CPU loads entire array in one cache fetch = FAST</text>
+</svg>
+</div>
+
+<h3>1.2 — Creating Arrays</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># From Python list</span>
+a = np.array([<span class="nm">1.0</span>, <span class="nm">2.0</span>, <span class="nm">3.0</span>, <span class="nm">4.0</span>])
+<span class="fn">print</span>(a.dtype)   <span class="cm"># float64</span>
+<span class="fn">print</span>(a.shape)   <span class="cm"># (4,)  ← 1D array, 4 elements</span>
+
+<span class="cm"># 2D array — think: rows × columns</span>
+prices = np.array([
+    [<span class="nm">100</span>, <span class="nm">102</span>, <span class="nm">98</span>],   <span class="cm"># AAPL: Day1, Day2, Day3</span>
+    [<span class="nm">200</span>, <span class="nm">205</span>, <span class="nm">195</span>]   <span class="cm"># GOOG: Day1, Day2, Day3</span>
+])
+<span class="fn">print</span>(prices.shape)  <span class="cm"># (2, 3) → 2 stocks, 3 days</span>
+
+<span class="cm"># Factory functions — these are extremely useful in quant work</span>
+np.zeros(<span class="nm">5</span>)              <span class="cm"># [0, 0, 0, 0, 0]</span>
+np.ones((<span class="nm">3</span>, <span class="nm">3</span>))           <span class="cm"># 3×3 matrix of 1s</span>
+np.linspace(<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">100</span>)   <span class="cm"># 100 evenly spaced from 0→1</span>
+np.arange(<span class="nm">0</span>, <span class="nm">365</span>)         <span class="cm"># integers 0 to 364 (days in a year)</span>
+np.eye(<span class="nm">4</span>)                 <span class="cm"># 4×4 identity matrix (for portfolio math)</span>
+
+<span class="cm"># Random arrays (critical for simulations)</span>
+rng = np.random.default_rng(seed=<span class="nm">42</span>)  <span class="cm"># reproducible!</span>
+returns = rng.normal(loc=<span class="nm">0.0</span>, scale=<span class="nm">0.01</span>, size=<span class="nm">252</span>)
+<span class="cm"># 252 trading days of daily returns ~ N(0, 1%)</span><div class="label">python</div></pre>
+
+<h3>1.3 — Array Indexing & Slicing</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+prices = np.array([<span class="nm">100</span>, <span class="nm">102</span>, <span class="nm">98</span>, <span class="nm">105</span>, <span class="nm">103</span>, <span class="nm">107</span>])
+
+<span class="cm"># Basic indexing (0-based, like Python)</span>
+prices[<span class="nm">0</span>]    <span class="cm"># 100  — first element</span>
+prices[<span class="op">-</span><span class="nm">1</span>]   <span class="cm"># 107  — last element</span>
+prices[<span class="nm">2</span>:<span class="nm">5</span>]  <span class="cm"># [98, 105, 103]  — index 2,3,4</span>
+prices[::<span class="nm">2</span>]  <span class="cm"># [100, 98, 103]   — every other</span>
+
+<span class="cm"># 2D indexing</span>
+mat = np.array([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>],[<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>]])
+mat[<span class="nm">1</span>, <span class="nm">2</span>]    <span class="cm"># 6   — row 1, col 2</span>
+mat[<span class="nm">0</span>, :]    <span class="cm"># [1,2,3]  — entire first row</span>
+mat[:, <span class="nm">1</span>]    <span class="cm"># [2,5,8]  — entire second column</span>
+
+<span class="cm"># Boolean (fancy) indexing — KEY for filtering data</span>
+big_days = prices[prices <span class="op">></span> <span class="nm">102</span>]  <span class="cm"># [105, 103, 107]</span>
+<span class="cm"># "Give me all prices above 102"</span>
+
+<span class="cm"># Fancy indexing with integer arrays</span>
+idx = np.array([<span class="nm">0</span>, <span class="nm">2</span>, <span class="nm">4</span>])  <span class="cm"># pick specific days</span>
+prices[idx]  <span class="cm"># [100, 98, 103]</span><div class="label">python</div></pre>
+
+<h3>1.4 — Broadcasting — The Magic Trick</h3>
+<div class="analogy"><div class="analogy-label">🧠 Analogy</div>
+<p style="font-size:.88rem">Broadcasting is like multiplying every price in a column by a scalar, but NumPy figures out <em>how</em> to stretch smaller arrays to match larger ones — without copying data.</p></div>
+
+<div class="diagram">
+<svg viewBox="0 0 680 180" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="22" fill="#64748b" font-size="11" font-family="IBM Plex Mono">Broadcasting: array (3,3) + scalar (1)</text>
+  <!-- Array -->
+  <g>
+    <rect x="20" y="35" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="40" y="58" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">100</text>
+    <rect x="65" y="35" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="85" y="58" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">102</text>
+    <rect x="110" y="35" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="130" y="58" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">98</text>
+    <rect x="20" y="75" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="40" y="98" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">200</text>
+    <rect x="65" y="75" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="85" y="98" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">205</text>
+    <rect x="110" y="75" width="40" height="35" rx="4" fill="#141824" stroke="#00e5ff"/>
+    <text x="130" y="98" fill="#00e5ff" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">195</text>
+  </g>
+  <text x="165" y="73" fill="#64748b" font-size="20" text-anchor="middle">×</text>
+  <!-- Scalar -->
+  <rect x="180" y="50" width="40" height="35" rx="4" fill="#7c3aed" opacity=".4" stroke="#7c3aed"/>
+  <text x="200" y="73" fill="#c084fc" font-size="12" text-anchor="middle" font-family="IBM Plex Mono">1.1</text>
+  <text x="200" y="100" fill="#475569" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">stretched to</text>
+  <text x="200" y="112" fill="#475569" font-size="9" text-anchor="middle" font-family="IBM Plex Mono">(2,3) auto</text>
+  <text x="235" y="73" fill="#64748b" font-size="20" text-anchor="middle">=</text>
+  <!-- Result -->
+  <rect x="250" y="35" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="272" y="58" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">110</text>
+  <rect x="300" y="35" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="322" y="58" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">112.2</text>
+  <rect x="350" y="35" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="372" y="58" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">107.8</text>
+  <rect x="250" y="75" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="272" y="98" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">220</text>
+  <rect x="300" y="75" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="322" y="98" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">225.5</text>
+  <rect x="350" y="75" width="45" height="35" rx="4" fill="#10b981" opacity=".2" stroke="#10b981"/>
+  <text x="372" y="98" fill="#10b981" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">214.5</text>
+  <text x="20" y="150" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">No loop needed. NumPy applies the scalar to every element in C-speed.</text>
+  <text x="20" y="165" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">Broadcasting Rules: shapes are compatible if dims are equal OR one of them is 1.</text>
+</svg>
+</div>
+
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = np.array([[<span class="nm">100</span>, <span class="nm">102</span>, <span class="nm">98</span>],
+                   [<span class="nm">200</span>, <span class="nm">205</span>, <span class="nm">195</span>]])  <span class="cm"># shape (2,3)</span>
+
+<span class="cm"># Scalar broadcast — applies to every element</span>
+prices <span class="op">*</span> <span class="nm">1.1</span>  <span class="cm"># shape (2,3) × scalar = (2,3)</span>
+
+<span class="cm"># Row-wise normalisation — subtract each asset's mean</span>
+means = prices.mean(axis=<span class="nm">1</span>, keepdims=<span class="kw">True</span>)  <span class="cm"># shape (2,1)</span>
+norm = prices <span class="op">-</span> means  <span class="cm"># (2,3) - (2,1) → broadcasts to (2,3)</span>
+
+<span class="cm"># Column broadcast — different weight per day</span>
+weights = np.array([<span class="nm">1.0</span>, <span class="nm">0.9</span>, <span class="nm">1.1</span>])  <span class="cm"># shape (3,)</span>
+adj = prices <span class="op">*</span> weights  <span class="cm"># (2,3) × (3,) → (2,3) ✓</span><div class="label">Broadcasting</div></pre>
+
+<h3>1.5 — Essential NumPy Operations for Quant Work</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nm">42</span>)
+returns = rng.normal(<span class="nm">0.001</span>, <span class="nm">0.02</span>, size=<span class="nm">252</span>)  <span class="cm"># 1yr daily returns</span>
+
+<span class="cm"># ── Statistics ──</span>
+<span class="fn">print</span>(returns.mean())           <span class="cm"># average daily return</span>
+<span class="fn">print</span>(returns.std())            <span class="cm"># daily volatility</span>
+<span class="fn">print</span>(returns.min(), returns.max())
+<span class="fn">print</span>(np.percentile(returns, [<span class="nm">5</span>, <span class="nm">95</span>]))  <span class="cm"># 5th/95th percentile = VaR-ish</span>
+
+<span class="cm"># ── Cumulative operations ──</span>
+cum_returns = np.cumprod(<span class="nm">1</span> <span class="op">+</span> returns)   <span class="cm"># wealth index</span>
+cum_sum = np.cumsum(returns)              <span class="cm"># cumulative P&L</span>
+
+<span class="cm"># ── Linear Algebra ──</span>
+cov_matrix = np.cov(returns.reshape(<span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>))  <span class="cm"># covariance</span>
+A = np.array([[<span class="nm">2</span>,<span class="nm">1</span>],[<span class="nm">1</span>,<span class="nm">3</span>]])
+eigenvalues, eigenvectors = np.linalg.eig(A)  <span class="cm"># eigendecomposition (PCA)</span>
+inv_A = np.linalg.inv(A)                       <span class="cm"># matrix inverse</span>
+
+<span class="cm"># ── Sorting & Ranking ──</span>
+sorted_r = np.sort(returns)[::<span class="op">-</span><span class="nm">1</span>]  <span class="cm"># descending sort</span>
+ranks = np.argsort(np.argsort(returns))  <span class="cm"># rank each return</span>
+
+<span class="cm"># ── Where (conditional assignment — no loops!) ──</span>
+signal = np.where(returns <span class="op">></span> <span class="nm">0</span>, <span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>)  <span class="cm"># 1 if positive day, -1 if negative</span>
+<div class="label">Quant NumPy</div></pre>
+
+<div class="experiment">
+  <div class="experiment-header"><span class="badge">COLAB</span><strong>Experiment 1 — NumPy Speed Test + Returns Analysis</strong></div>
+  <p style="font-size:.85rem;margin-bottom:.5rem">Run this notebook to see the speed difference between loops and NumPy, build a price series, and visualize cumulative returns.</p>
+  <pre style="margin:.5rem 0"><span class="cm"># Paste this into Google Colab</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> time, matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Speed test</span>
+N = <span class="nm">1_000_000</span>
+arr = np.random.randn(N)
+lst = <span class="fn">list</span>(arr)
+
+t0 = time.perf_counter()
+total_loop = <span class="fn">sum</span>(x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> lst)
+loop_time = time.perf_counter() <span class="op">-</span> t0
+
+t0 = time.perf_counter()
+total_np = (arr<span class="op">**</span><span class="nm">2</span>).sum()
+np_time = time.perf_counter() <span class="op">-</span> t0
+
+<span class="fn">print</span>(<span class="st">f"Loop: {loop_time*1000:.1f}ms | NumPy: {np_time*1000:.2f}ms | Speedup: {loop_time/np_time:.0f}x"</span>)
+
+<span class="cm"># Build a random walk price series (GBM)</span>
+rng = np.random.default_rng(<span class="nm">2024</span>)
+mu, sigma, S0, T = <span class="nm">0.0008</span>, <span class="nm">0.015</span>, <span class="nm">100.0</span>, <span class="nm">252</span>
+daily_returns = rng.normal(mu, sigma, T)
+prices = S0 <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> daily_returns)
+
+plt.figure(figsize=(<span class="nm">12</span>,<span class="nm">4</span>))
+plt.plot(prices, color=<span class="st">'cyan'</span>, lw=<span class="nm">1.5</span>)
+plt.title(<span class="st">'Simulated Stock Price (GBM)'</span>); plt.show()</pre>
+  <a href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/tools_numpy.ipynb" target="_blank" class="colab-btn">▶ Open Similar in Colab</a>
+</div>
+
+<div class="section">
+<div class="section-title">NumPy Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Create a 1D NumPy array of 10 equally spaced numbers between 0 and 1. Print its shape, dtype, min, max.</li>
+  <li>Create a 5×5 matrix of zeros, then set the diagonal to 1 using indexing (recreate the identity matrix without <code>np.eye</code>).</li>
+  <li>Generate 100 random returns from N(0, 0.01). Calculate the mean, std, and 5th percentile.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Given a 2D prices array of shape (5 stocks × 252 days), compute the daily log returns matrix using <code>np.log</code> and array slicing (no loops).</li>
+  <li>Using broadcasting, normalize each stock's return series to z-scores: subtract its mean, divide by its std. Result shape must still be (5, 252).</li>
+  <li>Simulate 10,000 Monte Carlo paths of a stock over 252 days using vectorized NumPy operations. Compute the distribution of final prices.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Build a covariance matrix from scratch for 5 assets using only NumPy dot products (no <code>np.cov</code>). Verify your result against <code>np.cov</code>.</li>
+  <li>Implement Sharpe Ratio and Maximum Drawdown calculations for a portfolio using only vectorized NumPy — no loops, no pandas.</li>
+  <li>Using eigendecomposition (<code>np.linalg.eig</code>), perform PCA on a returns matrix. Project onto the top 2 principal components and explain what they represent.</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ SCIPY ═══════════════════════════════════ -->
+<div id="tab-scipy" class="tab-panel">
+<div class="section">
+<div class="section-title">SciPy — Scientific Toolkit <span class="tag">TOPIC 2</span></div>
+<div class="section-desc">SciPy extends NumPy with higher-level scientific algorithms. Think of NumPy as the raw material and SciPy as the power tools.</div>
+
+<div class="analogy"><div class="analogy-label">🧠 Analogy</div>
+<p style="font-size:.88rem">If NumPy is a calculator, SciPy is a scientific lab. It contains pre-built, highly optimized routines that would take weeks to implement yourself: statistical tests, optimization algorithms, Fourier transforms, interpolation, and more.</p></div>
+
+<h3>2.1 — SciPy's Key Modules for Quant Work</h3>
+<div class="card-grid">
+  <div class="concept-card"><span class="emoji">📊</span><h4>scipy.stats</h4><p>Probability distributions, statistical tests, descriptive stats. Used for: VaR, fitting return distributions, hypothesis testing on signals.</p></div>
+  <div class="concept-card"><span class="emoji">🎯</span><h4>scipy.optimize</h4><p>Root finding, minimization, curve fitting. Used for: portfolio optimization, calibrating models, finding efficient frontier.</p></div>
+  <div class="concept-card"><span class="emoji">🔢</span><h4>scipy.linalg</h4><p>More robust than np.linalg. Cholesky decomposition, SVD. Used for: correlated simulations, PCA, solving linear systems.</p></div>
+  <div class="concept-card"><span class="emoji">🌊</span><h4>scipy.signal</h4><p>Signal processing, filtering. Used for: denoising price series, detecting patterns, technical indicators.</p></div>
+  <div class="concept-card"><span class="emoji">🔗</span><h4>scipy.interpolate</h4><p>Fit smooth curves through data points. Used for: building yield curves, interpolating volatility surfaces.</p></div>
+  <div class="concept-card"><span class="emoji">∫</span><h4>scipy.integrate</h4><p>Numerical integration. Used for: option pricing via integration, expectation calculations.</p></div>
+</div>
+
+<h3>2.2 — scipy.stats in Depth</h3>
+<pre><span class="kw">from</span> scipy <span class="kw">import</span> stats
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ── Work with any distribution ──</span>
+norm = stats.norm(loc=<span class="nm">0.001</span>, scale=<span class="nm">0.02</span>)  <span class="cm"># N(mu=0.1%, sigma=2%)</span>
+
+<span class="cm"># PDF, CDF — building blocks of option pricing</span>
+norm.pdf(<span class="nm">0.0</span>)      <span class="cm"># probability density at 0</span>
+norm.cdf(<span class="op">-</span><span class="nm">0.05</span>)   <span class="cm"># P(return < -5%) = tail probability</span>
+norm.ppf(<span class="nm">0.05</span>)    <span class="cm"># 5th percentile = daily VaR at 95% confidence</span>
+
+<span class="cm"># ── Value at Risk (VaR) ──</span>
+confidence = <span class="nm">0.95</span>
+mu, sigma = <span class="nm">0.001</span>, <span class="nm">0.02</span>
+VaR_95 = <span class="op">-</span>stats.norm.ppf(<span class="nm">1</span> <span class="op">-</span> confidence, mu, sigma)
+<span class="fn">print</span>(<span class="st">f"1-day 95% VaR: {VaR_95:.4f} = {VaR_95*100:.2f}%"</span>)
+<span class="cm"># Interpretation: 95% of the time, daily loss ≤ this amount</span>
+
+<span class="cm"># ── Fit a distribution to real data ──</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+real_returns = rng.normal(<span class="nm">0.001</span>, <span class="nm">0.02</span>, <span class="nm">1000</span>)
+mu_hat, sigma_hat = stats.norm.fit(real_returns)
+<span class="fn">print</span>(<span class="st">f"Fitted mu={mu_hat:.4f}, sigma={sigma_hat:.4f}"</span>)
+
+<span class="cm"># ── Fat tails? Test for normality ──</span>
+stat, p_value = stats.shapiro(real_returns[:<span class="nm">50</span>])  <span class="cm"># Shapiro-Wilk (small samples)</span>
+stat2, p2 = stats.normaltest(real_returns)  <span class="cm"># D'Agostino (large samples)</span>
+<span class="fn">print</span>(<span class="st">f"Returns are normal? p={p2:.3f} ({'YES' if p2>0.05 else 'NO - fat tails!'})"</span>)
+
+<span class="cm"># ── Student's t distribution (better for finance) ──</span>
+df, loc, scale = stats.t.fit(real_returns)  <span class="cm"># fit t-distribution</span>
+t_VaR = <span class="op">-</span>stats.t.ppf(<span class="nm">0.05</span>, df, loc, scale)
+<span class="fn">print</span>(<span class="st">f"t-dist 95% VaR: {t_VaR:.4f} (larger due to fat tails)"</span>)<div class="label">scipy.stats</div></pre>
+
+<h3>2.3 — scipy.optimize — Portfolio Optimization</h3>
+<div class="analogy"><div class="analogy-label">🧠 What is Optimization?</div>
+<p style="font-size:.88rem">Given a function f(x), find the x that minimizes f. In finance: find portfolio weights that minimize risk for a given return. <code>scipy.optimize.minimize</code> does this numerically.</p></div>
+
+<pre><span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Simulate 3-asset return data</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+returns_data = rng.multivariate_normal(
+    mean=[<span class="nm">0.001</span>, <span class="nm">0.0008</span>, <span class="nm">0.0012</span>],
+    cov=[[<span class="nm">0.0004</span>, <span class="nm">0.0001</span>, <span class="nm">0.0002</span>],
+         [<span class="nm">0.0001</span>, <span class="nm">0.0003</span>, <span class="nm">0.00015</span>],
+         [<span class="nm">0.0002</span>, <span class="nm">0.00015</span>, <span class="nm">0.0005</span>]],
+    size=<span class="nm">252</span>
+)  <span class="cm"># shape (252, 3): 252 days, 3 assets</span>
+
+cov = np.cov(returns_data.T)  <span class="cm"># (3,3) covariance matrix</span>
+mu = returns_data.mean(axis=<span class="nm">0</span>)  <span class="cm"># (3,) mean returns</span>
+
+<span class="cm"># Objective: minimize portfolio variance = w^T Σ w</span>
+<span class="kw">def</span> <span class="fn">portfolio_variance</span>(w):
+    <span class="kw">return</span> w @ cov @ w  <span class="cm"># dot(w, cov @ w)</span>
+
+<span class="cm"># Constraints: weights sum to 1</span>
+constraints = {<span class="st">'type'</span>: <span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> w: np.<span class="fn">sum</span>(w) <span class="op">-</span> <span class="nm">1</span>}
+<span class="cm"># Bounds: each weight between 0 and 1 (long-only)</span>
+bounds = [(<span class="nm">0</span>, <span class="nm">1</span>)] <span class="op">*</span> <span class="nm">3</span>
+w0 = np.array([<span class="nm">1</span><span class="op">/</span><span class="nm">3</span>, <span class="nm">1</span><span class="op">/</span><span class="nm">3</span>, <span class="nm">1</span><span class="op">/</span><span class="nm">3</span>])  <span class="cm"># equal-weight starting point</span>
+
+result = minimize(portfolio_variance, w0,
+                  method=<span class="st">'SLSQP'</span>,
+                  bounds=bounds,
+                  constraints=constraints)
+
+opt_weights = result.x
+<span class="fn">print</span>(<span class="st">f"Optimal weights: {opt_weights.round(4)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Min variance: {result.fun:.6f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Expected return: {(opt_weights @ mu):.4f}"</span>)<div class="label">Portfolio Optimization</div></pre>
+
+<h3>2.4 — Cholesky Decomposition — Correlated Simulations</h3>
+<pre><span class="kw">from</span> scipy <span class="kw">import</span> linalg
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Why: simulating correlated assets (e.g., AAPL and NASDAQ move together)</span>
+<span class="cm"># Cholesky: decompose Σ into L*L^T, so Z*L gives correlated samples</span>
+
+corr = np.array([[<span class="nm">1.0</span>, <span class="nm">0.7</span>, <span class="nm">0.3</span>],
+                 [<span class="nm">0.7</span>, <span class="nm">1.0</span>, <span class="nm">0.2</span>],
+                 [<span class="nm">0.3</span>, <span class="nm">0.2</span>, <span class="nm">1.0</span>]])  <span class="cm"># correlation matrix</span>
+
+L = linalg.cholesky(corr, lower=<span class="kw">True</span>)  <span class="cm"># lower triangular</span>
+
+rng = np.random.default_rng(<span class="nm">42</span>)
+Z = rng.standard_normal((<span class="nm">10000</span>, <span class="nm">3</span>))  <span class="cm"># independent standard normals</span>
+corr_samples = Z @ L.T  <span class="cm"># now correlated!</span>
+
+<span class="cm"># Verify: should match original corr matrix</span>
+<span class="fn">print</span>(np.corrcoef(corr_samples.T).round(<span class="nm">2</span>))<div class="label">Correlated Simulation</div></pre>
+
+<div class="experiment">
+  <div class="experiment-header"><span class="badge">COLAB</span><strong>Experiment 2 — Efficient Frontier Visualization</strong></div>
+  <pre style="font-size:.76rem"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Random 3-asset data</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+R = rng.multivariate_normal([<span class="nm">0.001</span>,<span class="nm">0.0015</span>,<span class="nm">0.0008</span>],
+    [[<span class="nm">4e-4</span>,<span class="nm">1e-4</span>,<span class="nm">2e-4</span>],[<span class="nm">1e-4</span>,<span class="nm">6e-4</span>,<span class="nm">1e-4</span>],[<span class="nm">2e-4</span>,<span class="nm">1e-4</span>,<span class="nm">3e-4</span>]], <span class="nm">252</span>)
+cov = np.cov(R.T); mu = R.mean(<span class="nm">0</span>)
+
+results = []
+<span class="kw">for</span> _ <span class="kw">in</span> range(<span class="nm">5000</span>):
+    w = np.random.dirichlet(np.ones(<span class="nm">3</span>))  <span class="cm"># random weights summing to 1</span>
+    ret = w @ mu * <span class="nm">252</span>
+    vol = np.sqrt(w @ cov @ w * <span class="nm">252</span>)
+    results.append((vol, ret))
+
+vols, rets = zip(<span class="op">*</span>results)
+plt.scatter(vols, rets, c=np.array(rets)<span class="op">/</span>np.array(vols), cmap=<span class="st">'viridis'</span>, s=<span class="nm">3</span>, alpha=<span class="nm">.6</span>)
+plt.colorbar(label=<span class="st">'Sharpe Ratio'</span>)
+plt.xlabel(<span class="st">'Annualised Volatility'</span>); plt.ylabel(<span class="st">'Annualised Return'</span>)
+plt.title(<span class="st">'Efficient Frontier — Monte Carlo'</span>); plt.show()</pre>
+  <a href="https://colab.research.google.com" target="_blank" class="colab-btn">▶ Open Colab & Paste</a>
+</div>
+
+<div class="section">
+<div class="section-title">SciPy Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Using <code>scipy.stats.norm</code>, compute the 1-day 99% VaR for a portfolio with daily return N(0.1%, 2%). Interpret the result in plain English.</li>
+  <li>Generate 500 random returns. Use <code>stats.norm.fit()</code> to estimate the distribution. Plot the fitted PDF over a histogram.</li>
+  <li>Use <code>scipy.optimize.brentq</code> to find the root of f(x) = x³ - 2x - 5 in [1, 3]. This is like finding an implied volatility numerically.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Fit a Student's t-distribution to a set of returns and compare the 95% VaR to the normal-distribution VaR. Which is larger and why?</li>
+  <li>Build a minimum-variance portfolio for 4 assets using <code>scipy.optimize.minimize</code> with long-only constraints. Print the optimal weights.</li>
+  <li>Use <code>scipy.signal.savgol_filter</code> to smooth a noisy price series. Experiment with different window sizes and polynomial orders.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Implement Black-Scholes option pricing using <code>scipy.stats.norm.cdf</code>. Then use <code>scipy.optimize.brentq</code> to back out the implied volatility from an option price. This is real quant work.</li>
+  <li>Sweep the efficient frontier for 3 assets: minimize variance for each target return level (use equality constraint for return). Plot the frontier curve.</li>
+  <li>Using Cholesky decomposition and Monte Carlo, simulate 10,000 paths of a 5-asset correlated portfolio. Compute the 95th percentile drawdown distribution across all paths.</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ PANDAS ═══════════════════════════════════ -->
+<div id="tab-pandas" class="tab-panel">
+<div class="section">
+<div class="section-title">pandas — Data Manipulation <span class="tag">TOPIC 3</span></div>
+<div class="section-desc">pandas is your spreadsheet-on-steroids. It adds labels, dates, and powerful grouping on top of NumPy arrays.</div>
+
+<div class="analogy"><div class="analogy-label">🧠 Analogy</div>
+<p style="font-size:.88rem">NumPy arrays are like spreadsheets without row/column names — just numbers. A pandas DataFrame is a spreadsheet with proper labels, dates as indices, missing value handling, and SQL-like operations. In quant work, you spend 60–70% of your time here wrangling data.</p></div>
+
+<h3>3.1 — Core Data Structures</h3>
+<div class="diagram">
+<svg viewBox="0 0 680 220" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="22" fill="#64748b" font-size="11" font-family="IBM Plex Mono">pandas Series — 1D labeled array (like a single column)</text>
+  <rect x="20" y="35" width="70" height="25" rx="3" fill="#7c3aed" opacity=".2" stroke="#7c3aed"/>
+  <text x="55" y="53" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">2024-01-02</text>
+  <rect x="95" y="35" width="60" height="25" rx="3" fill="#141824" stroke="#1e2535"/>
+  <text x="125" y="53" fill="#00e5ff" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">150.25</text>
+  <rect x="20" y="64" width="70" height="25" rx="3" fill="#7c3aed" opacity=".2" stroke="#7c3aed"/>
+  <text x="55" y="82" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">2024-01-03</text>
+  <rect x="95" y="64" width="60" height="25" rx="3" fill="#141824" stroke="#1e2535"/>
+  <text x="125" y="82" fill="#00e5ff" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">152.10</text>
+  <rect x="20" y="93" width="70" height="25" rx="3" fill="#7c3aed" opacity=".2" stroke="#7c3aed"/>
+  <text x="55" y="111" fill="#c084fc" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">2024-01-04</text>
+  <rect x="95" y="93" width="60" height="25" rx="3" fill="#141824" stroke="#1e2535"/>
+  <text x="125" y="111" fill="#00e5ff" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">148.90</text>
+  <text x="20" y="42" fill="#475569" font-size="9" font-family="IBM Plex Mono">INDEX</text>
+  <text x="95" y="42" fill="#475569" font-size="9" font-family="IBM Plex Mono">VALUES (prices)</text>
+  <text x="20" y="140" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">name="AAPL"  dtype=float64</text>
+
+  <text x="300" y="22" fill="#64748b" font-size="11" font-family="IBM Plex Mono">DataFrame — 2D: index + multiple columns</text>
+  <rect x="295" y="35" width="80" height="22" rx="3" fill="#475569" opacity=".3"/>
+  <text x="335" y="51" fill="#e2e8f0" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">Date</text>
+  <rect x="380" y="35" width="60" height="22" rx="3" fill="#475569" opacity=".3"/>
+  <text x="410" y="51" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">AAPL</text>
+  <rect x="445" y="35" width="60" height="22" rx="3" fill="#475569" opacity=".3"/>
+  <text x="475" y="51" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">GOOG</text>
+  <rect x="510" y="35" width="60" height="22" rx="3" fill="#475569" opacity=".3"/>
+  <text x="540" y="51" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">Volume</text>
+  <g fill="#e2e8f0" font-size="10" font-family="IBM Plex Mono">
+    <text x="335" y="74" text-anchor="middle">2024-01-02</text>
+    <text x="410" y="74" text-anchor="middle">150.25</text>
+    <text x="475" y="74" text-anchor="middle">140.10</text>
+    <text x="540" y="74" text-anchor="middle">82M</text>
+    <text x="335" y="95" text-anchor="middle">2024-01-03</text>
+    <text x="410" y="95" text-anchor="middle">152.10</text>
+    <text x="475" y="95" text-anchor="middle">141.50</text>
+    <text x="540" y="95" text-anchor="middle">75M</text>
+    <text x="335" y="116" text-anchor="middle">2024-01-04</text>
+    <text x="410" y="116" text-anchor="middle">148.90</text>
+    <text x="475" y="116" text-anchor="middle">139.20</text>
+    <text x="540" y="116" text-anchor="middle">91M</text>
+  </g>
+  <text x="295" y="155" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">Each column is a Series. Index is shared across all columns.</text>
+  <text x="295" y="170" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">Underlying storage: NumPy arrays for each column dtype group.</text>
+</svg>
+</div>
+
+<h3>3.2 — Creating DataFrames</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># From dictionary</span>
+df = pd.DataFrame({
+    <span class="st">'AAPL'</span>: [<span class="nm">150.25</span>, <span class="nm">152.10</span>, <span class="nm">148.90</span>, <span class="nm">155.00</span>],
+    <span class="st">'GOOG'</span>: [<span class="nm">140.10</span>, <span class="nm">141.50</span>, <span class="nm">139.20</span>, <span class="nm">143.00</span>],
+    <span class="st">'Volume'</span>: [<span class="nm">82e6</span>, <span class="nm">75e6</span>, <span class="nm">91e6</span>, <span class="nm">68e6</span>]
+}, index=pd.date_range(<span class="st">'2024-01-02'</span>, periods=<span class="nm">4</span>, freq=<span class="st">'B'</span>))
+<span class="cm"># 'B' = business days (skips weekends!)</span>
+
+<span class="cm"># Quick inspection</span>
+df.head()           <span class="cm"># first 5 rows</span>
+df.tail(<span class="nm">3</span>)          <span class="cm"># last 3 rows</span>
+df.info()           <span class="cm"># dtypes, nulls, memory</span>
+df.describe()       <span class="cm"># count, mean, std, min, max, percentiles</span>
+df.shape            <span class="cm"># (4, 3)</span>
+df.dtypes           <span class="cm"># dtype of each column</span>
+
+<span class="cm"># From NumPy array</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+raw = rng.normal(<span class="nm">0</span>, <span class="nm">1</span>, (<span class="nm">252</span>, <span class="nm">5</span>))
+dates = pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">252</span>, freq=<span class="st">'B'</span>)
+tickers = [<span class="st">'AAPL'</span>, <span class="st">'GOOG'</span>, <span class="st">'MSFT'</span>, <span class="st">'AMZN'</span>, <span class="st">'NVDA'</span>]
+df_ret = pd.DataFrame(raw, index=dates, columns=tickers)<div class="label">DataFrame Creation</div></pre>
+
+<h3>3.3 — Indexing: loc vs iloc</h3>
+<div class="callout warn"><div class="callout-title">⚠️ Critical Distinction</div>
+<p><strong><code>.loc</code></strong> uses <em>labels</em> (column names, date strings). <strong><code>.iloc</code></strong> uses <em>integer positions</em> (0-based). Getting this wrong is the #1 source of bugs in quant pandas code.</p></div>
+
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df = pd.DataFrame({<span class="st">'AAPL'</span>:[<span class="nm">150</span>,<span class="nm">152</span>,<span class="nm">149</span>], <span class="st">'GOOG'</span>:[<span class="nm">140</span>,<span class="nm">141</span>,<span class="nm">139</span>]},
+    index=pd.date_range(<span class="st">'2024-01-02'</span>, periods=<span class="nm">3</span>, freq=<span class="st">'B'</span>))
+
+<span class="cm"># ── .loc — label-based ──</span>
+df.loc[<span class="st">'2024-01-02'</span>]                   <span class="cm"># single row by date label</span>
+df.loc[<span class="st">'2024-01-02'</span>:<span class="st">'2024-01-04'</span>]    <span class="cm"># date range (INCLUSIVE on both ends!)</span>
+df.loc[:, <span class="st">'AAPL'</span>]                       <span class="cm"># all rows, AAPL column</span>
+df.loc[<span class="st">'2024-01-02'</span>, <span class="st">'AAPL'</span>]           <span class="cm"># specific cell: 150</span>
+
+<span class="cm"># ── .iloc — position-based ──</span>
+df.iloc[<span class="nm">0</span>]           <span class="cm"># first row (regardless of label)</span>
+df.iloc[<span class="nm">1</span>:<span class="nm">3</span>]         <span class="cm"># rows 1 and 2 (3 is EXCLUSIVE, like Python slices)</span>
+df.iloc[:, <span class="nm">0</span>]        <span class="cm"># first column</span>
+df.iloc[<span class="op">-</span><span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>]      <span class="cm"># bottom-right corner</span>
+
+<span class="cm"># ── Boolean indexing ──</span>
+df[df[<span class="st">'AAPL'</span>] <span class="op">></span> <span class="nm">150</span>]       <span class="cm"># days where AAPL > 150</span>
+df[(df[<span class="st">'AAPL'</span>] <span class="op">></span> <span class="nm">150</span>) <span class="op">&</span> (df[<span class="st">'GOOG'</span>] <span class="op"><</span> <span class="nm">141</span>)]  <span class="cm"># compound condition</span>
+df.query(<span class="st">'AAPL > 150 and GOOG < 141'</span>)  <span class="cm"># cleaner syntax for same thing</span><div class="label">Indexing</div></pre>
+
+<h3>3.4 — Groupby & Aggregation</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Imagine tick-by-tick data with a 'sector' column</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+n = <span class="nm">1000</span>
+df = pd.DataFrame({
+    <span class="st">'ticker'</span>: np.random.choice([<span class="st">'AAPL'</span>,<span class="st">'GOOG'</span>,<span class="st">'JPM'</span>,<span class="st">'BAC'</span>], n),
+    <span class="st">'sector'</span>: np.random.choice([<span class="st">'Tech'</span>,<span class="st">'Finance'</span>], n),
+    <span class="st">'return'</span>: rng.normal(<span class="nm">0.001</span>, <span class="nm">0.02</span>, n),
+    <span class="st">'volume'</span>: rng.integers(<span class="nm">1000</span>, <span class="nm">100000</span>, n)
+})
+
+<span class="cm"># Mean return by sector</span>
+df.groupby(<span class="st">'sector'</span>)[<span class="st">'return'</span>].mean()
+
+<span class="cm"># Multiple aggregations</span>
+df.groupby(<span class="st">'ticker'</span>).agg({
+    <span class="st">'return'</span>: [<span class="st">'mean'</span>, <span class="st">'std'</span>, <span class="st">'count'</span>],
+    <span class="st">'volume'</span>: <span class="st">'sum'</span>
+})
+
+<span class="cm"># Custom aggregation: Sharpe ratio by sector</span>
+<span class="kw">def</span> <span class="fn">sharpe</span>(r): <span class="kw">return</span> r.mean() / r.std() <span class="op">*</span> np.sqrt(<span class="nm">252</span>)
+df.groupby(<span class="st">'sector'</span>)[<span class="st">'return'</span>].apply(sharpe)<div class="label">GroupBy</div></pre>
+
+<h3>3.5 — Missing Data (Critical in Finance)</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = pd.Series([<span class="nm">100</span>, np.nan, <span class="nm">102</span>, np.nan, <span class="nm">105</span>],
+    index=pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">5</span>))
+
+<span class="cm"># Detection</span>
+prices.isna()        <span class="cm"># Boolean mask</span>
+prices.isna().sum()  <span class="cm"># count of NaNs</span>
+
+<span class="cm"># Fill strategies</span>
+prices.ffill()   <span class="cm"># Forward fill — use last known price (most common in finance)</span>
+prices.bfill()   <span class="cm"># Backward fill</span>
+prices.fillna(prices.mean())   <span class="cm"># Fill with mean</span>
+prices.interpolate()           <span class="cm"># Linear interpolation</span>
+
+<span class="cm"># Drop</span>
+prices.dropna()  <span class="cm"># Remove NaN rows entirely</span>
+
+<span class="cm"># Tip: ALWAYS check for NaNs before computing returns!</span>
+returns = prices.pct_change().dropna()<div class="label">Missing Data</div></pre>
+
+<div class="experiment">
+<div class="experiment-header"><span class="badge">COLAB</span><strong>Experiment 3 — Multi-Stock DataFrame Analysis</strong></div>
+<pre style="font-size:.76rem"><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np, matplotlib.pyplot <span class="kw">as</span> plt
+rng = np.random.default_rng(<span class="nm">42</span>)
+tickers = [<span class="st">'AAPL'</span>,<span class="st">'GOOG'</span>,<span class="st">'MSFT'</span>,<span class="st">'AMZN'</span>]
+dates = pd.date_range(<span class="st">'2023-01-01'</span>, periods=<span class="nm">252</span>, freq=<span class="st">'B'</span>)
+prices = pd.DataFrame(<span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0.001</span>, <span class="nm">0.02</span>, (<span class="nm">252</span>, <span class="nm">4</span>)), axis=<span class="nm">0</span>),
+    index=dates, columns=tickers)
+
+returns = prices.pct_change().dropna()
+print(<span class="st">"=== Correlation Matrix ==="</span>); print(returns.corr().round(<span class="nm">3</span>))
+print(<span class="st">"\n=== Annualised Sharpe ==="</span>)
+print((returns.mean() / returns.std() * np.sqrt(<span class="nm">252</span>)).round(<span class="nm">3</span>))
+prices.div(prices.iloc[<span class="nm">0</span>]).plot(figsize=(<span class="nm">12</span>,<span class="nm">5</span>), title=<span class="st">'Normalised Returns'</span>)
+plt.show()</pre>
+<a href="https://colab.research.google.com" target="_blank" class="colab-btn">▶ Open Colab & Paste</a>
+</div>
+
+<div class="section">
+<div class="section-title">pandas Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Create a DataFrame with 5 stocks and 20 trading days of random prices. Use <code>.describe()</code> to summarize it. Find the day with the highest AAPL price using <code>.idxmax()</code>.</li>
+  <li>Add a column <code>'AAPL_return'</code> computed as <code>.pct_change()</code>. Drop the first row (which is NaN). Verify no NaNs remain with <code>.isna().sum()</code>.</li>
+  <li>Filter the DataFrame to show only days where AAPL's daily return was positive. How many such days were there?</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Given a DataFrame of OHLCV data, compute daily returns, 20-day rolling volatility, and 50-day rolling mean. Add these as new columns without any loops.</li>
+  <li>Create a random dataset with 1000 trades: columns <code>['ticker', 'side', 'pnl']</code> where side is 'BUY' or 'SELL'. Use <code>groupby</code> to compute average PnL, trade count, and win rate per ticker per side.</li>
+  <li>Use <code>pd.merge</code> to join a fundamentals table (PE ratio, market cap) with a returns table on ticker. Filter to stocks with PE &lt; 20 and positive 30-day return.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Implement a complete factor backtesting pipeline: for each month, rank stocks by prior-month return (momentum factor), form a long/short portfolio (top/bottom decile), compute the next month return. Report the monthly factor return series.</li>
+  <li>Build a multi-level indexed DataFrame of daily OHLCV data for 10 tickers. Use <code>xs</code>, <code>swaplevel</code>, and <code>unstack</code> to reshape it. Compute cross-sectional z-score normalized returns for each day.</li>
+  <li>Write a function that detects data quality issues: outliers (>5σ), missing sequences, duplicate timestamps, and zero-price entries. Return a diagnostic report DataFrame.</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ TIME-SERIES ═══════════════════════════════════ -->
+<div id="tab-timeseries" class="tab-panel">
+<div class="section">
+<div class="section-title">Time-Series Analysis <span class="tag">TOPIC 4</span></div>
+<div class="section-desc">Financial data is fundamentally time-ordered. pandas has world-class time-series tools built in.</div>
+
+<h3>4.1 — DatetimeIndex — The Spine of Financial Data</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Create date ranges</span>
+trading_days = pd.date_range(<span class="st">'2024-01-01'</span>, <span class="st">'2024-12-31'</span>, freq=<span class="st">'B'</span>)  <span class="cm"># Business days</span>
+calendar_days = pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">365</span>, freq=<span class="st">'D'</span>)
+month_ends = pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">12</span>, freq=<span class="st">'ME'</span>)    <span class="cm"># Month end</span>
+quarter_ends = pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">4</span>, freq=<span class="st">'QE'</span>)  <span class="cm"># Quarter end</span>
+
+<span class="cm"># Parse dates from strings</span>
+ts = pd.Timestamp(<span class="st">'2024-01-15 09:30:00'</span>)  <span class="cm"># single timestamp</span>
+ts.year, ts.month, ts.day, ts.dayofweek  <span class="cm"># 2024, 1, 15, 0 (Monday=0)</span>
+ts.is_month_end    <span class="cm"># False</span>
+
+<span class="cm"># Timezone handling — critical for tick data across markets</span>
+ts_utc = ts.tz_localize(<span class="st">'UTC'</span>)
+ts_ny = ts_utc.tz_convert(<span class="st">'America/New_York'</span>)
+ts_lon = ts_utc.tz_convert(<span class="st">'Europe/London'</span>)
+
+<span class="cm"># Time deltas</span>
+pd.Timedelta(<span class="st">'5D'</span>)  <span class="cm"># 5 days</span>
+ts + pd.DateOffset(months=<span class="nm">3</span>)  <span class="cm"># 3 months later (respects calendar)</span><div class="label">DatetimeIndex</div></pre>
+
+<h3>4.2 — Resampling — The Key to Multi-Frequency Data</h3>
+<div class="analogy"><div class="analogy-label">🧠 Analogy</div>
+<p style="font-size:.88rem">Resampling is like converting a minute-by-minute GPS log into hourly checkpoints. You can upsample (add more timestamps, interpolate between known points) or downsample (aggregate many points into one candle/bar).</p></div>
+
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Simulate 1-minute tick data (6.5hr trading day × 250 days)</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+n_min = <span class="nm">390</span> <span class="op">*</span> <span class="nm">100</span>  <span class="cm"># 100 days of 390 minutes</span>
+minute_idx = pd.date_range(<span class="st">'2024-01-02 09:30'</span>, periods=n_min, freq=<span class="st">'1min'</span>)
+prices = pd.Series(<span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0</span>, <span class="nm">0.0005</span>, n_min)), index=minute_idx)
+
+<span class="cm"># ── Downsample: 1-min → OHLCV candles ──</span>
+ohlc = prices.resample(<span class="st">'1h'</span>).ohlc()  <span class="cm"># OHLC bars every hour</span>
+daily = prices.resample(<span class="st">'1D'</span>).ohlc()  <span class="cm"># daily OHLC</span>
+
+<span class="cm"># Custom aggregation</span>
+daily_custom = prices.resample(<span class="st">'1D'</span>).agg({
+    <span class="st">'open'</span>: <span class="st">'first'</span>,
+    <span class="st">'high'</span>: <span class="st">'max'</span>,
+    <span class="st">'low'</span>: <span class="st">'min'</span>,
+    <span class="st">'close'</span>: <span class="st">'last'</span>,
+})
+
+<span class="cm"># ── Upsample: daily → hourly (fill gaps) ──</span>
+daily_prices = prices.resample(<span class="st">'1D'</span>).last()
+hourly = daily_prices.resample(<span class="st">'1h'</span>).ffill()  <span class="cm"># forward fill into hourly</span>
+
+<span class="cm"># ── Frequency aliases cheat sheet ──</span>
+<span class="cm"># 'T' or 'min' = minute, 'H' = hour, 'D' = day</span>
+<span class="cm"># 'B' = business day, 'W' = week, 'ME' = month end</span>
+<span class="cm"># 'QE' = quarter end, 'YE' = year end</span><div class="label">Resampling</div></pre>
+
+<h3>4.3 — Rolling Windows — The Heart of Technical Analysis</h3>
+<div class="diagram">
+<svg viewBox="0 0 680 170" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="20" fill="#64748b" font-size="11" font-family="IBM Plex Mono">Rolling window of size 3 slides across the series</text>
+  <g font-family="IBM Plex Mono" font-size="11">
+    <text x="30" y="45" fill="#475569">Day:</text>
+    <text x="90" y="45" fill="#475569">1</text><text x="140" y="45" fill="#475569">2</text><text x="190" y="45" fill="#475569">3</text><text x="240" y="45" fill="#475569">4</text><text x="290" y="45" fill="#475569">5</text><text x="340" y="45" fill="#475569">6</text>
+    <text x="30" y="68" fill="#e2e8f0">Price:</text>
+    <text x="87" y="68" fill="#00e5ff">100</text><text x="137" y="68" fill="#00e5ff">102</text><text x="187" y="68" fill="#00e5ff">98</text><text x="237" y="68" fill="#00e5ff">105</text><text x="287" y="68" fill="#00e5ff">103</text><text x="337" y="68" fill="#00e5ff">107</text>
+    <!-- Window 1 -->
+    <rect x="78" y="55" width="165" height="22" rx="4" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4"/>
+    <text x="80" y="105" fill="#f59e0b">Win1:</text>
+    <text x="80" y="120" fill="#475569">mean=</text>
+    <text x="118" y="120" fill="#10b981">100</text>
+    <!-- Window 2 -->
+    <rect x="128" y="55" width="165" height="22" rx="4" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4"/>
+    <text x="175" y="105" fill="#c084fc">Win2:</text>
+    <text x="175" y="120" fill="#475569">mean=</text>
+    <text x="213" y="120" fill="#10b981">101.7</text>
+    <!-- Window 3 -->
+    <rect x="178" y="55" width="165" height="22" rx="4" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4"/>
+    <text x="270" y="105" fill="#60a5fa">Win3:</text>
+    <text x="270" y="120" fill="#475569">mean=</text>
+    <text x="308" y="120" fill="#10b981">102.0</text>
+    <!-- Window 4 -->
+    <rect x="228" y="55" width="165" height="22" rx="4" fill="none" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4"/>
+    <text x="370" y="105" fill="#34d399">Win4:</text>
+    <text x="370" y="120" fill="#475569">mean=</text>
+    <text x="408" y="120" fill="#10b981">105.0</text>
+  </g>
+  <text x="20" y="160" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">First min_periods-1 results are NaN (not enough data yet). Always dropna() or fillna() before using.</text>
+</svg>
+</div>
+
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nm">42</span>)
+prices = pd.Series(
+    <span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0.001</span>, <span class="nm">0.015</span>, <span class="nm">252</span>)),
+    index=pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">252</span>, freq=<span class="st">'B'</span>)
+)
+returns = prices.pct_change().dropna()
+
+<span class="cm"># ── Moving Averages (MA) ──</span>
+ma20 = prices.rolling(<span class="nm">20</span>).mean()   <span class="cm"># 20-day Simple MA</span>
+ma50 = prices.rolling(<span class="nm">50</span>).mean()   <span class="cm"># 50-day Simple MA</span>
+ema20 = prices.ewm(span=<span class="nm">20</span>).mean() <span class="cm"># Exponential MA (weights recent more)</span>
+
+<span class="cm"># ── Rolling Volatility (core risk metric) ──</span>
+daily_vol = returns.rolling(<span class="nm">20</span>).std()               <span class="cm"># 20-day rolling std</span>
+ann_vol = daily_vol <span class="op">*</span> np.sqrt(<span class="nm">252</span>)                 <span class="cm"># annualise: × √252</span>
+
+<span class="cm"># ── Rolling Sharpe ──</span>
+rolling_sharpe = (returns.rolling(<span class="nm">60</span>).mean() /
+                  returns.rolling(<span class="nm">60</span>).std()) <span class="op">*</span> np.sqrt(<span class="nm">252</span>)
+
+<span class="cm"># ── Bollinger Bands ──</span>
+mid = prices.rolling(<span class="nm">20</span>).mean()
+std = prices.rolling(<span class="nm">20</span>).std()
+upper_band = mid <span class="op">+</span> <span class="nm">2</span> <span class="op">*</span> std
+lower_band = mid <span class="op">-</span> <span class="nm">2</span> <span class="op">*</span> std
+
+<span class="cm"># ── Rolling Correlation (pairs trading signal) ──</span>
+other_prices = pd.Series(
+    <span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0.001</span>, <span class="nm">0.015</span>, <span class="nm">252</span>)),
+    index=prices.index
+)
+other_ret = other_prices.pct_change().dropna()
+rolling_corr = returns.rolling(<span class="nm">60</span>).corr(other_ret)<div class="label">Rolling Windows</div></pre>
+
+<h3>4.4 — Shift & Lag — Return Calculations</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = pd.Series([<span class="nm">100</span>,<span class="nm">102</span>,<span class="nm">98</span>,<span class="nm">105</span>,<span class="nm">103</span>])
+
+<span class="cm"># shift(1) moves data DOWN by 1 row — "yesterday's price"</span>
+prices.shift(<span class="nm">1</span>)   <span class="cm"># [NaN, 100, 102, 98, 105]</span>
+
+<span class="cm"># Simple returns</span>
+simple_returns = prices.pct_change()    <span class="cm"># (p_t - p_{t-1}) / p_{t-1}</span>
+<span class="cm"># Equivalent to:</span>
+manual = (prices <span class="op">-</span> prices.shift(<span class="nm">1</span>)) / prices.shift(<span class="nm">1</span>)
+
+<span class="cm"># Log returns (preferred in quant finance — additive across time)</span>
+log_returns = np.log(prices / prices.shift(<span class="nm">1</span>))
+
+<span class="cm"># Multi-period returns</span>
+returns_5d = prices.pct_change(<span class="nm">5</span>)   <span class="cm"># 5-day return</span>
+returns_20d = prices.pct_change(<span class="nm">20</span>)  <span class="cm"># 20-day return</span>
+
+<span class="cm"># shift(-1): "tomorrow's price" — for forward returns in signals</span>
+fwd_1d_ret = prices.pct_change().shift(<span class="op">-</span><span class="nm">1</span>)  <span class="cm"># careful: this is the FUTURE!</span></pre>
+
+<h3>4.5 — Expanding Windows & Drawdown</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+rng = np.random.default_rng(<span class="nm">42</span>)
+prices = pd.Series(<span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0.001</span>, <span class="nm">0.015</span>, <span class="nm">252</span>)))
+
+<span class="cm"># Expanding window: grows from start to current row</span>
+cum_max = prices.expanding().max()   <span class="cm"># all-time high at each point</span>
+cum_min = prices.expanding().min()
+
+<span class="cm"># ── Maximum Drawdown ──</span>
+<span class="cm"># Drawdown = (current price - peak) / peak</span>
+drawdown = (prices <span class="op">-</span> cum_max) / cum_max
+max_drawdown = drawdown.min()
+<span class="fn">print</span>(<span class="st">f"Maximum Drawdown: {max_drawdown*100:.2f}%"</span>)
+
+<span class="cm"># ── Calmar Ratio = Annualised Return / |Max Drawdown| ──</span>
+returns = prices.pct_change().dropna()
+ann_return = returns.mean() <span class="op">*</span> <span class="nm">252</span>
+calmar = ann_return / <span class="fn">abs</span>(max_drawdown)
+<span class="fn">print</span>(<span class="st">f"Calmar Ratio: {calmar:.2f}"</span>)<div class="label">Drawdown Analysis</div></pre>
+
+<div class="experiment">
+<div class="experiment-header"><span class="badge">COLAB</span><strong>Experiment 4 — Full Technical Analysis Dashboard</strong></div>
+<pre style="font-size:.76rem"><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np, matplotlib.pyplot <span class="kw">as</span> plt
+rng = np.random.default_rng(<span class="nm">42</span>)
+prices = pd.Series(<span class="nm">100</span> <span class="op">*</span> np.cumprod(<span class="nm">1</span> <span class="op">+</span> rng.normal(<span class="nm">0.0008</span>, <span class="nm">0.015</span>, <span class="nm">252</span>)),
+    index=pd.date_range(<span class="st">'2024-01-01'</span>, periods=<span class="nm">252</span>, freq=<span class="st">'B'</span>))
+returns = prices.pct_change().dropna()
+
+fig, axes = plt.subplots(<span class="nm">3</span>, <span class="nm">1</span>, figsize=(<span class="nm">14</span>, <span class="nm">10</span>), sharex=<span class="kw">True</span>)
+<span class="cm"># Price + Bollinger</span>
+mid=prices.rolling(<span class="nm">20</span>).mean(); std=prices.rolling(<span class="nm">20</span>).std()
+axes[<span class="nm">0</span>].plot(prices, color=<span class="st">'cyan'</span>, lw=<span class="nm">1</span>, label=<span class="st">'Price'</span>)
+axes[<span class="nm">0</span>].plot(mid, color=<span class="st">'orange'</span>, lw=<span class="nm">1</span>, label=<span class="st">'MA20'</span>)
+axes[<span class="nm">0</span>].fill_between(prices.index, mid<span class="op">-</span><span class="nm">2</span><span class="op">*</span>std, mid<span class="op">+</span><span class="nm">2</span><span class="op">*</span>std, alpha=<span class="nm">.2</span>)
+axes[<span class="nm">0</span>].legend(); axes[<span class="nm">0</span>].set_title(<span class="st">'Price + Bollinger Bands'</span>)
+<span class="cm"># Rolling vol</span>
+(returns.rolling(<span class="nm">20</span>).std()<span class="op">*</span>np.sqrt(<span class="nm">252</span>)).plot(ax=axes[<span class="nm">1</span>], color=<span class="st">'magenta'</span>)
+axes[<span class="nm">1</span>].set_title(<span class="st">'20-Day Rolling Annualised Volatility'</span>)
+<span class="cm"># Drawdown</span>
+dd = (prices <span class="op">-</span> prices.expanding().max()) / prices.expanding().max()
+dd.plot(ax=axes[<span class="nm">2</span>], color=<span class="st">'red'</span>, lw=<span class="nm">1</span>)
+axes[<span class="nm">2</span>].fill_between(prices.index, dd, <span class="nm">0</span>, alpha=<span class="nm">.3</span>, color=<span class="st">'red'</span>)
+axes[<span class="nm">2</span>].set_title(<span class="st">'Drawdown'</span>); plt.tight_layout(); plt.show()</pre>
+<a href="https://colab.research.google.com" target="_blank" class="colab-btn">▶ Open Colab & Paste</a>
+</div>
+
+<div class="section">
+<div class="section-title">Time-Series Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Create a DatetimeIndex of all trading days in 2024. How many are there? Identify the last trading day of each quarter.</li>
+  <li>Build a price series with a 20-day moving average and a 50-day moving average. Find the first "golden cross" date (where MA20 crosses above MA50).</li>
+  <li>Compute 1-day, 5-day, and 20-day returns for a simulated stock. Plot all three on the same chart to see how noise scales with horizon.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Simulate 1-minute prices for one trading day (390 minutes). Resample to 5-min, 15-min, and 1-hour OHLCV bars. Verify that the daily high from 1-min data matches the high from 1-hour bars.</li>
+  <li>Build a Bollinger Band strategy: generate a buy signal when price crosses below the lower band, and a sell signal when it crosses above the upper band. Use <code>np.where</code> — no loops.</li>
+  <li>Compute rolling 60-day correlation between two simulated stocks. Plot the correlation over time. Identify the top 5 most-correlated and most-anticorrelated 60-day windows.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Implement a Kalman Filter for price smoothing using only NumPy arrays (no external Kalman libraries). Use it to build an adaptive moving average and compare it to a 20-day SMA on a volatile series.</li>
+  <li>Build a complete OHLCV-based backtester: takes a signal Series, executes trades at next open, accounts for transaction costs (0.05%), and reports PnL, Sharpe, Calmar, and max drawdown.</li>
+  <li>Implement Hurst Exponent estimation using rescaled range (R/S) analysis to test whether a given price series is mean-reverting (H &lt; 0.5), random (H ≈ 0.5), or trending (H &gt; 0.5).</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ VECTORIZATION ═══════════════════════════════════ -->
+<div id="tab-vectorization" class="tab-panel">
+<div class="section">
+<div class="section-title">Vectorization <span class="tag">TOPIC 5</span></div>
+<div class="section-desc">The single most important performance skill. Replace every Python loop with array operations.</div>
+
+<div class="analogy"><div class="analogy-label">🧠 The Factory Analogy</div>
+<p style="font-size:.88rem">A Python loop is like a single worker assembling cars one at a time. Vectorization is like an assembly line — 10,000 cars built simultaneously in parallel. The same work, done 100× faster, because modern CPUs have SIMD (Single Instruction, Multiple Data) units that operate on entire arrays in one clock cycle.</p></div>
+
+<h3>5.1 — The Core Mental Model</h3>
+<div class="vs-grid">
+  <div class="vs-col bad"><h5>❌ Think: "For each element..."</h5><ul>
+    <li>Leads to Python loops</li>
+    <li>Interpreted one element at a time</li>
+    <li>Function call overhead × N</li>
+    <li>Slow: 100–1000ms for 1M elements</li>
+  </ul></div>
+  <div class="vs-col good"><h5>✅ Think: "Transform the whole array"</h5><ul>
+    <li>Array operations on all elements at once</li>
+    <li>Runs in optimized C/Fortran</li>
+    <li>SIMD: process 8+ floats per clock</li>
+    <li>Fast: 1–5ms for 1M elements</li>
+  </ul></div>
+</div>
+
+<h3>5.2 — Replacing Loops: Pattern Catalog</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+prices = np.array([<span class="nm">100</span>, <span class="nm">102</span>, <span class="nm">98</span>, <span class="nm">105</span>, <span class="nm">103</span>])
+
+<span class="cm"># ── Pattern 1: Element-wise transformation ──</span>
+<span class="cm"># ❌ SLOW:</span>
+log_prices_slow = [np.log(p) <span class="kw">for</span> p <span class="kw">in</span> prices]
+
+<span class="cm"># ✅ FAST:</span>
+log_prices = np.log(prices)  <span class="cm"># ufunc — operates on entire array</span>
+
+<span class="cm"># ── Pattern 2: Pairwise differences (returns) ──</span>
+<span class="cm"># ❌ SLOW:</span>
+returns_slow = [(prices[i]<span class="op">-</span>prices[i<span class="op">-</span><span class="nm">1</span>])/prices[i<span class="op">-</span><span class="nm">1</span>] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>,<span class="fn">len</span>(prices))]
+
+<span class="cm"># ✅ FAST: use slicing to create "current" and "previous" arrays</span>
+returns = (prices[<span class="nm">1</span>:] <span class="op">-</span> prices[:<span class="op">-</span><span class="nm">1</span>]) / prices[:<span class="op">-</span><span class="nm">1</span>]
+
+<span class="cm"># ── Pattern 3: Cumulative operations ──</span>
+<span class="cm"># ❌ SLOW:</span>
+cum_ret = [<span class="nm">1.0</span>]
+<span class="kw">for</span> r <span class="kw">in</span> returns: cum_ret.append(cum_ret[<span class="op">-</span><span class="nm">1</span>] <span class="op">*</span> (<span class="nm">1</span><span class="op">+</span>r))
+
+<span class="cm"># ✅ FAST:</span>
+wealth = np.cumprod(<span class="nm">1</span> <span class="op">+</span> returns)
+
+<span class="cm"># ── Pattern 4: Conditional assignment ──</span>
+<span class="cm"># ❌ SLOW:</span>
+signals_slow = []
+<span class="kw">for</span> r <span class="kw">in</span> returns:
+    <span class="kw">if</span> r <span class="op">></span> <span class="nm">0</span>: signals_slow.append(<span class="nm">1</span>)
+    <span class="kw">else</span>: signals_slow.append(<span class="op">-</span><span class="nm">1</span>)
+
+<span class="cm"># ✅ FAST:</span>
+signals = np.where(returns <span class="op">></span> <span class="nm">0</span>, <span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>)
+
+<span class="cm"># ── Pattern 5: Rolling sum without loop ──</span>
+<span class="cm"># Equivalent to rolling(3).sum() — manual version</span>
+k = <span class="nm">3</span>
+rolling_sum = np.convolve(returns, np.ones(k), mode=<span class="st">'valid'</span>)
+<div class="label">Vectorization Patterns</div></pre>
+
+<h3>5.3 — pandas Vectorization</h3>
+<pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+n = <span class="nm">100_000</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+df = pd.DataFrame({
+    <span class="st">'price'</span>: rng.uniform(<span class="nm">50</span>, <span class="nm">200</span>, n),
+    <span class="st">'volume'</span>: rng.integers(<span class="nm">1000</span>, <span class="nm">1_000_000</span>, n),
+    <span class="st">'side'</span>: rng.choice([<span class="st">'BUY'</span>, <span class="st">'SELL'</span>], n)
+})
+
+<span class="cm"># ── ALWAYS prefer built-in vectorized methods ──</span>
+<span class="cm"># ❌ Slow: .apply() on row-by-row basis</span>
+df[<span class="st">'notional_slow'</span>] = df.apply(<span class="kw">lambda</span> row: row[<span class="st">'price'</span>] <span class="op">*</span> row[<span class="st">'volume'</span>], axis=<span class="nm">1</span>)
+
+<span class="cm"># ✅ Fast: direct column operations</span>
+df[<span class="st">'notional'</span>] = df[<span class="st">'price'</span>] <span class="op">*</span> df[<span class="st">'volume'</span>]  <span class="cm"># element-wise vectorized</span>
+
+<span class="cm"># ❌ Slow: .apply() for string comparison</span>
+df[<span class="st">'signed_slow'</span>] = df[<span class="st">'side'</span>].apply(<span class="kw">lambda</span> x: <span class="nm">1</span> <span class="kw">if</span> x<span class="op">==</span><span class="st">'BUY'</span> <span class="kw">else</span> <span class="op">-</span><span class="nm">1</span>)
+
+<span class="cm"># ✅ Fast: np.where on the underlying values</span>
+df[<span class="st">'signed'</span>] = np.where(df[<span class="st">'side'</span>] <span class="op">==</span> <span class="st">'BUY'</span>, <span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>)
+
+<span class="cm"># ❌ Slow: .apply() for threshold logic</span>
+df[<span class="st">'bucket_slow'</span>] = df[<span class="st">'price'</span>].apply(<span class="kw">lambda</span> p: <span class="st">'high'</span> <span class="kw">if</span> p<span class="op">></span><span class="nm">150</span> <span class="kw">else</span> <span class="st">'low'</span>)
+
+<span class="cm"># ✅ Fast: np.select for multi-condition logic</span>
+conditions = [df[<span class="st">'price'</span>] <span class="op">></span> <span class="nm">150</span>, df[<span class="st">'price'</span>] <span class="op">></span> <span class="nm">100</span>]
+choices = [<span class="st">'high'</span>, <span class="st">'mid'</span>]
+df[<span class="st">'bucket'</span>] = np.select(conditions, choices, default=<span class="st">'low'</span>)
+<div class="label">pandas Vectorization</div></pre>
+
+<h3>5.4 — Speed Comparison with Timeit</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> timeit
+
+N = <span class="nm">1_000_000</span>
+arr = np.random.randn(N)
+lst = arr.tolist()  <span class="cm"># Python list</span>
+
+<span class="cm"># Benchmark: sum of squares</span>
+<span class="kw">def</span> <span class="fn">loop_version</span>(): <span class="kw">return</span> <span class="fn">sum</span>(x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> lst)
+<span class="kw">def</span> <span class="fn">numpy_version</span>(): <span class="kw">return</span> (arr<span class="op">**</span><span class="nm">2</span>).sum()
+<span class="kw">def</span> <span class="fn">numpy_dot</span>(): <span class="kw">return</span> np.dot(arr, arr)  <span class="cm"># fastest: single BLAS call</span>
+
+t1 = timeit.timeit(loop_version, number=<span class="nm">3</span>) / <span class="nm">3</span>
+t2 = timeit.timeit(numpy_version, number=<span class="nm">100</span>) / <span class="nm">100</span>
+t3 = timeit.timeit(numpy_dot, number=<span class="nm">100</span>) / <span class="nm">100</span>
+
+<span class="fn">print</span>(<span class="st">f"Loop:      {t1*1000:.1f}ms"</span>)
+<span class="fn">print</span>(<span class="st">f"NumPy **2: {t2*1000:.2f}ms  ({t1/t2:.0f}× faster)"</span>)
+<span class="fn">print</span>(<span class="st">f"NumPy dot: {t3*1000:.2f}ms  ({t1/t3:.0f}× faster)"</span>)<div class="label">Benchmarking</div></pre>
+
+<h3>5.5 — Advanced: Matrix Operations for Portfolio Work</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Given: returns matrix R (T × N) — T days, N assets</span>
+T, N = <span class="nm">252</span>, <span class="nm">10</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+R = rng.normal(<span class="nm">0.001</span>, <span class="nm">0.02</span>, (T, N))
+
+<span class="cm"># ── Covariance matrix — vectorized ──</span>
+<span class="cm"># Manual (but correct) — all in one matrix op</span>
+R_demean = R <span class="op">-</span> R.mean(axis=<span class="nm">0</span>)          <span class="cm"># (T,N) - (N,) broadcast</span>
+Sigma = (R_demean.T @ R_demean) / (T<span class="op">-</span><span class="nm">1</span>)   <span class="cm"># (N,N) covariance matrix</span>
+
+<span class="cm"># ── Portfolio variance for ALL weight combos simultaneously ──</span>
+W = rng.dirichlet(np.ones(N), size=<span class="nm">10000</span>)  <span class="cm"># (10000, N) — 10K portfolios</span>
+<span class="cm"># w^T Σ w for all portfolios at once (matrix op, no loop!)</span>
+port_var = np.einsum(<span class="st">'ij,jk,ik->i'</span>, W, Sigma, W)  <span class="cm"># (10000,) — pure speed</span>
+port_std = np.sqrt(port_var)
+
+<span class="cm"># ── Cross-sectional z-score normalization (factor investing) ──</span>
+<span class="cm"># Each row = one day, normalize across stocks (axis=1)</span>
+mu_cross = R.mean(axis=<span class="nm">1</span>, keepdims=<span class="kw">True</span>)    <span class="cm"># (T,1)</span>
+sd_cross = R.std(axis=<span class="nm">1</span>, keepdims=<span class="kw">True</span>)     <span class="cm"># (T,1)</span>
+R_normalized = (R <span class="op">-</span> mu_cross) / sd_cross    <span class="cm"># (T,N) — broadcasting!</span><div class="label">Matrix Portfolio Ops</div></pre>
+
+<div class="callout info"><div class="callout-title">💡 The Einsum Trick</div>
+<p><code>np.einsum</code> is the most powerful vectorization tool. It expresses complex matrix operations in Einstein notation. <code>'ij,jk,ik->i'</code> means: for each portfolio i, sum over j,k the product W[i,j] × Σ[j,k] × W[i,k]. This is w^T Σ w for all portfolios simultaneously.</p></div>
+
+<div class="section">
+<div class="section-title">Vectorization Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Rewrite this loop as a vectorized operation: <code>for i in range(1, len(p)): r.append((p[i]-p[i-1])/p[i-1])</code>. Use <code>%timeit</code> in Colab to compare speeds.</li>
+  <li>Given a DataFrame of 5 stocks, compute the cross-sectional rank of each stock's return for each day using <code>.rank(axis=1)</code>. No loops.</li>
+  <li>Replace this pandas <code>.apply()</code> with a vectorized equivalent: <code>df['signal'] = df['return'].apply(lambda x: 1 if x > 0.01 else (-1 if x < -0.01 else 0))</code></li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Implement a vectorized rolling z-score: for each day t, compute (return[t] - mean(last 20 days)) / std(last 20 days) using only pandas rolling — no loops.</li>
+  <li>Given a (252, 10) returns matrix, compute pairwise correlations for all 45 pairs simultaneously using matrix operations. Verify against <code>np.corrcoef</code>.</li>
+  <li>Vectorize this simulation: for 10,000 portfolios of 5 assets, compute Sharpe ratio. Store results in an array. Time it and compare to a Python loop version.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Implement a vectorized VWAP (Volume-Weighted Average Price) over a rolling 30-minute window for tick data, without using any Python loops.</li>
+  <li>Using <code>np.einsum</code>, compute the weighted covariance matrix for a portfolio where weights decay exponentially (recent days matter more). This is the core of EWMA risk models.</li>
+  <li>Implement vectorized backtest: given signals (1/-1/0) and prices, compute daily PnL, cumulative PnL, and drawdown — all without any Python for loops. Include transaction cost model.</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ PERFORMANCE ═══════════════════════════════════ -->
+<div id="tab-perf" class="tab-panel">
+<div class="section">
+<div class="section-title">Performance Optimization <span class="tag">TOPIC 6</span></div>
+<div class="section-desc">When vectorization isn't enough — profiling, memory layout, Numba JIT, and algorithmic tricks.</div>
+
+<div class="analogy"><div class="analogy-label">🧠 The Optimization Hierarchy</div>
+<p style="font-size:.88rem">Always optimize in this order: <strong>(1) Algorithm</strong> — a O(n) algorithm beats O(n²) always. <strong>(2) Vectorization</strong> — remove Python loops. <strong>(3) Memory</strong> — keep data cache-friendly. <strong>(4) Parallelism</strong> — use all CPU cores. <strong>(5) JIT/C extensions</strong> — Numba as last resort. Never start at step 5.</p></div>
+
+<h3>6.1 — Profiling: Finding the Bottleneck</h3>
+<div class="callout warn"><div class="callout-title">⚠️ Golden Rule</div>
+<p>Never optimize without profiling first. 90% of execution time is in 10% of the code. Guess wrong and you waste hours. Profile to find the real bottleneck.</p></div>
+
+<pre><span class="kw">import</span> cProfile
+<span class="kw">import</span> pstats
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">slow_portfolio_calc</span>(returns, weights):
+    <span class="cm">"""Example with hidden bottleneck"""</span>
+    port_returns = []
+    <span class="kw">for</span> day <span class="kw">in</span> range(<span class="fn">len</span>(returns)):
+        daily_port_return = <span class="nm">0</span>
+        <span class="kw">for</span> i, w <span class="kw">in</span> <span class="fn">enumerate</span>(weights):
+            daily_port_return <span class="op">+=</span> w <span class="op">*</span> returns[day, i]
+        port_returns.append(daily_port_return)
+    <span class="kw">return</span> port_returns
+
+<span class="cm"># Profile it</span>
+rng = np.random.default_rng(<span class="nm">42</span>)
+R = rng.normal(<span class="nm">0</span>, <span class="nm">0.01</span>, (<span class="nm">1000</span>, <span class="nm">10</span>))
+w = np.ones(<span class="nm">10</span>) / <span class="nm">10</span>
+
+<span class="cm"># In Jupyter/Colab use %timeit for quick timing:</span>
+<span class="cm"># %timeit slow_portfolio_calc(R, w)</span>
+
+<span class="cm"># In a script, use cProfile:</span>
+profiler = cProfile.Profile()
+profiler.enable()
+slow_portfolio_calc(R, w)
+profiler.disable()
+stats = pstats.Stats(profiler)
+stats.sort_stats(<span class="st">'cumulative'</span>).print_stats(<span class="nm">10</span>)
+
+<span class="cm"># The fix — vectorized:</span>
+fast = R @ w  <span class="cm"># 100× faster — one BLAS call</span><div class="label">Profiling</div></pre>
+
+<h3>6.2 — Memory Layout: C-order vs F-order</h3>
+<div class="diagram">
+<svg viewBox="0 0 680 170" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="20" fill="#64748b" font-size="11" font-family="IBM Plex Mono">C-order (row-major, default) — rows stored contiguously</text>
+  <g font-family="IBM Plex Mono" font-size="10">
+    <rect x="20" y="30" width="50" height="30" rx="3" fill="#00e5ff" opacity=".2" stroke="#00e5ff"/><text x="45" y="50" fill="#00e5ff" text-anchor="middle">A[0,0]</text>
+    <rect x="75" y="30" width="50" height="30" rx="3" fill="#00e5ff" opacity=".2" stroke="#00e5ff"/><text x="100" y="50" fill="#00e5ff" text-anchor="middle">A[0,1]</text>
+    <rect x="130" y="30" width="50" height="30" rx="3" fill="#00e5ff" opacity=".2" stroke="#00e5ff"/><text x="155" y="50" fill="#00e5ff" text-anchor="middle">A[0,2]</text>
+    <rect x="185" y="30" width="50" height="30" rx="3" fill="#c084fc" opacity=".2" stroke="#c084fc"/><text x="210" y="50" fill="#c084fc" text-anchor="middle">A[1,0]</text>
+    <rect x="240" y="30" width="50" height="30" rx="3" fill="#c084fc" opacity=".2" stroke="#c084fc"/><text x="265" y="50" fill="#c084fc" text-anchor="middle">A[1,1]</text>
+    <rect x="295" y="30" width="50" height="30" rx="3" fill="#c084fc" opacity=".2" stroke="#c084fc"/><text x="320" y="50" fill="#c084fc" text-anchor="middle">A[1,2]</text>
+    <text x="20" y="80" fill="#10b981">→ Row iteration: cache-friendly (sequential RAM access)</text>
+    <text x="20" y="95" fill="#ef4444">→ Column iteration: cache-unfriendly (jumps in RAM)</text>
+
+    <text x="400" y="20" fill="#64748b">F-order (column-major) — columns stored contiguously</text>
+    <rect x="400" y="30" width="50" height="30" rx="3" fill="#00e5ff" opacity=".2" stroke="#00e5ff"/><text x="425" y="50" fill="#00e5ff" text-anchor="middle">A[0,0]</text>
+    <rect x="455" y="30" width="50" height="30" rx="3" fill="#c084fc" opacity=".2" stroke="#c084fc"/><text x="480" y="50" fill="#c084fc" text-anchor="middle">A[1,0]</text>
+    <rect x="510" y="30" width="50" height="30" rx="3" fill="#f59e0b" opacity=".2" stroke="#f59e0b"/><text x="535" y="50" fill="#f59e0b" text-anchor="middle">A[2,0]</text>
+    <rect x="565" y="30" width="50" height="30" rx="3" fill="#00e5ff" opacity=".2" stroke="#00e5ff"/><text x="590" y="50" fill="#00e5ff" text-anchor="middle">A[0,1]</text>
+    <text x="400" y="80" fill="#10b981">→ Column iteration: cache-friendly</text>
+    <text x="400" y="95" fill="#475569">Use when ops are column-wise (BLAS LAPACK default)</text>
+  </g>
+  <text x="20" y="150" fill="#f59e0b" font-size="10" font-family="IBM Plex Mono">Use np.ascontiguousarray() to ensure C-order. Check with arr.flags['C_CONTIGUOUS']</text>
+</svg>
+</div>
+
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> timeit
+
+A = np.random.randn(<span class="nm">1000</span>, <span class="nm">1000</span>)
+A_F = np.asfortranarray(A)  <span class="cm"># column-major copy</span>
+
+<span class="cm"># Row slicing: C-order wins (rows are contiguous)</span>
+t_c = timeit.timeit(<span class="kw">lambda</span>: A[<span class="nm">500</span>, :].sum(), number=<span class="nm">10000</span>)
+t_f = timeit.timeit(<span class="kw">lambda</span>: A_F[<span class="nm">500</span>, :].sum(), number=<span class="nm">10000</span>)
+<span class="fn">print</span>(<span class="st">f"Row slice: C={t_c:.3f}s, F={t_f:.3f}s"</span>)
+
+<span class="cm"># Column slicing: F-order wins (columns are contiguous)</span>
+t_c2 = timeit.timeit(<span class="kw">lambda</span>: A[:, <span class="nm">500</span>].sum(), number=<span class="nm">10000</span>)
+t_f2 = timeit.timeit(<span class="kw">lambda</span>: A_F[:, <span class="nm">500</span>].sum(), number=<span class="nm">10000</span>)
+<span class="fn">print</span>(<span class="st">f"Col slice: C={t_c2:.3f}s, F={t_f2:.3f}s"</span>)
+
+<span class="cm"># Check contiguity</span>
+<span class="fn">print</span>(A.flags[<span class="st">'C_CONTIGUOUS'</span>])   <span class="cm"># True</span>
+<span class="fn">print</span>(A.flags[<span class="st">'F_CONTIGUOUS'</span>])   <span class="cm"># False</span><div class="label">Memory Layout</div></pre>
+
+<h3>6.3 — dtype Optimization</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># float64 is default but often overkill — float32 is 2× faster on modern GPUs</span>
+a64 = np.random.randn(<span class="nm">1_000_000</span>).astype(np.float64)  <span class="cm"># 8 bytes each</span>
+a32 = a64.astype(np.float32)                            <span class="cm"># 4 bytes each</span>
+
+<span class="fn">print</span>(<span class="st">f"float64 memory: {a64.nbytes / 1e6:.1f} MB"</span>)
+<span class="fn">print</span>(<span class="st">f"float32 memory: {a32.nbytes / 1e6:.1f} MB"</span>)
+
+<span class="cm"># int8 for signals (BUY=1, SELL=-1, FLAT=0) — 8× memory savings vs int64</span>
+signals = np.array([<span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>, <span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">1</span>, <span class="op">-</span><span class="nm">1</span>], dtype=np.int8)
+
+<span class="cm"># bool for masks — 1 byte each</span>
+mask = a64 <span class="op">></span> <span class="nm">0</span>  <span class="cm"># bool array — very fast for filtering</span>
+
+<span class="cm"># pandas dtypes</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+df = pd.DataFrame({<span class="st">'ticker'</span>: [<span class="st">'AAPL'</span>, <span class="st">'GOOG'</span>] <span class="op">*</span> <span class="nm">100000</span>})
+<span class="fn">print</span>(<span class="st">f"object dtype: {df['ticker'].nbytes} bytes"</span>)
+df[<span class="st">'ticker'</span>] = df[<span class="st">'ticker'</span>].astype(<span class="st">'category'</span>)  <span class="cm"># encode strings as int codes</span>
+<span class="fn">print</span>(<span class="st">f"category dtype: {df['ticker'].nbytes} bytes"</span>)  <span class="cm"># 90%+ reduction!</span><div class="label">dtype Optimization</div></pre>
+
+<h3>6.4 — Numba: JIT Compilation</h3>
+<div class="analogy"><div class="analogy-label">🧠 What is JIT?</div>
+<p style="font-size:.88rem">Numba's <code>@jit</code> decorator compiles your Python function to native machine code the first time it runs. After that, it executes at C speed. Use it when a problem genuinely can't be vectorized (e.g., path-dependent algorithms like Asian option pricing).</p></div>
+
+<pre><span class="kw">from</span> numba <span class="kw">import</span> jit, prange
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Path-dependent: can't vectorize due to sequential dependency</span>
+<span class="cm"># ❌ Pure Python — slow:</span>
+<span class="kw">def</span> <span class="fn">asian_option_slow</span>(S0, K, r, sigma, T, n_paths, n_steps):
+    dt = T / n_steps
+    payoffs = []
+    <span class="kw">for</span> _ <span class="kw">in</span> range(n_paths):
+        S = S0
+        path = [S]
+        <span class="kw">for</span> _ <span class="kw">in</span> range(n_steps):
+            S <span class="op">*=</span> np.exp((r <span class="op">-</span> <span class="nm">0.5</span><span class="op">*</span>sigma<span class="op">**</span><span class="nm">2</span>)<span class="op">*</span>dt <span class="op">+</span> sigma<span class="op">*</span>np.sqrt(dt)<span class="op">*</span>np.random.randn())
+            path.append(S)
+        payoffs.append(<span class="fn">max</span>(np.mean(path) <span class="op">-</span> K, <span class="nm">0</span>))
+    <span class="kw">return</span> np.exp(<span class="op">-</span>r<span class="op">*</span>T) <span class="op">*</span> np.mean(payoffs)
+
+<span class="cm"># ✅ Numba JIT — C-speed:</span>
+<span class="op">@</span>jit(nopython=<span class="kw">True</span>, parallel=<span class="kw">True</span>)  <span class="cm"># parallel=True uses all CPU cores!</span>
+<span class="kw">def</span> <span class="fn">asian_option_fast</span>(S0, K, r, sigma, T, n_paths, n_steps):
+    dt = T / n_steps
+    payoffs = np.zeros(n_paths)
+    <span class="kw">for</span> i <span class="kw">in</span> prange(n_paths):  <span class="cm"># prange = parallel range</span>
+        S = S0
+        path_sum = S0
+        <span class="kw">for</span> j <span class="kw">in</span> range(n_steps):
+            S <span class="op">*=</span> np.exp((r <span class="op">-</span> <span class="nm">0.5</span><span class="op">*</span>sigma<span class="op">**</span><span class="nm">2</span>)<span class="op">*</span>dt <span class="op">+</span> sigma<span class="op">*</span>np.sqrt(dt)<span class="op">*</span>np.random.randn())
+            path_sum <span class="op">+=</span> S
+        avg = path_sum / (n_steps <span class="op">+</span> <span class="nm">1</span>)
+        payoffs[i] = <span class="fn">max</span>(avg <span class="op">-</span> K, <span class="nm">0.0</span>)
+    <span class="kw">return</span> np.exp(<span class="op">-</span>r<span class="op">*</span>T) <span class="op">*</span> payoffs.mean()
+
+<span class="cm"># First call: compiles (takes a moment). Subsequent calls: C-speed</span>
+price = asian_option_fast(<span class="nm">100</span>, <span class="nm">100</span>, <span class="nm">0.05</span>, <span class="nm">0.2</span>, <span class="nm">1.0</span>, <span class="nm">100_000</span>, <span class="nm">252</span>)
+<span class="fn">print</span>(<span class="st">f"Asian option price: ${price:.4f}"</span>)<div class="label">Numba JIT</div></pre>
+
+<h3>6.5 — Memory Efficiency with Views vs Copies</h3>
+<pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+large_arr = np.random.randn(<span class="nm">10_000_000</span>)
+
+<span class="cm"># ── VIEW — shares memory, no copy (fast, memory efficient) ──</span>
+view = large_arr[:<span class="nm">1_000_000</span>]       <span class="cm"># slice = VIEW</span>
+view_T = large_arr.reshape(<span class="nm">1000</span>, <span class="nm">10000</span>)  <span class="cm"># reshape = VIEW (if contiguous)</span>
+<span class="fn">print</span>(view.base <span class="kw">is</span> large_arr)        <span class="cm"># True — it's a view</span>
+
+<span class="cm"># ── COPY — new memory (safe, expensive) ──</span>
+copy = large_arr[:<span class="nm">1_000_000</span>].copy()  <span class="cm"># explicit copy</span>
+fancy = large_arr[[<span class="nm">0</span>, <span class="nm">5</span>, <span class="nm">10</span>]]        <span class="cm"># fancy indexing always copies!</span>
+
+<span class="cm"># Modifying a view modifies the original — potential bug source!</span>
+view[<span class="nm">0</span>] = <span class="nm">9999</span>
+<span class="fn">print</span>(large_arr[<span class="nm">0</span>])  <span class="cm"># 9999 — original changed!</span>
+
+<span class="cm"># Rule: if you need to modify safely, always .copy() first</span>
+safe = large_arr[:<span class="nm">100</span>].copy()
+safe[<span class="nm">0</span>] = <span class="nm">0</span>
+<span class="fn">print</span>(large_arr[<span class="nm">0</span>])  <span class="cm"># still 9999 — original unchanged</span><div class="label">Views vs Copies</div></pre>
+
+<h3>6.6 — Performance Summary Table</h3>
+<table>
+<thead><tr><th>Technique</th><th>When to Use</th><th>Typical Speedup</th><th>Complexity</th></tr></thead>
+<tbody>
+<tr><td>Vectorization (NumPy ufuncs)</td><td>Element-wise ops, no dependencies</td><td>100–500×</td><td>Low</td></tr>
+<tr><td>BLAS (np.dot, matmul)</td><td>Matrix/vector operations</td><td>200–1000×</td><td>Low</td></tr>
+<tr><td>dtype reduction (float32)</td><td>Large arrays, ML pipelines</td><td>1.5–2×</td><td>Very Low</td></tr>
+<tr><td>Memory layout (C vs F order)</td><td>Matrix traversal direction matters</td><td>1.5–5×</td><td>Low</td></tr>
+<tr><td>Numba @jit</td><td>Path-dependent loops (option pricing)</td><td>50–200×</td><td>Medium</td></tr>
+<tr><td>Numba parallel=True</td><td>Independent path MC simulations</td><td>N_cores × faster</td><td>Medium</td></tr>
+<tr><td>Cython / C extensions</td><td>Production critical paths</td><td>100–500×</td><td>High</td></tr>
+<tr><td>GPU (CuPy / PyTorch)</td><td>Very large matrices, DL</td><td>10–100×</td><td>High</td></tr>
+</tbody>
+</table>
+
+<div class="experiment">
+<div class="experiment-header"><span class="badge">COLAB</span><strong>Experiment 6 — Full Performance Benchmark Suite</strong></div>
+<pre style="font-size:.76rem"><span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+<span class="kw">import</span> timeit
+<span class="kw">from</span> numba <span class="kw">import</span> jit
+
+N = <span class="nm">1_000_000</span>; arr = np.random.randn(N); lst = <span class="fn">list</span>(arr)
+
+benchmarks = {}
+benchmarks[<span class="st">'Python loop'</span>] = timeit.timeit(<span class="kw">lambda</span>: <span class="fn">sum</span>(x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> lst), number=<span class="nm">3</span>) / <span class="nm">3</span>
+benchmarks[<span class="st">'NumPy **2 + sum'</span>] = timeit.timeit(<span class="kw">lambda</span>: (arr<span class="op">**</span><span class="nm">2</span>).sum(), number=<span class="nm">100</span>) / <span class="nm">100</span>
+benchmarks[<span class="st">'NumPy dot'</span>] = timeit.timeit(<span class="kw">lambda</span>: np.dot(arr, arr), number=<span class="nm">100</span>) / <span class="nm">100</span>
+
+<span class="op">@</span>jit(nopython=<span class="kw">True</span>)
+<span class="kw">def</span> <span class="fn">numba_sum_sq</span>(a):
+    s = <span class="nm">0.0</span>
+    <span class="kw">for</span> x <span class="kw">in</span> a: s <span class="op">+=</span> x<span class="op">*</span>x
+    <span class="kw">return</span> s
+numba_sum_sq(arr[:10])  <span class="cm"># warmup</span>
+benchmarks[<span class="st">'Numba JIT'</span>] = timeit.timeit(<span class="kw">lambda</span>: numba_sum_sq(arr), number=<span class="nm">100</span>) / <span class="nm">100</span>
+
+fastest = <span class="fn">min</span>(benchmarks.values())
+<span class="fn">print</span>(<span class="st">f"{'Method':<25} {'Time(ms)':<12} {'vs Loop'}"</span>)
+<span class="fn">print</span>(<span class="st">"-"</span><span class="op">*</span><span class="nm">50</span>)
+<span class="kw">for</span> name, t <span class="kw">in</span> benchmarks.items():
+    <span class="fn">print</span>(<span class="st">f"{name:<25} {t*1000:<12.2f} {benchmarks['Python loop']/t:.0f}×"</span>)</pre>
+<a href="https://colab.research.google.com" target="_blank" class="colab-btn">▶ Open Colab & Paste</a>
+</div>
+
+<div class="section">
+<div class="section-title">Performance Exercises <span class="tag">PRACTICE</span></div>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Easy</span>
+<ul class="ex-list">
+  <li>Use <code>%timeit</code> in Colab to compare: Python list comprehension vs NumPy for computing square roots of 1 million numbers. Report the speedup ratio.</li>
+  <li>Create a float64 array of 10M random numbers. Convert to float32 and int16. Print the memory usage of each. Use <code>arr.nbytes</code>.</li>
+  <li>Create a (1000, 1000) array. Test if row iteration is faster than column iteration using timeit. Explain the result in terms of memory layout.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Medium</span>
+<ul class="ex-list">
+  <li>Profile a Monte Carlo simulation (1M paths, 252 steps each) using <code>cProfile</code>. Identify the top 3 time-consuming functions. Optimize the worst one using vectorization.</li>
+  <li>Compare <code>pandas.apply()</code> vs direct column operations for computing transaction costs (price × volume × fee_rate) on a 500K row trade log. Report the speedup.</li>
+  <li>Implement a function that computes a 252-day rolling covariance matrix for 10 stocks using <code>pandas.rolling().cov()</code>. Profile memory usage before and after adding a <code>.astype(np.float32)</code>.</li>
+</ul></div>
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Hard</span>
+<ul class="ex-list">
+  <li>Use Numba with <code>parallel=True</code> and <code>prange</code> to parallelize a 1M-path Monte Carlo barrier option pricer. Compare serial vs parallel performance on Google Colab's CPU.</li>
+  <li>Build a complete performance benchmark framework: test 5 different implementations of a 20-day rolling Sharpe ratio (loop, apply, rolling, NumPy stride tricks, Numba). Create a comparison table.</li>
+  <li>Use NumPy stride tricks (<code>np.lib.stride_tricks.as_strided</code>) to implement a rolling window without any copies. Implement rolling mean using only matrix multiplication. This is how efficient rolling windows work internally.</li>
+</ul></div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════ ALL EXERCISES ═══════════════════════════════════ -->
+<div id="tab-exercises" class="tab-panel">
+<div class="section">
+<div class="section-title">Master Exercise Set <span class="tag">ALL TOPICS</span></div>
+<div class="section-desc">Integrated exercises that combine multiple topics. These are closest to real quant engineering tasks.</div>
+
+<div class="callout info"><div class="callout-title">💡 How to Use</div>
+<p>Each exercise below integrates 2+ topics from this guide. They're graded by the combination of skills required, not just difficulty. Complete these after finishing individual topic exercises.</p></div>
+
+<h3>🔗 Integrated Exercises</h3>
+<div class="exercise-tier"><span class="tier-label tier-easy">🟢 Starter Projects</span>
+<ul class="ex-list">
+  <li><strong>[NumPy + pandas]</strong> Build a function that takes a list of tickers and generates a random OHLCV DataFrame (252 trading days). Ensure Open ≤ High, Open ≥ Low, and Close is between Low and High.</li>
+  <li><strong>[pandas + Time-Series]</strong> Given a DataFrame of daily prices, compute: daily return, 5-day MA, 20-day rolling std, and maximum drawdown to date. Add all as new columns. Export to CSV.</li>
+  <li><strong>[SciPy + NumPy]</strong> Fit a normal and t-distribution to 5 years of simulated daily returns. Compare their 99% VaR estimates and visualize both distributions on a histogram.</li>
+</ul></div>
+
+<div class="exercise-tier"><span class="tier-label tier-med">🟡 Mini-Projects</span>
+<ul class="ex-list">
+  <li><strong>[All Topics]</strong> Build a simple momentum backtest: rank 10 stocks by prior 20-day return each day; go long top 3, short bottom 3 (equal-weighted within each leg). Report annual Sharpe, max drawdown, and Calmar ratio.</li>
+  <li><strong>[pandas + SciPy + Vectorization]</strong> Implement a rolling pairs-trading signal: compute rolling 60-day correlation, z-score the spread, generate entry/exit signals when spread z-score exceeds ±2σ. Use no Python loops.</li>
+  <li><strong>[NumPy + SciPy + Performance]</strong> Monte Carlo price a European call option (Black-Scholes inputs) using 100K paths. Compare runtime to the analytical Black-Scholes formula from SciPy. Then Numba-accelerate the MC and benchmark.</li>
+</ul></div>
+
+<div class="exercise-tier"><span class="tier-label tier-hard">🔴 Capstone Projects</span>
+<ul class="ex-list">
+  <li><strong>[All Topics — Full System]</strong> Build a complete vectorized factor backtesting engine: ingest simulated data, compute value (P/E inverse) and momentum factors, cross-sectionally normalize, form long-short portfolios, compute performance metrics, handle transaction costs, and output a performance report DataFrame. No Python loops anywhere in the signal or backtest logic.</li>
+  <li><strong>[SciPy + NumPy + Performance]</strong> Implement Markowitz Mean-Variance Optimization with a rolling estimation window: every month, re-estimate the covariance matrix using the prior 6 months of data, solve for the maximum-Sharpe portfolio using SciPy, apply turnover constraints, and track the portfolio's out-of-sample performance. Profile and optimize the most expensive step.</li>
+  <li><strong>[All Topics — Production Grade]</strong> Build a risk system for a 10-stock portfolio: compute real-time VaR (historical simulation and parametric) at 95% and 99%, rolling beta to a market index, tracking error vs equal-weight benchmark, and stress-test PnL under 2008-style scenarios (scaled historical shocks). All results must update incrementally as each new day's data arrives — no full recalculation.</li>
+</ul></div>
+
+<h3>📚 Recommended Learning Path Resources</h3>
+<div class="resource-grid">
+  <a href="https://numpy.org/numpy-tutorials/" target="_blank" class="resource-card"><div class="rc-type">📘 Official</div><div class="rc-title">NumPy Tutorials</div><div class="rc-desc">Interactive notebooks from the NumPy team</div></a>
+  <a href="https://scipy-lectures.org/intro/numpy/index.html" target="_blank" class="resource-card"><div class="rc-type">📚 Book</div><div class="rc-title">SciPy Lectures: NumPy</div><div class="rc-desc">Visual, detailed — the best free resource</div></a>
+  <a href="https://pandas.pydata.org/docs/getting_started/intro_tutorials/index.html" target="_blank" class="resource-card"><div class="rc-type">📘 Official</div><div class="rc-title">pandas Getting Started</div><div class="rc-desc">Step-by-step official tutorials</div></a>
+  <a href="https://numba.readthedocs.io/en/stable/user/5minguide.html" target="_blank" class="resource-card"><div class="rc-type">📘 Docs</div><div class="rc-title">Numba 5-Min Guide</div><div class="rc-desc">Get started with JIT compilation</div></a>
+  <a href="https://www.youtube.com/watch?v=GB9ByFAIAH4" target="_blank" class="resource-card"><div class="rc-type">🎥 Video</div><div class="rc-title">Python Performance Tips</div><div class="rc-desc">mCoding — deep dive on Python speed</div></a>
+  <a href="https://github.com/firmai/financial-machine-learning" target="_blank" class="resource-card"><div class="rc-type">💻 GitHub</div><div class="rc-title">Financial ML</div><div class="rc-desc">Collection of quant Python notebooks</div></a>
+  <a href="https://www.quantstart.com/articles/Scientific-Python-Pandas-Quant-Finance-Introduction/" target="_blank" class="resource-card"><div class="rc-type">📖 Article</div><div class="rc-title">QuantStart pandas Guide</div><div class="rc-desc">Finance-specific pandas walkthrough</div></a>
+  <a href="https://people.duke.edu/~ccc14/sta-663-2016/15A_RandomNumbers.html" target="_blank" class="resource-card"><div class="rc-type">📚 Course</div><div class="rc-title">Duke STA663 Notebooks</div><div class="rc-desc">Statistical computing for scientists</div></a>
+</div>
+
+<h3 style="margin-top:2rem">🗺 Self-Assessment Checklist</h3>
+<div class="card">
+<p style="font-weight:600;margin-bottom:.8rem;font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--accent)">NumPy</p>
+<div style="font-size:.83rem;display:flex;flex-direction:column;gap:.3rem">
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can create arrays from lists, using factory functions, and random generators</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I understand broadcasting rules and can apply them without errors</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can compute returns, volatility, and cumulative products vectorized</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can index with booleans, integers, and slices</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I know when a NumPy operation returns a view vs a copy</label>
+</div>
+<p style="font-weight:600;margin:.8rem 0;font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--accent)">SciPy</p>
+<div style="font-size:.83rem;display:flex;flex-direction:column;gap:.3rem">
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can compute VaR using normal and t-distributions</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can set up and run portfolio optimization with constraints</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can generate correlated asset simulations using Cholesky</label>
+</div>
+<p style="font-weight:600;margin:.8rem 0;font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--accent)">pandas</p>
+<div style="font-size:.83rem;display:flex;flex-direction:column;gap:.3rem">
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I know the difference between loc and iloc and never confuse them</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can resample, roll, and shift time-series data</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I handle missing data appropriately for financial context (ffill vs drop)</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can groupby + agg for multi-asset analysis</label>
+</div>
+<p style="font-weight:600;margin:.8rem 0;font-family:'IBM Plex Mono',monospace;font-size:.85rem;color:var(--accent)">Performance</p>
+<div style="font-size:.83rem;display:flex;flex-direction:column;gap:.3rem">
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I always profile before optimizing</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I can recognize when to use loops vs vectorized ops</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I understand when Numba adds value and when it doesn't</label>
+<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox"> I know the difference between views and copies and can avoid accidental copies</label>
+</div>
+</div>
+
+</div>
+</div>
+
+<footer>
+  <p>Built for first-time quant engineering learners · <span>Python for Quant Work</span> · Fully Offline · 2024</p>
+  <p style="margin-top:.4rem">Tabs: Roadmap → Prerequisites → NumPy → SciPy → pandas → Time-Series → Vectorization → Performance → Exercises</p>
+</footer>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
