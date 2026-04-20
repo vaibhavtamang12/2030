@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Risk & Portfolio Theory — Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@300;400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0e1a;
+    --surface: #111525;
+    --surface2: #161b2e;
+    --border: #1e2640;
+    --accent: #00d4ff;
+    --accent2: #7c5cfc;
+    --accent3: #ff6b6b;
+    --accent4: #00e5a0;
+    --gold: #f0c040;
+    --text: #d8e0f0;
+    --text-dim: #6b7a9e;
+    --text-bright: #ffffff;
+    --tab-active: #00d4ff;
+    --code-bg: #090c17;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: linear-gradient(135deg, #0b0e1a 0%, #111830 50%, #0d1220 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .logo-badge {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 10px;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+
+  .header-text p {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── Tabs ── */
+  .tabs-bar {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0;
+  }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-btn .tab-num {
+    display: inline-block;
+    background: var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    margin-right: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tab-btn.active .tab-num {
+    background: rgba(0,212,255,0.15);
+    color: var(--accent);
+  }
+
+  /* ── Main content ── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Typography ── */
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin: 36px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 24px 0 8px;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,0.3); transition: 0.2s; }
+  a:hover { border-bottom-color: var(--accent); }
+
+  /* ── Section intro ── */
+  .section-intro {
+    background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(0,212,255,0.05));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    margin-top: 16px;
+  }
+
+  .section-intro .topic-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    border: 1px solid;
+  }
+
+  .callout-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .callout.intuition {
+    background: rgba(0,229,160,0.05);
+    border-color: rgba(0,229,160,0.25);
+  }
+  .callout.intuition .callout-title { color: var(--accent4); }
+
+  .callout.formula {
+    background: rgba(240,192,64,0.05);
+    border-color: rgba(240,192,64,0.25);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .callout.formula .callout-title { color: var(--gold); }
+
+  .callout.warning {
+    background: rgba(255,107,107,0.05);
+    border-color: rgba(255,107,107,0.25);
+  }
+  .callout.warning .callout-title { color: var(--accent3); }
+
+  .callout.resource {
+    background: rgba(0,212,255,0.04);
+    border-color: rgba(0,212,255,0.2);
+  }
+  .callout.resource .callout-title { color: var(--accent); }
+
+  .callout.tip {
+    background: rgba(124,92,252,0.06);
+    border-color: rgba(124,92,252,0.25);
+  }
+  .callout.tip .callout-title { color: var(--accent2); }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .code-block .code-label {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .code-block pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #c9d1e8;
+    line-height: 1.65;
+    white-space: pre;
+  }
+
+  .code-block pre .kw { color: #7c5cfc; }
+  .code-block pre .fn { color: #00d4ff; }
+  .code-block pre .st { color: #00e5a0; }
+  .code-block pre .cm { color: #4a5568; font-style: italic; }
+  .code-block pre .nm { color: #f0c040; }
+  .code-block pre .op { color: #ff6b6b; }
+
+  /* ── Math display ── */
+  .math-display {
+    background: linear-gradient(135deg, #0d1220, #111830);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin: 16px 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    overflow-x: auto;
+  }
+
+  /* ── Visual diagrams (pure CSS) ── */
+  .diagram-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  .diagram-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* Normal distribution curve via CSS */
+  .normal-curve-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1px;
+  }
+
+  .curve-bar {
+    background: linear-gradient(to top, var(--accent2), var(--accent));
+    border-radius: 2px 2px 0 0;
+    transition: all 0.3s;
+    opacity: 0.7;
+  }
+
+  .curve-bar.var-zone { background: linear-gradient(to top, var(--accent3), rgba(255,107,107,0.4)); opacity: 0.9; }
+  .curve-bar.cvar-zone { background: linear-gradient(to top, #ff3a3a, rgba(255,58,58,0.5)); opacity: 1; }
+
+  /* Portfolio scatter plot */
+  .scatter-grid {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    border-left: 2px solid var(--border);
+    border-bottom: 2px solid var(--border);
+  }
+
+  .scatter-dot {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, 50%);
+  }
+
+  .scatter-label {
+    position: absolute;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    transform: translate(-50%, 50%);
+  }
+
+  .efficient-frontier {
+    position: absolute;
+    width: 100%; height: 100%;
+    top: 0; left: 0;
+    overflow: hidden;
+  }
+
+  /* ── Cards grid ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-bright);
+    margin-bottom: 6px;
+  }
+
+  .card-body {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ── Prerequisite tag ── */
+  .prereq-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(240,192,64,0.1);
+    border: 1px solid rgba(240,192,64,0.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    margin: 4px;
+  }
+
+  /* ── Exercise tiers ── */
+  .exercise-tier {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    border: 1px solid;
+  }
+
+  .exercise-tier.easy {
+    background: rgba(0,229,160,0.04);
+    border-color: rgba(0,229,160,0.2);
+  }
+
+  .exercise-tier.medium {
+    background: rgba(240,192,64,0.04);
+    border-color: rgba(240,192,64,0.2);
+  }
+
+  .exercise-tier.hard {
+    background: rgba(255,107,107,0.04);
+    border-color: rgba(255,107,107,0.2);
+  }
+
+  .tier-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tier-label.easy { color: var(--accent4); }
+  .tier-label.medium { color: var(--gold); }
+  .tier-label.hard { color: var(--accent3); }
+
+  .exercise-item {
+    margin: 10px 0;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    font-size: 14px;
+    counter-increment: exercise-counter;
+  }
+
+  .exercise-item::before {
+    content: "→ ";
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Colab CTA ── */
+  .colab-card {
+    background: linear-gradient(135deg, rgba(245,124,0,0.08), rgba(255,193,7,0.05));
+    border: 1px solid rgba(245,124,0,0.3);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin: 20px 0;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .colab-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .colab-content h4 {
+    color: #f5a623;
+    margin: 0 0 6px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 15px;
+  }
+
+  .colab-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,124,0,0.15);
+    border: 1px solid rgba(245,124,0,0.4);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #f5a623;
+    margin-top: 10px;
+    text-decoration: none;
+    border-bottom: none;
+    transition: background 0.2s;
+  }
+
+  .colab-link:hover { background: rgba(245,124,0,0.25); border-bottom: none; }
+
+  /* ── Resource links ── */
+  .resource-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: none;
+    transition: all 0.2s;
+  }
+
+  .resource-link:hover {
+    background: rgba(0,212,255,0.08);
+    border-color: var(--accent);
+    border-bottom: none;
+  }
+
+  .resource-link .rl-type {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── Analogy box ── */
+  .analogy-box {
+    background: linear-gradient(135deg, rgba(124,92,252,0.06), rgba(0,212,255,0.04));
+    border: 1px solid rgba(124,92,252,0.2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+
+  .analogy-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+
+  th {
+    background: var(--surface2);
+    color: var(--text-bright);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    padding: 11px 16px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+
+  /* ── Progress roadmap ── */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 22px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent2), var(--accent), var(--accent4));
+    opacity: 0.3;
+  }
+
+  .roadmap-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 14px 0;
+    position: relative;
+  }
+
+  .roadmap-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .roadmap-step.prereq .roadmap-num { color: var(--gold); border-color: rgba(240,192,64,0.4); }
+
+  .roadmap-content h4 {
+    color: var(--text-bright);
+    font-size: 14px;
+    margin: 6px 0 3px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .roadmap-content p {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* ── Interactive SVG charts ── */
+  svg text { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .site-header { padding: 20px 16px 0; }
+    .main { padding: 24px 16px 60px; }
+    h2 { font-size: 26px; }
+    .tab-btn { padding: 10px 14px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════ HEADER ════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo-badge">Q∑</div>
+    <div class="header-text">
+      <h1>Risk Metrics & Portfolio Theory</h1>
+      <p>Complete Self-Study Guide · Quant Engineering Track · Beginner → Advanced</p>
+    </div>
+  </div>
+  <nav class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab(0)"><span class="tab-num">00</span>Roadmap</button>
+    <button class="tab-btn" onclick="switchTab(1)"><span class="tab-num">01</span>Prerequisites</button>
+    <button class="tab-btn" onclick="switchTab(2)"><span class="tab-num">02</span>Statistics Core</button>
+    <button class="tab-btn" onclick="switchTab(3)"><span class="tab-num">03</span>Returns & Risk</button>
+    <button class="tab-btn" onclick="switchTab(4)"><span class="tab-num">04</span>VaR</button>
+    <button class="tab-btn" onclick="switchTab(5)"><span class="tab-num">05</span>CVaR</button>
+    <button class="tab-btn" onclick="switchTab(6)"><span class="tab-num">06</span>Sharpe Ratio</button>
+    <button class="tab-btn" onclick="switchTab(7)"><span class="tab-num">07</span>Diversification</button>
+    <button class="tab-btn" onclick="switchTab(8)"><span class="tab-num">08</span>CAPM</button>
+    <button class="tab-btn" onclick="switchTab(9)"><span class="tab-num">09</span>Factor Models</button>
+    <button class="tab-btn" onclick="switchTab(10)"><span class="tab-num">10</span>Putting It Together</button>
+  </nav>
+</header>
+
+<main class="main">
+
+<!-- ════════════════ TAB 0: ROADMAP ════════════════ -->
+<div class="tab-panel active" id="panel-0">
+  <h2>Your Learning Roadmap</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// START HERE</div>
+    <p>This guide is designed to be <strong>100% self-contained</strong>. You will go from zero to understanding every risk metric used by professional quant engineers. Each topic builds on the one before it. Follow the tabs in order.</p>
+    <p>Estimated total study time: <strong>15–25 hours</strong> depending on pace. Each tab includes theory, visuals, Python experiments, and tiered practice exercises.</p>
+  </div>
+
+  <h3>Topic Sequence & Dependencies</h3>
+  <div class="roadmap">
+    <div class="roadmap-step prereq">
+      <div class="roadmap-num">P1</div>
+      <div class="roadmap-content">
+        <h4>Prerequisites → Tab 01</h4>
+        <p>Logarithms, Algebra, Summation notation, Basic Probability. These are the language of finance math.</p>
+      </div>
+    </div>
+    <div class="roadmap-step prereq">
+      <div class="roadmap-num">P2</div>
+      <div class="roadmap-content">
+        <h4>Statistics Core → Tab 02</h4>
+        <p>Mean, Variance, Standard Deviation, Correlation, Normal Distribution. Everything else is built on these.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">1</div>
+      <div class="roadmap-content">
+        <h4>Returns & Risk → Tab 03</h4>
+        <p>How to calculate investment returns, log returns, and why volatility is the basic risk measure.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">2</div>
+      <div class="roadmap-content">
+        <h4>Value at Risk (VaR) → Tab 04</h4>
+        <p>The most widely used risk metric. Requires: Normal Distribution, Returns.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">3</div>
+      <div class="roadmap-content">
+        <h4>CVaR (Expected Shortfall) → Tab 05</h4>
+        <p>The smarter version of VaR that fixes its biggest flaw. Requires: VaR.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">4</div>
+      <div class="roadmap-content">
+        <h4>Sharpe Ratio → Tab 06</h4>
+        <p>Risk-adjusted return measurement. Requires: Returns & Risk, Statistics Core.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">5</div>
+      <div class="roadmap-content">
+        <h4>Diversification Math → Tab 07</h4>
+        <p>Why holding many assets reduces risk. Requires: Correlation, Variance.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">6</div>
+      <div class="roadmap-content">
+        <h4>CAPM → Tab 08</h4>
+        <p>The Capital Asset Pricing Model — Beta, market risk, expected return. Requires: Diversification, Correlation.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">7</div>
+      <div class="roadmap-content">
+        <h4>Factor Models → Tab 09</h4>
+        <p>Fama-French, multifactor models that extend CAPM. Requires: CAPM, Regression basics.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">★</div>
+      <div class="roadmap-content">
+        <h4>Synthesis → Tab 10</h4>
+        <p>How all topics connect. Portfolio construction walkthrough. Real-world application guide.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Tools You Will Use</h3>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">🐍</div>
+      <div class="card-title">Python (Google Colab)</div>
+      <div class="card-body">Free, runs in browser. Libraries: numpy, pandas, scipy, matplotlib, yfinance. All experiments are copy-paste ready.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Real Market Data</div>
+      <div class="card-body">We use yfinance to pull real stock price data from Yahoo Finance for all experiments.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧮</div>
+      <div class="card-title">Desmos Calculator</div>
+      <div class="card-body">Interactive graphing calculator at desmos.com — used to visualize formulas live as you type.</div>
+    </div>
+  </div>
+
+  <div class="callout resource">
+    <div class="callout-title">🔗 Core External Resources</div>
+    <div class="resource-links">
+      <a href="https://colab.research.google.com" class="resource-link" target="_blank">🔬 Google Colab <span class="rl-type">free python</span></a>
+      <a href="https://www.desmos.com/calculator" class="resource-link" target="_blank">📈 Desmos Graphing <span class="rl-type">interactive math</span></a>
+      <a href="https://finance.yahoo.com" class="resource-link" target="_blank">📉 Yahoo Finance <span class="rl-type">market data</span></a>
+      <a href="https://www.investopedia.com" class="resource-link" target="_blank">📚 Investopedia <span class="rl-type">definitions</span></a>
+      <a href="https://brilliant.org/courses/probability/" class="resource-link" target="_blank">🧠 Brilliant.org <span class="rl-type">probability</span></a>
+      <a href="https://www.khanacademy.org/math/statistics-probability" class="resource-link" target="_blank">🎓 Khan Academy Stats <span class="rl-type">free course</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 1: PREREQUISITES ════════════════ -->
+<div class="tab-panel" id="panel-1">
+  <h2>Prerequisites</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// FOUNDATION LAYER</div>
+    <p>Before diving into portfolio theory, you need to be comfortable with these foundational math concepts. Don't skip this — they appear everywhere. Each concept is explained from scratch.</p>
+  </div>
+
+  <h3>1. Summation Notation (Σ)</h3>
+  <p>The Greek letter Sigma (Σ) is just a shorthand for "add things up." Instead of writing:</p>
+  <p><em>x₁ + x₂ + x₃ + x₄ + x₅</em></p>
+  <p>We write:</p>
+  <div class="math-display">Σ(i=1 to 5) xᵢ</div>
+  <div class="callout intuition">
+    <div class="callout-title">💡 Real World Analogy</div>
+    Think of Σ as a FOR loop in Python: <code>sum([x1, x2, x3, x4, x5])</code>. You're iterating through items and adding them up. Finance is full of sums — summing returns, summing weighted positions, summing errors.
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Python</span>
+    <pre><span class="cm"># Summation in Python</span>
+returns = [<span class="nm">0.05</span>, <span class="nm">0.02</span>, -<span class="nm">0.03</span>, <span class="nm">0.07</span>, <span class="nm">0.01</span>]
+
+<span class="cm"># Manual sum</span>
+total = <span class="nm">0</span>
+<span class="kw">for</span> r <span class="kw">in</span> returns:
+    total += r
+
+<span class="cm"># Or simply:</span>
+total = <span class="fn">sum</span>(returns)  <span class="cm"># = 0.12</span>
+<span class="fn">print</span>(total)</pre>
+  </div>
+
+  <h3>2. Logarithms (log)</h3>
+  <p>A logarithm answers the question: <em>"What power do I raise the base to, to get this number?"</em></p>
+  <div class="math-display">log₁₀(100) = 2  because  10² = 100</div>
+  <p>In finance we use the <strong>natural logarithm</strong> (ln, base e ≈ 2.718). The key property we need:</p>
+  <div class="math-display">ln(A × B) = ln(A) + ln(B)</div>
+  <div class="callout intuition">
+    <div class="callout-title">💡 Why logs matter in finance</div>
+    When a stock price goes from $100 to $110 to $121, it grew by the same percentage each step (10%). Log returns let us <em>add</em> these percentage changes instead of multiplying them. This makes math much easier and is used in almost every financial model.
+  </div>
+
+  <h3>3. Weighted Averages</h3>
+  <p>A plain average treats all items equally. A weighted average lets some items matter more:</p>
+  <div class="math-display">Weighted Mean = Σ(wᵢ × xᵢ)   where  Σwᵢ = 1</div>
+  <div class="callout intuition">
+    <div class="callout-title">💡 Portfolio Analogy</div>
+    If you invest 70% in Stock A (return 5%) and 30% in Stock B (return 10%), your portfolio return is: 0.70 × 5% + 0.30 × 10% = 3.5% + 3% = 6.5%. This is a weighted average — used constantly in portfolio theory.
+  </div>
+
+  <h3>4. Variance vs. Standard Deviation</h3>
+  <p>These measure how "spread out" data is. Variance is the average of squared differences from the mean. Standard deviation is its square root (more interpretable because it's in the same units as the data).</p>
+  <div class="math-display">Variance = Σ(xᵢ - mean)² / n</div>
+  <div class="math-display">Std Dev (σ) = √Variance</div>
+
+  <h3>5. Basic Probability</h3>
+  <p>Probability measures likelihood on a scale of 0 (impossible) to 1 (certain). In finance, we use probability to model how likely different returns are.</p>
+  <table>
+    <tr><th>Concept</th><th>Definition</th><th>Finance Example</th></tr>
+    <tr><td>P(event)</td><td>Probability of event</td><td>P(stock drops 5%) = 0.10</td></tr>
+    <tr><td>Expected value</td><td>Σ P(x) × x</td><td>Expected daily return</td></tr>
+    <tr><td>Percentile</td><td>Value below which X% of data falls</td><td>5th percentile → used in VaR</td></tr>
+  </table>
+
+  <div class="callout resource">
+    <div class="callout-title">📚 Study Resources</div>
+    <div class="resource-links">
+      <a href="https://www.khanacademy.org/math/algebra-home/alg-exp-and-log" class="resource-link" target="_blank">Khan: Logarithms</a>
+      <a href="https://www.khanacademy.org/math/statistics-probability" class="resource-link" target="_blank">Khan: Stats & Probability</a>
+      <a href="https://www.desmos.com/calculator" class="resource-link" target="_blank">Desmos: Graph ln(x)</a>
+    </div>
+  </div>
+
+  <!-- Exercises -->
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">Calculate: Σ(i=1 to 4) of [2, 5, 8, 11]. What is the answer?</div>
+    <div class="exercise-item">You invest 60% in Asset A (return 4%) and 40% in Asset B (return 8%). What is the weighted average return?</div>
+    <div class="exercise-item">What is ln(1)? What is ln(e)? Why does this matter?</div>
+    <div class="exercise-item">Open Python/Colab and compute: import numpy as np; np.log(100) — what does this return?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Given returns [0.02, -0.03, 0.05, 0.01, -0.01], compute mean and variance by hand, then verify with Python (numpy).</div>
+    <div class="exercise-item">If P(loss &gt; 5%) = 0.10 and P(loss &gt; 10%) = 0.02, what does this tell you about the distribution?</div>
+    <div class="exercise-item">Write a Python function that takes a list of returns and weights, and returns the portfolio weighted average return.</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Prove algebraically that the weighted average of two assets' variances is NOT the variance of the portfolio (hint: why does this matter?).</div>
+    <div class="exercise-item">Write a Colab notebook that: loads 5 years of S&P 500 data, computes log returns, and plots the distribution. What shape do you see?</div>
+    <div class="exercise-item">Research the difference between geometric and arithmetic mean returns. When would you use each, and why does compounding make the geometric mean important?</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 2: STATISTICS CORE ════════════════ -->
+<div class="tab-panel" id="panel-2">
+  <h2>Statistics Core</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// PREREQUISITE — READ BEFORE TABS 3-10</div>
+    <p>Statistical concepts are the DNA of every risk model. This tab gives you everything you need before touching any financial formula.</p>
+  </div>
+
+  <h3>Mean (Expected Value)</h3>
+  <p>The mean is the "center of gravity" of a dataset. In finance, the mean of returns is the <strong>expected return</strong> — our best guess of what the investment will produce.</p>
+  <div class="math-display">μ = (1/n) × Σ xᵢ</div>
+  <div class="callout warning">
+    <div class="callout-title">⚠️ Common Pitfall</div>
+    A high expected return alone tells you nothing useful. A stock that returns on average +10% but swings wildly between +80% and -60% is very different from one that steadily returns +10%. You need to measure the <em>variability</em> too.
+  </div>
+
+  <h3>Variance & Standard Deviation</h3>
+  <p>Variance measures how far returns are from their average, on average. Standard deviation (σ) is the square root — it gives us "typical swing" in the same units as returns.</p>
+  <div class="math-display">σ² = (1/n) Σ (xᵢ - μ)²</div>
+  <div class="math-display">σ = √σ²</div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">// Analogy</div>
+    <p>Imagine two archers. Archer A hits exactly the bullseye every shot. Archer B's shots are scattered wildly — sometimes very high, sometimes very low, but averaging the bullseye. They have the same mean but very different standard deviations. Standard deviation in finance = how scattered your outcomes are.</p>
+  </div>
+
+  <h3>Covariance & Correlation</h3>
+  <p>Covariance tells us whether two assets tend to move together (positive covariance) or in opposite directions (negative covariance). Correlation normalizes this into a [-1, 1] range.</p>
+  <div class="math-display">Cov(A,B) = (1/n) Σ (Aᵢ - μ_A)(Bᵢ - μ_B)</div>
+  <div class="math-display">ρ(A,B) = Cov(A,B) / (σ_A × σ_B)</div>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// Correlation Spectrum</div>
+    <svg width="100%" height="160" viewBox="0 0 700 160">
+      <!-- Background -->
+      <defs>
+        <linearGradient id="corrGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.8"/>
+          <stop offset="50%" style="stop-color:#4a5568;stop-opacity:0.8"/>
+          <stop offset="100%" style="stop-color:#00e5a0;stop-opacity:0.8"/>
+        </linearGradient>
+      </defs>
+      <rect x="40" y="60" width="620" height="20" rx="10" fill="url(#corrGrad)" opacity="0.6"/>
+      <!-- Markers -->
+      <line x1="40" y1="55" x2="40" y2="85" stroke="#ff6b6b" stroke-width="2"/>
+      <line x1="350" y1="55" x2="350" y2="85" stroke="#4a5568" stroke-width="2"/>
+      <line x1="660" y1="55" x2="660" y2="85" stroke="#00e5a0" stroke-width="2"/>
+      <!-- Labels -->
+      <text x="40" y="45" fill="#ff6b6b" font-size="13" text-anchor="middle">ρ = -1</text>
+      <text x="350" y="45" fill="#888" font-size="13" text-anchor="middle">ρ = 0</text>
+      <text x="660" y="45" fill="#00e5a0" font-size="13" text-anchor="middle">ρ = +1</text>
+      <!-- Descriptions -->
+      <text x="40" y="110" fill="#ff6b6b" font-size="11" text-anchor="middle">Perfect</text>
+      <text x="40" y="123" fill="#ff6b6b" font-size="11" text-anchor="middle">Opposite</text>
+      <text x="350" y="110" fill="#888" font-size="11" text-anchor="middle">No</text>
+      <text x="350" y="123" fill="#888" font-size="11" text-anchor="middle">Relationship</text>
+      <text x="660" y="110" fill="#00e5a0" font-size="11" text-anchor="middle">Move</text>
+      <text x="660" y="123" fill="#00e5a0" font-size="11" text-anchor="middle">Together</text>
+      <!-- Finance examples -->
+      <text x="40" y="148" fill="#666" font-size="10" text-anchor="middle">Gold vs USD</text>
+      <text x="350" y="148" fill="#666" font-size="10" text-anchor="middle">Unrelated stocks</text>
+      <text x="660" y="148" fill="#666" font-size="10" text-anchor="middle">Two tech stocks</text>
+    </svg>
+  </div>
+
+  <h3>The Normal Distribution (Bell Curve)</h3>
+  <p>The normal distribution describes data that clusters around a mean with symmetric tails. It's defined entirely by two parameters: mean (μ) and standard deviation (σ).</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// Normal Distribution — The Foundation of VaR</div>
+    <svg width="100%" height="200" viewBox="0 0 700 200">
+      <defs>
+        <linearGradient id="bellGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#7c5cfc;stop-opacity:0.1"/>
+          <stop offset="50%" style="stop-color:#00d4ff;stop-opacity:0.9"/>
+          <stop offset="100%" style="stop-color:#7c5cfc;stop-opacity:0.1"/>
+        </linearGradient>
+        <linearGradient id="tailLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.8"/>
+          <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0.3"/>
+        </linearGradient>
+      </defs>
+      <!-- Bell curve path approximation -->
+      <path d="M 50,185 C 100,183 130,165 170,120 C 200,90 240,35 350,20 C 460,35 500,90 530,120 C 570,165 600,183 650,185" 
+            stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+      <!-- Shaded area under curve -->
+      <path d="M 50,185 C 100,183 130,165 170,120 C 200,90 240,35 350,20 C 460,35 500,90 530,120 C 570,165 600,183 650,185 Z"
+            fill="url(#bellGrad)" opacity="0.25"/>
+      <!-- 5% tail (left) -->
+      <path d="M 50,185 C 100,183 130,165 155,145 L 155,185 Z"
+            fill="#ff6b6b" opacity="0.5"/>
+      <!-- Vertical lines -->
+      <line x1="350" y1="20" x2="350" y2="185" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+      <line x1="155" y1="140" x2="155" y2="185" stroke="#ff6b6b" stroke-width="2"/>
+      <!-- Labels -->
+      <text x="350" y="15" fill="#00d4ff" font-size="12" text-anchor="middle">μ (mean)</text>
+      <text x="105" y="175" fill="#ff6b6b" font-size="11" text-anchor="middle">5% tail</text>
+      <text x="105" y="188" fill="#ff6b6b" font-size="10" text-anchor="middle">← VaR zone</text>
+      <!-- Std dev markers -->
+      <text x="220" y="195" fill="#888" font-size="11" text-anchor="middle">-2σ</text>
+      <text x="280" y="195" fill="#888" font-size="11" text-anchor="middle">-1σ</text>
+      <text x="350" y="195" fill="#888" font-size="11" text-anchor="middle">0</text>
+      <text x="420" y="195" fill="#888" font-size="11" text-anchor="middle">+1σ</text>
+      <text x="480" y="195" fill="#888" font-size="11" text-anchor="middle">+2σ</text>
+      <!-- 68-95-99.7 rule annotation -->
+      <text x="550" y="60" fill="#888" font-size="10">68% within ±1σ</text>
+      <text x="550" y="75" fill="#888" font-size="10">95% within ±2σ</text>
+      <text x="550" y="90" fill="#888" font-size="10">99.7% within ±3σ</text>
+    </svg>
+  </div>
+
+  <div class="callout formula">
+    <div class="callout-title">📐 The 68-95-99.7 Rule (Empirical Rule)</div>
+    <p>For any normal distribution:<br>
+    • 68% of outcomes fall within 1 standard deviation of the mean<br>
+    • 95% fall within 2 standard deviations<br>
+    • 99.7% fall within 3 standard deviations</p>
+    <p>Example: If daily return μ = 0% and σ = 1%, there's a 95% chance the daily return falls between -2% and +2%.</p>
+  </div>
+
+  <h3>Z-Scores</h3>
+  <p>A Z-score tells you how many standard deviations a value is from the mean. This lets you compare values across different distributions.</p>
+  <div class="math-display">Z = (x - μ) / σ</div>
+  <p>Key Z-scores used in finance:</p>
+  <table>
+    <tr><th>Confidence Level</th><th>Z-Score</th><th>Used for</th></tr>
+    <tr><td>90%</td><td>1.282</td><td>Less conservative VaR</td></tr>
+    <tr><td>95%</td><td>1.645</td><td>Standard VaR</td></tr>
+    <tr><td>99%</td><td>2.326</td><td>Strict risk limits</td></tr>
+    <tr><td>99.9%</td><td>3.090</td><td>Extreme risk (bank regulation)</td></tr>
+  </table>
+
+  <div class="colab-card">
+    <div class="colab-icon">🔬</div>
+    <div class="colab-content">
+      <h4>Colab Experiment: Explore the Normal Distribution</h4>
+      <p>Copy this into a new Colab notebook to see the normal distribution come alive with real financial data.</p>
+      <a href="https://colab.research.google.com/drive/1bZ4WMFnnSXGHlkqMjEXlf5v5i4L1h4g" class="colab-link" target="_blank">▶ Open Colab Template</a>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab</span>
+    <pre><span class="cm"># EXPERIMENT: Normal Distribution in Finance</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+
+<span class="cm"># Download real stock data</span>
+ticker = yf.<span class="fn">Ticker</span>(<span class="st">"SPY"</span>)  <span class="cm"># S&P 500 ETF</span>
+hist = ticker.history(period=<span class="st">"2y"</span>)
+
+<span class="cm"># Compute daily log returns</span>
+prices = hist[<span class="st">'Close'</span>]
+returns = np.<span class="fn">log</span>(prices / prices.<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+mu = returns.<span class="fn">mean</span>()
+sigma = returns.<span class="fn">std</span>()
+
+<span class="fn">print</span>(<span class="st">f"Mean daily return: {mu:.4f} ({mu*252*100:.1f}% annual)"</span>)
+<span class="fn">print</span>(<span class="st">f"Daily volatility: {sigma:.4f} ({sigma*np.sqrt(252)*100:.1f}% annual)"</span>)
+
+<span class="cm"># Plot distribution</span>
+fig, ax = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">1</span>, figsize=(<span class="nm">10</span>, <span class="nm">5</span>))
+ax.<span class="fn">hist</span>(returns, bins=<span class="nm">60</span>, density=<span class="kw">True</span>, alpha=<span class="nm">0.6</span>,
+       color=<span class="st">'#00d4ff'</span>, label=<span class="st">'Actual Returns'</span>)
+
+<span class="cm"># Overlay normal distribution curve</span>
+x = np.<span class="fn">linspace</span>(returns.<span class="fn">min</span>(), returns.<span class="fn">max</span>(), <span class="nm">200</span>)
+ax.<span class="fn">plot</span>(x, stats.norm.<span class="fn">pdf</span>(x, mu, sigma), color=<span class="st">'#ff6b6b'</span>,
+       linewidth=<span class="nm">2</span>, label=<span class="st">'Normal Fit'</span>)
+
+ax.<span class="fn">axvline</span>(mu - <span class="nm">2</span>*sigma, color=<span class="st">'#f0c040'</span>, linestyle=<span class="st">'--'</span>,
+          label=<span class="st">f'μ ± 2σ zone'</span>)
+ax.<span class="fn">axvline</span>(mu + <span class="nm">2</span>*sigma, color=<span class="st">'#f0c040'</span>, linestyle=<span class="st">'--'</span>)
+
+ax.<span class="fn">set_title</span>(<span class="st">'SPY Daily Return Distribution'</span>, fontsize=<span class="nm">14</span>)
+ax.<span class="fn">legend</span>()
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">Given returns [1%, 3%, -2%, 4%, -1%, 2%], compute: mean, variance, and std dev by hand.</div>
+    <div class="exercise-item">Stock A has σ = 2% daily. What range of returns would you expect 95% of the time?</div>
+    <div class="exercise-item">Two stocks: Stock X always returns 5%. Stock Y returns either 0% or 10% equally. Which has higher variance? Which would you prefer and why?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Download AAPL data using yfinance, compute daily log returns, and find the mean and std dev. What does this tell you about AAPL's risk?</div>
+    <div class="exercise-item">Compute the correlation between AAPL and MSFT daily returns using pandas .corr() method. Is this what you expected?</div>
+    <div class="exercise-item">What is the Z-score of a -5% return for a stock with mean 0% and σ = 2%? What percentile does this correspond to?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Run a Jarque-Bera test on SPY returns to test if they are truly normally distributed. Are they? What are the implications for VaR calculations?</div>
+    <div class="exercise-item">Create a heatmap of correlations for a portfolio of 10 stocks. Identify which pairs would be best for diversification and explain why mathematically.</div>
+    <div class="exercise-item">Show that for two assets with correlation ρ = 0, the variance of a 50/50 portfolio is exactly half the average of individual variances. Then derive what happens when ρ = 1.</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 3: RETURNS & RISK ════════════════ -->
+<div class="tab-panel" id="panel-3">
+  <h2>Returns & Risk</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 1 — FOUNDATION</div>
+    <p>Before measuring risk, we need to understand how we measure gains and losses from investments. This is the fundamental language of finance.</p>
+  </div>
+
+  <h3>Simple Returns</h3>
+  <p>The simplest measure of gain or loss over one period:</p>
+  <div class="math-display">R = (P_end - P_start) / P_start = (P_end / P_start) - 1</div>
+
+  <div class="callout intuition">
+    <div class="callout-title">💡 Example</div>
+    You buy a stock at $100. Next day it closes at $103. Simple return = (103 - 100) / 100 = 0.03 = 3%.
+  </div>
+
+  <h3>Log Returns (Continuously Compounded Returns)</h3>
+  <p>Log returns are the natural logarithm of the price ratio. They are preferred in quantitative finance because they are additive over time and have nicer mathematical properties.</p>
+  <div class="math-display">r = ln(P_t / P_{t-1})</div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">// Simple vs Log Returns</div>
+    <p><strong>Simple returns</strong> are what you'd tell a friend: "I made 5% today!"<br>
+    <strong>Log returns</strong> are what you use in models: they can be summed across time, and their distribution is closer to normal — which is why every risk formula in this guide uses them.</p>
+    <p>For small returns (under ±10%), simple ≈ log. For larger moves, they diverge. Always use log returns in quant work.</p>
+  </div>
+
+  <h3>Why Volatility = Risk?</h3>
+  <p>In finance, <strong>risk is uncertainty</strong>. Volatility (standard deviation of returns) measures how uncertain future returns are. Higher volatility = wider range of possible outcomes = more risk.</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// Low vs High Volatility — Same Mean, Different Risk</div>
+    <svg width="100%" height="180" viewBox="0 0 700 180">
+      <!-- Low vol curve (narrow, tall) -->
+      <path d="M 100,170 C 140,168 165,140 190,80 C 205,50 220,30 250,22 C 280,30 295,50 310,80 C 335,140 360,168 400,170"
+            stroke="#00e5a0" stroke-width="2.5" fill="none"/>
+      <path d="M 100,170 C 140,168 165,140 190,80 C 205,50 220,30 250,22 C 280,30 295,50 310,80 C 335,140 360,168 400,170 Z"
+            fill="#00e5a0" opacity="0.12"/>
+      <!-- High vol curve (wide, flat) -->
+      <path d="M 50,170 C 130,168 210,145 300,60 C 390,145 470,168 550,170"
+            stroke="#ff6b6b" stroke-width="2.5" fill="none" stroke-dasharray="6,3"/>
+      <path d="M 50,170 C 130,168 210,145 300,60 C 390,145 470,168 550,170 Z"
+            fill="#ff6b6b" opacity="0.08"/>
+      <!-- Mean line -->
+      <line x1="300" y1="58" x2="300" y2="170" stroke="#888" stroke-width="1" stroke-dasharray="3,3"/>
+      <!-- Labels -->
+      <text x="245" y="15" fill="#00e5a0" font-size="12">Low Volatility</text>
+      <text x="530" y="100" fill="#ff6b6b" font-size="12">High Volatility</text>
+      <text x="300" y="178" fill="#888" font-size="11" text-anchor="middle">Same Mean Return</text>
+    </svg>
+  </div>
+
+  <h3>Annualizing Volatility</h3>
+  <p>Daily volatility is hard to interpret. We annualize it using the square root of time rule:</p>
+  <div class="math-display">σ_annual = σ_daily × √252</div>
+  <p>Why 252? That's the number of trading days in a year (not 365 — markets are closed on weekends and holidays).</p>
+
+  <div class="callout formula">
+    <div class="callout-title">📐 Key Formulas Reference</div>
+    <p>Simple Return: R = (P_t - P_{t-1}) / P_{t-1}</p>
+    <p>Log Return: r = ln(P_t / P_{t-1})</p>
+    <p>Multi-period (log): r_{total} = r_1 + r_2 + ... + r_n (just add them!)</p>
+    <p>Multi-period (simple): R_{total} = (1+R_1)(1+R_2)...(1+R_n) - 1</p>
+    <p>Annual Vol: σ_annual = σ_daily × √252</p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab</span>
+    <pre><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Download 3 years of Apple stock data</span>
+data = yf.<span class="fn">download</span>(<span class="st">"AAPL"</span>, start=<span class="st">"2022-01-01"</span>, end=<span class="st">"2025-01-01"</span>)
+
+<span class="cm"># Simple returns</span>
+simple_returns = data[<span class="st">'Close'</span>].<span class="fn">pct_change</span>().<span class="fn">dropna</span>()
+
+<span class="cm"># Log returns (preferred in quant)</span>
+log_returns = np.<span class="fn">log</span>(data[<span class="st">'Close'</span>] / data[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+<span class="cm"># Key statistics</span>
+daily_vol = log_returns.<span class="fn">std</span>()
+annual_vol = daily_vol * np.<span class="fn">sqrt</span>(<span class="nm">252</span>)
+daily_mean = log_returns.<span class="fn">mean</span>()
+annual_mean = daily_mean * <span class="nm">252</span>
+
+<span class="fn">print</span>(<span class="st">"=== AAPL Risk Profile ==="</span>)
+<span class="fn">print</span>(<span class="st">f"Daily Volatility:  {daily_vol:.4f} ({daily_vol*100:.2f}%)"</span>)
+<span class="fn">print</span>(<span class="st">f"Annual Volatility: {annual_vol:.4f} ({annual_vol*100:.2f}%)"</span>)
+<span class="fn">print</span>(<span class="st">f"Expected Annual Return: {annual_mean*100:.2f}%"</span>)
+
+<span class="cm"># Compare log vs simple returns</span>
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">2</span>, figsize=(<span class="nm">12</span>, <span class="nm">4</span>))
+ax1.<span class="fn">hist</span>(simple_returns, bins=<span class="nm">50</span>, color=<span class="st">'#7c5cfc'</span>, alpha=<span class="nm">0.7</span>)
+ax1.<span class="fn">set_title</span>(<span class="st">'Simple Returns'</span>)
+ax2.<span class="fn">hist</span>(log_returns, bins=<span class="nm">50</span>, color=<span class="st">'#00d4ff'</span>, alpha=<span class="nm">0.7</span>)
+ax2.<span class="fn">set_title</span>(<span class="st">'Log Returns'</span>)
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">A stock goes from $50 → $55 → $52. Compute the simple return for each step, and the total simple return. Now do the same with log returns and add them up. Do you get the same answer?</div>
+    <div class="exercise-item">Stock A: σ_daily = 1.5%. What is the annual volatility?</div>
+    <div class="exercise-item">Which is "riskier": a bond with 3% annual return and 1% volatility, or a stock with 10% annual return and 25% volatility? Why can't you answer without more info?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Download Tesla (TSLA) and SPY data. Compare their annual volatilities. Which is more "risky"? Does that mean you should avoid TSLA?</div>
+    <div class="exercise-item">Compute the rolling 30-day volatility of AAPL and plot it over time. Were there periods of higher/lower risk? What events might explain them?</div>
+    <div class="exercise-item">Write a Python function <code>risk_profile(ticker, years)</code> that outputs: mean daily return, daily vol, annual vol, and annualized Sharpe (we'll define this formally later — use Sharpe ≈ annual_return / annual_vol for now).</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Research and implement Realized Volatility (RV) using high-frequency data. Compare to simple std dev — when would they differ significantly?</div>
+    <div class="exercise-item">Test the square-root-of-time scaling rule: compare the empirical 30-day vol (using 30-day windows) to σ_daily × √30. How accurate is the approximation?</div>
+    <div class="exercise-item">Investigate volatility clustering (GARCH): plot AAPL's squared log returns. Do you see patterns? Why does this violate the i.i.d. assumption behind standard deviation?</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 4: VaR ════════════════ -->
+<div class="tab-panel" id="panel-4">
+  <h2>Value at Risk (VaR)</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 2</div>
+    <p><strong>VaR is the most widely used risk metric in finance.</strong> Every major bank, hedge fund, and regulator uses it. Once you understand it, you'll see it everywhere.</p>
+  </div>
+
+  <div class="prereq-badge">Requires: Normal Distribution</div>
+  <div class="prereq-badge">Requires: Standard Deviation</div>
+  <div class="prereq-badge">Requires: Returns & Volatility</div>
+
+  <h3>What is VaR?</h3>
+  <p>Value at Risk answers one specific question:</p>
+  <div class="callout formula">
+    <div class="callout-title">📐 The VaR Question</div>
+    <p style="font-size: 16px; color: var(--gold); font-weight: 600;">"What is the maximum loss I can expect over the next X days, with Y% confidence?"</p>
+    <p>Example: "My 1-day 95% VaR is $50,000" means: "There is only a 5% chance I will lose MORE than $50,000 in the next trading day."</p>
+  </div>
+
+  <div class="analogy-box">
+    <div class="analogy-label">// Intuition: The Weather Forecast Analogy</div>
+    <p>Think of VaR like a weather forecast. A meteorologist might say "There's a 95% chance it won't rain more than 2 inches tomorrow." They're not saying it CAN'T rain more — they're saying the probability of that happening is only 5%.</p>
+    <p>VaR is the same: "There's a 95% chance our loss won't exceed $X." That remaining 5% — the tail — is what CVaR (the next topic) handles.</p>
+  </div>
+
+  <h3>The Three VaR Methods</h3>
+
+  <h4>Method 1: Parametric VaR (Variance-Covariance)</h4>
+  <p>Assumes returns follow a normal distribution. Uses mean and standard deviation directly.</p>
+  <div class="math-display">VaR = -(μ - Z_α × σ) × Portfolio Value</div>
+  <p>Where Z_α is the Z-score for confidence level α (e.g., Z = 1.645 for 95% confidence).</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// VaR Visualized on Normal Distribution</div>
+    <svg width="100%" height="210" viewBox="0 0 700 210">
+      <defs>
+        <linearGradient id="mainBell" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.6"/>
+          <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.1"/>
+        </linearGradient>
+        <linearGradient id="varTail" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.8"/>
+          <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0.2"/>
+        </linearGradient>
+      </defs>
+      <!-- Main distribution -->
+      <path d="M 50,190 C 100,188 150,175 200,140 C 240,110 290,50 350,28 C 410,50 460,110 500,140 C 550,175 600,188 650,190"
+            stroke="#00d4ff" stroke-width="2" fill="none"/>
+      <!-- Shaded safe area -->
+      <path d="M 175,190 C 220,187 275,170 330,110 C 350,85 390,50 350,28 C 410,50 460,110 500,140 C 550,175 600,188 650,190 Z"
+            fill="url(#mainBell)" opacity="0.4"/>
+      <!-- VaR tail (5%) -->
+      <path d="M 50,190 C 100,188 150,175 175,168 L 175,190 Z"
+            fill="url(#varTail)" opacity="0.7"/>
+      <!-- VaR line -->
+      <line x1="175" y1="165" x2="175" y2="200" stroke="#ff6b6b" stroke-width="2.5"/>
+      <!-- Annotations -->
+      <text x="110" y="175" fill="#ff6b6b" font-size="12" text-anchor="middle">5% of</text>
+      <text x="110" y="188" fill="#ff6b6b" font-size="12" text-anchor="middle">outcomes</text>
+      <text x="175" y="208" fill="#ff6b6b" font-size="12" text-anchor="middle">VaR</text>
+      <text x="350" y="22" fill="#00d4ff" font-size="12" text-anchor="middle">μ</text>
+      <text x="420" y="165" fill="#00d4ff" font-size="13">95% of outcomes</text>
+      <text x="420" y="180" fill="#00d4ff" font-size="13">within this region</text>
+      <!-- Confidence label -->
+      <rect x="520" y="20" width="155" height="44" rx="6" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+      <text x="598" y="38" fill="#00d4ff" font-size="11" text-anchor="middle">95% Confidence</text>
+      <text x="598" y="54" fill="#888" font-size="10" text-anchor="middle">Z = 1.645</text>
+    </svg>
+  </div>
+
+  <h4>Method 2: Historical Simulation</h4>
+  <p>No distribution assumption needed. Take actual historical returns, sort them worst to best, and find the return at the Xth percentile.</p>
+
+  <div class="callout intuition">
+    <div class="callout-title">💡 Example Step-by-Step</div>
+    <p>You have 500 days of historical returns. For 95% VaR:</p>
+    <p>1. Sort all 500 returns from worst to best<br>
+    2. The 5th percentile = 500 × 0.05 = 25th worst day<br>
+    3. Look at the 25th worst return — that's your 95% VaR<br>
+    4. If that return was -3.2%, your VaR is 3.2% of portfolio value</p>
+  </div>
+
+  <h4>Method 3: Monte Carlo Simulation</h4>
+  <p>Simulate thousands of possible future scenarios using random number generation based on statistical parameters. Take the percentile of simulated outcomes.</p>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — All 3 VaR Methods</span>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># ── Data ──────────────────────────────────────</span>
+data = yf.<span class="fn">download</span>(<span class="st">"SPY"</span>, start=<span class="st">"2020-01-01"</span>, end=<span class="st">"2025-01-01"</span>)
+returns = np.<span class="fn">log</span>(data[<span class="st">'Close'</span>] / data[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+portfolio_value = <span class="nm">1_000_000</span>  <span class="cm"># $1 million</span>
+confidence = <span class="nm">0.95</span>
+alpha = <span class="nm">1</span> - confidence  <span class="cm"># 0.05</span>
+
+mu = returns.<span class="fn">mean</span>()
+sigma = returns.<span class="fn">std</span>()
+
+<span class="cm"># ── Method 1: Parametric VaR ──────────────────</span>
+z = stats.norm.<span class="fn">ppf</span>(alpha)  <span class="cm"># Z-score for 5th percentile</span>
+parametric_var = -(mu + z * sigma) * portfolio_value
+<span class="fn">print</span>(<span class="st">f"Parametric VaR (95%): ${parametric_var:,.0f}"</span>)
+
+<span class="cm"># ── Method 2: Historical Simulation ───────────</span>
+historical_var = -np.<span class="fn">percentile</span>(returns, alpha*<span class="nm">100</span>) * portfolio_value
+<span class="fn">print</span>(<span class="st">f"Historical VaR (95%): ${historical_var:,.0f}"</span>)
+
+<span class="cm"># ── Method 3: Monte Carlo ─────────────────────</span>
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+simulated = np.random.<span class="fn">normal</span>(mu, sigma, <span class="nm">100_000</span>)
+monte_carlo_var = -np.<span class="fn">percentile</span>(simulated, alpha*<span class="nm">100</span>) * portfolio_value
+<span class="fn">print</span>(<span class="st">f"Monte Carlo VaR (95%): ${monte_carlo_var:,.0f}"</span>)
+
+<span class="cm"># ── Visualization ─────────────────────────────</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">11</span>, <span class="nm">5</span>))
+ax.<span class="fn">hist</span>(returns, bins=<span class="nm">80</span>, density=<span class="kw">True</span>, color=<span class="st">'#00d4ff'</span>,
+       alpha=<span class="nm">0.5</span>, label=<span class="st">'SPY Daily Returns'</span>)
+ax.<span class="fn">axvline</span>(-parametric_var/portfolio_value, color=<span class="st">'#ff6b6b'</span>,
+          lw=<span class="nm">2</span>, label=<span class="st">f'Parametric VaR (${parametric_var:,.0f})'</span>)
+ax.<span class="fn">axvline</span>(-historical_var/portfolio_value, color=<span class="st">'#f0c040'</span>,
+          lw=<span class="nm">2</span>, linestyle=<span class="st">'--'</span>, label=<span class="st">f'Historical VaR'</span>)
+ax.<span class="fn">axvline</span>(-monte_carlo_var/portfolio_value, color=<span class="st">'#00e5a0'</span>,
+          lw=<span class="nm">2</span>, linestyle=<span class="st">':'</span>, label=<span class="st">f'Monte Carlo VaR'</span>)
+ax.<span class="fn">legend</span>()
+ax.<span class="fn">set_title</span>(<span class="st">'SPY — Three VaR Methods Compared ($1M Portfolio)'</span>)
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>VaR Limitations</h3>
+  <div class="callout warning">
+    <div class="callout-title">⚠️ Critical Flaws to Know</div>
+    <p><strong>1. VaR says nothing about how bad "bad" gets.</strong> If VaR is $50K, it only says losses beyond $50K happen 5% of the time. It doesn't say whether those losses are $51K or $5 million.</p>
+    <p><strong>2. Not sub-additive.</strong> Portfolio VaR can exceed the sum of individual VaRs under certain conditions — violating intuition.</p>
+    <p><strong>3. Normal distribution assumption is wrong.</strong> Real returns have "fat tails" — extreme events happen more than normal distribution predicts. This is why CVaR (next tab) was invented.</p>
+    <p><strong>4. It's backward-looking.</strong> Historical data doesn't predict future crises.</p>
+  </div>
+
+  <div class="callout resource">
+    <div class="callout-title">🔗 Deeper Resources</div>
+    <div class="resource-links">
+      <a href="https://www.investopedia.com/articles/04/092904.asp" class="resource-link" target="_blank">Investopedia: VaR Guide</a>
+      <a href="https://www.riskglossary.com/link/value_at_risk.htm" class="resource-link" target="_blank">Risk Glossary: VaR</a>
+      <a href="https://www.bis.org/publ/work347.pdf" class="resource-link" target="_blank">BIS: VaR in Banking</a>
+    </div>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">You have a $500,000 portfolio. Daily μ = 0.05%, σ = 1.2%. Calculate the 95% parametric VaR using Z = 1.645.</div>
+    <div class="exercise-item">Given 20 days of returns: sort them and find the 5th percentile. This is your Historical VaR estimate.</div>
+    <div class="exercise-item">True or False: A 99% VaR of $100,000 means there is a 1% chance of losing exactly $100,000. Explain your answer.</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Compute Historical, Parametric, and Monte Carlo VaR for TSLA using 3 years of data. Why do the methods give different answers?</div>
+    <div class="exercise-item">Run a VaR backtest: for each day in 2024, compute the 95% VaR using the prior year's data. How many times did actual losses exceed VaR? Was it close to 5%?</div>
+    <div class="exercise-item">How does the VaR change if you move from 95% to 99% confidence? Calculate for a portfolio with σ = 2% daily.</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Implement Cornish-Fisher VaR expansion to account for skewness and kurtosis in the return distribution. Compare to parametric VaR.</div>
+    <div class="exercise-item">Implement a rolling VaR model with exponential weighting (EWMA) where recent returns matter more. How does this compare to equal-weighted historical VaR during the COVID crash?</div>
+    <div class="exercise-item">Build a complete VaR backtesting framework with Kupiec's POF test. Determine which VaR model passes the test at 5% significance level for SPY data.</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 5: CVaR ════════════════ -->
+<div class="tab-panel" id="panel-5">
+  <h2>CVaR — Conditional Value at Risk</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 3 — ALSO CALLED: Expected Shortfall (ES)</div>
+    <p>CVaR fixes VaR's biggest flaw. While VaR says "how bad can it get at the 5% threshold," CVaR asks "if things do go into that 5% zone, how bad is it on average?"</p>
+  </div>
+
+  <div class="prereq-badge">Requires: VaR (Tab 04)</div>
+
+  <h3>The Core Problem with VaR</h3>
+  <div class="analogy-box">
+    <div class="analogy-label">// The Insurance Analogy</div>
+    <p>Imagine two insurance policies. Both have a 95% VaR of $10,000 (meaning 5% of the time, losses exceed $10K).</p>
+    <p><strong>Policy A:</strong> In the bad 5%, losses are always exactly $10,001.<br>
+    <strong>Policy B:</strong> In the bad 5%, losses range from $10,001 to $1,000,000.</p>
+    <p>VaR says they're identical. CVaR would immediately show Policy B is far riskier. CVaR = average loss in that 5% tail.</p>
+  </div>
+
+  <h3>CVaR Formula</h3>
+  <div class="math-display">CVaR_α = E[Loss | Loss > VaR_α]</div>
+  <p>Read as: "The expected (average) loss, given that the loss is worse than VaR."</p>
+  <p>For a normal distribution, CVaR has a clean formula:</p>
+  <div class="math-display">CVaR_α = μ + σ × φ(Z_α) / α</div>
+  <p>Where φ(Z_α) is the standard normal PDF at the Z-score, and α is the tail probability (e.g., 0.05).</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// VaR vs CVaR on the Loss Distribution</div>
+    <svg width="100%" height="220" viewBox="0 0 700 220">
+      <!-- Bell curve -->
+      <path d="M 50,200 C 100,198 150,185 200,150 C 240,120 290,60 350,38 C 410,60 460,120 500,150 C 550,185 600,198 650,200"
+            stroke="#00d4ff" stroke-width="2" fill="none"/>
+      <!-- Normal area -->
+      <path d="M 175,200 C 200,198 240,190 280,170 C 310,155 320,120 350,38 C 410,60 460,120 500,150 C 550,185 600,198 650,200 Z"
+            fill="#00d4ff" opacity="0.12"/>
+      <!-- VaR tail -->
+      <path d="M 50,200 C 100,198 150,185 175,178 L 175,200 Z"
+            fill="#ff6b6b" opacity="0.5"/>
+      <!-- CVaR zone (darker) -->
+      <path d="M 50,200 C 80,200 100,199 115,198 L 115,200 Z"
+            fill="#ff3a3a" opacity="0.9"/>
+      <!-- Lines -->
+      <line x1="175" y1="175" x2="175" y2="210" stroke="#ff6b6b" stroke-width="2.5"/>
+      <line x1="100" y1="198" x2="100" y2="210" stroke="#ff3a3a" stroke-width="2.5"/>
+      <!-- Labels -->
+      <text x="175" y="218" fill="#ff6b6b" font-size="12" text-anchor="middle">VaR</text>
+      <text x="175" y="230" fill="#ff6b6b" font-size="10" text-anchor="middle">(5th pctile)</text>
+      <text x="100" y="218" fill="#ff3a3a" font-size="12" text-anchor="middle">CVaR</text>
+      <text x="100" y="230" fill="#ff3a3a" font-size="10" text-anchor="middle">(mean of tail)</text>
+      <!-- Arrow showing CVaR is worse -->
+      <text x="85" y="150" fill="#888" font-size="11" transform="rotate(-90, 85, 150)">Tail region →</text>
+      <!-- Annotation box -->
+      <rect x="400" y="20" width="250" height="70" rx="6" fill="rgba(255,107,107,0.06)" stroke="rgba(255,107,107,0.3)" stroke-width="1"/>
+      <text x="525" y="40" fill="#ff6b6b" font-size="11" text-anchor="middle">CVaR is always worse</text>
+      <text x="525" y="56" fill="#ff6b6b" font-size="11" text-anchor="middle">than VaR (bigger number)</text>
+      <text x="525" y="78" fill="#888" font-size="10" text-anchor="middle">CVaR ≥ VaR always</text>
+    </svg>
+  </div>
+
+  <h3>Why CVaR is Better (Coherent Risk Measure)</h3>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-title">Sub-additive</div>
+      <div class="card-body">Portfolio CVaR ≤ sum of individual CVaRs. Diversification always helps. VaR doesn't guarantee this.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-title">Tells you the worst</div>
+      <div class="card-body">Quantifies the average loss in bad scenarios — critical for stress testing and portfolio insurance.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">✅</div>
+      <div class="card-title">Convex optimization</div>
+      <div class="card-body">CVaR can be minimized directly using linear programming — making it practical for portfolio optimization.</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — VaR vs CVaR Comparison</span>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+data = yf.<span class="fn">download</span>(<span class="st">"SPY"</span>, start=<span class="st">"2018-01-01"</span>, end=<span class="st">"2025-01-01"</span>)
+returns = np.<span class="fn">log</span>(data[<span class="st">'Close'</span>] / data[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+portfolio = <span class="nm">1_000_000</span>
+alpha = <span class="nm">0.05</span>
+
+<span class="cm"># ── Historical VaR ─────────────────────────────</span>
+var_95 = -np.<span class="fn">percentile</span>(returns, alpha * <span class="nm">100</span>)
+
+<span class="cm"># ── Historical CVaR (Expected Shortfall) ───────</span>
+<span class="cm"># Average of all returns WORSE than VaR</span>
+tail_returns = returns[returns < -var_95]
+cvar_95 = -tail_returns.<span class="fn">mean</span>()
+
+<span class="fn">print</span>(<span class="st">f"=== $1M SPY Portfolio ==="</span>)
+<span class="fn">print</span>(<span class="st">f"95% Historical VaR:  ${var_95 * portfolio:,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"95% Historical CVaR: ${cvar_95 * portfolio:,.0f}"</span>)
+<span class="fn">print</span>(<span class="st">f"CVaR is {cvar_95/var_95:.1f}x worse than VaR"</span>)
+<span class="fn">print</span>(<span class="st">f"Number of tail days: {len(tail_returns)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Worst single day: ${returns.min() * portfolio:,.0f}"</span>)
+
+<span class="cm"># ── Visualization ─────────────────────────────</span>
+fig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="nm">11</span>, <span class="nm">5</span>))
+
+<span class="cm"># Returns histogram</span>
+ax.<span class="fn">hist</span>(returns, bins=<span class="nm">80</span>, density=<span class="kw">True</span>, color=<span class="st">'#00d4ff'</span>,
+       alpha=<span class="nm">0.4</span>, label=<span class="st">'Daily Returns'</span>)
+
+<span class="cm"># Highlight tail</span>
+tail_vals = np.<span class="fn">linspace</span>(returns.<span class="fn">min</span>(), -var_95, <span class="nm">100</span>)
+mu, sigma = returns.<span class="fn">mean</span>(), returns.<span class="fn">std</span>()
+ax.<span class="fn">fill_between</span>(tail_vals, stats.norm.<span class="fn">pdf</span>(tail_vals, mu, sigma),
+                alpha=<span class="nm">0.6</span>, color=<span class="st">'#ff6b6b'</span>, label=<span class="st">'5% Tail'</span>)
+
+ax.<span class="fn">axvline</span>(-var_95, color=<span class="st">'#ff6b6b'</span>, lw=<span class="nm">2</span>,
+          label=<span class="st">f'VaR = ${var_95*portfolio:,.0f}'</span>)
+ax.<span class="fn">axvline</span>(-cvar_95, color=<span class="st">'#ff3a3a'</span>, lw=<span class="nm">2</span>, linestyle=<span class="st">'--'</span>,
+          label=<span class="st">f'CVaR = ${cvar_95*portfolio:,.0f}'</span>)
+
+ax.<span class="fn">set_xlabel</span>(<span class="st">'Daily Log Return'</span>)
+ax.<span class="fn">set_title</span>(<span class="st">'VaR vs CVaR: SPY 2018–2025'</span>)
+ax.<span class="fn">legend</span>()
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">Given 10 returns sorted: [-8%, -6%, -5%, -3%, -2%, 0%, 1%, 2%, 3%, 4%], compute the 90% VaR and 90% CVaR manually.</div>
+    <div class="exercise-item">If 95% VaR = $10,000 and the 5% tail has an average loss of $18,000, what is the CVaR?</div>
+    <div class="exercise-item">Why is CVaR always greater than or equal to VaR? Explain in plain English.</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Compare the CVaR of SPY vs TSLA at the 95% confidence level. Compute the ratio CVaR/VaR for each. Which has more "tail risk"?</div>
+    <div class="exercise-item">Implement parametric CVaR using the normal distribution formula. Compare to historical simulation CVaR. Which is higher and why?</div>
+    <div class="exercise-item">Compute CVaR during the COVID crash period (Feb–April 2020) vs a normal period. By how much does CVaR increase?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Use the PyPortfolioOpt library to minimize CVaR for a 10-stock portfolio. Compare the resulting portfolio weights to minimum-variance optimization. How do they differ?</div>
+    <div class="exercise-item">Implement CVaR optimization from scratch using scipy.optimize (without dedicated libraries). Verify against historical simulation results.</div>
+    <div class="exercise-item">Research and implement the Rockafellar-Uryasev CVaR minimization formulation. Why can it be solved as a linear program, and what advantage does this give?</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 6: SHARPE RATIO ════════════════ -->
+<div class="tab-panel" id="panel-6">
+  <h2>The Sharpe Ratio</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 4 — RISK-ADJUSTED PERFORMANCE</div>
+    <p>The Sharpe Ratio is arguably the most important metric for comparing investments. It measures how much return you earn per unit of risk taken. Created by Nobel Prize winner William Sharpe in 1966.</p>
+  </div>
+
+  <div class="prereq-badge">Requires: Returns & Volatility (Tab 03)</div>
+  <div class="prereq-badge">Requires: Standard Deviation</div>
+
+  <h3>The Core Insight</h3>
+  <div class="analogy-box">
+    <div class="analogy-label">// The Investment Efficiency Analogy</div>
+    <p>Imagine two investment strategies:</p>
+    <p><strong>Strategy A:</strong> Returns 12% per year with 20% volatility<br>
+    <strong>Strategy B:</strong> Returns 8% per year with 5% volatility</p>
+    <p>Strategy A looks better (higher return). But is it really? Strategy B is giving you solid, predictable returns with far less risk. The Sharpe Ratio quantifies this trade-off by asking: <em>"How much return am I getting per unit of risk I'm taking?"</em></p>
+    <p>If Strategy A has Sharpe = 0.5 and Strategy B has Sharpe = 1.2 — B is the better investment per unit of risk.</p>
+  </div>
+
+  <h3>The Formula</h3>
+  <div class="math-display">Sharpe = (R_p - R_f) / σ_p</div>
+  <p>Where:</p>
+  <table>
+    <tr><th>Symbol</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td>R_p</td><td>Portfolio return (annualized)</td><td>12%</td></tr>
+    <tr><td>R_f</td><td>Risk-free rate (e.g., US Treasury)</td><td>4.5%</td></tr>
+    <tr><td>R_p - R_f</td><td>Excess return (the "reward")</td><td>7.5%</td></tr>
+    <tr><td>σ_p</td><td>Portfolio volatility (annualized)</td><td>15%</td></tr>
+    <tr><td>Sharpe</td><td>Return per unit of risk</td><td>0.50</td></tr>
+  </table>
+
+  <h3>Why Subtract the Risk-Free Rate?</h3>
+  <div class="callout intuition">
+    <div class="callout-title">💡 The Free Lunch Baseline</div>
+    <p>The risk-free rate (e.g., 3-month US Treasury yield) is what you earn by doing absolutely nothing risky — just lending money to the US government, which essentially can't default in its own currency.</p>
+    <p>If your stock portfolio returns 5% and the risk-free rate is 5%, you haven't done anything useful — you took on risk but earned no extra return. The Sharpe Ratio measures the <em>excess return</em> per unit of risk, ensuring we only credit returns that exceed this "free" baseline.</p>
+  </div>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// Sharpe Ratio Benchmark Guide</div>
+    <svg width="100%" height="130" viewBox="0 0 700 130">
+      <defs>
+        <linearGradient id="sharpeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ff6b6b"/>
+          <stop offset="25%" style="stop-color:#f0c040"/>
+          <stop offset="55%" style="stop-color:#00e5a0"/>
+          <stop offset="100%" style="stop-color:#00d4ff"/>
+        </linearGradient>
+      </defs>
+      <rect x="40" y="50" width="620" height="24" rx="4" fill="url(#sharpeGrad)" opacity="0.7"/>
+      <!-- Tick marks -->
+      <line x1="40" y1="45" x2="40" y2="80" stroke="#fff" stroke-width="1.5" opacity="0.5"/>
+      <line x1="195" y1="45" x2="195" y2="80" stroke="#fff" stroke-width="1.5" opacity="0.5"/>
+      <line x1="350" y1="45" x2="350" y2="80" stroke="#fff" stroke-width="1.5" opacity="0.5"/>
+      <line x1="505" y1="45" x2="505" y2="80" stroke="#fff" stroke-width="1.5" opacity="0.5"/>
+      <line x1="660" y1="45" x2="660" y2="80" stroke="#fff" stroke-width="1.5" opacity="0.5"/>
+      <!-- Values -->
+      <text x="40" y="38" fill="#ff6b6b" font-size="13" text-anchor="middle">&lt; 0</text>
+      <text x="195" y="38" fill="#f0c040" font-size="13" text-anchor="middle">0.5</text>
+      <text x="350" y="38" fill="#00e5a0" font-size="13" text-anchor="middle">1.0</text>
+      <text x="505" y="38" fill="#00d4ff" font-size="13" text-anchor="middle">2.0</text>
+      <text x="660" y="38" fill="#fff" font-size="13" text-anchor="middle">3.0+</text>
+      <!-- Labels -->
+      <text x="117" y="105" fill="#ff6b6b" font-size="11" text-anchor="middle">Losing vs</text>
+      <text x="117" y="118" fill="#ff6b6b" font-size="11" text-anchor="middle">risk-free</text>
+      <text x="272" y="105" fill="#f0c040" font-size="11" text-anchor="middle">Acceptable</text>
+      <text x="272" y="118" fill="#f0c040" font-size="11" text-anchor="middle">benchmark</text>
+      <text x="427" y="105" fill="#00e5a0" font-size="11" text-anchor="middle">Good</text>
+      <text x="427" y="118" fill="#00e5a0" font-size="11" text-anchor="middle">performance</text>
+      <text x="582" y="105" fill="#00d4ff" font-size="11" text-anchor="middle">Exceptional</text>
+      <text x="582" y="118" fill="#00d4ff" font-size="11" text-anchor="middle">(hedge funds)</text>
+    </svg>
+  </div>
+
+  <h3>Sharpe Ratio Variants</h3>
+  <table>
+    <tr><th>Metric</th><th>Formula</th><th>When to Use</th></tr>
+    <tr><td><strong>Sharpe</strong></td><td>(R_p - R_f) / σ_total</td><td>General performance comparison</td></tr>
+    <tr><td><strong>Sortino</strong></td><td>(R_p - R_f) / σ_downside</td><td>When you only care about downside risk</td></tr>
+    <tr><td><strong>Calmar</strong></td><td>Annual Return / Max Drawdown</td><td>For trading strategies</td></tr>
+    <tr><td><strong>Information Ratio</strong></td><td>(R_p - R_benchmark) / σ_tracking</td><td>Active management vs benchmark</td></tr>
+  </table>
+
+  <div class="callout warning">
+    <div class="callout-title">⚠️ Sharpe Ratio Limitations</div>
+    <p><strong>Assumes symmetry:</strong> Penalizes upside and downside equally. A portfolio with big gains would be "punished" for high volatility even if the swings are positive.</p>
+    <p><strong>Can be gamed:</strong> Smooth strategies (like selling options) can have artificially high Sharpe ratios that hide tail risk.</p>
+    <p><strong>Not comparable across periods:</strong> Daily, monthly, and annual Sharpe ratios aren't directly comparable without proper annualization.</p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — Sharpe Ratio Comparison</span>
+    <pre><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Compare multiple assets by Sharpe Ratio</span>
+tickers = [<span class="st">"SPY"</span>, <span class="st">"QQQ"</span>, <span class="st">"GLD"</span>, <span class="st">"TLT"</span>, <span class="st">"AAPL"</span>, <span class="st">"TSLA"</span>]
+risk_free = <span class="nm">0.045</span>  <span class="cm"># ~4.5% annual (approx 2024 Treasury rate)</span>
+
+results = []
+<span class="kw">for</span> ticker <span class="kw">in</span> tickers:
+    data = yf.<span class="fn">download</span>(ticker, start=<span class="st">"2020-01-01"</span>, end=<span class="st">"2025-01-01"</span>,
+                      progress=<span class="kw">False</span>)
+    log_ret = np.<span class="fn">log</span>(data[<span class="st">'Close'</span>] / data[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+    annual_ret = log_ret.<span class="fn">mean</span>() * <span class="nm">252</span>
+    annual_vol = log_ret.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nm">252</span>)
+    sharpe = (annual_ret - risk_free) / annual_vol
+
+    <span class="cm"># Sortino: use only negative returns for denominator</span>
+    downside = log_ret[log_ret < <span class="nm">0</span>].<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nm">252</span>)
+    sortino = (annual_ret - risk_free) / downside
+
+    results.<span class="fn">append</span>({<span class="st">'Ticker'</span>: ticker,
+                    <span class="st">'Annual Return'</span>: <span class="st">f"{annual_ret*100:.1f}%"</span>,
+                    <span class="st">'Annual Vol'</span>: <span class="st">f"{annual_vol*100:.1f}%"</span>,
+                    <span class="st">'Sharpe'</span>: <span class="fn">round</span>(sharpe, <span class="nm">2</span>),
+                    <span class="st">'Sortino'</span>: <span class="fn">round</span>(sortino, <span class="nm">2</span>)})
+
+df = pd.<span class="fn">DataFrame</span>(results).<span class="fn">sort_values</span>(<span class="st">'Sharpe'</span>, ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(df.<span class="fn">to_string</span>(index=<span class="kw">False</span>))
+
+<span class="cm"># Bar chart</span>
+sharpe_vals = [r[<span class="st">'Sharpe'</span>] <span class="kw">for</span> r <span class="kw">in</span> results]
+colors = [<span class="st">'#00e5a0'</span> <span class="kw">if</span> s > <span class="nm">1</span> <span class="kw">else</span> <span class="st">'#f0c040'</span> <span class="kw">if</span> s > <span class="nm">0</span> <span class="kw">else</span> <span class="st">'#ff6b6b'</span>
+          <span class="kw">for</span> s <span class="kw">in</span> sharpe_vals]
+plt.<span class="fn">figure</span>(figsize=(<span class="nm">9</span>, <span class="nm">4</span>))
+plt.<span class="fn">bar</span>(tickers, sharpe_vals, color=colors, alpha=<span class="nm">0.8</span>)
+plt.<span class="fn">axhline</span>(<span class="nm">1</span>, color=<span class="st">'white'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nm">0.4</span>, label=<span class="st">'Sharpe = 1'</span>)
+plt.<span class="fn">title</span>(<span class="st">'Sharpe Ratios: 2020–2025'</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <div class="callout resource">
+    <div class="callout-title">🔗 Resources</div>
+    <div class="resource-links">
+      <a href="https://web.stanford.edu/~wfsharpe/art/sr/sr.htm" class="resource-link" target="_blank">Original Sharpe Paper</a>
+      <a href="https://www.investopedia.com/terms/s/sharperatio.asp" class="resource-link" target="_blank">Investopedia: Sharpe</a>
+      <a href="https://pyportfolioopt.readthedocs.io/en/latest/" class="resource-link" target="_blank">PyPortfolioOpt Docs</a>
+    </div>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">Portfolio A: Return 10%, Vol 15%. Portfolio B: Return 7%, Vol 8%. Risk-free = 3%. Compute Sharpe for both. Which is better?</div>
+    <div class="exercise-item">You compute daily Sharpe = 0.08. What is the approximate annualized Sharpe? (Multiply by √252)</div>
+    <div class="exercise-item">Can a strategy with negative returns have a positive Sharpe ratio? Under what circumstances?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Compute and compare the Sharpe and Sortino ratios for AAPL (2020–2024). Why might they give different rankings?</div>
+    <div class="exercise-item">Build a rolling 252-day Sharpe Ratio for SPY and plot it. When was SPY most/least efficient?</div>
+    <div class="exercise-item">Optimize a 5-stock portfolio to maximize Sharpe Ratio using scipy.optimize. Compare to an equal-weight portfolio's Sharpe.</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Show mathematically why the Sortino ratio is preferred for positively-skewed return distributions. Use real data to demonstrate.</div>
+    <div class="exercise-item">Implement a bootstrap confidence interval for the Sharpe Ratio. If Sharpe = 0.8 with 3 years of data, is it statistically different from zero?</div>
+    <div class="exercise-item">Research the Probabilistic Sharpe Ratio (PSR) by López de Prado. Implement it and compute it for a trading strategy you design.</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 7: DIVERSIFICATION ════════════════ -->
+<div class="tab-panel" id="panel-7">
+  <h2>Diversification Math</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 5 — WHY NOT TO PUT ALL EGGS IN ONE BASKET</div>
+    <p>Diversification is the only "free lunch" in finance. By combining assets intelligently, you can reduce risk without necessarily reducing return. Let's understand the math behind it.</p>
+  </div>
+
+  <div class="prereq-badge">Requires: Variance & Standard Deviation</div>
+  <div class="prereq-badge">Requires: Correlation (Tab 02)</div>
+
+  <h3>Portfolio Variance Formula (2 Assets)</h3>
+  <p>This is where diversification lives. For two assets A and B with weights w_A and w_B:</p>
+  <div class="math-display">σ²_portfolio = w²_A σ²_A + w²_B σ²_B + 2·w_A·w_B·Cov(A,B)</div>
+  <p>Substituting Cov(A,B) = ρ_{AB} · σ_A · σ_B:</p>
+  <div class="math-display">σ²_portfolio = w²_A σ²_A + w²_B σ²_B + 2·w_A·w_B·ρ_{AB}·σ_A·σ_B</div>
+
+  <div class="callout intuition">
+    <div class="callout-title">💡 The Magic of Low Correlation</div>
+    <p>Look at the formula. The last term has ρ in it. When ρ is low (or negative), that last term shrinks — meaning portfolio variance is <em>less</em> than the weighted average of individual variances. That's diversification in action.</p>
+    <p><strong>When ρ = 1:</strong> No benefit — portfolio vol = weighted average of individual vols<br>
+    <strong>When ρ = 0:</strong> Portfolio vol is meaningfully reduced<br>
+    <strong>When ρ = -1:</strong> Perfect diversification — you can theoretically eliminate all risk!</p>
+  </div>
+
+  <h3>Visualizing Diversification</h3>
+  <div class="diagram-box">
+    <div class="diagram-title">// How Correlation Affects Portfolio Volatility</div>
+    <svg width="100%" height="220" viewBox="0 0 700 220">
+      <!-- Grid -->
+      <line x1="60" y1="20" x2="60" y2="180" stroke="#1e2640" stroke-width="1"/>
+      <line x1="60" y1="180" x2="660" y2="180" stroke="#1e2640" stroke-width="1"/>
+      <!-- Horizontal guides -->
+      <line x1="60" y1="60" x2="660" y2="60" stroke="#1e2640" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <line x1="60" y1="100" x2="660" y2="100" stroke="#1e2640" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <line x1="60" y1="140" x2="660" y2="140" stroke="#1e2640" stroke-width="0.5" stroke-dasharray="2,4"/>
+      <!-- ρ = 1: straight line (no benefit) -->
+      <line x1="60" y1="60" x2="660" y2="140" stroke="#ff6b6b" stroke-width="2"/>
+      <!-- ρ = 0: curved lower -->
+      <path d="M 60,60 C 200,110 450,155 660,140" stroke="#f0c040" stroke-width="2" fill="none"/>
+      <!-- ρ = -1: V-shape to zero -->
+      <path d="M 60,60 C 200,170 440,175 550,180 C 600,180 630,165 660,140"
+            stroke="#00e5a0" stroke-width="2" fill="none"/>
+      <!-- Labels along right edge -->
+      <text x="665" y="143" fill="#ff6b6b" font-size="11">ρ = +1</text>
+      <text x="665" y="110" fill="#f0c040" font-size="11">ρ = 0</text>
+      <text x="665" y="78" fill="#00e5a0" font-size="11">ρ = -1</text>
+      <!-- Axes labels -->
+      <text x="360" y="205" fill="#888" font-size="11" text-anchor="middle">Portfolio Weight in Asset B (0% → 100%)</text>
+      <text x="20" y="120" fill="#888" font-size="11" text-anchor="middle" transform="rotate(-90, 20, 120)">Portfolio Volatility</text>
+      <!-- Min variance point for ρ=-1 -->
+      <circle cx="540" cy="179" r="5" fill="#00e5a0"/>
+      <text x="480" y="172" fill="#00e5a0" font-size="10">Min σ ≈ 0</text>
+    </svg>
+  </div>
+
+  <h3>N-Asset Portfolio Variance</h3>
+  <p>For a portfolio of N assets with weight vector <strong>w</strong> and covariance matrix <strong>Σ</strong>:</p>
+  <div class="math-display">σ²_p = wᵀ Σ w</div>
+  <p>The covariance matrix Σ is an N×N matrix where diagonal elements are variances and off-diagonal elements are covariances. This is the core of Modern Portfolio Theory (Markowitz 1952).</p>
+
+  <h3>The Efficient Frontier</h3>
+  <p>For any given set of assets, there's a set of "optimal" portfolios that give the highest return for each level of risk. This is the Efficient Frontier.</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// The Efficient Frontier — Return vs Risk Space</div>
+    <svg width="100%" height="250" viewBox="0 0 700 250">
+      <!-- Grid -->
+      <line x1="70" y1="20" x2="70" y2="220" stroke="#1e2640" stroke-width="1.5"/>
+      <line x1="70" y1="220" x2="670" y2="220" stroke="#1e2640" stroke-width="1.5"/>
+      <!-- Axes labels -->
+      <text x="370" y="245" fill="#888" font-size="12" text-anchor="middle">Risk (Volatility σ) →</text>
+      <text x="30" y="130" fill="#888" font-size="12" text-anchor="middle" transform="rotate(-90, 30, 130)">Return →</text>
+      <!-- Minimum variance frontier (full bullet shape) -->
+      <path d="M 250,180 C 230,165 220,140 230,110 C 240,80 270,55 320,40 C 380,28 450,35 530,60 C 590,80 630,110 650,140"
+            stroke="rgba(0,212,255,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+      <!-- Efficient frontier (upper half) -->
+      <path d="M 250,180 C 240,155 260,120 290,95 C 325,68 380,45 450,32 C 510,22 570,28 630,50"
+            stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+      <!-- Scatter dots (individual assets) -->
+      <circle cx="400" cy="100" r="7" fill="#7c5cfc" opacity="0.8"/>
+      <circle cx="480" cy="80" r="7" fill="#7c5cfc" opacity="0.8"/>
+      <circle cx="520" cy="130" r="7" fill="#7c5cfc" opacity="0.8"/>
+      <circle cx="560" cy="90" r="7" fill="#7c5cfc" opacity="0.8"/>
+      <circle cx="350" cy="140" r="7" fill="#7c5cfc" opacity="0.8"/>
+      <!-- Sub-optimal portfolios (scattered below frontier) -->
+      <circle cx="380" cy="140" r="5" fill="#888" opacity="0.5"/>
+      <circle cx="440" cy="120" r="5" fill="#888" opacity="0.5"/>
+      <circle cx="500" cy="150" r="5" fill="#888" opacity="0.5"/>
+      <!-- Min variance portfolio -->
+      <circle cx="250" cy="180" r="8" fill="#00e5a0"/>
+      <text x="210" y="178" fill="#00e5a0" font-size="10" text-anchor="end">Min Variance</text>
+      <!-- Max Sharpe -->
+      <circle cx="370" cy="68" r="8" fill="#f0c040"/>
+      <text x="375" y="58" fill="#f0c040" font-size="10">Max Sharpe</text>
+      <!-- Tangent line from risk-free -->
+      <line x1="70" y1="215" x2="370" y2="68" stroke="#f0c040" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+      <!-- Risk free label -->
+      <text x="75" y="213" fill="#888" font-size="10">R_f</text>
+      <!-- Legend -->
+      <circle cx="480" cy="215" r="5" fill="#00d4ff"/>
+      <text x="490" y="218" fill="#00d4ff" font-size="11">Efficient Frontier</text>
+      <circle cx="580" cy="215" r="5" fill="#888" opacity="0.5"/>
+      <text x="590" y="218" fill="#888" font-size="11">Sub-optimal</text>
+    </svg>
+  </div>
+
+  <h3>How Many Assets to Diversify?</h3>
+  <p>For a portfolio of N equal-weight uncorrelated assets, portfolio variance is:</p>
+  <div class="math-display">σ²_p = σ² / N</div>
+  <p>As N increases, idiosyncratic (firm-specific) risk approaches zero. But <strong>systematic (market) risk</strong> cannot be diversified away — it's the floor.</p>
+
+  <div class="callout warning">
+    <div class="callout-title">⚠️ The Diversification Trap</div>
+    <p>After about 30–40 well-chosen, low-correlation stocks, additional diversification gives diminishing returns. Beyond 50–100 stocks, you're essentially replicating an index — you might as well just buy an index fund.</p>
+    <p>More importantly: correlation between assets rises during crises. "Diversification fails when you need it most" is a well-known phenomenon — during market crashes, correlations spike toward 1.</p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — Efficient Frontier</span>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Download data for 5 assets</span>
+tickers = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GLD"</span>, <span class="st">"TLT"</span>, <span class="st">"SPY"</span>]
+data = yf.<span class="fn">download</span>(tickers, start=<span class="st">"2020-01-01"</span>, end=<span class="st">"2025-01-01"</span>)[<span class="st">'Close'</span>]
+log_ret = np.<span class="fn">log</span>(data / data.<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+mu = log_ret.<span class="fn">mean</span>() * <span class="nm">252</span>          <span class="cm"># Annual expected returns</span>
+cov = log_ret.<span class="fn">cov</span>() * <span class="nm">252</span>           <span class="cm"># Annual covariance matrix</span>
+rf = <span class="nm">0.045</span>
+
+<span class="cm"># Monte Carlo: generate random portfolios</span>
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+n_sims = <span class="nm">10_000</span>
+n_assets = <span class="fn">len</span>(tickers)
+
+port_returns, port_vols, port_sharpes = [], [], []
+all_weights = []
+
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n_sims):
+    w = np.random.<span class="fn">random</span>(n_assets)
+    w /= w.<span class="fn">sum</span>()                     <span class="cm"># Normalize to sum to 1</span>
+    all_weights.<span class="fn">append</span>(w)
+
+    ret = np.<span class="fn">dot</span>(w, mu)             <span class="cm"># Portfolio return</span>
+    vol = np.<span class="fn">sqrt</span>(np.<span class="fn">dot</span>(w, np.<span class="fn">dot</span>(cov, w)))  <span class="cm"># Portfolio vol</span>
+    sharpe = (ret - rf) / vol
+
+    port_returns.<span class="fn">append</span>(ret)
+    port_vols.<span class="fn">append</span>(vol)
+    port_sharpes.<span class="fn">append</span>(sharpe)
+
+port_returns = np.<span class="fn">array</span>(port_returns)
+port_vols = np.<span class="fn">array</span>(port_vols)
+port_sharpes = np.<span class="fn">array</span>(port_sharpes)
+
+<span class="cm"># Find max Sharpe portfolio</span>
+best_idx = port_sharpes.<span class="fn">argmax</span>()
+
+<span class="fn">print</span>(<span class="st">"=== Max Sharpe Portfolio ==="</span>)
+<span class="kw">for</span> t, w <span class="kw">in</span> <span class="fn">zip</span>(tickers, all_weights[best_idx]):
+    <span class="fn">print</span>(<span class="st">f"  {t}: {w*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"  Return: {port_returns[best_idx]*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"  Vol: {port_vols[best_idx]*100:.1f}%"</span>)
+<span class="fn">print</span>(<span class="st">f"  Sharpe: {port_sharpes[best_idx]:.2f}"</span>)
+
+<span class="cm"># Plot efficient frontier</span>
+plt.<span class="fn">figure</span>(figsize=(<span class="nm">10</span>, <span class="nm">6</span>))
+sc = plt.<span class="fn">scatter</span>(port_vols*<span class="nm">100</span>, port_returns*<span class="nm">100</span>,
+                 c=port_sharpes, cmap=<span class="st">'viridis'</span>, alpha=<span class="nm">0.4</span>, s=<span class="nm">8</span>)
+plt.<span class="fn">colorbar</span>(sc, label=<span class="st">'Sharpe Ratio'</span>)
+plt.<span class="fn">scatter</span>(port_vols[best_idx]*<span class="nm">100</span>, port_returns[best_idx]*<span class="nm">100</span>,
+           color=<span class="st">'red'</span>, s=<span class="nm">200</span>, marker=<span class="st">'*'</span>, zorder=<span class="nm">5</span>, label=<span class="st">'Max Sharpe'</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">'Annual Volatility (%)'</span>)
+plt.<span class="fn">ylabel</span>(<span class="st">'Annual Return (%)'</span>)
+plt.<span class="fn">title</span>(<span class="st">'Efficient Frontier — 10,000 Random Portfolios'</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">Two assets: σ_A = 10%, σ_B = 15%, ρ = 0.3, w_A = 60%, w_B = 40%. Compute portfolio variance and standard deviation.</div>
+    <div class="exercise-item">If ρ = 1 for two assets with equal weights and equal vol = 20%, what is portfolio vol? Now repeat for ρ = -1. Surprised?</div>
+    <div class="exercise-item">Why can't you eliminate ALL risk through diversification? What kind of risk remains no matter what?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Build the correlation matrix for 5 stocks. Identify which pair is best for diversification and build a 50/50 portfolio. Compute its vol.</div>
+    <div class="exercise-item">Simulate the diversification effect: build portfolios of 1, 5, 10, 20, 30, 50 random stocks and plot portfolio vol vs N. At what N does it flatten out?</div>
+    <div class="exercise-item">Compare correlations between stocks during 2019 (calm) vs 2020 Q1 (COVID crash). Show that correlations spiked. What does this imply for risk models?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Implement Minimum Variance Portfolio optimization using scipy and compare to the Monte Carlo approach. Are they consistent?</div>
+    <div class="exercise-item">Implement the full Markowitz mean-variance optimization: trace the entire efficient frontier curve by solving a sequence of quadratic programs at different target returns.</div>
+    <div class="exercise-item">Investigate the impact of estimation error in the covariance matrix. Use Ledoit-Wolf shrinkage (sklearn) and compare portfolio stability to the sample covariance. Why does this matter in practice?</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 8: CAPM ════════════════ -->
+<div class="tab-panel" id="panel-8">
+  <h2>CAPM — Capital Asset Pricing Model</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 6 — THE MOST FAMOUS MODEL IN FINANCE</div>
+    <p>CAPM (developed by Sharpe, Lintner, and Mossin in the 1960s) tells us how much return you should expect from a risky asset, given its relationship to the overall market. It introduced the concept of Beta — one of the most-used words in finance.</p>
+  </div>
+
+  <div class="prereq-badge">Requires: Diversification Math (Tab 07)</div>
+  <div class="prereq-badge">Requires: Correlation & Covariance</div>
+
+  <h3>The Big Idea: Systematic vs Idiosyncratic Risk</h3>
+  <div class="analogy-box">
+    <div class="analogy-label">// The Two Types of Risk</div>
+    <p><strong>Idiosyncratic Risk (unsystematic):</strong> Risk specific to one company. Apple might have a bad product launch. This risk can be diversified away by holding many stocks.</p>
+    <p><strong>Systematic Risk (market risk):</strong> Risk that affects all stocks — recessions, interest rate changes, wars. No amount of diversification eliminates this.</p>
+    <p>CAPM says: Investors are only rewarded for taking systematic risk. Why? Because idiosyncratic risk is free to eliminate through diversification, so the market won't pay you for bearing unnecessary risk.</p>
+  </div>
+
+  <h3>CAPM Formula</h3>
+  <div class="math-display">E[R_i] = R_f + β_i × (E[R_m] - R_f)</div>
+  <table>
+    <tr><th>Symbol</th><th>Meaning</th><th>Typical Value</th></tr>
+    <tr><td>E[R_i]</td><td>Expected return of asset i</td><td>What we're solving for</td></tr>
+    <tr><td>R_f</td><td>Risk-free rate</td><td>~4–5% (current US Treasury)</td></tr>
+    <tr><td>β_i</td><td>Beta of asset i</td><td>0 to 2+ (see below)</td></tr>
+    <tr><td>E[R_m]</td><td>Expected market return</td><td>~8–10% historically</td></tr>
+    <tr><td>E[R_m] - R_f</td><td>Market Risk Premium (MRP)</td><td>~5–6%</td></tr>
+  </table>
+
+  <h3>Beta (β) — The Key Parameter</h3>
+  <div class="math-display">β_i = Cov(R_i, R_m) / Var(R_m)</div>
+
+  <div class="diagram-box">
+    <div class="diagram-title">// Beta Interpretation Guide</div>
+    <svg width="100%" height="160" viewBox="0 0 700 160">
+      <!-- Beta scale line -->
+      <line x1="50" y1="80" x2="650" y2="80" stroke="#1e2640" stroke-width="2"/>
+      <!-- Points -->
+      <circle cx="50" cy="80" r="6" fill="#4a5568"/>
+      <circle cx="200" cy="80" r="6" fill="#7c5cfc"/>
+      <circle cx="350" cy="80" r="8" fill="#00d4ff"/>
+      <circle cx="480" cy="80" r="8" fill="#f0c040"/>
+      <circle cx="600" cy="80" r="8" fill="#ff6b6b"/>
+      <!-- Labels top -->
+      <text x="50" y="60" fill="#4a5568" font-size="11" text-anchor="middle">β ≈ 0</text>
+      <text x="200" y="60" fill="#7c5cfc" font-size="11" text-anchor="middle">β = 0.5</text>
+      <text x="350" y="60" fill="#00d4ff" font-size="11" text-anchor="middle">β = 1.0</text>
+      <text x="480" y="60" fill="#f0c040" font-size="11" text-anchor="middle">β = 1.5</text>
+      <text x="600" y="60" fill="#ff6b6b" font-size="11" text-anchor="middle">β = 2.0+</text>
+      <!-- Labels bottom -->
+      <text x="50" y="105" fill="#888" font-size="10" text-anchor="middle">Cash/</text>
+      <text x="50" y="118" fill="#888" font-size="10" text-anchor="middle">Bonds</text>
+      <text x="200" y="105" fill="#888" font-size="10" text-anchor="middle">Defensive</text>
+      <text x="200" y="118" fill="#888" font-size="10" text-anchor="middle">utilities</text>
+      <text x="350" y="105" fill="#888" font-size="10" text-anchor="middle">Moves like</text>
+      <text x="350" y="118" fill="#888" font-size="10" text-anchor="middle">market</text>
+      <text x="480" y="105" fill="#888" font-size="10" text-anchor="middle">Aggressive</text>
+      <text x="480" y="118" fill="#888" font-size="10" text-anchor="middle">growth</text>
+      <text x="600" y="105" fill="#888" font-size="10" text-anchor="middle">High-risk</text>
+      <text x="600" y="118" fill="#888" font-size="10" text-anchor="middle">leveraged</text>
+      <!-- Example companies -->
+      <text x="50" y="143" fill="#555" font-size="9" text-anchor="middle">Gold</text>
+      <text x="200" y="143" fill="#555" font-size="9" text-anchor="middle">Walmart</text>
+      <text x="350" y="143" fill="#555" font-size="9" text-anchor="middle">S&amp;P 500</text>
+      <text x="480" y="143" fill="#555" font-size="9" text-anchor="middle">AAPL</text>
+      <text x="600" y="143" fill="#555" font-size="9" text-anchor="middle">TSLA</text>
+    </svg>
+  </div>
+
+  <h3>The Security Market Line (SML)</h3>
+  <p>CAPM defines a linear relationship between Beta and expected return. This line is the Security Market Line (SML). Every asset should lie on this line if CAPM holds perfectly.</p>
+  <div class="callout intuition">
+    <div class="callout-title">💡 Alpha — Deviation from CAPM</div>
+    <p>In practice, stocks don't perfectly sit on the SML. The deviation is called <strong>Alpha (α)</strong>:</p>
+    <div style="font-family: 'JetBrains Mono', monospace; margin: 8px 0; color: var(--gold);">α = Actual Return - CAPM Expected Return</div>
+    <p>Positive alpha = outperformed CAPM → stock delivered more than its systematic risk predicted.<br>
+    Negative alpha = underperformed CAPM → bad risk-adjusted performance.<br>
+    <em>Finding positive alpha is literally what active portfolio managers are paid to do.</em></p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — Compute Beta & Alpha</span>
+    <pre><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+<span class="cm"># Market proxy: SPY; assets to analyze</span>
+tickers = [<span class="st">"AAPL"</span>, <span class="st">"TSLA"</span>, <span class="st">"WMT"</span>, <span class="st">"GLD"</span>]
+market = <span class="st">"SPY"</span>
+rf = <span class="nm">0.045</span> / <span class="nm">252</span>  <span class="cm"># Daily risk-free rate</span>
+
+all_tickers = tickers + [market]
+data = yf.<span class="fn">download</span>(all_tickers, start=<span class="st">"2021-01-01"</span>, end=<span class="st">"2025-01-01"</span>)[<span class="st">'Close'</span>]
+ret = np.<span class="fn">log</span>(data / data.<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+market_excess = ret[market] - rf  <span class="cm"># Excess market returns</span>
+
+<span class="fn">print</span>(<span class="st">"="</span>*<span class="nm">55</span>)
+<span class="fn">print</span>(<span class="st">f"{'Asset':<span class="nm">8</span>} {'Beta':<span class="nm">8</span>} {'Alpha(ann)':<span class="nm">12</span>} {'R²':<span class="nm">8</span>} {'p-val β'}"</span>)
+<span class="fn">print</span>(<span class="st">"="</span>*<span class="nm">55</span>)
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nm">2</span>, <span class="nm">2</span>, figsize=(<span class="nm">12</span>, <span class="nm">9</span>))
+axes = axes.<span class="fn">flatten</span>()
+
+<span class="kw">for</span> i, ticker <span class="kw">in</span> <span class="fn">enumerate</span>(tickers):
+    asset_excess = ret[ticker] - rf
+
+    <span class="cm"># OLS regression: R_i - Rf = α + β(R_m - Rf)</span>
+    slope, intercept, r_val, p_val, _ = stats.<span class="fn">linregress</span>(
+        market_excess, asset_excess)
+
+    beta = slope
+    alpha_annual = intercept * <span class="nm">252</span>
+    r_sq = r_val**<span class="nm">2</span>
+
+    <span class="fn">print</span>(<span class="st">f"{ticker:<span class="nm">8</span>} {beta:<span class="nm">8</span>.2f} {alpha_annual*100:<span class="nm">10</span>.2f}% {r_sq:<span class="nm">8</span>.3f} {p_val:.4f}"</span>)
+
+    <span class="cm"># Scatter plot with regression line</span>
+    ax = axes[i]
+    ax.<span class="fn">scatter</span>(market_excess*<span class="nm">100</span>, asset_excess*<span class="nm">100</span>,
+               alpha=<span class="nm">0.3</span>, s=<span class="nm">8</span>, color=<span class="st">'#00d4ff'</span>)
+    x_range = np.<span class="fn">array</span>([market_excess.<span class="fn">min</span>(), market_excess.<span class="fn">max</span>()]) * <span class="nm">100</span>
+    ax.<span class="fn">plot</span>(x_range, slope * x_range/(<span class="nm">100</span>) * <span class="nm">100</span> + intercept*<span class="nm">100</span>,
+           color=<span class="st">'#ff6b6b'</span>, lw=<span class="nm">2</span>)
+    ax.<span class="fn">set_title</span>(<span class="st">f"{ticker} | β={beta:.2f}, α={alpha_annual*100:.1f}%/yr, R²={r_sq:.2f}"</span>)
+    ax.<span class="fn">set_xlabel</span>(<span class="st">'Market Excess Return (%)'</span>)
+    ax.<span class="fn">set_ylabel</span>(<span class="st">f'{ticker} Excess Return (%)'</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>CAPM Assumptions & Limitations</h3>
+  <table>
+    <tr><th>Assumption</th><th>Reality</th></tr>
+    <tr><td>Single period</td><td>Investors have different horizons</td></tr>
+    <tr><td>No taxes or transaction costs</td><td>Taxes and costs are significant</td></tr>
+    <tr><td>All investors hold the same portfolio</td><td>Huge variation in portfolios</td></tr>
+    <tr><td>Return fully explained by market beta</td><td>Size, value, momentum effects exist → leads to Factor Models</td></tr>
+    <tr><td>Normal return distributions</td><td>Fat tails, skewness in practice</td></tr>
+  </table>
+
+  <div class="callout resource">
+    <div class="callout-title">🔗 Resources</div>
+    <div class="resource-links">
+      <a href="https://finance.yahoo.com/quote/SPY/risk/" class="resource-link" target="_blank">Yahoo Finance Beta Data</a>
+      <a href="https://www.investopedia.com/terms/c/capm.asp" class="resource-link" target="_blank">Investopedia: CAPM</a>
+      <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="resource-link" target="_blank">French Data Library</a>
+    </div>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">R_f = 4%, Market return = 9%, Stock A β = 1.3. What is CAPM expected return for Stock A?</div>
+    <div class="exercise-item">Stock B has β = 0.5. If the market rises 10%, by how much would you expect Stock B to rise? What if the market falls 10%?</div>
+    <div class="exercise-item">A portfolio has β = 1.0. What does CAPM predict for its return? What type of portfolio would have β = 1.0 by definition?</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Compute the beta of AAPL, MSFT, and TSLA vs SPY using regression on 3 years of daily returns. Verify using yahoo finance beta for comparison.</div>
+    <div class="exercise-item">Build a "market-neutral" portfolio: combine a high-beta stock (β ≈ 2) with cash to target β = 1. What weights do you need?</div>
+    <div class="exercise-item">Is CAPM alpha statistically significant for any stock in your analysis? Use t-test to determine significance. What are the implications?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Run a cross-sectional regression (Fama-MacBeth 1973 method) to test if higher beta stocks actually earn higher returns in your sample. Do you find evidence for or against CAPM?</div>
+    <div class="exercise-item">Implement rolling beta estimation using a 252-day window for a stock of your choice. How stable is beta over time? What does instability imply for CAPM's practical usefulness?</div>
+    <div class="exercise-item">Build a portfolio of 20 stocks and compute its beta two ways: (1) from portfolio return regression on SPY and (2) as a weighted sum of individual betas. Do you get the same result? Why should you?</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 9: FACTOR MODELS ════════════════ -->
+<div class="tab-panel" id="panel-9">
+  <h2>Factor Models</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// TOPIC 7 — BEYOND CAPM</div>
+    <p>CAPM uses one factor (market beta) to explain returns. But decades of research showed this isn't enough. Factor models use multiple systematic drivers to better explain why stocks earn the returns they do.</p>
+  </div>
+
+  <div class="prereq-badge">Requires: CAPM & Beta (Tab 08)</div>
+  <div class="prereq-badge">Requires: Regression concepts</div>
+
+  <h3>Why CAPM Fails (Empirically)</h3>
+  <p>In the 1990s, Eugene Fama and Kenneth French documented that CAPM left systematic patterns unexplained:</p>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">📐</div>
+      <div class="card-title">Size Effect (SMB)</div>
+      <div class="card-body">Small-cap stocks historically outperform large-cap stocks over time, even after adjusting for beta. CAPM cannot explain this.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <div class="card-title">Value Effect (HML)</div>
+      <div class="card-body">Value stocks (high book-to-market ratio) outperform growth stocks historically. CAPM says no — it should only care about beta.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <div class="card-title">Momentum (MOM)</div>
+      <div class="card-body">Stocks that performed well in the past 6–12 months tend to continue outperforming. This is a fourth factor added by Carhart.</div>
+    </div>
+  </div>
+
+  <h3>Fama-French 3-Factor Model</h3>
+  <div class="math-display">R_i - R_f = α + β_mkt(R_m - R_f) + β_smb(SMB) + β_hml(HML) + ε</div>
+
+  <table>
+    <tr><th>Factor</th><th>What it captures</th><th>How constructed</th></tr>
+    <tr><td><strong>MKT</strong> (Market)</td><td>Overall market risk (same as CAPM beta)</td><td>R_market - R_f</td></tr>
+    <tr><td><strong>SMB</strong> (Small Minus Big)</td><td>Size premium</td><td>Return of small stocks minus return of large stocks</td></tr>
+    <tr><td><strong>HML</strong> (High Minus Low)</td><td>Value premium</td><td>Return of high book/market minus low book/market stocks</td></tr>
+  </table>
+
+  <h3>Carhart 4-Factor Model</h3>
+  <div class="math-display">R_i - R_f = α + β_mkt·MKT + β_smb·SMB + β_hml·HML + β_mom·MOM + ε</div>
+
+  <h3>Fama-French 5-Factor Model (2015)</h3>
+  <div class="math-display">R_i - R_f = α + β_mkt·MKT + β_smb·SMB + β_hml·HML + β_rmw·RMW + β_cma·CMA + ε</div>
+  <p>Adding RMW (Robust Minus Weak, profitability factor) and CMA (Conservative Minus Aggressive, investment factor).</p>
+
+  <div class="analogy-box">
+    <div class="analogy-label">// The Recipe Analogy for Factor Models</div>
+    <p>Imagine the return of any stock is like a recipe made from standard ingredients. Instead of buying each exotic ingredient separately, you buy "factor ETFs" that provide exposure to each ingredient.</p>
+    <p>A tech growth stock might have: heavy market exposure (β_mkt = 1.4), negative value loading (β_hml = -0.5), positive momentum (β_mom = 0.3), small size (β_smb = 0.2). The factor model lets you decompose exactly what drives that stock's returns.</p>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — Fama-French 3-Factor Model</span>
+    <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> statsmodels.api <span class="kw">as</span> sm
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> io <span class="kw">import</span> BytesIO
+<span class="kw">import</span> zipfile
+<span class="kw">import</span> requests
+
+<span class="cm"># ── Download Fama-French factors from Ken French's website ──</span>
+url = (<span class="st">"https://mba.tuck.dartmouth.edu/pages/faculty/ken.french"</span>
+       <span class="st">"/ftp/F-F_Research_Data_Factors_daily_CSV.zip"</span>)
+response = requests.<span class="fn">get</span>(url)
+z = zipfile.<span class="fn">ZipFile</span>(BytesIO(response.content))
+fname = [f <span class="kw">for</span> f <span class="kw">in</span> z.<span class="fn">namelist</span>() <span class="kw">if</span> <span class="st">'.CSV'</span> <span class="kw">in</span> f][<span class="nm">0</span>]
+
+<span class="kw">with</span> z.<span class="fn">open</span>(fname) <span class="kw">as</span> f:
+    ff = pd.<span class="fn">read_csv</span>(f, skiprows=<span class="nm">3</span>, index_col=<span class="nm">0</span>)
+
+<span class="cm"># Clean up</span>
+ff = ff[ff.index.<span class="fn">astype</span>(<span class="st">str</span>).<span class="fn">str</span>.<span class="fn">match</span>(<span class="st">r'^\d{8}$'</span>)]
+ff.index = pd.<span class="fn">to_datetime</span>(ff.index, format=<span class="st">'%Y%m%d'</span>)
+ff = ff.<span class="fn">astype</span>(<span class="nm">float</span>) / <span class="nm">100</span>  <span class="cm"># Convert from % to decimal</span>
+ff = ff[<span class="st">"2020-01-01"</span>:<span class="st">"2024-12-31"</span>]
+ff.<span class="fn">rename</span>(columns={<span class="st">'Mkt-RF'</span>: <span class="st">'MKT'</span>}, inplace=<span class="kw">True</span>)
+
+<span class="cm"># ── Get Apple returns ──────────────────────────</span>
+aapl = yf.<span class="fn">download</span>(<span class="st">"AAPL"</span>, start=<span class="st">"2020-01-01"</span>, end=<span class="st">"2025-01-01"</span>,
+                  progress=<span class="kw">False</span>)
+aapl_ret = np.<span class="fn">log</span>(aapl[<span class="st">'Close'</span>] / aapl[<span class="st">'Close'</span>].<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+aapl_ret.index = aapl_ret.index.<span class="fn">tz_localize</span>(<span class="kw">None</span>)
+
+<span class="cm"># ── Align data ────────────────────────────────</span>
+df = pd.<span class="fn">concat</span>([aapl_ret, ff], axis=<span class="nm">1</span>).<span class="fn">dropna</span>()
+df.<span class="fn">rename</span>(columns={<span class="st">'Close'</span>: <span class="st">'AAPL'</span>}, inplace=<span class="kw">True</span>)
+df[<span class="st">'AAPL_excess'</span>] = df[<span class="st">'AAPL'</span>] - df[<span class="st">'RF'</span>]
+
+<span class="cm"># ── CAPM regression (1 factor) ─────────────────</span>
+X1 = sm.<span class="fn">add_constant</span>(df[<span class="st">'MKT'</span>])
+capm = sm.<span class="fn">OLS</span>(df[<span class="st">'AAPL_excess'</span>], X1).<span class="fn">fit</span>()
+
+<span class="cm"># ── FF3 regression (3 factors) ────────────────</span>
+X3 = sm.<span class="fn">add_constant</span>(df[[<span class="st">'MKT'</span>, <span class="st">'SMB'</span>, <span class="st">'HML'</span>]])
+ff3 = sm.<span class="fn">OLS</span>(df[<span class="st">'AAPL_excess'</span>], X3).<span class="fn">fit</span>()
+
+<span class="fn">print</span>(<span class="st">"=== CAPM Results for AAPL ==="</span>)
+<span class="fn">print</span>(capm.<span class="fn">summary</span>().<span class="fn">tables</span>[<span class="nm">1</span>])
+
+<span class="fn">print</span>(<span class="st">"\n=== Fama-French 3-Factor Results for AAPL ==="</span>)
+<span class="fn">print</span>(ff3.<span class="fn">summary</span>().<span class="fn">tables</span>[<span class="nm">1</span>])
+
+<span class="fn">print</span>(<span class="st">f"\nCAPM R² = {capm.rsquared:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"FF3 R²  = {ff3.rsquared:.3f}"</span>)
+<span class="fn">print</span>(<span class="st">"A higher R² means more return is explained by the model"</span>)</pre>
+  </div>
+
+  <h3>Factor Zoo & Smart Beta</h3>
+  <p>Researchers have documented hundreds of "factors" that predict returns. The most established ones:</p>
+  <table>
+    <tr><th>Factor</th><th>Source</th><th>Intuition</th></tr>
+    <tr><td>Market (β)</td><td>CAPM 1964</td><td>Compensation for market risk</td></tr>
+    <tr><td>Size (SMB)</td><td>Fama-French 1993</td><td>Small firms are riskier</td></tr>
+    <tr><td>Value (HML)</td><td>Fama-French 1993</td><td>Distressed stocks require higher return</td></tr>
+    <tr><td>Momentum</td><td>Jegadeesh-Titman 1993</td><td>Behavioral: trend-following</td></tr>
+    <tr><td>Quality/Profitability</td><td>Novy-Marx 2013</td><td>Profitable firms outperform</td></tr>
+    <tr><td>Low Volatility</td><td>Blitz & van Vliet 2007</td><td>Low-risk stocks earn better risk-adj. returns</td></tr>
+    <tr><td>Carry</td><td>Currency markets</td><td>High-yield assets outperform low-yield</td></tr>
+  </table>
+
+  <div class="callout resource">
+    <div class="callout-title">🔗 Factor Data & Resources</div>
+    <div class="resource-links">
+      <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" class="resource-link" target="_blank">Ken French Data Library</a>
+      <a href="https://www.aqr.com/Insights/Datasets" class="resource-link" target="_blank">AQR Factor Data</a>
+      <a href="https://alphaarchitect.com/factor-investing-education/" class="resource-link" target="_blank">Alpha Architect: Factors</a>
+    </div>
+  </div>
+
+  <h3>Practice Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Easy</div>
+    <div class="exercise-item">What is the SMB factor? If a stock has positive SMB loading (β_smb > 0), is it more like a small or large cap stock? What return premium does it earn?</div>
+    <div class="exercise-item">CAPM explains 60% of a stock's return variance (R² = 0.60). If FF3 explains 70% (R² = 0.70), what does the extra 10% represent?</div>
+    <div class="exercise-item">A stock has: β_mkt = 1.1, β_smb = 0.6, β_hml = -0.3. Is this likely a growth or value stock? Large or small cap? Explain each answer.</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Medium</div>
+    <div class="exercise-item">Run FF3 regression for 5 different stocks (tech, utilities, financials, consumer staples, energy). Compare their factor loadings — do they match your intuitions?</div>
+    <div class="exercise-item">Compare FF3 R² to CAPM R² for the same stocks. Which sectors benefit most from adding size and value factors?</div>
+    <div class="exercise-item">Compute the cumulative returns of the SMB and HML factors over the last 5 years. Have they been positive? What does this say about the stability of these premiums?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Hard</div>
+    <div class="exercise-item">Build a "factor-neutral" portfolio: combine stocks to achieve β_smb = 0 and β_hml = 0 while maximizing beta-adjusted expected return. Use quadratic programming.</div>
+    <div class="exercise-item">Implement a momentum factor from scratch using monthly return data. Test if it predicts next-month returns in a cross-sectional regression.</div>
+    <div class="exercise-item">Research and implement the Fama-MacBeth two-step regression to estimate factor risk premia. Compare your estimated premia to the theoretical premia from the French data library.</div>
+  </div>
+</div>
+
+<!-- ════════════════ TAB 10: PUTTING IT TOGETHER ════════════════ -->
+<div class="tab-panel" id="panel-10">
+  <h2>Putting It All Together</h2>
+  <div class="section-intro">
+    <div class="topic-tag">// SYNTHESIS — HOW EVERYTHING CONNECTS</div>
+    <p>Now we step back and see how all the topics form a coherent framework for thinking about risk and return. This is the quant engineer's mental model of portfolio theory.</p>
+  </div>
+
+  <h3>The Complete Conceptual Map</h3>
+  <div class="diagram-box">
+    <div class="diagram-title">// From Data to Decision — The Full Pipeline</div>
+    <svg width="100%" height="320" viewBox="0 0 700 320">
+      <!-- Step boxes -->
+      <!-- Step 1: Data -->
+      <rect x="10" y="10" width="120" height="50" rx="8" fill="rgba(124,92,252,0.15)" stroke="#7c5cfc" stroke-width="1.5"/>
+      <text x="70" y="32" fill="#7c5cfc" font-size="11" text-anchor="middle" font-weight="bold">Market Data</text>
+      <text x="70" y="48" fill="#888" font-size="10" text-anchor="middle">Prices, returns</text>
+
+      <!-- Step 2: Stats -->
+      <rect x="170" y="10" width="120" height="50" rx="8" fill="rgba(0,212,255,0.12)" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="230" y="32" fill="#00d4ff" font-size="11" text-anchor="middle" font-weight="bold">Statistics</text>
+      <text x="230" y="48" fill="#888" font-size="10" text-anchor="middle">μ, σ, ρ, Cov</text>
+
+      <!-- Step 3: Risk Metrics -->
+      <rect x="330" y="10" width="120" height="50" rx="8" fill="rgba(255,107,107,0.12)" stroke="#ff6b6b" stroke-width="1.5"/>
+      <text x="390" y="32" fill="#ff6b6b" font-size="11" text-anchor="middle" font-weight="bold">Risk Metrics</text>
+      <text x="390" y="48" fill="#888" font-size="10" text-anchor="middle">VaR, CVaR, Vol</text>
+
+      <!-- Step 4: Performance -->
+      <rect x="490" y="10" width="120" height="50" rx="8" fill="rgba(0,229,160,0.12)" stroke="#00e5a0" stroke-width="1.5"/>
+      <text x="550" y="32" fill="#00e5a0" font-size="11" text-anchor="middle" font-weight="bold">Performance</text>
+      <text x="550" y="48" fill="#888" font-size="10" text-anchor="middle">Sharpe, Alpha</text>
+
+      <!-- Arrows top row -->
+      <path d="M 132,35 L 168,35" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 292,35 L 328,35" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 452,35 L 488,35" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Second row -->
+      <rect x="90" y="120" width="120" height="50" rx="8" fill="rgba(240,192,64,0.12)" stroke="#f0c040" stroke-width="1.5"/>
+      <text x="150" y="142" fill="#f0c040" font-size="11" text-anchor="middle" font-weight="bold">Diversification</text>
+      <text x="150" y="158" fill="#888" font-size="10" text-anchor="middle">σ²_p = wᵀΣw</text>
+
+      <rect x="270" y="120" width="120" height="50" rx="8" fill="rgba(124,92,252,0.12)" stroke="#7c5cfc" stroke-width="1.5"/>
+      <text x="330" y="142" fill="#7c5cfc" font-size="11" text-anchor="middle" font-weight="bold">CAPM</text>
+      <text x="330" y="158" fill="#888" font-size="10" text-anchor="middle">E[R] = Rf + β·MRP</text>
+
+      <rect x="450" y="120" width="120" height="50" rx="8" fill="rgba(0,212,255,0.12)" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="510" y="142" fill="#00d4ff" font-size="11" text-anchor="middle" font-weight="bold">Factor Models</text>
+      <text x="510" y="158" fill="#888" font-size="10" text-anchor="middle">FF3, FF5, Carhart</text>
+
+      <!-- Vertical connections -->
+      <path d="M 230,62 L 150,118" stroke="#888" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <path d="M 390,62 L 330,118" stroke="#888" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <path d="M 550,62 L 510,118" stroke="#888" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <path d="M 210,145 L 268,145" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 392,145 L 448,145" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Third row: Portfolio Construction -->
+      <rect x="200" y="230" width="300" height="70" rx="8" fill="rgba(0,229,160,0.08)" stroke="#00e5a0" stroke-width="2"/>
+      <text x="350" y="256" fill="#00e5a0" font-size="13" text-anchor="middle" font-weight="bold">Portfolio Construction</text>
+      <text x="350" y="274" fill="#888" font-size="10" text-anchor="middle">Maximize Sharpe / Minimize CVaR</text>
+      <text x="350" y="290" fill="#888" font-size="10" text-anchor="middle">subject to risk constraints (VaR, CVaR limits)</text>
+
+      <!-- Arrows to portfolio construction -->
+      <path d="M 150,172 L 270,228" stroke="#888" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+      <path d="M 350,172 L 350,228" stroke="#888" stroke-width="1.5" marker-end="url(#arr)"/>
+      <path d="M 510,172 L 430,228" stroke="#888" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+
+      <!-- Arrow marker def -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M 0,0 L 6,3 L 0,6" fill="none" stroke="#888" stroke-width="1.5"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3>Real-World Application: Build a Portfolio from Scratch</h3>
+  <p>Here's the complete workflow a quant engineer follows:</p>
+
+  <div class="roadmap">
+    <div class="roadmap-step">
+      <div class="roadmap-num">1</div>
+      <div class="roadmap-content">
+        <h4>Universe Selection</h4>
+        <p>Choose your investable universe (e.g., S&P 500 stocks). Filter by liquidity, market cap, data availability.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">2</div>
+      <div class="roadmap-content">
+        <h4>Return & Risk Estimation</h4>
+        <p>Compute log returns. Estimate μ (expected returns) via CAPM or factor models. Estimate Σ (covariance matrix) — often with shrinkage to improve stability.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">3</div>
+      <div class="roadmap-content">
+        <h4>Risk Assessment</h4>
+        <p>Compute individual VaR, CVaR for each asset. Compute correlation structure. Identify concentration risks.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">4</div>
+      <div class="roadmap-content">
+        <h4>Portfolio Optimization</h4>
+        <p>Maximize Sharpe Ratio (or minimize CVaR) subject to: position limits, sector limits, VaR limits, turnover constraints.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">5</div>
+      <div class="roadmap-content">
+        <h4>Factor Analysis</h4>
+        <p>Decompose portfolio into factor exposures using FF model. Ensure no unintended factor tilts. Hedge unwanted exposures if needed.</p>
+      </div>
+    </div>
+    <div class="roadmap-step">
+      <div class="roadmap-num">6</div>
+      <div class="roadmap-content">
+        <h4>Backtesting & Monitoring</h4>
+        <p>Backtest strategy on historical data. Compute realized Sharpe, max drawdown, Calmar ratio. Set up live risk monitoring with daily VaR/CVaR reporting.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3>Complete Portfolio Project — Colab Notebook</h3>
+  <div class="colab-card">
+    <div class="colab-icon">🔬</div>
+    <div class="colab-content">
+      <h4>Full End-to-End Portfolio Analysis</h4>
+      <p>This comprehensive experiment ties together every topic: returns, VaR, CVaR, Sharpe optimization, CAPM beta, and factor decomposition for a real portfolio.</p>
+      <a href="https://colab.research.google.com/drive/1bZ4WMFnnSXGHlkqMjEXlf5v5i4L1h4g" class="colab-link" target="_blank">▶ Open Complete Notebook</a>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Google Colab — Complete Portfolio Risk Dashboard</span>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy <span class="kw">import</span> stats, optimize
+
+<span class="cm"># ── Configuration ─────────────────────────────</span>
+TICKERS  = [<span class="st">"AAPL"</span>, <span class="st">"MSFT"</span>, <span class="st">"GLD"</span>, <span class="st">"TLT"</span>, <span class="st">"VNQ"</span>]
+WEIGHTS  = np.<span class="fn">array</span>([<span class="nm">0.30</span>, <span class="nm">0.30</span>, <span class="nm">0.15</span>, <span class="nm">0.15</span>, <span class="nm">0.10</span>])
+PORT_VAL = <span class="nm">1_000_000</span>
+RF       = <span class="nm">0.045</span>
+CONF     = <span class="nm">0.95</span>
+
+<span class="cm"># ── Data ──────────────────────────────────────</span>
+data = yf.<span class="fn">download</span>(TICKERS + [<span class="st">"SPY"</span>], start=<span class="st">"2020-01-01"</span>,
+                  end=<span class="st">"2025-01-01"</span>)[<span class="st">'Close'</span>]
+ret = np.<span class="fn">log</span>(data / data.<span class="fn">shift</span>(<span class="nm">1</span>)).<span class="fn">dropna</span>()
+
+asset_ret = ret[TICKERS]
+mkt_ret   = ret[<span class="st">"SPY"</span>]
+
+<span class="cm"># ── Portfolio Returns ─────────────────────────</span>
+port_ret = asset_ret.<span class="fn">dot</span>(WEIGHTS)
+
+<span class="cm"># ── Summary Statistics ────────────────────────</span>
+ann_ret = port_ret.<span class="fn">mean</span>() * <span class="nm">252</span>
+ann_vol = port_ret.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nm">252</span>)
+sharpe  = (ann_ret - RF) / ann_vol
+
+<span class="cm"># ── VaR & CVaR ───────────────────────────────</span>
+alpha   = <span class="nm">1</span> - CONF
+var_h   = -np.<span class="fn">percentile</span>(port_ret, alpha*<span class="nm">100</span>) * PORT_VAL
+cvar_h  = -port_ret[port_ret < -var_h/PORT_VAL].<span class="fn">mean</span>() * PORT_VAL
+
+<span class="cm"># ── Beta (vs SPY) ────────────────────────────</span>
+beta, alpha_capm, r, p, _ = stats.<span class="fn">linregress</span>(mkt_ret, port_ret)
+
+<span class="cm"># ── Covariance & Correlation ─────────────────</span>
+corr_mat = asset_ret.<span class="fn">corr</span>()
+
+<span class="cm"># ── Print Dashboard ───────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"╔══════════════════════════════════════╗"</span>)
+<span class="fn">print</span>(<span class="st">"║   PORTFOLIO RISK DASHBOARD           ║"</span>)
+<span class="fn">print</span>(<span class="st">"╠══════════════════════════════════════╣"</span>)
+<span class="fn">print</span>(<span class="st">f"║  Annual Return:    {ann_ret*100:>7.2f}%           ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  Annual Volatility:{ann_vol*100:>7.2f}%           ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  Sharpe Ratio:     {sharpe:>7.2f}            ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  95% 1-Day VaR:  ${var_h:>10,.0f}         ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  95% CVaR:       ${cvar_h:>10,.0f}         ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  Market Beta:      {beta:>7.2f}            ║"</span>)
+<span class="fn">print</span>(<span class="st">f"║  CAPM Alpha:       {alpha_capm*252*100:>7.2f}%/yr       ║"</span>)
+<span class="fn">print</span>(<span class="st">"╚══════════════════════════════════════╝"</span>)
+
+<span class="cm"># ── 2x2 Dashboard Plot ────────────────────────</span>
+fig, axes = plt.<span class="fn">subplots</span>(<span class="nm">2</span>, <span class="nm">2</span>, figsize=(<span class="nm">13</span>, <span class="nm">9</span>))
+fig.<span class="fn">suptitle</span>(<span class="st">"Portfolio Risk Dashboard"</span>, fontsize=<span class="nm">15</span>)
+
+<span class="cm"># 1. Cumulative returns</span>
+axes[<span class="nm">0</span>,<span class="nm">0</span>].<span class="fn">plot</span>((port_ret+<span class="nm">1</span>).<span class="fn">cumprod</span>(), color=<span class="st">'#00d4ff'</span>, lw=<span class="nm">2</span>)
+axes[<span class="nm">0</span>,<span class="nm">0</span>].<span class="fn">set_title</span>(<span class="st">'Cumulative Portfolio Returns'</span>)
+
+<span class="cm"># 2. Return distribution with VaR/CVaR</span>
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">hist</span>(port_ret, bins=<span class="nm">60</span>, color=<span class="st">'#7c5cfc'</span>, alpha=<span class="nm">0.6</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">axvline</span>(-var_h/PORT_VAL, color=<span class="st">'#ff6b6b'</span>, lw=<span class="nm">2</span>, label=<span class="st">'VaR'</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">axvline</span>(-cvar_h/PORT_VAL, color=<span class="st">'#ff3a3a'</span>, lw=<span class="nm">2</span>,
+                   linestyle=<span class="st">'--'</span>, label=<span class="st">'CVaR'</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">legend</span>()
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">set_title</span>(<span class="st">'Return Distribution + Risk Metrics'</span>)
+
+<span class="cm"># 3. Correlation heatmap</span>
+im = axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">imshow</span>(corr_mat, cmap=<span class="st">'RdYlGn'</span>, vmin=-<span class="nm">1</span>, vmax=<span class="nm">1</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_xticks</span>(<span class="fn">range</span>(<span class="fn">len</span>(TICKERS)))
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_yticks</span>(<span class="fn">range</span>(<span class="fn">len</span>(TICKERS)))
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_xticklabels</span>(TICKERS)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_yticklabels</span>(TICKERS)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(TICKERS)):
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(TICKERS)):
+        axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">text</span>(j, i, <span class="st">f"{corr_mat.iloc[i,j]:.2f}"</span>, ha=<span class="st">'center'</span>,
+                      fontsize=<span class="nm">9</span>)
+plt.<span class="fn">colorbar</span>(im, ax=axes[<span class="nm">1</span>,<span class="nm">0</span>])
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_title</span>(<span class="st">'Correlation Matrix'</span>)
+
+<span class="cm"># 4. Rolling 30-day Sharpe</span>
+rolling_ret = port_ret.<span class="fn">rolling</span>(<span class="nm">252</span>).<span class="fn">mean</span>() * <span class="nm">252</span>
+rolling_vol = port_ret.<span class="fn">rolling</span>(<span class="nm">252</span>).<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="nm">252</span>)
+rolling_sharpe = (rolling_ret - RF) / rolling_vol
+axes[<span class="nm">1</span>,<span class="nm">1</span>].<span class="fn">plot</span>(rolling_sharpe, color=<span class="st">'#00e5a0'</span>, lw=<span class="nm">2</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].<span class="fn">axhline</span>(<span class="nm">1</span>, color=<span class="st">'#888'</span>, linestyle=<span class="st">'--'</span>, alpha=<span class="nm">0.5</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].<span class="fn">set_title</span>(<span class="st">'Rolling 252-Day Sharpe Ratio'</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <h3>Quick Reference: All Formulas</h3>
+  <table>
+    <tr><th>Concept</th><th>Formula</th><th>Python</th></tr>
+    <tr><td>Log Return</td><td>r = ln(P_t / P_{t-1})</td><td>np.log(P / P.shift(1))</td></tr>
+    <tr><td>Annual Vol</td><td>σ_annual = σ_daily × √252</td><td>ret.std() * np.sqrt(252)</td></tr>
+    <tr><td>VaR (Param)</td><td>-(μ - Z_α × σ) × V</td><td>-(mu + stats.norm.ppf(0.05)*sigma)*V</td></tr>
+    <tr><td>CVaR (Hist)</td><td>avg loss in tail</td><td>-ret[ret&lt;-VaR].mean() * V</td></tr>
+    <tr><td>Sharpe</td><td>(R_p - R_f) / σ_p</td><td>(ann_ret - rf) / ann_vol</td></tr>
+    <tr><td>Portfolio Var</td><td>wᵀ Σ w</td><td>w @ cov @ w</td></tr>
+    <tr><td>Beta</td><td>Cov(R_i,R_m) / Var(R_m)</td><td>stats.linregress(mkt, asset)</td></tr>
+    <tr><td>CAPM E[R]</td><td>R_f + β(R_m - R_f)</td><td>rf + beta * (mkt_ret - rf)</td></tr>
+    <tr><td>Alpha</td><td>R_actual - CAPM E[R]</td><td>intercept from OLS regression</td></tr>
+  </table>
+
+  <h3>What to Learn Next</h3>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon">📉</div>
+      <div class="card-title">Options Pricing</div>
+      <div class="card-body">Black-Scholes model, Greeks (Delta, Gamma, Vega). Essential for derivatives risk management.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌊</div>
+      <div class="card-title">Stochastic Calculus</div>
+      <div class="card-body">Brownian motion, Ito's lemma. The mathematical foundation under most asset pricing models.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">ML for Finance</div>
+      <div class="card-body">LSTM for price prediction, gradient boosting for factor modeling, reinforcement learning for portfolio allocation.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">High-Frequency Trading</div>
+      <div class="card-body">Microstructure, order book dynamics, latency optimization. A different world from portfolio theory.</div>
+    </div>
+  </div>
+
+  <div class="callout resource">
+    <div class="callout-title">📚 Recommended Books to Continue</div>
+    <div class="resource-links">
+      <a href="https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089" class="resource-link" target="_blank">Advances in Financial ML — de Prado</a>
+      <a href="https://www.amazon.com/Options-Futures-Other-Derivatives-10th/dp/013447208X" class="resource-link" target="_blank">Options, Futures — Hull</a>
+      <a href="https://www.amazon.com/Active-Portfolio-Management-Quantitative-Controlling/dp/0070248826" class="resource-link" target="_blank">Active Portfolio Management — Grinold</a>
+      <a href="https://www.amazon.com/Quantitative-Equity-Portfolio-Management-Strategies/dp/0071459391" class="resource-link" target="_blank">Quant Equity PM — Qian</a>
+    </div>
+  </div>
+
+  <!-- Final Capstone Exercises -->
+  <h3>Capstone Exercises</h3>
+  <div class="exercise-tier easy">
+    <div class="tier-label easy">⬢ Tier 1 — Portfolio Review</div>
+    <div class="exercise-item">Without code: explain VaR and CVaR to a non-technical friend using an analogy. Can you do it in under 2 minutes?</div>
+    <div class="exercise-item">Draw the efficient frontier from memory and label: the minimum variance portfolio, max Sharpe portfolio, and Capital Market Line.</div>
+    <div class="exercise-item">List 5 ways CAPM is unrealistic. For each, say which topic in this guide partially addresses it.</div>
+  </div>
+  <div class="exercise-tier medium">
+    <div class="tier-label medium">⬡ Tier 2 — Integration Projects</div>
+    <div class="exercise-item">Build a Streamlit or Gradio app that takes a list of tickers and outputs: Sharpe, VaR, CVaR, Beta, and correlation heatmap. Deploy it publicly.</div>
+    <div class="exercise-item">Compare three portfolio strategies over 5 years: (1) Equal weight, (2) Max Sharpe, (3) Min Variance. Which wins on Sharpe? On CVaR? On drawdown?</div>
+    <div class="exercise-item">Implement a simple risk parity portfolio (equal risk contribution) and compare to equal weight. Which performs better in crisis periods?</div>
+  </div>
+  <div class="exercise-tier hard">
+    <div class="tier-label hard">⬠ Tier 3 — Professional Level</div>
+    <div class="exercise-item">Build a full systematic strategy: use FF5 factor loadings to identify mispriced stocks, build a long-short portfolio, and report CAPM alpha, Sharpe, and max drawdown over a 3-year out-of-sample period.</div>
+    <div class="exercise-item">Implement a regime-switching risk model: use HMM (Hidden Markov Model) to identify bull/bear regimes, then switch between risk-on and risk-off portfolios based on regime. Evaluate improvement in risk-adjusted returns.</div>
+    <div class="exercise-item">Research and implement Black-Litterman model: combine market equilibrium (from CAPM) with your own views to produce a more stable optimal portfolio. Compare to mean-variance optimization on robustness.</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+  function switchTab(idx) {
+    document.querySelectorAll('.tab-panel').forEach((p, i) => {
+      p.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

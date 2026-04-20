@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Series Analysis — Quant Engineer's Study Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --accent: #c0392b;
+    --accent2: #2471a3;
+    --gold: #b7860b;
+    --green: #1e8449;
+    --muted: #7f8c8d;
+    --border: #c8bfaf;
+    --code-bg: #1a1a2e;
+    --code-text: #e0e0e0;
+    --highlight: #fef9c3;
+    --tab-active: #c0392b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2.5rem 2rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.04) 39px,
+      rgba(255,255,255,0.04) 40px
+    );
+    pointer-events: none;
+  }
+  .header-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+  .header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+  .site-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 0.7rem;
+    font-style: italic;
+  }
+  .header-pills {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-top: 1.2rem;
+  }
+  .pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ddd;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  /* TAB NAV */
+  .tab-nav-wrap {
+    background: var(--ink);
+    border-bottom: 2px solid var(--accent);
+    position: sticky; top: 0; z-index: 100;
+    overflow-x: auto;
+  }
+  .tab-nav {
+    display: flex;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 0;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    top: 2px;
+  }
+  .tab-btn:hover { color: var(--paper); }
+  .tab-btn.active {
+    color: var(--paper);
+    border-bottom-color: var(--accent);
+  }
+
+  /* MAIN CONTENT */
+  .main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+  .tab-panel { display: none; padding-top: 2.5rem; }
+  .tab-panel.active { display: block; }
+
+  /* TYPOGRAPHY */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2.2rem 0 0.7rem;
+    color: var(--ink);
+  }
+  h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 1.8rem 0 0.5rem;
+  }
+  p { margin-bottom: 1.1rem; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+
+  /* SECTION DIVIDER */
+  .section-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-left: 4px solid var(--accent2);
+    background: var(--cream);
+    padding: 1.1rem 1.4rem;
+    margin: 1.5rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout.warn { border-left-color: var(--gold); }
+  .callout.tip { border-left-color: var(--green); }
+  .callout.key { border-left-color: var(--accent); }
+  .callout-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    opacity: 0.7;
+  }
+
+  /* FORMULA BOXES */
+  .formula {
+    background: var(--ink);
+    color: #f0e6d3;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    padding: 1.2rem 1.8rem;
+    margin: 1.2rem 0;
+    border-radius: 4px;
+    overflow-x: auto;
+    line-height: 1.9;
+  }
+  .formula .comment { color: #aaa; font-size: 0.85rem; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    padding: 1.4rem 1.6rem;
+    margin: 1.2rem 0;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.7;
+    position: relative;
+  }
+  .code-block .kw { color: #c792ea; }
+  .code-block .fn { color: #82aaff; }
+  .code-block .str { color: #c3e88d; }
+  .code-block .cm { color: #546e7a; font-style: italic; }
+  .code-block .num { color: #f78c6c; }
+  .code-block .cls { color: #ffcb6b; }
+  .code-lang {
+    position: absolute; top: 0.5rem; right: 0.9rem;
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    color: #546e7a; text-transform: uppercase;
+  }
+
+  /* ANALOGY BOXES */
+  .analogy {
+    background: var(--highlight);
+    border: 1px solid #e5d98f;
+    padding: 1.1rem 1.4rem;
+    border-radius: 4px;
+    margin: 1.3rem 0;
+  }
+  .analogy-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+  }
+
+  /* DIAGRAM / CANVAS CONTAINERS */
+  .diagram-wrap {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+  .diagram-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+  }
+  canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* GRID LAYOUTS */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin: 1.5rem 0; }
+  @media(max-width: 700px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+  }
+  .card h4 { margin-top: 0; }
+
+  /* EXERCISE TIERS */
+  .exercise-set { margin: 1.5rem 0; }
+  .tier-label {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+  }
+  .tier-easy { background: #d5f5e3; color: var(--green); }
+  .tier-medium { background: #fdebd0; color: #a04000; }
+  .tier-hard { background: #fadbd8; color: var(--accent); }
+  ol.exercises { padding-left: 1.4rem; }
+  ol.exercises li { margin-bottom: 0.7rem; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 1.3rem 0; font-size: 0.93rem; }
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.7rem 1rem;
+    text-align: left;
+  }
+  td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--cream); }
+
+  /* RESOURCE LINKS */
+  .resources { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 1.2rem 0; }
+  .res-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .res-link:hover { background: var(--accent); }
+  .res-link.secondary {
+    background: white;
+    color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .res-link.secondary:hover { background: var(--cream); }
+
+  /* STEP LIST */
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex; gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.1rem;
+  }
+  .steps li::before {
+    content: counter(step);
+    min-width: 2rem; height: 2rem;
+    background: var(--accent);
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* CONCEPT MAP */
+  .concept-map {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 2.2;
+    overflow-x: auto;
+  }
+  .cm-node {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 3px;
+    margin: 0 0.2rem;
+  }
+  .cm-pre { background: #2c3e50; }
+  .cm-main { background: var(--accent); }
+  .cm-arrow { color: var(--gold); }
+
+  /* INTERACTIVE SLIDERS */
+  .interactive-box {
+    background: white;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .interactive-box h4 { margin-top: 0; }
+  .slider-row { display: flex; align-items: center; gap: 1rem; margin: 0.6rem 0; flex-wrap: wrap; }
+  .slider-row label { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; min-width: 120px; }
+  input[type=range] { flex: 1; min-width: 120px; accent-color: var(--accent); }
+  .slider-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    min-width: 40px;
+    color: var(--accent);
+  }
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.5rem 1.2rem;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .btn:hover { background: #a93226; }
+  .btn.secondary {
+    background: var(--ink);
+  }
+
+  /* COLAB BADGE */
+  .colab-box {
+    background: linear-gradient(135deg, #f9ab00 0%, #e37400 100%);
+    color: white;
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.4rem 0;
+    display: flex; align-items: flex-start; gap: 1rem;
+  }
+  .colab-icon { font-size: 2rem; line-height: 1; }
+  .colab-box h4 { color: white; margin: 0 0 0.3rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.1em; }
+  .colab-box p { margin: 0; font-size: 0.9rem; }
+  .colab-box a { color: white; font-weight: 600; }
+
+  /* PROGRESS BAR */
+  .topic-progress {
+    display: flex; gap: 0.3rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .prog-step {
+    flex: 1; min-width: 80px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.5rem 0.7rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    position: relative;
+  }
+  .prog-step.done { background: var(--ink); color: var(--paper); }
+  .prog-step.current { background: var(--accent); color: white; }
+
+  /* SVG DIAGRAMS */
+  svg text { font-family: 'IBM Plex Mono', monospace; }
+
+  /* FOOTER */
+  .guide-footer {
+    background: var(--ink);
+    color: #888;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <p class="header-tag">Quant Engineering Study Guide · Series I</p>
+    <h1>Time Series Analysis</h1>
+    <p class="header-sub">A complete, self-contained guide for first-time learners entering quantitative finance</p>
+    <div class="header-pills">
+      <span class="pill">Prerequisites</span>
+      <span class="pill">Stationarity</span>
+      <span class="pill">Autocorrelation</span>
+      <span class="pill">ARIMA</span>
+      <span class="pill">Cointegration</span>
+      <span class="pill">Granger Causality</span>
+      <span class="pill">Colab Experiments</span>
+      <span class="pill">Practice Exercises</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tab-nav-wrap" role="navigation" aria-label="Study topics">
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('prereqs')">0. Prerequisites</button>
+    <button class="tab-btn" onclick="showTab('stationarity')">1. Stationarity</button>
+    <button class="tab-btn" onclick="showTab('autocorrelation')">2. Autocorrelation</button>
+    <button class="tab-btn" onclick="showTab('arima')">3. ARIMA</button>
+    <button class="tab-btn" onclick="showTab('cointegration')">4. Cointegration</button>
+    <button class="tab-btn" onclick="showTab('granger')">5. Granger Causality</button>
+    <button class="tab-btn" onclick="showTab('colab')">6. Colab Lab</button>
+    <button class="tab-btn" onclick="showTab('exercises')">7. Exercises</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ===================== TAB 0: PREREQUISITES ===================== -->
+<section class="tab-panel active" id="tab-prereqs">
+  <h2>Prerequisites</h2>
+  <p style="color:var(--muted); font-style:italic;">Before we touch time series, you need these building blocks. Every concept below is explained from scratch.</p>
+
+  <div class="concept-map">
+    <div style="text-align:center; margin-bottom:1rem; font-size:0.9rem; color:#ccc;">CONCEPT MAP — How everything connects</div>
+    <div style="text-align:center; line-height: 3;">
+      <span class="cm-node cm-pre">Mean & Variance</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-pre">Normal Distribution</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-pre">Random Walk</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-main">Stationarity</span><br>
+      <span class="cm-node cm-pre">Correlation</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-main">Autocorrelation</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-main">ARIMA</span><br>
+      <span class="cm-node cm-main">Stationarity</span>
+      <span class="cm-arrow"> + </span>
+      <span class="cm-node cm-main">Regression</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-main">Cointegration</span>
+      <span class="cm-arrow"> → </span>
+      <span class="cm-node cm-main">Granger Causality</span>
+    </div>
+  </div>
+
+  <h3>P1. What is a Time Series?</h3>
+  <p>A <strong>time series</strong> is simply a sequence of numbers collected over time, in order. Think of it like a diary: every day you write down one number, and after a year you have 365 numbers in sequence. That's a time series.</p>
+
+  <div class="analogy"><div class="analogy-label">🌡️ Real World Analogy</div>
+  Your daily body temperature recorded at 8am every morning for a year is a time series. Stock prices, GDP, rainfall, heart rate — all time series. The key is: <strong>order matters</strong>. Shuffling the values destroys the meaning.
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure P1 — A simple time series visualized</div>
+    <canvas id="cvBasicTS" width="760" height="200"></canvas>
+  </div>
+
+  <h3>P2. Mean, Variance, and Standard Deviation</h3>
+  <p>These are the three most fundamental summary statistics. If you know these cold, you can understand everything else.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Mean (μ)</h4>
+      <p>The average of all values. Add them up, divide by how many there are.</p>
+      <div class="formula">μ = (x₁ + x₂ + ... + xₙ) / n<br><span class="comment">= Sum of all values / number of values</span></div>
+      <p><strong>Example:</strong> Prices [10, 12, 11, 13, 9] → Mean = 55/5 = <strong>11</strong></p>
+    </div>
+    <div class="card">
+      <h4>Variance (σ²)</h4>
+      <p>How "spread out" the values are from the mean. Big variance = wild swings.</p>
+      <div class="formula">σ² = Σ(xᵢ - μ)² / n<br><span class="comment">Average of squared deviations</span></div>
+      <p><strong>Std Dev (σ):</strong> Square root of variance. Same units as your data.</p>
+    </div>
+  </div>
+
+  <h3>P3. Probability & the Normal Distribution</h3>
+  <p>Many statistical tests assume data follows a <strong>normal (Gaussian) distribution</strong> — the famous bell curve. This bell is symmetric around the mean, and ~68% of values fall within 1 standard deviation of the mean.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure P2 — Normal Distribution Bell Curve</div>
+    <canvas id="cvNormal" width="760" height="220"></canvas>
+  </div>
+
+  <div class="callout">
+    <div class="callout-label">📊 Why This Matters for Quant Finance</div>
+    Many statistical tests in time series (like the ADF test for stationarity) use p-values derived from normal-like distributions. Understanding what a p-value means is essential.
+    <br><br><strong>p-value</strong>: The probability of seeing your data (or something more extreme) <em>if the null hypothesis were true</em>. Small p-value (< 0.05) → reject null hypothesis.
+  </div>
+
+  <h3>P4. Correlation</h3>
+  <p>Correlation measures how two variables <em>move together</em>. It ranges from -1 to +1.</p>
+
+  <div class="three-col">
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem">📈📈</div>
+      <h4>+1 Perfect Positive</h4>
+      <p>When X goes up, Y goes up by the same proportion. Example: Celsius & Fahrenheit temperatures.</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem">🔀</div>
+      <h4>0 No Correlation</h4>
+      <p>X and Y move independently. Knowing X tells you nothing about Y.</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem">📈📉</div>
+      <h4>-1 Perfect Negative</h4>
+      <p>When X goes up, Y goes down proportionally. Example: Bond prices vs interest rates.</p>
+    </div>
+  </div>
+
+  <div class="formula">Pearson Correlation: r = Σ[(xᵢ-μₓ)(yᵢ-μᵧ)] / (n · σₓ · σᵧ)<br><span class="comment">Ranges from -1 (perfect negative) to +1 (perfect positive)</span></div>
+
+  <h3>P5. Random Walk — The Most Important Concept in Finance</h3>
+  <p>A <strong>random walk</strong> is a process where each new value is the previous value plus a random shock (noise). It's like a drunk person walking — each step goes in a random direction.</p>
+
+  <div class="formula">Xₜ = Xₜ₋₁ + εₜ<br><span class="comment">where εₜ is random noise (white noise), drawn from N(0, σ²)</span></div>
+
+  <div class="analogy"><div class="analogy-label">🚶 The Drunk Walker Analogy</div>
+  Imagine someone standing at position 0 on a number line. Every second, they flip a fair coin: heads = step right (+1), tails = step left (-1). After 1000 steps, they could be anywhere. <em>This is how stock prices behave</em> — their future position is unpredictable from where they are now.
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure P3 — Random Walk vs Stationary Series</div>
+    <canvas id="cvRandWalk" width="760" height="240"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem">Red = Random Walk (non-stationary) · Blue = Stationary series (wiggles around a fixed mean)</div>
+  </div>
+
+  <h3>P6. White Noise</h3>
+  <p><strong>White noise</strong> is a sequence of random values that are: (1) independent of each other, (2) have zero mean, and (3) have constant variance. It's the simplest stationary process and serves as the "residual" or "error term" in almost all time series models.</p>
+
+  <div class="formula">εₜ ~ WN(0, σ²)<br><span class="comment">Independently and identically distributed (i.i.d.) with mean 0 and variance σ²</span></div>
+
+  <h3>P7. Regression Basics</h3>
+  <p><strong>Linear regression</strong> fits a line through data: Y = β₀ + β₁X + ε. In time series, we often regress one series on another. The <strong>residuals</strong> (ε) are the leftover variation not explained by X. These residuals play a huge role in cointegration.</p>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.khanacademy.org/math/statistics-probability" target="_blank">📐 Khan Academy: Statistics</a>
+    <a class="res-link" href="https://seeing-theory.brown.edu/" target="_blank">🎲 Seeing Theory (Visual Probability)</a>
+    <a class="res-link" href="https://www.statology.org/time-series-analysis/" target="_blank">📊 Statology: Time Series Basics</a>
+    <a class="res-link secondary" href="https://numpy.org/doc/stable/reference/random/index.html" target="_blank">🐍 NumPy Random Docs</a>
+  </div>
+
+  <hr class="section-rule">
+  <div class="callout tip">
+    <div class="callout-label">✅ You're Ready When...</div>
+    You can explain to someone else: (1) what mean and variance are, (2) why r=0 doesn't mean no relationship, (3) why a random walk is unpredictable, and (4) what a p-value means. If you can do that, move to Tab 1.
+  </div>
+</section>
+
+<!-- ===================== TAB 1: STATIONARITY ===================== -->
+<section class="tab-panel" id="tab-stationarity">
+  <h2>1. Stationarity</h2>
+  <p><em>The most fundamental concept in time series analysis. Everything else depends on this.</em></p>
+
+  <div class="topic-progress">
+    <div class="prog-step done">Prerequisites</div>
+    <div class="prog-step current">Stationarity</div>
+    <div class="prog-step">Autocorrelation</div>
+    <div class="prog-step">ARIMA</div>
+    <div class="prog-step">Cointegration</div>
+    <div class="prog-step">Granger</div>
+  </div>
+
+  <h3>What Does Stationary Mean?</h3>
+  <p>A time series is <strong>stationary</strong> if its statistical properties — particularly its <em>mean</em> and <em>variance</em> — do not change over time. Think of it as a series that has a stable "personality."</p>
+
+  <div class="analogy"><div class="analogy-label">🌊 Ocean Analogy</div>
+  Imagine ocean waves at a beach. The waves go up and down, but over time the average height of waves stays the same, and the height range (variance) stays similar. That's stationary. Now imagine a tsunami growing bigger and bigger — that's non-stationary: its properties change over time.
+  </div>
+
+  <h3>The 3 Conditions for (Weak) Stationarity</h3>
+  <p>In practice, we use <strong>weak (covariance) stationarity</strong>, which requires three things:</p>
+
+  <div class="three-col">
+    <div class="card">
+      <h4>1. Constant Mean</h4>
+      <p>E[Xₜ] = μ for all t</p>
+      <p>The series wiggles around a <em>fixed</em> horizontal level. It doesn't trend upward or downward.</p>
+    </div>
+    <div class="card">
+      <h4>2. Constant Variance</h4>
+      <p>Var[Xₜ] = σ² for all t</p>
+      <p>The swings in the series don't get bigger or smaller over time. No "explosive" behavior.</p>
+    </div>
+    <div class="card">
+      <h4>3. Autocovariance depends only on lag</h4>
+      <p>Cov[Xₜ, Xₜ₋ₖ] = γ(k)</p>
+      <p>How correlated values are k steps apart is the same regardless of <em>when</em> you measure it.</p>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 1.1 — Stationary vs Non-Stationary Series</div>
+    <canvas id="cvStationary" width="760" height="300"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+      <span style="color:#2471a3">■ Stationary:</span> wiggles around constant mean &nbsp;|&nbsp;
+      <span style="color:#c0392b">■ Trending (non-stationary):</span> mean increases &nbsp;|&nbsp;
+      <span style="color:#e67e22">■ Random Walk (non-stationary):</span> variance grows
+    </div>
+  </div>
+
+  <h3>Why Stationarity Matters So Much</h3>
+  <div class="callout key">
+    <div class="callout-label">⚡ Critical Insight</div>
+    Almost every classical statistical model (regression, ARIMA, etc.) assumes stationarity. If you apply these models to a non-stationary series, you get <strong>spurious results</strong> — results that look statistically significant but are completely meaningless.
+    <br><br>Famous example: Regressing US cheese consumption against the number of people who died by getting tangled in bed sheets — both trended upward, so R² ≈ 0.95, but this is <em>nonsense</em>. This is called <strong>spurious regression</strong>.
+  </div>
+
+  <h3>Types of Non-Stationarity</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Description</th><th>Example</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Trend-stationary</strong></td><td>Has a deterministic trend</td><td>GDP growing 2% per year</td><td>Detrend (subtract trend)</td></tr>
+      <tr><td><strong>Random Walk (unit root)</strong></td><td>Shocks accumulate forever</td><td>Stock prices</td><td>First difference</td></tr>
+      <tr><td><strong>Variance non-stationary</strong></td><td>Volatility changes over time</td><td>Stock returns during crises</td><td>ARCH/GARCH models</td></tr>
+      <tr><td><strong>Seasonal</strong></td><td>Repeating pattern by season</td><td>Holiday retail sales</td><td>Seasonal differencing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The Unit Root — The Heart of Non-Stationarity</h3>
+  <p>Consider the AR(1) model: <strong>Xₜ = φ · Xₜ₋₁ + εₜ</strong></p>
+  <ul style="padding-left:1.5rem; margin-bottom:1rem;">
+    <li>If |φ| &lt; 1: Series is <strong>stationary</strong>. Shocks decay over time.</li>
+    <li>If φ = 1: Series is a <strong>random walk</strong> — has a "unit root." Shocks persist forever.</li>
+    <li>If φ &gt; 1: Series <strong>explodes</strong>. Gets bigger and bigger (almost never in practice).</li>
+  </ul>
+
+  <div class="interactive-box">
+    <h4>🎛️ Interactive: AR(1) φ Parameter Explorer</h4>
+    <p style="font-size:0.9rem; margin-bottom:0.8rem;">Drag the slider to see how different values of φ affect the series behavior:</p>
+    <div class="slider-row">
+      <label>φ (phi)</label>
+      <input type="range" id="sl_phi" min="-120" max="105" value="80" oninput="updatePhiPlot()">
+      <span class="slider-val" id="phi_val">0.80</span>
+    </div>
+    <canvas id="cvAR1" width="700" height="200"></canvas>
+    <div id="phi_label" style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; margin-top:0.5rem; color:var(--accent);">→ Stationary (shocks decay)</div>
+  </div>
+
+  <h3>Making a Series Stationary: Differencing</h3>
+  <p>The most common fix for a unit root is <strong>first differencing</strong>: instead of modeling Xₜ, model the changes ΔXₜ = Xₜ - Xₜ₋₁.</p>
+
+  <div class="analogy"><div class="analogy-label">📈 Stock Price Analogy</div>
+  Stock price levels are non-stationary (they trend upward over time). But daily <em>returns</em> (percentage changes) are approximately stationary — they wiggle around zero. This is why quant models usually work with <strong>log returns</strong>, not price levels.
+  </div>
+
+  <div class="formula">If Xₜ is non-stationary (I(1)):<br>ΔXₜ = Xₜ - Xₜ₋₁ → usually stationary<br><br><span class="comment">Notation: I(1) means "integrated of order 1" — needs 1 difference to become stationary</span></div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 1.2 — Stock Price vs Log Returns</div>
+    <canvas id="cvDifferencing" width="760" height="280"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">Top: Non-stationary price level (random walk) · Bottom: Stationary first differences (returns)</div>
+  </div>
+
+  <h3>Testing for Stationarity</h3>
+
+  <h4>The Augmented Dickey-Fuller (ADF) Test</h4>
+  <p>The most widely used test. It tests the null hypothesis that a unit root exists (i.e., the series is <em>non-stationary</em>).</p>
+
+  <div class="formula">H₀: Series has a unit root (non-stationary)<br>H₁: Series is stationary<br><br>Decision: If p-value &lt; 0.05 → Reject H₀ → Series is stationary<br><span class="comment">Counterintuitive: you WANT a small p-value (means the series IS stationary)</span></div>
+
+  <div class="callout warn">
+    <div class="callout-label">⚠️ Common Mistake</div>
+    In the ADF test, a <strong>large p-value means the series is non-stationary</strong>. This confuses beginners because normally "significant result" means small p-value. Here: small p-value = stationary (good!).
+  </div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Load a stock price series</span>
+prices = pd.Series([<span class="num">100</span>, <span class="num">101.2</span>, <span class="num">102.5</span>, <span class="num">100.8</span>, <span class="num">103.1</span>, ...])
+
+<span class="cm"># Run ADF test on price levels</span>
+result = adfuller(prices, autolag=<span class="str">'AIC'</span>)
+<span class="fn">print</span>(<span class="str">f"ADF Statistic: {result[0]:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"p-value: {result[1]:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">"Critical Values:"</span>, result[<span class="num">4</span>])
+
+<span class="cm"># Interpretation</span>
+<span class="kw">if</span> result[<span class="num">1</span>] &lt; <span class="num">0.05</span>:
+    <span class="fn">print</span>(<span class="str">"✅ Stationary (reject unit root)"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"❌ Non-stationary (fail to reject unit root)"</span>)
+
+<span class="cm"># Now test on first differences (returns)</span>
+returns = prices.diff().dropna()
+result2 = adfuller(returns)
+<span class="fn">print</span>(<span class="str">f"\nAfter differencing, p-value: {result2[1]:.4f}"</span>)
+  </div>
+
+  <h4>The KPSS Test (Alternative)</h4>
+  <p>The KPSS test flips the hypotheses: H₀ is <em>stationarity</em>, and a small p-value means <em>non-stationary</em>. Use both ADF and KPSS together for robustness.</p>
+
+  <table>
+    <thead><tr><th>Test</th><th>H₀ (Null)</th><th>Small p-value means</th><th>Large p-value means</th></tr></thead>
+    <tbody>
+      <tr><td>ADF</td><td>Non-stationary (unit root)</td><td>✅ Stationary</td><td>❌ Non-stationary</td></tr>
+      <tr><td>KPSS</td><td>Stationary</td><td>❌ Non-stationary</td><td>✅ Stationary</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Order of Integration I(d)</h3>
+  <p>A series is <strong>I(d)</strong> if you need to difference it <em>d</em> times to make it stationary:</p>
+  <ul style="padding-left:1.5rem; margin-bottom:1rem;">
+    <li><strong>I(0)</strong>: Already stationary. Most economic rates, returns.</li>
+    <li><strong>I(1)</strong>: Need 1 difference. Most price levels, GDP levels, CPI.</li>
+    <li><strong>I(2)</strong>: Need 2 differences. Rare. Some price indices during hyperinflation.</li>
+  </ul>
+
+  <div class="callout tip">
+    <div class="callout-label">💡 Quant Finance Connection</div>
+    Stock log-prices are I(1). Log-returns are I(0). This is why pairs trading is built on cointegration (coming in Tab 4) — two I(1) series can combine to form an I(0) series, which is mean-reverting and tradeable.
+  </div>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.adfuller.html" target="_blank">📦 statsmodels ADF docs</a>
+    <a class="res-link" href="https://otexts.com/fpp3/stationarity.html" target="_blank">📖 Forecasting: Principles (Free Book)</a>
+    <a class="res-link" href="https://www.machinelearningplus.com/time-series/augmented-dickey-fuller-test/" target="_blank">🔬 ADF Test Deep Dive</a>
+    <a class="res-link secondary" href="https://colab.research.google.com/" target="_blank">🚀 Open Google Colab</a>
+  </div>
+</section>
+
+<!-- ===================== TAB 2: AUTOCORRELATION ===================== -->
+<section class="tab-panel" id="tab-autocorrelation">
+  <h2>2. Autocorrelation</h2>
+  <p><em>How a series correlates with its own past. The foundation of ARIMA model identification.</em></p>
+
+  <div class="topic-progress">
+    <div class="prog-step done">Prerequisites</div>
+    <div class="prog-step done">Stationarity</div>
+    <div class="prog-step current">Autocorrelation</div>
+    <div class="prog-step">ARIMA</div>
+    <div class="prog-step">Cointegration</div>
+    <div class="prog-step">Granger</div>
+  </div>
+
+  <h3>What is Autocorrelation?</h3>
+  <p>Regular correlation measures how two <em>different</em> variables move together. <strong>Autocorrelation</strong> (also called serial correlation) measures how a time series correlates with <em>itself</em> at different time lags.</p>
+
+  <div class="analogy"><div class="analogy-label">🌡️ Weather Analogy</div>
+  If today is hot, tomorrow is probably also hot. If it rained today, there's a higher chance it rains tomorrow. This is autocorrelation — yesterday's temperature predicts today's temperature. The "lag" is the time gap (1 day, 2 days, 1 week, etc.).
+  </div>
+
+  <h3>The Autocorrelation Function (ACF)</h3>
+  <p>The ACF computes the correlation between the series and its lagged version, for lags k = 0, 1, 2, 3, ...</p>
+
+  <div class="formula">ACF(k) = Corr(Xₜ, Xₜ₋ₖ)<br><span class="comment">= Cov(Xₜ, Xₜ₋ₖ) / Var(Xₜ)</span><br><br>At k=0: ACF = 1 always (a series is perfectly correlated with itself)<br>At k=1: Correlation with yesterday's value<br>At k=7: Correlation with last week's value (for daily data)</div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 2.1 — ACF Plot (Correlogram) for Different Series</div>
+    <canvas id="cvACF" width="760" height="320"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+      <span style="color:#2471a3">■ Bars</span> = autocorrelation at each lag &nbsp;|&nbsp; <span style="color:#c0392b">Dashed lines</span> = 95% confidence bounds (±1.96/√n) &nbsp;|&nbsp; Bars outside bounds are statistically significant
+    </div>
+  </div>
+
+  <h3>The Partial Autocorrelation Function (PACF)</h3>
+  <p>The PACF is trickier: it shows the <strong>direct</strong> correlation between Xₜ and Xₜ₋ₖ, <em>after removing the influence of all intermediate lags</em>.</p>
+
+  <div class="analogy"><div class="analogy-label">🔗 Chain Analogy</div>
+  Suppose today's temperature correlates with 3 days ago. But maybe that's only because: today → yesterday → day before → 3 days ago. The PACF removes this indirect chain effect and shows only the <em>direct</em> connection. If PACF at lag 3 is near zero after removing lags 1 and 2, the apparent correlation at lag 3 was spurious.
+  </div>
+
+  <h3>Reading ACF/PACF Plots — The Pattern Decoder</h3>
+  <p>This is the most important skill for building ARIMA models. Learn these patterns cold:</p>
+
+  <table>
+    <thead><tr><th>ACF Pattern</th><th>PACF Pattern</th><th>Model Suggested</th></tr></thead>
+    <tbody>
+      <tr><td>Exponential decay / oscillates & decays</td><td>Cuts off after lag p</td><td>AR(p)</td></tr>
+      <tr><td>Cuts off after lag q</td><td>Exponential decay / oscillates & decays</td><td>MA(q)</td></tr>
+      <tr><td>Both decay gradually</td><td>Both decay gradually</td><td>ARMA(p,q)</td></tr>
+      <tr><td>Very slow, gradual decay</td><td>High spike at lag 1, then cuts off</td><td>Non-stationary → difference first!</td></tr>
+      <tr><td>All near zero</td><td>All near zero</td><td>White noise (no model needed)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 2.2 — ACF/PACF Pattern Gallery</div>
+    <canvas id="cvACFPACF" width="760" height="400"></canvas>
+  </div>
+
+  <h3>Ljung-Box Test: Is There Significant Autocorrelation?</h3>
+  <p>The <strong>Ljung-Box test</strong> checks whether there is <em>any</em> significant autocorrelation across multiple lags jointly. Useful for checking model residuals.</p>
+
+  <div class="formula">H₀: No autocorrelation at lags 1 through m (residuals are white noise)<br>H₁: At least one lag has significant autocorrelation<br><br>If p-value &lt; 0.05 → significant autocorrelation remains → model needs improvement</div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> statsmodels.graphics.tsaplots <span class="kw">import</span> plot_acf, plot_pacf
+<span class="kw">from</span> statsmodels.stats.diagnostic <span class="kw">import</span> acorr_ljungbox
+
+<span class="cm"># Generate example series (AR(1) with phi=0.7)</span>
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">300</span>
+x = np.zeros(n)
+x[<span class="num">0</span>] = np.random.randn()
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n):
+    x[t] = <span class="num">0.7</span> * x[t-<span class="num">1</span>] + np.random.randn()
+
+<span class="cm"># Plot ACF and PACF</span>
+fig, (ax1, ax2) = plt.subplots(<span class="num">2</span>, <span class="num">1</span>, figsize=(<span class="num">12</span>, <span class="num">6</span>))
+plot_acf(x, lags=<span class="num">30</span>, ax=ax1, title=<span class="str">'ACF — AR(1) with φ=0.7'</span>)
+plot_pacf(x, lags=<span class="num">30</span>, ax=ax2, title=<span class="str">'PACF — AR(1) with φ=0.7'</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="cm"># Ljung-Box test for first 20 lags</span>
+lb_test = acorr_ljungbox(x, lags=[<span class="num">5</span>, <span class="num">10</span>, <span class="num">20</span>], return_df=<span class="kw">True</span>)
+<span class="fn">print</span>(lb_test)
+<span class="cm"># p-values should be small — confirming autocorrelation exists</span>
+  </div>
+
+  <h3>Autocovariance Function</h3>
+  <p>Related to ACF, the <strong>autocovariance function (ACVF)</strong> γ(k) measures covariance (not normalized correlation) at lag k. ACF is just the normalized version: ρ(k) = γ(k)/γ(0).</p>
+
+  <h3>Durbin-Watson Statistic</h3>
+  <p>A simpler test specifically for lag-1 autocorrelation in regression residuals. Ranges from 0 to 4:</p>
+  <ul style="padding-left:1.5rem; margin-bottom:1rem;">
+    <li><strong>≈ 2</strong>: No autocorrelation ✅</li>
+    <li><strong>&lt; 2</strong>: Positive autocorrelation (consecutive residuals are similar)</li>
+    <li><strong>&gt; 2</strong>: Negative autocorrelation (residuals alternate in sign)</li>
+  </ul>
+
+  <h3>Why Autocorrelation Matters for Quants</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>📊 Model Building</h4>
+      <p>ACF/PACF plots tell you what AR and MA orders to use in ARIMA. Without them, you're guessing blindly.</p>
+    </div>
+    <div class="card">
+      <h4>🔍 Model Diagnosis</h4>
+      <p>After fitting a model, residuals should be white noise (no autocorrelation). If ACF of residuals has significant spikes, the model is incomplete.</p>
+    </div>
+    <div class="card">
+      <h4>💰 Trading Signals</h4>
+      <p>Positive autocorrelation at short lags → momentum strategy. Negative autocorrelation → mean-reversion strategy.</p>
+    </div>
+    <div class="card">
+      <h4>⚠️ Regression Problems</h4>
+      <p>Autocorrelated errors in OLS regression make standard errors wrong, invalidating t-tests and confidence intervals.</p>
+    </div>
+  </div>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.statsmodels.org/stable/generated/statsmodels.graphics.tsaplots.plot_acf.html" target="_blank">📦 statsmodels plot_acf</a>
+    <a class="res-link" href="https://online.stat.psu.edu/stat510/lesson/1/1.2" target="_blank">🎓 Penn State: ACF/PACF</a>
+    <a class="res-link" href="https://www.youtube.com/watch?v=DeORzP0go5I" target="_blank">🎥 ACF/PACF Visual Explanation</a>
+    <a class="res-link secondary" href="https://nwfsc-timeseries.github.io/atsa-labs/" target="_blank">📚 Applied Time Series Course</a>
+  </div>
+</section>
+
+<!-- ===================== TAB 3: ARIMA ===================== -->
+<section class="tab-panel" id="tab-arima">
+  <h2>3. ARIMA Models</h2>
+  <p><em>AutoRegressive Integrated Moving Average — the workhorse of univariate time series forecasting.</em></p>
+
+  <div class="topic-progress">
+    <div class="prog-step done">Prerequisites</div>
+    <div class="prog-step done">Stationarity</div>
+    <div class="prog-step done">Autocorrelation</div>
+    <div class="prog-step current">ARIMA</div>
+    <div class="prog-step">Cointegration</div>
+    <div class="prog-step">Granger</div>
+  </div>
+
+  <h3>Building Blocks: AR and MA</h3>
+  <p>ARIMA is built from three components: <strong>AR</strong> (autoregressive), <strong>I</strong> (integrated/differencing), and <strong>MA</strong> (moving average). Let's understand each.</p>
+
+  <h4>AR — AutoRegressive Models</h4>
+  <p>An <strong>AR(p)</strong> model says: the current value is a linear function of the past <em>p</em> values, plus noise.</p>
+
+  <div class="formula">AR(p):  Xₜ = c + φ₁Xₜ₋₁ + φ₂Xₜ₋₂ + ... + φₚXₜ₋ₚ + εₜ<br><br><span class="comment">c = constant (intercept)</span><br><span class="comment">φ₁...φₚ = AR coefficients (how much weight to give each past value)</span><br><span class="comment">εₜ = white noise shock</span></div>
+
+  <div class="analogy"><div class="analogy-label">🎯 Momentum Trading Analogy</div>
+  AR models are like momentum strategies. If you buy a stock because it went up yesterday AND the day before, you're implicitly using AR(2) logic: Xₜ = φ₁Xₜ₋₁ + φ₂Xₜ₋₂ + noise.
+  </div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="cm"># Simulate AR(2) process: Xₜ = 0.6*Xₜ₋₁ + 0.2*Xₜ₋₂ + εₜ</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.seed(<span class="num">42</span>)
+n, phi1, phi2 = <span class="num">500</span>, <span class="num">0.6</span>, <span class="num">0.2</span>
+x = np.zeros(n)
+eps = np.random.randn(n)
+
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, n):
+    x[t] = phi1 * x[t-<span class="num">1</span>] + phi2 * x[t-<span class="num">2</span>] + eps[t]
+
+<span class="cm"># PACF will show significant spikes at lags 1 and 2, then cut off</span>
+  </div>
+
+  <h4>MA — Moving Average Models</h4>
+  <p>An <strong>MA(q)</strong> model says: the current value depends on the current shock <em>plus</em> a weighted sum of past shocks (not past values of X itself!)</p>
+
+  <div class="formula">MA(q):  Xₜ = μ + εₜ + θ₁εₜ₋₁ + θ₂εₜ₋₂ + ... + θqεₜ₋q<br><br><span class="comment">μ = mean of the series</span><br><span class="comment">θ₁...θq = MA coefficients</span><br><span class="comment">εₜ, εₜ₋₁... = current and past shocks (unobservable noise)</span></div>
+
+  <div class="analogy"><div class="analogy-label">📰 News Shock Analogy</div>
+  Imagine a CEO's press statement that caused a stock to spike. The MA model says: today's price is affected by today's news shock PLUS some residual effect from yesterday's news shock AND last week's news shock. The effect of news fades over time according to the θ weights.
+  </div>
+
+  <h4>Combining: ARMA(p,q)</h4>
+  <p>Put them together and you get <strong>ARMA(p,q)</strong>:</p>
+  <div class="formula">ARMA(p,q):  Xₜ = c + φ₁Xₜ₋₁ + ... + φₚXₜ₋ₚ + εₜ + θ₁εₜ₋₁ + ... + θqεₜ₋q</div>
+
+  <h3>The "I" in ARIMA: Integration</h3>
+  <p>The <strong>I(d)</strong> part handles non-stationarity. If a series needs to be differenced <em>d</em> times to become stationary, we include that in the model. For most economic series, d=1.</p>
+
+  <div class="formula">ARIMA(p, d, q)<br><br>p = order of AR part<br>d = number of differences (integration order)<br>q = order of MA part<br><br>ARIMA(0,1,0) = Random Walk<br>ARIMA(1,0,0) = AR(1) on stationary series<br>ARIMA(1,1,1) = AR(1)+MA(1) on first-differenced series</div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 3.1 — ARIMA Model Structure</div>
+    <canvas id="cvARIMA" width="760" height="200"></canvas>
+  </div>
+
+  <h3>The Box-Jenkins Methodology — ARIMA in 4 Steps</h3>
+  <p>George Box and Gwilym Jenkins developed a systematic procedure for ARIMA model building:</p>
+
+  <ol class="steps">
+    <li><strong>Identification:</strong> Plot the series. Use ADF/KPSS to check stationarity. Difference if needed (determines d). Plot ACF/PACF of stationary series to guess p and q.</li>
+    <li><strong>Estimation:</strong> Fit the model using MLE (Maximum Likelihood Estimation) or conditional least squares.</li>
+    <li><strong>Diagnostics:</strong> Check residuals. They should look like white noise: no autocorrelation (ACF/PACF all near zero), no patterns, Ljung-Box p-value &gt; 0.05.</li>
+    <li><strong>Forecasting:</strong> Use the fitted model to forecast future values with confidence intervals.</li>
+  </ol>
+
+  <h3>Model Selection: AIC and BIC</h3>
+  <p>When unsure between multiple candidate models, use information criteria. Lower is better.</p>
+
+  <div class="formula">AIC = 2k - 2·ln(L)<br>BIC = k·ln(n) - 2·ln(L)<br><br><span class="comment">k = number of model parameters, n = sample size, L = likelihood</span><br><span class="comment">AIC penalizes parameters less; BIC penalizes more (prefers simpler models)</span></div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> statsmodels.tsa.arima.model <span class="kw">import</span> ARIMA
+<span class="kw">from</span> statsmodels.graphics.tsaplots <span class="kw">import</span> plot_acf, plot_pacf
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Step 1: Generate sample non-stationary data (ARIMA(1,1,1) process)</span>
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">300</span>
+shocks = np.random.randn(n)
+x_stat = np.zeros(n)
+x_stat[<span class="num">0</span>] = shocks[<span class="num">0</span>]
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n):
+    x_stat[t] = <span class="num">0.5</span> * x_stat[t-<span class="num">1</span>] + shocks[t] + <span class="num">0.3</span> * shocks[t-<span class="num">1</span>]
+
+x_nonstat = np.cumsum(x_stat)  <span class="cm"># Integrate once → I(1) series</span>
+series = pd.Series(x_nonstat)
+
+<span class="cm"># Step 2: Check stationarity of original</span>
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+adf = adfuller(series)
+<span class="fn">print</span>(<span class="str">f"Original series ADF p-value: {adf[1]:.4f}"</span>)  <span class="cm"># Should be > 0.05</span>
+
+<span class="cm"># Step 3: Fit ARIMA model</span>
+model = ARIMA(series, order=(<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>))
+result = model.fit()
+<span class="fn">print</span>(result.summary())
+
+<span class="cm"># Step 4: Diagnostic check</span>
+residuals = result.resid
+adf_resid = adfuller(residuals.dropna())
+<span class="fn">print</span>(<span class="str">f"\nResiduals ADF p-value: {adf_resid[1]:.4f}"</span>)  <span class="cm"># Should be < 0.05</span>
+
+<span class="cm"># Step 5: Forecast 20 steps ahead</span>
+forecast = result.forecast(steps=<span class="num">20</span>)
+conf_int = result.get_forecast(steps=<span class="num">20</span>).conf_int()
+<span class="fn">print</span>(<span class="str">"\nForecast:"</span>, forecast.values[:<span class="num">5</span>])
+  </div>
+
+  <h3>Auto ARIMA — Automated Selection</h3>
+  <p>For quick model selection, <code>pmdarima</code>'s <code>auto_arima</code> searches over (p,d,q) combinations and picks the best by AIC/BIC.</p>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="cm"># pip install pmdarima</span>
+<span class="kw">import</span> pmdarima <span class="kw">as</span> pm
+
+<span class="cm"># Auto ARIMA: searches for best (p,d,q)</span>
+auto_model = pm.auto_arima(
+    series,
+    start_p=<span class="num">0</span>, start_q=<span class="num">0</span>,
+    max_p=<span class="num">5</span>, max_q=<span class="num">5</span>,
+    d=<span class="kw">None</span>,                  <span class="cm"># auto-detect d</span>
+    seasonal=<span class="kw">False</span>,
+    information_criterion=<span class="str">'aic'</span>,
+    stepwise=<span class="kw">True</span>,            <span class="cm"># faster search</span>
+    suppress_warnings=<span class="kw">True</span>
+)
+<span class="fn">print</span>(auto_model.summary())
+<span class="fn">print</span>(<span class="str">f"Best order: {auto_model.order}"</span>)
+  </div>
+
+  <h3>SARIMA — Seasonal Extension</h3>
+  <p><strong>SARIMA(p,d,q)(P,D,Q)[m]</strong> adds seasonal AR, differencing, and MA terms for series with repeating patterns (monthly seasonality m=12, quarterly m=4, etc.).</p>
+
+  <div class="formula">SARIMA(p,d,q)(P,D,Q)[m]<br><br><span class="comment">Lowercase (p,d,q) = non-seasonal component</span><br><span class="comment">Uppercase (P,D,Q) = seasonal component</span><br><span class="comment">m = seasonal period (12 for monthly, 4 for quarterly)</span></div>
+
+  <h3>Model Diagnostics — What Good Residuals Look Like</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>✅ Good Residuals</h4>
+      <ul style="padding-left:1rem; font-size:0.9rem;">
+        <li>ACF: All bars within confidence bounds</li>
+        <li>Histogram: Approximately normal</li>
+        <li>QQ-plot: Points near diagonal</li>
+        <li>Ljung-Box: p-value &gt; 0.05</li>
+        <li>No visible patterns over time</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>❌ Bad Residuals Signal</h4>
+      <ul style="padding-left:1rem; font-size:0.9rem;">
+        <li>Significant ACF spikes → increase p or q</li>
+        <li>PACF spike at lag 1 → add AR term</li>
+        <li>ACF spike at lag m → add seasonal term</li>
+        <li>Increasing variance → try log transform</li>
+        <li>Outliers → investigate data quality</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 3.2 — ARIMA Forecast with Confidence Intervals</div>
+    <canvas id="cvARIMAfcst" width="760" height="250"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+      <span style="color:#2471a3">■ Historical</span> · <span style="color:#c0392b">■ Forecast</span> · <span style="color:#e8d5c4">■ 95% Confidence Interval</span>
+    </div>
+  </div>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima.model.ARIMA.html" target="_blank">📦 statsmodels ARIMA</a>
+    <a class="res-link" href="https://alkaline-ml.com/pmdarima/" target="_blank">⚙️ pmdarima auto_arima</a>
+    <a class="res-link" href="https://otexts.com/fpp3/arima.html" target="_blank">📖 FPP3: ARIMA Chapter</a>
+    <a class="res-link secondary" href="https://people.duke.edu/~rnau/411arim.htm" target="_blank">🎓 Duke ARIMA Guide</a>
+  </div>
+</section>
+
+<!-- ===================== TAB 4: COINTEGRATION ===================== -->
+<section class="tab-panel" id="tab-cointegration">
+  <h2>4. Cointegration</h2>
+  <p><em>The magic behind pairs trading. Two non-stationary series that move together in a stable long-run relationship.</em></p>
+
+  <div class="topic-progress">
+    <div class="prog-step done">Prerequisites</div>
+    <div class="prog-step done">Stationarity</div>
+    <div class="prog-step done">Autocorrelation</div>
+    <div class="prog-step done">ARIMA</div>
+    <div class="prog-step current">Cointegration</div>
+    <div class="prog-step">Granger</div>
+  </div>
+
+  <h3>The Puzzle That Motivates Cointegration</h3>
+  <p>We know that two random walks (non-stationary series) shouldn't be regressed on each other — it gives spurious results. But here's the puzzle: what if two random walks move <em>so closely together</em> that their difference is stationary?</p>
+
+  <div class="analogy"><div class="analogy-label">🐕 The Dog on a Leash Analogy</div>
+  Imagine a drunk owner (random walk 1) and their dog on a leash (random walk 2). Both wander randomly across the park — they're non-stationary. But they can't stray too far from each other because of the leash. The <em>distance</em> between them (the spread) is bounded and mean-reverting — that's stationary! The leash is the cointegrating relationship.
+  </div>
+
+  <p>This is <strong>cointegration</strong>: two or more I(1) series that share a common stochastic trend, such that a linear combination of them is I(0) (stationary).</p>
+
+  <h3>Formal Definition</h3>
+  <div class="formula">Two series Xₜ and Yₜ are cointegrated if:<br><br>1. Both are I(1) (non-stationary individually)<br>2. There exists β such that: Zₜ = Yₜ - β·Xₜ is I(0) (stationary)<br><br>Zₜ is called the <strong>cointegrating residual</strong> or <strong>spread</strong><br>β is the <strong>cointegrating coefficient</strong></div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 4.1 — Cointegrated Pair vs Non-Cointegrated Pair</div>
+    <canvas id="cvCointegration" width="760" height="340"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+      Left: Cointegrated pair (spread mean-reverts) · Right: Non-cointegrated pair (spread drifts away)
+    </div>
+  </div>
+
+  <h3>Why This Matters in Finance: Pairs Trading</h3>
+  <p>Pairs trading is one of the most famous stat-arb strategies, built entirely on cointegration:</p>
+
+  <ol class="steps">
+    <li>Find two stocks that are cointegrated (e.g., Coca-Cola & Pepsi, Gold ETF & Gold Futures)</li>
+    <li>Estimate the cointegrating vector β (from regression: Y = β·X + ε)</li>
+    <li>Compute the spread: Zₜ = Yₜ - β·Xₜ. This should be mean-reverting.</li>
+    <li>When spread is <strong>too high</strong> (above mean + 2σ): Short Y, Long X</li>
+    <li>When spread is <strong>too low</strong> (below mean - 2σ): Long Y, Short X</li>
+    <li>Close positions when spread returns to mean</li>
+  </ol>
+
+  <div class="callout tip">
+    <div class="callout-label">💰 The Intuition</div>
+    If Coke and Pepsi are cointegrated and Coke suddenly becomes much more expensive relative to Pepsi (spread is high), the market will likely correct this imbalance. You profit by shorting the overpriced one and buying the underpriced one, betting on mean-reversion.
+  </div>
+
+  <h3>Testing for Cointegration</h3>
+  <h4>Engle-Granger 2-Step Test</h4>
+  <p>The simplest approach for two series:</p>
+
+  <ol class="steps">
+    <li><strong>Step 1:</strong> Regress Y on X: Yₜ = α + β·Xₜ + eₜ. Save the residuals eₜ.</li>
+    <li><strong>Step 2:</strong> Apply ADF test to residuals eₜ. If residuals are stationary (ADF p &lt; 0.05), the series are cointegrated.</li>
+  </ol>
+
+  <div class="callout warn">
+    <div class="callout-label">⚠️ Important Caveat</div>
+    The Engle-Granger test uses special critical values (not standard ADF ones) because the residuals are from a regression. Use the <code>coint()</code> function in statsmodels which handles this correctly.
+  </div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> coint, adfuller
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">500</span>
+
+<span class="cm"># Simulate a cointegrated pair</span>
+common_trend = np.cumsum(np.random.randn(n))  <span class="cm"># Shared I(1) trend</span>
+X = common_trend + np.random.randn(n) * <span class="num">0.5</span>  <span class="cm"># X tracks the trend</span>
+Y = <span class="num">2</span> * common_trend + np.random.randn(n) * <span class="num">0.5</span>  <span class="cm"># Y = 2*trend + noise</span>
+<span class="cm"># True cointegrating vector: Y - 2X should be stationary</span>
+
+<span class="cm"># Engle-Granger test using statsmodels</span>
+score, pvalue, crit_values = coint(X, Y)
+<span class="fn">print</span>(<span class="str">f"Cointegration test score: {score:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"p-value: {pvalue:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Critical values (1%, 5%, 10%): {crit_values}"</span>)
+
+<span class="kw">if</span> pvalue &lt; <span class="num">0.05</span>:
+    <span class="fn">print</span>(<span class="str">"✅ Series ARE cointegrated"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"❌ Series are NOT cointegrated"</span>)
+
+<span class="cm"># Step 2: Compute the spread for trading</span>
+<span class="kw">from</span> numpy.linalg <span class="kw">import</span> lstsq
+beta = lstsq(np.column_stack([X, np.ones(n)]), Y, rcond=<span class="kw">None</span>)[<span class="num">0</span>][<span class="num">0</span>]
+spread = Y - beta * X
+<span class="fn">print</span>(<span class="str">f"\nEstimated β: {beta:.4f}"</span>)
+
+<span class="cm"># Verify spread is stationary</span>
+adf_spread = adfuller(spread)
+<span class="fn">print</span>(<span class="str">f"Spread ADF p-value: {adf_spread[1]:.4f}"</span>)  <span class="cm"># Should be < 0.05</span>
+
+<span class="cm"># Generate trading signals</span>
+spread_mean = spread.mean()
+spread_std = spread.std()
+z_score = (spread - spread_mean) / spread_std
+
+entry_long = z_score &lt; -<span class="num">2</span>   <span class="cm"># Buy spread when 2σ below mean</span>
+entry_short = z_score &gt; <span class="num">2</span>    <span class="cm"># Sell spread when 2σ above mean</span>
+<span class="fn">print</span>(<span class="str">f"\nLong entry signals: {entry_long.sum()}"</span>)
+<span class="fn">print</span>(<span class="str">f"Short entry signals: {entry_short.sum()}"</span>)
+  </div>
+
+  <h4>Johansen Test (for Multiple Series)</h4>
+  <p>When testing for cointegration among 3+ series, use the <strong>Johansen test</strong>. It also tells you <em>how many</em> cointegrating relationships exist (the "cointegration rank").</p>
+
+  <div class="formula">Johansen Test:<br>H₀: At most r cointegrating vectors<br>H₁: More than r cointegrating vectors<br><br>Tests are done sequentially: r=0, then r=1, etc.<br>Two test statistics: Trace statistic and Max-eigenvalue statistic</div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">from</span> statsmodels.tsa.vector_ar.vecm <span class="kw">import</span> coint_johansen
+
+<span class="cm"># Stack multiple I(1) series into a matrix</span>
+data = np.column_stack([X, Y])
+
+<span class="cm"># Johansen test (det_order=-1: no constant, k_ar_diff=1: one lag)</span>
+result = coint_johansen(data, det_order=<span class="num">0</span>, k_ar_diff=<span class="num">1</span>)
+
+<span class="fn">print</span>(<span class="str">"Eigenvalues:"</span>, result.eig)
+<span class="fn">print</span>(<span class="str">"Trace statistics:"</span>, result.lr1)
+<span class="fn">print</span>(<span class="str">"Critical values (90%, 95%, 99%):\n"</span>, result.cvt)
+<span class="fn">print</span>(<span class="str">"Cointegrating vectors:\n"</span>, result.evec)
+  </div>
+
+  <h3>Error Correction Models (ECM)</h3>
+  <p>When series are cointegrated, you should use an <strong>Error Correction Model</strong> instead of a VAR in differences. The ECM captures both short-run dynamics and long-run equilibrium.</p>
+
+  <div class="formula">ΔYₜ = α + γ·Zₜ₋₁ + β₁·ΔXₜ₋₁ + εₜ<br><br><span class="comment">γ = error correction coefficient (how fast Y corrects back to equilibrium)</span><br><span class="comment">Zₜ₋₁ = lagged spread (error from long-run relationship)</span><br><span class="comment">-1 &lt; γ &lt; 0: Negative γ creates mean-reversion pull back to equilibrium</span></div>
+
+  <div class="analogy"><div class="analogy-label">⚖️ Equilibrium Analogy</div>
+  The ECM is like a rubber band. When the spread (Zₜ₋₁) is stretched above equilibrium, the negative γ pulls Y back down. When the spread is compressed below equilibrium, it pulls Y back up. The larger |γ|, the faster the adjustment.
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 4.2 — Spread Z-Score and Trading Signals</div>
+    <canvas id="cvSpread" width="760" height="260"></canvas>
+    <div style="font-size:0.8rem; color:var(--muted); margin-top:0.5rem;">
+      <span style="color:#2471a3">■ Z-score of spread</span> · <span style="color:#27ae60">▲ Long entry (z &lt; -2)</span> · <span style="color:#c0392b">▼ Short entry (z &gt; +2)</span> · Dashed = ±2σ thresholds
+    </div>
+  </div>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.coint.html" target="_blank">📦 statsmodels coint()</a>
+    <a class="res-link" href="https://www.quantopian.com/lectures/integration-cointegration-and-stationarity" target="_blank">📖 Quantopian: Cointegration</a>
+    <a class="res-link" href="https://hudsonthames.org/an-introduction-to-cointegration/" target="_blank">🔬 Hudson & Thames: Cointegration</a>
+    <a class="res-link secondary" href="https://www.youtube.com/watch?v=2z9JYAG_5ms" target="_blank">🎥 Pairs Trading Explained</a>
+  </div>
+</section>
+
+<!-- ===================== TAB 5: GRANGER CAUSALITY ===================== -->
+<section class="tab-panel" id="tab-granger">
+  <h2>5. Granger Causality</h2>
+  <p><em>Does knowing X's past help predict Y's future, beyond what Y's own past already tells us?</em></p>
+
+  <div class="topic-progress">
+    <div class="prog-step done">Prerequisites</div>
+    <div class="prog-step done">Stationarity</div>
+    <div class="prog-step done">Autocorrelation</div>
+    <div class="prog-step done">ARIMA</div>
+    <div class="prog-step done">Cointegration</div>
+    <div class="prog-step current">Granger Causality</div>
+  </div>
+
+  <h3>What is Granger Causality?</h3>
+  <p>Granger causality is a statistical concept of causality, not true philosophical causality. It was developed by Nobel laureate Clive Granger in 1969.</p>
+
+  <div class="callout key">
+    <div class="callout-label">🔑 The Core Idea</div>
+    X <strong>Granger-causes</strong> Y if: <em>past values of X contain information that helps predict future values of Y, above and beyond the information in Y's own past</em>.
+    <br><br>
+    This is predictive causality — "X precedes Y and adds predictive value." It does <strong>NOT</strong> mean X truly causes Y in a scientific sense.
+  </div>
+
+  <div class="analogy"><div class="analogy-label">📺 TV Ratings Analogy</div>
+  Suppose Super Bowl ad spending goes up, and 2 weeks later product sales go up. Does ad spending Granger-cause sales? The Granger test would check: knowing last month's ad spending, can we better predict this month's sales than using only past sales alone? If yes → Granger causality (but beware: both might be driven by a third factor like the economy!).
+  </div>
+
+  <h3>The Formal Test: Two Regressions</h3>
+  <p>Granger causality is tested by comparing two models:</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Model 1: Restricted</h4>
+      <p>Predict Y using only Y's own past lags:</p>
+      <div class="formula" style="font-size:0.85rem">Yₜ = α + Σβᵢ·Yₜ₋ᵢ + εₜ</div>
+      <p style="font-size:0.9rem">This is the baseline — how well can Y predict itself?</p>
+    </div>
+    <div class="card">
+      <h4>Model 2: Unrestricted</h4>
+      <p>Predict Y using Y's past AND X's past lags:</p>
+      <div class="formula" style="font-size:0.85rem">Yₜ = α + Σβᵢ·Yₜ₋ᵢ + Σγᵢ·Xₜ₋ᵢ + εₜ</div>
+      <p style="font-size:0.9rem">Does adding X's past significantly reduce the error?</p>
+    </div>
+  </div>
+
+  <div class="formula">Null Hypothesis H₀: γ₁ = γ₂ = ... = γₖ = 0<br><span class="comment">(X's past lags add NO predictive value — X does NOT Granger-cause Y)</span><br><br>Test: F-statistic (or Chi-squared)<br>If p-value &lt; 0.05 → Reject H₀ → X Granger-causes Y</div>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">Figure 5.1 — Granger Causality Framework</div>
+    <canvas id="cvGranger" width="760" height="220"></canvas>
+  </div>
+
+  <h3>Critical Assumptions</h3>
+  <div class="callout warn">
+    <div class="callout-label">⚠️ Assumptions You Must Check Before Running Granger Test</div>
+    <ol style="padding-left:1.3rem; margin-top:0.5rem;">
+      <li><strong>Both series must be stationary.</strong> If they're I(1), difference them first (unless cointegrated — then use VECM).</li>
+      <li><strong>Correct lag selection.</strong> Use AIC/BIC to choose the number of lags k. Too few lags = miss the relationship; too many = noisy test.</li>
+      <li><strong>Granger causality ≠ real causality.</strong> A rooster crowing Granger-causes sunrise — but roosters don't make the sun rise. Common third variables can drive both series.</li>
+    </ol>
+  </div>
+
+  <h3>Granger Causality in Python</h3>
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> grangercausalitytests
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">400</span>
+
+<span class="cm"># Simulate X that causes Y with a 2-period lag</span>
+X = np.random.randn(n)
+Y = np.zeros(n)
+Y[<span class="num">0</span>], Y[<span class="num">1</span>] = np.random.randn(<span class="num">2</span>)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, n):
+    Y[t] = <span class="num">0.4</span> * Y[t-<span class="num">1</span>] + <span class="num">0.6</span> * X[t-<span class="num">2</span>] + np.random.randn() * <span class="num">0.3</span>
+
+<span class="cm"># Check stationarity first!</span>
+<span class="kw">for</span> name, series <span class="kw">in</span> [(<span class="str">"X"</span>, X), (<span class="str">"Y"</span>, Y)]:
+    pval = adfuller(series)[<span class="num">1</span>]
+    <span class="fn">print</span>(<span class="str">f"{name} ADF p-value: {pval:.4f} → {'Stationary ✅' if pval < 0.05 else 'Non-stationary ❌'}"</span>)
+
+<span class="cm"># Stack into dataframe: grangercausalitytests needs [Y, X] order</span>
+df = pd.DataFrame({<span class="str">'Y'</span>: Y, <span class="str">'X'</span>: X})
+
+<span class="fn">print</span>(<span class="str">"\n=== Granger Causality Test: Does X cause Y? ==="</span>)
+gc_results = grangercausalitytests(df[[<span class="str">'Y'</span>, <span class="str">'X'</span>]], maxlag=<span class="num">5</span>, verbose=<span class="kw">True</span>)
+
+<span class="cm"># Interpret: check if lag 2 gives small p-value (we know true lag=2)</span>
+<span class="fn">print</span>(<span class="str">"\n=== Reverse: Does Y cause X? (should be NO) ==="</span>)
+gc_results_rev = grangercausalitytests(df[[<span class="str">'X'</span>, <span class="str">'Y'</span>]], maxlag=<span class="num">5</span>, verbose=<span class="kw">False</span>)
+
+<span class="cm"># Extract F-test p-values for each lag</span>
+<span class="fn">print</span>(<span class="str">"\nLag | p-value (X→Y) | p-value (Y→X)"</span>)
+<span class="fn">print</span>(<span class="str">"-"</span> * <span class="num">40</span>)
+<span class="kw">for</span> lag <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>):
+    p1 = gc_results[lag][<span class="num">0</span>][<span class="str">'ssr_ftest'</span>][<span class="num">1</span>]
+    p2 = gc_results_rev[lag][<span class="num">0</span>][<span class="str">'ssr_ftest'</span>][<span class="num">1</span>]
+    <span class="fn">print</span>(<span class="str">f"  {lag}   | {p1:.4f}         | {p2:.4f}"</span>)
+  </div>
+
+  <h3>Granger Causality in a VAR System</h3>
+  <p>For systems with more than 2 variables, Granger causality is typically tested within a <strong>Vector Autoregression (VAR)</strong> model. VAR extends ARIMA to multiple time series simultaneously.</p>
+
+  <div class="formula">VAR(p) System (2 variables):<br><br>Yₜ = A₁Yₜ₋₁ + A₂Yₜ₋₂ + ... + AₚYₜ₋ₚ + εₜ<br><br><span class="comment">where Yₜ = [y₁ₜ, y₂ₜ, ...]' is a vector of all variables</span><br><span class="comment">A₁...Aₚ are coefficient matrices</span><br><span class="comment">Granger test: are the cross-variable coefficients jointly zero?</span></div>
+
+  <div class="code-block"><span class="code-lang">Python</span>
+<span class="kw">from</span> statsmodels.tsa.api <span class="kw">import</span> VAR
+
+<span class="cm"># Fit VAR model to data</span>
+df_var = pd.DataFrame({<span class="str">'y1'</span>: Y, <span class="str">'y2'</span>: X})
+model = VAR(df_var)
+
+<span class="cm"># Select lag order using information criteria</span>
+lag_order = model.select_order(maxlags=<span class="num">10</span>)
+<span class="fn">print</span>(lag_order.summary())
+
+<span class="cm"># Fit chosen order</span>
+results = model.fit(lag_order.aic)
+<span class="fn">print</span>(results.summary())
+
+<span class="cm"># Test Granger causality within VAR</span>
+gc_test = results.test_causality(<span class="str">'y1'</span>, causing=<span class="str">'y2'</span>, kind=<span class="str">'f'</span>)
+<span class="fn">print</span>(<span class="str">f"\nDoes y2 Granger-cause y1?"</span>)
+<span class="fn">print</span>(gc_test.summary())
+  </div>
+
+  <h3>Granger Causality vs Cointegration</h3>
+  <p>These concepts are related but distinct. Here's the key relationship:</p>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Granger Causality</th><th>Cointegration</th></tr></thead>
+    <tbody>
+      <tr><td>What it tests</td><td>Predictive relationship</td><td>Long-run equilibrium</td></tr>
+      <tr><td>Series requirement</td><td>Must be stationary</td><td>Both must be I(1)</td></tr>
+      <tr><td>Direction</td><td>One-way or bidirectional</td><td>Symmetric relationship</td></tr>
+      <tr><td>Time horizon</td><td>Short-run dynamics</td><td>Long-run relationship</td></tr>
+      <tr><td>Main use</td><td>Causal inference, prediction</td><td>Pairs trading, ECM</td></tr>
+      <tr><td>Model context</td><td>VAR on stationary data</td><td>VECM on I(1) cointegrated data</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="callout-label">🔗 The Connection</div>
+    If two series are cointegrated, there must be Granger causality in at least one direction (Granger Representation Theorem). The ECM's error correction term captures the long-run Granger causal relationship.
+  </div>
+
+  <h3>Practical Applications in Quant Finance</h3>
+  <div class="three-col">
+    <div class="card">
+      <h4>🏦 Macro Analysis</h4>
+      <p>Does the Fed Funds Rate Granger-cause unemployment? Does M2 money supply Granger-cause inflation? Critical for macro strategy.</p>
+    </div>
+    <div class="card">
+      <h4>📊 Market Microstructure</h4>
+      <p>Do futures prices Granger-cause spot prices? Does options implied volatility lead realized volatility? Common in risk management.</p>
+    </div>
+    <div class="card">
+      <h4>🌐 Cross-Asset</h4>
+      <p>Does gold price Granger-cause gold miners' stock prices? Does oil Granger-cause the Canadian dollar (petrocurrency)? Used in cross-asset strategies.</p>
+    </div>
+  </div>
+
+  <div class="resources">
+    <a class="res-link" href="https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html" target="_blank">📦 statsmodels Granger Test</a>
+    <a class="res-link" href="https://www.statsmodels.org/stable/vector_ar.html" target="_blank">📦 statsmodels VAR</a>
+    <a class="res-link" href="https://en.wikipedia.org/wiki/Granger_causality" target="_blank">📖 Wikipedia: Granger Causality</a>
+    <a class="res-link secondary" href="https://www.youtube.com/watch?v=WCfMwvGVbLs" target="_blank">🎥 Granger Test Walkthrough</a>
+  </div>
+</section>
+
+<!-- ===================== TAB 6: COLAB LAB ===================== -->
+<section class="tab-panel" id="tab-colab">
+  <h2>6. Colab Experiments</h2>
+  <p><em>Hands-on experiments to run on Google Colab. Copy-paste ready, zero setup required.</em></p>
+
+  <div class="colab-box">
+    <div class="colab-icon">🚀</div>
+    <div>
+      <h4>GETTING STARTED WITH GOOGLE COLAB</h4>
+      <p>Go to <a href="https://colab.research.google.com/" target="_blank">colab.research.google.com</a> → New Notebook → paste any code block below → Run (Shift+Enter). All required libraries (numpy, pandas, statsmodels, matplotlib) are pre-installed.</p>
+    </div>
+  </div>
+
+  <h3>Experiment 1: Visualizing Stationarity</h3>
+  <p><strong>Goal:</strong> Generate and visualize stationary vs non-stationary series, test with ADF.</p>
+
+  <div class="code-block"><span class="code-lang">Python — Colab Cell 1</span>
+<span class="cm"># ============================================================
+# EXPERIMENT 1: Visualizing & Testing Stationarity
+# ============================================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> kpss
+
+np.random.seed(<span class="num">123</span>)
+n = <span class="num">500</span>
+t = np.arange(n)
+
+<span class="cm"># Series 1: Stationary (AR(1), phi=0.5)</span>
+stationary = np.zeros(n)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, n):
+    stationary[i] = <span class="num">0.5</span> * stationary[i-<span class="num">1</span>] + np.random.randn()
+
+<span class="cm"># Series 2: Random walk (non-stationary, I(1))</span>
+random_walk = np.cumsum(np.random.randn(n))
+
+<span class="cm"># Series 3: Trend-stationary</span>
+trend_stat = <span class="num">0.05</span> * t + np.random.randn(n)
+
+<span class="cm"># Plot all three</span>
+fig, axes = plt.subplots(<span class="num">3</span>, <span class="num">1</span>, figsize=(<span class="num">14</span>, <span class="num">10</span>))
+axes[<span class="num">0</span>].plot(stationary, color=<span class="str">'steelblue'</span>)
+axes[<span class="num">0</span>].axhline(<span class="num">0</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>, alpha=<span class="num">0.5</span>)
+axes[<span class="num">0</span>].set_title(<span class="str">'Stationary AR(1): φ=0.5 — wiggles around zero'</span>)
+
+axes[<span class="num">1</span>].plot(random_walk, color=<span class="str">'crimson'</span>)
+axes[<span class="num">1</span>].set_title(<span class="str">'Random Walk I(1): drifts without bound'</span>)
+
+axes[<span class="num">2</span>].plot(trend_stat, color=<span class="str">'darkorange'</span>)
+axes[<span class="num">2</span>].set_title(<span class="str">'Trend-stationary: detrend to make stationary'</span>)
+plt.tight_layout(); plt.show()
+
+<span class="cm"># ADF test on all three</span>
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">60</span>)
+<span class="kw">for</span> name, series <span class="kw">in</span> [
+    (<span class="str">"Stationary AR(1)"</span>, stationary),
+    (<span class="str">"Random Walk"</span>, random_walk),
+    (<span class="str">"Trend-Stationary"</span>, trend_stat)
+]:
+    result = adfuller(series, autolag=<span class="str">'AIC'</span>)
+    <span class="fn">print</span>(<span class="str">f"\n{name}:"</span>)
+    <span class="fn">print</span>(<span class="str">f"  ADF Stat: {result[0]:.3f}, p-value: {result[1]:.4f}"</span>)
+    <span class="fn">print</span>(<span class="str">f"  Result: {'✅ STATIONARY' if result[1] < 0.05 else '❌ NON-STATIONARY'}"</span>)
+
+<span class="cm"># Fix the random walk by differencing</span>
+rw_differenced = pd.Series(random_walk).diff().dropna()
+result = adfuller(rw_differenced)
+<span class="fn">print</span>(<span class="str">f"\nRandom Walk AFTER differencing: p-value = {result[1]:.4f} ✅"</span>)
+  </div>
+
+  <h3>Experiment 2: ACF/PACF Pattern Recognition</h3>
+  <p><strong>Goal:</strong> Generate AR, MA, and ARMA processes and learn to read their ACF/PACF patterns.</p>
+
+  <div class="code-block"><span class="code-lang">Python — Colab Cell 2</span>
+<span class="cm"># ============================================================
+# EXPERIMENT 2: ACF/PACF Pattern Recognition
+# ============================================================</span>
+
+<span class="kw">from</span> statsmodels.graphics.tsaplots <span class="kw">import</span> plot_acf, plot_pacf
+<span class="kw">from</span> statsmodels.tsa.arima_process <span class="kw">import</span> ArmaProcess
+
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">500</span>
+
+<span class="cm"># AR(2): PACF cuts off after lag 2, ACF decays</span>
+ar2 = ArmaProcess(ar=np.array([<span class="num">1</span>, -<span class="num">0.7</span>, -<span class="num">0.2</span>]), ma=np.array([<span class="num">1</span>]))
+ar2_series = ar2.generate_sample(n)
+
+<span class="cm"># MA(2): ACF cuts off after lag 2, PACF decays</span>
+ma2 = ArmaProcess(ar=np.array([<span class="num">1</span>]), ma=np.array([<span class="num">1</span>, <span class="num">0.6</span>, <span class="num">0.3</span>]))
+ma2_series = ma2.generate_sample(n)
+
+<span class="cm"># ARMA(1,1): Both decay gradually</span>
+arma11 = ArmaProcess(ar=np.array([<span class="num">1</span>, -<span class="num">0.5</span>]), ma=np.array([<span class="num">1</span>, <span class="num">0.4</span>]))
+arma11_series = arma11.generate_sample(n)
+
+<span class="cm"># White noise: everything near zero</span>
+wn = np.random.randn(n)
+
+fig, axes = plt.subplots(<span class="num">4</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">16</span>))
+titles = [<span class="str">'AR(2)'</span>, <span class="str">'MA(2)'</span>, <span class="str">'ARMA(1,1)'</span>, <span class="str">'White Noise'</span>]
+series_list = [ar2_series, ma2_series, arma11_series, wn]
+
+<span class="kw">for</span> i, (title, series) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">zip</span>(titles, series_list)):
+    plot_acf(series, lags=<span class="num">20</span>, ax=axes[i, <span class="num">0</span>], title=<span class="str">f'ACF — {title}'</span>)
+    plot_pacf(series, lags=<span class="num">20</span>, ax=axes[i, <span class="num">1</span>], title=<span class="str">f'PACF — {title}'</span>, method=<span class="str">'ywm'</span>)
+
+plt.tight_layout(); plt.show()
+
+<span class="fn">print</span>(<span class="str">"""
+WHAT TO LOOK FOR:
+AR(2):   PACF has 2 significant spikes then cuts off. ACF decays exponentially.
+MA(2):   ACF has 2 significant spikes then cuts off. PACF decays exponentially.
+ARMA:    Both ACF and PACF decay gradually. Harder to identify.
+WN:      Nothing significant in either plot — no model needed!
+"""</span>)
+  </div>
+
+  <h3>Experiment 3: Full ARIMA Workflow</h3>
+  <p><strong>Goal:</strong> Download real stock data and build an ARIMA model end-to-end.</p>
+
+  <div class="code-block"><span class="code-lang">Python — Colab Cell 3</span>
+<span class="cm"># ============================================================
+# EXPERIMENT 3: Full ARIMA Pipeline on Synthetic Stock Data
+# ============================================================
+# Note: install yfinance for real data: !pip install yfinance</span>
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> statsmodels.tsa.arima.model <span class="kw">import</span> ARIMA
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> adfuller
+<span class="kw">from</span> statsmodels.stats.diagnostic <span class="kw">import</span> acorr_ljungbox
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> warnings; warnings.filterwarnings(<span class="str">'ignore'</span>)
+
+<span class="cm"># Simulate stock price (geometric random walk)</span>
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">600</span>
+daily_returns = np.random.normal(<span class="num">0.0003</span>, <span class="num">0.015</span>, n)
+log_prices = np.cumsum(daily_returns) + np.log(<span class="num">100</span>)
+prices = pd.Series(np.exp(log_prices), name=<span class="str">'Price'</span>)
+log_returns = pd.Series(daily_returns[<span class="num">1</span>:], name=<span class="str">'LogReturn'</span>)
+
+<span class="cm"># --- STEP 1: Check stationarity ---</span>
+<span class="fn">print</span>(<span class="str">"STEP 1: Stationarity Check"</span>)
+<span class="fn">print</span>(<span class="str">f"Price ADF p-val: {adfuller(prices)[1]:.4f} → Non-stationary (as expected)"</span>)
+<span class="fn">print</span>(<span class="str">f"Returns ADF p-val: {adfuller(log_returns)[1]:.4f} → Stationary ✅"</span>)
+
+<span class="cm"># --- STEP 2: ACF/PACF on returns ---</span>
+<span class="kw">from</span> statsmodels.graphics.tsaplots <span class="kw">import</span> plot_acf, plot_pacf
+fig, (ax1, ax2) = plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">4</span>))
+plot_acf(log_returns, lags=<span class="num">30</span>, ax=ax1, title=<span class="str">'ACF of Log Returns'</span>)
+plot_pacf(log_returns, lags=<span class="num">30</span>, ax=ax2, title=<span class="str">'PACF of Log Returns'</span>, method=<span class="str">'ywm'</span>)
+plt.tight_layout(); plt.show()
+
+<span class="cm"># --- STEP 3: Try different ARIMA models, compare AIC ---</span>
+<span class="fn">print</span>(<span class="str">"\nSTEP 3: Model Comparison (on returns)"</span>)
+<span class="fn">print</span>(<span class="str">f"{'Model':<15} {'AIC':<12} {'BIC':<12}"</span>)
+<span class="fn">print</span>(<span class="str">"-"</span> * <span class="num">40</span>)
+<span class="kw">for</span> p, q <span class="kw">in</span> [(<span class="num">0</span>,<span class="num">0</span>),(<span class="num">1</span>,<span class="num">0</span>),(<span class="num">0</span>,<span class="num">1</span>),(<span class="num">1</span>,<span class="num">1</span>),(<span class="num">2</span>,<span class="num">0</span>),(<span class="num">0</span>,<span class="num">2</span>),(<span class="num">2</span>,<span class="num">1</span>)]:
+    <span class="kw">try</span>:
+        m = ARIMA(log_returns, order=(p,<span class="num">0</span>,q)).fit()
+        <span class="fn">print</span>(<span class="str">f"ARIMA({p},0,{q})    {m.aic:.2f}       {m.bic:.2f}"</span>)
+    <span class="kw">except</span>: <span class="kw">pass</span>
+
+<span class="cm"># --- STEP 4: Fit best model and check residuals ---</span>
+<span class="fn">print</span>(<span class="str">"\nSTEP 4: Fitting ARIMA(1,0,0)"</span>)
+model = ARIMA(log_returns, order=(<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>)).fit()
+residuals = model.resid
+lb = acorr_ljungbox(residuals, lags=[<span class="num">10</span>], return_df=<span class="kw">True</span>)
+<span class="fn">print</span>(<span class="str">f"Ljung-Box p-value at lag 10: {lb['lb_pvalue'].values[0]:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">"Residuals look like white noise ✅" if lb['lb_pvalue'].values[0] > 0.05 else "Model needs improvement ❌"</span>)
+
+<span class="cm"># --- STEP 5: Forecast ---</span>
+train = log_returns[:500]; test = log_returns[500:]
+model_train = ARIMA(train, order=(<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>)).fit()
+forecast_obj = model_train.get_forecast(steps=<span class="fn">len</span>(test))
+fc = forecast_obj.predicted_mean
+ci = forecast_obj.conf_int()
+
+fig, ax = plt.subplots(figsize=(<span class="num">12</span>, <span class="num">4</span>))
+ax.plot(train.index[-<span class="num">100</span>:], train[-<span class="num">100</span>:], label=<span class="str">'Historical'</span>, color=<span class="str">'steelblue'</span>)
+ax.plot(fc.index, fc, label=<span class="str">'Forecast'</span>, color=<span class="str">'crimson'</span>)
+ax.fill_between(ci.index, ci.iloc[:,<span class="num">0</span>], ci.iloc[:,<span class="num">1</span>], alpha=<span class="num">0.2</span>, color=<span class="str">'crimson'</span>)
+ax.plot(test.index, test, label=<span class="str">'Actual'</span>, color=<span class="str">'green'</span>, alpha=<span class="num">0.7</span>)
+ax.legend(); ax.set_title(<span class="str">'ARIMA(1,0,0) Forecast vs Actual'</span>)
+plt.tight_layout(); plt.show()
+  </div>
+
+  <h3>Experiment 4: Cointegration & Pairs Trading Signal</h3>
+  <div class="code-block"><span class="code-lang">Python — Colab Cell 4</span>
+<span class="cm"># ============================================================
+# EXPERIMENT 4: Cointegration & Pairs Trading
+# ============================================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> coint, adfuller
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+
+np.random.seed(<span class="num">42</span>)
+n = <span class="num">1000</span>
+
+<span class="cm"># Create a cointegrated pair (simulate KO/PEP-like stocks)</span>
+common_trend = np.cumsum(np.random.randn(n) * <span class="num">0.01</span>)
+X = <span class="num">50</span> * np.exp(common_trend + np.random.randn(n) * <span class="num">0.005</span>)  <span class="cm"># Stock A</span>
+Y = <span class="num">60</span> * np.exp(<span class="num">1.1</span> * common_trend + np.random.randn(n) * <span class="num">0.005</span>)  <span class="cm"># Stock B</span>
+dates = pd.date_range(<span class="str">'2020-01-01'</span>, periods=n, freq=<span class="str">'B'</span>)
+
+df = pd.DataFrame({<span class="str">'StockA'</span>: X, <span class="str">'StockB'</span>: Y}, index=dates)
+
+<span class="cm"># Test cointegration</span>
+score, pval, cvt = coint(df[<span class="str">'StockA'</span>], df[<span class="str">'StockB'</span>])
+<span class="fn">print</span>(<span class="str">f"Engle-Granger p-value: {pval:.6f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Cointegrated: {'YES ✅' if pval < 0.05 else 'NO ❌'}"</span>)
+
+<span class="cm"># Estimate hedge ratio via OLS</span>
+model = LinearRegression()
+model.fit(df[[<span class="str">'StockA'</span>]], df[<span class="str">'StockB'</span>])
+beta = model.coef_[<span class="num">0</span>]
+alpha = model.intercept_
+<span class="fn">print</span>(<span class="str">f"Hedge ratio β: {beta:.4f}"</span>)
+
+<span class="cm"># Compute spread (cointegrating residual)</span>
+df[<span class="str">'spread'</span>] = df[<span class="str">'StockB'</span>] - beta * df[<span class="str">'StockA'</span>] - alpha
+
+<span class="cm"># Rolling z-score of the spread</span>
+window = <span class="num">60</span>
+df[<span class="str">'z_score'</span>] = (df[<span class="str">'spread'</span>] - df[<span class="str">'spread'</span>].rolling(window).mean()) / \
+                df[<span class="str">'spread'</span>].rolling(window).std()
+
+<span class="cm"># Generate signals</span>
+df[<span class="str">'signal'</span>] = <span class="num">0</span>
+df.loc[df[<span class="str">'z_score'</span>] &gt; <span class="num">2</span>, <span class="str">'signal'</span>] = -<span class="num">1</span>   <span class="cm"># Short spread</span>
+df.loc[df[<span class="str">'z_score'</span>] &lt; -<span class="num">2</span>, <span class="str">'signal'</span>] = <span class="num">1</span>    <span class="cm"># Long spread</span>
+
+<span class="cm"># Plot</span>
+fig, (ax1, ax2, ax3) = plt.subplots(<span class="num">3</span>, <span class="num">1</span>, figsize=(<span class="num">14</span>, <span class="num">12</span>))
+
+ax1.plot(df[<span class="str">'StockA'</span>], label=<span class="str">'Stock A'</span>, alpha=<span class="num">0.8</span>)
+ax1.plot(df[<span class="str">'StockB'</span>], label=<span class="str">'Stock B'</span>, alpha=<span class="num">0.8</span>)
+ax1.set_title(<span class="str">'Cointegrated Stock Pair'</span>); ax1.legend()
+
+ax2.plot(df[<span class="str">'spread'</span>], color=<span class="str">'purple'</span>)
+ax2.set_title(<span class="str">'Spread (cointegrating residual)'</span>)
+
+ax3.plot(df[<span class="str">'z_score'</span>], color=<span class="str">'steelblue'</span>, label=<span class="str">'Z-score'</span>)
+ax3.axhline(<span class="num">2</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'+2σ (short)'</span>)
+ax3.axhline(-<span class="num">2</span>, color=<span class="str">'green'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'-2σ (long)'</span>)
+ax3.axhline(<span class="num">0</span>, color=<span class="str">'black'</span>, linestyle=<span class="str">':'</span>)
+short_idx = df[df[<span class="str">'signal'</span>]==-<span class="num">1</span>].index
+long_idx = df[df[<span class="str">'signal'</span>]==<span class="num">1</span>].index
+ax3.scatter(short_idx, df.loc[short_idx, <span class="str">'z_score'</span>], color=<span class="str">'red'</span>, s=<span class="num">20</span>, zorder=<span class="num">5</span>)
+ax3.scatter(long_idx, df.loc[long_idx, <span class="str">'z_score'</span>], color=<span class="str">'green'</span>, s=<span class="num">20</span>, zorder=<span class="num">5</span>)
+ax3.set_title(<span class="str">'Trading Signals from Z-Score'</span>); ax3.legend()
+plt.tight_layout(); plt.show()
+  </div>
+
+  <h3>Experiment 5: Granger Causality Investigation</h3>
+  <div class="code-block"><span class="code-lang">Python — Colab Cell 5</span>
+<span class="cm"># ============================================================
+# EXPERIMENT 5: Granger Causality — Full Investigation
+# ============================================================</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> statsmodels.tsa.stattools <span class="kw">import</span> grangercausalitytests, adfuller
+
+np.random.seed(<span class="num">777</span>)
+n = <span class="num">600</span>
+
+<span class="cm"># Scenario 1: X causes Y at lag 3</span>
+X1 = np.random.randn(n)
+Y1 = np.zeros(n)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>, n):
+    Y1[t] = <span class="num">0.3</span> * Y1[t-<span class="num">1</span>] + <span class="num">0.7</span> * X1[t-<span class="num">3</span>] + np.random.randn() * <span class="num">0.2</span>
+
+<span class="cm"># Scenario 2: No causality (independent series)</span>
+X2 = np.random.randn(n)
+Y2 = np.random.randn(n)
+
+<span class="cm"># Scenario 3: Bidirectional causality</span>
+X3, Y3 = np.zeros(n), np.zeros(n)
+<span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, n):
+    X3[t] = <span class="num">0.4</span> * X3[t-<span class="num">1</span>] + <span class="num">0.3</span> * Y3[t-<span class="num">1</span>] + np.random.randn() * <span class="num">0.3</span>
+    Y3[t] = <span class="num">0.4</span> * Y3[t-<span class="num">1</span>] + <span class="num">0.5</span> * X3[t-<span class="num">2</span>] + np.random.randn() * <span class="num">0.3</span>
+
+<span class="cm"># Granger test function helper</span>
+<span class="kw">def</span> <span class="fn">granger_pvalue</span>(series_y, series_x, max_lags=<span class="num">6</span>):
+    df = pd.DataFrame({<span class="str">'y'</span>: series_y, <span class="str">'x'</span>: series_x})
+    results = grangercausalitytests(df, maxlag=max_lags, verbose=<span class="kw">False</span>)
+    pvals = {lag: results[lag][<span class="num">0</span>][<span class="str">'ssr_ftest'</span>][<span class="num">1</span>] <span class="kw">for</span> lag <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, max_lags+<span class="num">1</span>)}
+    <span class="kw">return</span> pvals
+
+<span class="fn">print</span>(<span class="str">"="</span>*<span class="num">65</span>)
+<span class="fn">print</span>(<span class="str">"SCENARIO 1: X causes Y at lag 3 (expect small p at lag 3+)"</span>)
+<span class="fn">print</span>(<span class="str">"Lag | X→Y p-value | Y→X p-value"</span>)
+<span class="fn">print</span>(<span class="str">"-"</span>*<span class="num">40</span>)
+p_xy = granger_pvalue(Y1, X1); p_yx = granger_pvalue(X1, Y1)
+<span class="kw">for</span> lag <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">7</span>):
+    sig_xy = <span class="str">'✅'</span> <span class="kw">if</span> p_xy[lag] &lt; <span class="num">0.05</span> <span class="kw">else</span> <span class="str">' '</span>
+    sig_yx = <span class="str">'✅'</span> <span class="kw">if</span> p_yx[lag] &lt; <span class="num">0.05</span> <span class="kw">else</span> <span class="str">' '</span>
+    <span class="fn">print</span>(<span class="str">f"  {lag}  | {p_xy[lag]:.4f} {sig_xy}   | {p_yx[lag]:.4f} {sig_yx}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nSCENARIO 2: No causality (expect ALL large p-values)"</span>)
+p_xy2 = granger_pvalue(Y2, X2); p_yx2 = granger_pvalue(X2, Y2)
+<span class="fn">print</span>(<span class="str">f"Min X→Y p-value: {min(p_xy2.values()):.4f}  Min Y→X: {min(p_yx2.values()):.4f}"</span>)
+
+<span class="fn">print</span>(<span class="str">"\nSCENARIO 3: Bidirectional causality (both should be significant)"</span>)
+p_xy3 = granger_pvalue(Y3, X3); p_yx3 = granger_pvalue(X3, Y3)
+<span class="fn">print</span>(<span class="str">f"X→Y significant lags: {[l for l,p in p_xy3.items() if p < 0.05]}"</span>)
+<span class="fn">print</span>(<span class="str">f"Y→X significant lags: {[l for l,p in p_yx3.items() if p < 0.05]}"</span>)
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-label">🎓 Extended Learning</div>
+    After completing these 5 experiments, try: (1) Download real data using <code>yfinance</code> or <code>pandas-datareader</code>, (2) Apply the entire pipeline to real stocks (SPY vs QQQ for cointegration, oil vs CAD currency for Granger), (3) Build a simple pairs trading backtest.
+  </div>
+</section>
+
+<!-- ===================== TAB 7: EXERCISES ===================== -->
+<section class="tab-panel" id="tab-exercises">
+  <h2>7. Practice Exercises</h2>
+  <p><em>Three tiers: Easy (conceptual), Medium (applied), Hard (research-grade). Do all tiers before moving to the next topic.</em></p>
+
+  <h3>Topic 1: Stationarity Exercises</h3>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-easy">🟢 Easy — Conceptual</div>
+    <ol class="exercises">
+      <li>Describe in your own words why a random walk is non-stationary. Use the drunk walker analogy and explain what happens to the variance over time.</li>
+      <li>For each series below, state whether it is likely stationary or non-stationary and why: (a) Daily temperature in London, (b) Apple stock price level, (c) S&P 500 daily returns, (d) US 10-year bond yield level, (e) Federal Funds Rate monthly changes.</li>
+      <li>What does ADF stand for? In the ADF test, what is the null hypothesis? If p-value = 0.02, is the series stationary or non-stationary?</li>
+      <li>What is a unit root? For an AR(1) model Xₜ = φXₜ₋₁ + εₜ, what values of φ give: (a) stationarity, (b) unit root, (c) explosive behavior?</li>
+      <li>What is the difference between I(0) and I(1) series? Give one financial example of each.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-medium">🟡 Medium — Applied</div>
+    <ol class="exercises">
+      <li>In Python, generate 1000 observations from an AR(1) process with φ=0.3, φ=0.7, φ=0.95, and φ=1.0. For each: plot the series, run the ADF test, and compare the results. What happens as φ approaches 1?</li>
+      <li>Download Apple (AAPL) closing prices for the past 5 years using <code>yfinance</code>. Apply the ADF and KPSS tests to: (a) log price levels, (b) log returns (first differences). Do the two tests agree? What do you conclude?</li>
+      <li>Simulate a non-stationary series with a linear trend plus noise. Apply: (a) ADF test without a trend term (constant only), (b) ADF test with a trend term. Compare results and explain why including the trend matters.</li>
+      <li>A colleague says "I applied regression between US GDP and S&P 500 and got R²=0.92, so they're highly related!" Explain the spurious regression problem. Run this regression in Python and show why the results are misleading.</li>
+      <li>Write a function <code>find_integration_order(series, max_d=3)</code> that automatically determines the order of integration by repeatedly differencing and running ADF tests until stationarity is achieved.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-hard">🔴 Hard — Research Grade</div>
+    <ol class="exercises">
+      <li>Implement the KPSS test from scratch in Python (without using statsmodels) and verify your results match <code>statsmodels.tsa.stattools.kpss</code> on at least 3 different series. Document every step with equations.</li>
+      <li>Research the "power of unit root tests" problem. Write a 400-word analysis explaining why ADF tests have low statistical power against near-unit-root alternatives (e.g., φ=0.97). How does sample size affect the power? Generate a simulation to demonstrate this.</li>
+      <li>Implement a bootstrap-based stationarity test that doesn't assume a specific distribution of test statistics. Compare your bootstrap p-values with the ADF p-values on 5 different financial time series. When do they disagree?</li>
+      <li>Investigate structural breaks in stationarity. Use the Zivot-Andrews test to test for stationarity allowing for a structural break. Apply this to S&P 500 data including the 2008 financial crisis and COVID-19 period. How does ignoring structural breaks affect conclusions?</li>
+    </ol>
+  </div>
+
+  <hr class="section-rule">
+  <h3>Topic 2: Autocorrelation Exercises</h3>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-easy">🟢 Easy — Conceptual</div>
+    <ol class="exercises">
+      <li>What is the difference between autocorrelation and partial autocorrelation? Draw a simple diagram showing why PACF removes the indirect effects of intermediate lags.</li>
+      <li>In an ACF plot, what do the dashed lines represent? If a bar exceeds these lines, what does that mean?</li>
+      <li>Match each pattern to a model: (a) ACF decays, PACF cuts off at lag 2 → ?, (b) ACF cuts off at lag 1, PACF decays → ?, (c) Both decay gradually → ?, (d) All bars near zero → ?</li>
+      <li>What is the Ljung-Box test testing? If you fit an ARIMA model and the Ljung-Box p-value on residuals is 0.003, is your model adequate? What should you do?</li>
+      <li>For daily temperature data, at what lags would you expect significant autocorrelation? Explain your reasoning.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-medium">🟡 Medium — Applied</div>
+    <ol class="exercises">
+      <li>Generate 4 processes (AR(1), AR(2), MA(1), MA(2)) with specific parameters. Plot their ACF and PACF. Then give your plots to someone else and ask them to identify which model generated each plot (test your ability to "read" ACF/PACF patterns).</li>
+      <li>Download daily S&P 500 returns (squared returns and absolute returns). Plot the ACF for each. Notice how while raw returns show little autocorrelation, squared returns show strong autocorrelation at many lags. What does this tell you about the nature of financial return series?</li>
+      <li>Test whether the ACF at a specific lag is statistically significant using the formula ±1.96/√n. Write a function that returns all lags with statistically significant autocorrelation and their estimated values.</li>
+      <li>Investigate the seasonality of a monthly retail sales dataset (create synthetic seasonal data). Plot the ACF and identify the seasonal lag. What pattern do you see at lags 12, 24, 36?</li>
+      <li>Implement the ACF computation from scratch using only numpy. Verify against <code>statsmodels.tsa.stattools.acf</code> for accuracy up to lag 50.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-hard">🔴 Hard — Research Grade</div>
+    <ol class="exercises">
+      <li>Analyze the "leverage effect" in financial returns: compute rolling correlations between current log returns and past squared returns (e.g., correlation of r_t with r²_{t-k} for k=1,...,20). Is this captured by the standard ACF? If not, what kind of model would capture this asymmetry?</li>
+      <li>Implement a spectral density estimator for time series. Show that the spectral density at frequency ω is the Fourier transform of the autocovariance function. Plot the spectral density for AR(1) and MA(1) processes and explain the peaks/troughs.</li>
+      <li>The sample ACF is biased for finite samples. Research and implement the bias correction formula. How significant is the bias for n=50 vs n=500? Run a simulation study with 1000 replications to demonstrate the bias and its correction.</li>
+    </ol>
+  </div>
+
+  <hr class="section-rule">
+  <h3>Topic 3: ARIMA Exercises</h3>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-easy">🟢 Easy — Conceptual</div>
+    <ol class="exercises">
+      <li>In your own words, explain what each letter in ARIMA stands for and what role each plays. Use a concrete financial analogy for each.</li>
+      <li>For an ARIMA(2,1,1) model: (a) How many times is the series differenced? (b) How many AR lags are used? (c) How many MA terms? (d) How many parameters total (including constant)?</li>
+      <li>What is the Box-Jenkins methodology? Describe each of the 4 steps without using any equations.</li>
+      <li>What does the AIC penalize for? Why would you choose a model with higher AIC over one with lower AIC?</li>
+      <li>After fitting an ARIMA model, you plot the ACF of residuals and see significant spikes at lags 12 and 24. What does this suggest? How would you fix it?</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-medium">🟡 Medium — Applied</div>
+    <ol class="exercises">
+      <li>Download monthly US CPI data from FRED (<code>pandas_datareader</code>). Build an ARIMA model step-by-step: stationarity test, ACF/PACF identification, model fitting, residual diagnostics, and 12-month forecast with confidence intervals. Evaluate your forecast using RMSE.</li>
+      <li>Implement a simple ARIMA model selection grid search that tests all combinations of (p,d,q) for p,q ∈ {0,1,2,3} and d ∈ {0,1}. Select the best by AIC and verify it matches <code>pmdarima.auto_arima</code>.</li>
+      <li>Compare ARIMA(1,1,0), ARIMA(0,1,1), and ARIMA(1,1,1) on Apple stock returns using walk-forward validation: train on first 80%, evaluate on last 20% using rolling 1-step-ahead forecasts. Which model has lowest RMSE?</li>
+      <li>Build a SARIMA model for airline passenger data (classic AirPassengers dataset). Choose seasonal period m=12. Document your model selection process and produce a 24-month forecast.</li>
+      <li>Simulate a series with structural break in the middle (first half is AR(1) with φ=0.3, second half is AR(1) with φ=0.8). Fit a single ARIMA model to the full series. How does the structural break affect the estimated parameters and residuals?</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-hard">🔴 Hard — Research Grade</div>
+    <ol class="exercises">
+      <li>Implement the Kalman filter for state-space representation of ARMA models. Show that the ARMA(1,1) model can be written in state-space form, and derive the likelihood function. Compare your MLE estimates to those from <code>statsmodels.ARIMA</code>.</li>
+      <li>Build a rolling forecast evaluation framework with walk-forward validation. For each step: (a) refit ARIMA with new data, (b) produce n-step ahead forecasts (n=1,5,10,20), (c) compute coverage probability of confidence intervals. Is the stated 95% CI actually 95% coverage?</li>
+      <li>Implement ARIMA with exogenous variables (ARIMAX) and apply it to a real problem: predict hotel occupancy rates using ARIMA with weather data, holidays, and local events as exogenous variables. Quantify the value-add of each exogenous variable.</li>
+    </ol>
+  </div>
+
+  <hr class="section-rule">
+  <h3>Topic 4: Cointegration Exercises</h3>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-easy">🟢 Easy — Conceptual</div>
+    <ol class="exercises">
+      <li>Explain cointegration using the "drunk owner and dog on leash" analogy. Why must both series be I(1) for cointegration to make sense?</li>
+      <li>What is the difference between a spurious regression and a cointegrating regression? Both involve regressing one non-stationary series on another — what determines which is which?</li>
+      <li>In pairs trading, what does the "spread" represent? Why should it be mean-reverting if the two stocks are cointegrated?</li>
+      <li>What is the Engle-Granger two-step procedure? Describe each step without code.</li>
+      <li>What is the Error Correction Model (ECM)? What does the error correction coefficient γ represent? What happens if γ = 0?</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-medium">🟡 Medium — Applied</div>
+    <ol class="exercises">
+      <li>Test for cointegration between: (a) Brent and WTI crude oil prices, (b) EUR/USD and GBP/USD exchange rates, (c) Gold spot price and GLD ETF, (d) S&P 500 and NASDAQ. Download data using <code>yfinance</code>, run both Engle-Granger and Johansen tests. Do they agree?</li>
+      <li>Implement a complete pairs trading backtest: find 3 cointegrated pairs in the S&P 500 tech sector, compute hedge ratios, generate entry/exit signals at ±2σ, simulate PnL (assume proportional transaction costs of 5 bps per trade). Report Sharpe ratio and maximum drawdown.</li>
+      <li>Simulate the Error Correction Model: generate cointegrated data, fit the ECM, and verify that γ is negative and significant. Visualize how fast the system corrects back to equilibrium for different values of γ.</li>
+      <li>Investigate how stable the cointegrating relationship is over time. Use rolling windows of 1 year to estimate the hedge ratio β for a cointegrated pair. Plot β over time — is it stable? What happens to your trading strategy if β is unstable?</li>
+      <li>Compare two hedge ratio estimation methods: (a) OLS regression, (b) Johansen cointegrating vector. Generate data with known β=1.5, estimate using both methods, and compare bias and variance across 500 simulations.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-hard">🔴 Hard — Research Grade</div>
+    <ol class="exercises">
+      <li>Implement the Kalman filter-based dynamic hedge ratio for pairs trading (as in the "Kalman Filter Pairs Trade" paper). Compare the dynamic hedge ratio approach to the static OLS hedge ratio on real equity pairs. Measure improvement in spread stationarity, trading frequency, and Sharpe ratio.</li>
+      <li>Research and implement the Johansen test from scratch: derive the reduced rank regression problem, compute the trace and max-eigenvalue test statistics, and compare with <code>statsmodels</code> output on at least 10 different datasets.</li>
+      <li>Build a cointegration-based fixed-income relative value strategy: test for cointegration among 2-year, 5-year, and 10-year US Treasury yields. Model the yield curve spread (e.g., 10Y-2Y) as a mean-reverting spread, and build a VECM to model the joint dynamics. Identify trading opportunities and evaluate the strategy with proper transaction costs and realistic execution assumptions.</li>
+    </ol>
+  </div>
+
+  <hr class="section-rule">
+  <h3>Topic 5: Granger Causality Exercises</h3>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-easy">🟢 Easy — Conceptual</div>
+    <ol class="exercises">
+      <li>"The rooster's crow Granger-causes the sunrise." Explain what this means and why Granger causality ≠ true causality. Give your own example of spurious Granger causality driven by a common third factor.</li>
+      <li>In the Granger causality test, what are the restricted and unrestricted models? What is the null hypothesis? How is the F-statistic computed?</li>
+      <li>Why must you ensure stationarity before running a Granger test? What could go wrong if you test non-stationary series?</li>
+      <li>What is the difference between unidirectional and bidirectional Granger causality? Give a financial example of each.</li>
+      <li>How does the choice of lag length k affect the Granger causality test? What happens with too few lags? Too many lags?</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-medium">🟡 Medium — Applied</div>
+    <ol class="exercises">
+      <li>Test for Granger causality between: (a) Gold prices and USD index, (b) VIX (fear index) and S&P 500 returns, (c) Oil prices and airline stock returns, (d) Bitcoin and Ethereum returns. Use proper lag selection (AIC) and report both directions of causality.</li>
+      <li>Design a simulation study to evaluate the size and power of the Granger test: (a) Generate 1000 series where H₀ is true (no causality) — what % of tests incorrectly reject at 5% level? (b) Generate 1000 series with true Granger causality at lag 2 — what % correctly detect it? How does power change with n?</li>
+      <li>Fit a bivariate VAR model to S&P 500 returns and VIX changes. Test Granger causality in both directions within the VAR framework. Produce impulse response functions (IRFs) to show how a shock to VIX affects future S&P returns.</li>
+      <li>Investigate whether Google Trends search volume for "unemployment" Granger-causes the actual unemployment rate (download from FRED). Use 4-week and 8-week lagged relationships. Compare predictive power of adding Google Trends vs. not.</li>
+      <li>Implement the Toda-Yamamoto modification of the Granger test, which works on I(1) or even I(2) series without requiring differencing. Compare results to the standard approach on non-stationary financial series.</li>
+    </ol>
+  </div>
+
+  <div class="exercise-set">
+    <div class="tier-label tier-hard">🔴 Hard — Research Grade</div>
+    <ol class="exercises">
+      <li>Implement non-linear Granger causality testing: extend the standard linear Granger test to allow non-linear relationships using neural networks. Compare linear vs. non-linear Granger causality for: (a) oil → airline stocks, (b) VIX → S&P returns. When does non-linear Granger outperform linear?</li>
+      <li>Build a time-varying Granger causality framework using rolling window regressions. Apply to the relationship between the USD index and gold prices. Plot how the p-value and F-statistic of the Granger test evolves over time (e.g., rolling 2-year windows). Does the causal relationship change during financial crises?</li>
+      <li>Implement and compare three multiple-variable causality tests: (a) standard pairwise Granger in a VAR, (b) Granger causality with block exogeneity test, (c) Partial Granger causality (controlling for all other variables). Show why pairwise Granger can be misleading when a third variable is present. Use a 5-variable macro VAR (GDP, CPI, unemployment, interest rates, stock prices).</li>
+    </ol>
+  </div>
+
+  <hr class="section-rule">
+  <div class="callout tip">
+    <div class="callout-label">🎯 Final Capstone Project</div>
+    <p><strong>Build a complete quant research pipeline:</strong></p>
+    <ol style="padding-left:1.3rem;">
+      <li>Select 10 stocks from the S&P 500 tech sector</li>
+      <li>Test all pairs for cointegration (45 pairs total)</li>
+      <li>For each cointegrated pair, build the ECM and test Granger causality</li>
+      <li>Build an ARIMA model for the spread of each cointegrated pair</li>
+      <li>Implement a pairs trading strategy: generate signals, backtest with transaction costs</li>
+      <li>Report: Sharpe ratio, max drawdown, hit rate, Calmar ratio</li>
+      <li>Discuss what could go wrong in production (non-stationarity regime changes, look-ahead bias, etc.)</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer class="guide-footer">
+  <p>TIME SERIES ANALYSIS — QUANT ENGINEER'S STUDY GUIDE · v1.0 · Covers Stationarity, Autocorrelation, ARIMA, Cointegration, Granger Causality</p>
+  <p style="margin-top:0.4rem; font-size:0.65rem;">EXTERNAL RESOURCES: statsmodels.org · otexts.com/fpp3 · hudsonthames.org · quantopian.com lectures · Penn State STAT 510</p>
+</footer>
+
+<script>
+// ===================== TAB SWITCHING =====================
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ===================== CANVAS UTILITIES =====================
+function ctx(id) {
+  const c = document.getElementById(id);
+  if (!c) return null;
+  c.width = Math.min(760, c.parentElement.offsetWidth - 24);
+  return c.getContext('2d');
+}
+
+function drawGrid(cx, x0, y0, w, h, steps=8) {
+  cx.strokeStyle = '#eee'; cx.lineWidth = 0.5;
+  for (let i=0; i<=steps; i++) {
+    const xx = x0 + (w/steps)*i;
+    cx.beginPath(); cx.moveTo(xx, y0); cx.lineTo(xx, y0+h); cx.stroke();
+  }
+  for (let i=0; i<=6; i++) {
+    const yy = y0 + (h/6)*i;
+    cx.beginPath(); cx.moveTo(x0, yy); cx.lineTo(x0+w, yy); cx.stroke();
+  }
+}
+
+function seeded(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 9301 + 49297) % 233280;
+    return s / 233280;
+  };
+}
+
+function randn(rng) {
+  let u = 0, v = 0;
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+// ===================== DIAGRAM: BASIC TIME SERIES =====================
+window.addEventListener('DOMContentLoaded', function() {
+
+  // P1 - Basic TS
+  (function() {
+    const cx = ctx('cvBasicTS'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    const rng = seeded(42), n = 120;
+    const data = []; let v = 50;
+    for (let i=0; i<n; i++) { v += (rng()-0.5)*8; data.push(v); }
+    const mn = Math.min(...data), mx = Math.max(...data);
+    const pad = 30;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    drawGrid(cx, pad, 10, W-pad*2, H-30);
+    // Axes
+    cx.strokeStyle = '#ccc'; cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(pad, H-20); cx.lineTo(W-pad, H-20); cx.stroke();
+    cx.beginPath(); cx.moveTo(pad, 10); cx.lineTo(pad, H-20); cx.stroke();
+    // Line
+    cx.beginPath(); cx.strokeStyle = '#2471a3'; cx.lineWidth = 1.8;
+    for (let i=0; i<n; i++) {
+      const x = pad + (i/(n-1))*(W-pad*2);
+      const y = 10 + (1-(data[i]-mn)/(mx-mn))*(H-40);
+      if (i===0) cx.moveTo(x,y); else cx.lineTo(x,y);
+    }
+    cx.stroke();
+    // Labels
+    cx.fillStyle = '#888'; cx.font = '11px IBM Plex Mono'; cx.textAlign = 'center';
+    cx.fillText('Time →', W/2, H-2);
+    cx.save(); cx.translate(12, H/2); cx.rotate(-Math.PI/2);
+    cx.fillText('Value', 0, 0); cx.restore();
+    // Dots
+    cx.fillStyle = '#2471a3';
+    for (let i=0; i<n; i+=15) {
+      const x = pad + (i/(n-1))*(W-pad*2);
+      const y = 10 + (1-(data[i]-mn)/(mx-mn))*(H-40);
+      cx.beginPath(); cx.arc(x,y,3,0,Math.PI*2); cx.fill();
+    }
+  })();
+
+  // P2 - Normal Distribution
+  (function() {
+    const cx = ctx('cvNormal'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const pad = 40, pw = W-pad*2, ph = H-50;
+    drawGrid(cx, pad, 10, pw, ph);
+    const gauss = x => Math.exp(-0.5*x*x) / Math.sqrt(2*Math.PI);
+    const xMin = -4, xMax = 4;
+    function toX(v) { return pad + (v-xMin)/(xMax-xMin)*pw; }
+    function toY(v) { return 10 + (1-v/0.42)*ph; }
+    // Fill regions
+    const regions = [
+      {a:-3, b:3, c:'rgba(36,113,163,0.1)'},
+      {a:-2, b:2, c:'rgba(36,113,163,0.15)'},
+      {a:-1, b:1, c:'rgba(36,113,163,0.25)'}
+    ];
+    regions.forEach(r => {
+      cx.beginPath(); cx.moveTo(toX(r.a), toY(0));
+      for (let x=r.a; x<=r.b; x+=0.05) cx.lineTo(toX(x), toY(gauss(x)));
+      cx.lineTo(toX(r.b), toY(0)); cx.closePath();
+      cx.fillStyle = r.c; cx.fill();
+    });
+    // Curve
+    cx.beginPath(); cx.strokeStyle = '#2471a3'; cx.lineWidth = 2.5;
+    for (let x=xMin; x<=xMax; x+=0.05) {
+      const px = toX(x), py = toY(gauss(x));
+      if (x===xMin) cx.moveTo(px,py); else cx.lineTo(px,py);
+    }
+    cx.stroke();
+    // Axis
+    cx.strokeStyle = '#aaa'; cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(pad, toY(0)); cx.lineTo(W-pad, toY(0)); cx.stroke();
+    // Labels
+    cx.fillStyle = '#555'; cx.font = '10px IBM Plex Mono'; cx.textAlign = 'center';
+    [[-3,'−3σ'],[-2,'−2σ'],[-1,'−1σ'],[0,'μ'],[1,'+1σ'],[2,'+2σ'],[3,'+3σ']].forEach(([v,l]) => {
+      cx.fillText(l, toX(v), toY(0)+15);
+    });
+    cx.fillStyle = '#2471a3'; cx.font = '11px IBM Plex Mono'; cx.textAlign = 'center';
+    cx.fillText('68%', toX(0), toY(0.22));
+    cx.fillText('95%', toX(0), toY(0.1));
+    cx.fillText('99.7%', toX(0), toY(0.03));
+  })();
+
+  // P3 - Random Walk
+  (function() {
+    const cx = ctx('cvRandWalk'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const pad = 35, pw = W-pad*2, ph = H-50;
+    const rng = seeded(7), n = 200;
+    const rw = [0], stat = [0];
+    for (let i=1; i<n; i++) {
+      rw.push(rw[i-1] + randn(rng)*1.5);
+      stat.push(0.7*stat[i-1] + randn(rng)*0.8);
+    }
+    const allVals = [...rw, ...stat];
+    const mn = Math.min(...allVals), mx = Math.max(...allVals);
+    function px(i) { return pad + (i/(n-1))*pw; }
+    function py(v) { return ph/2+pad + ((v-mn)/(mx-mn)-0.5)*(-(ph*0.85)); }
+    drawGrid(cx, pad, 20, pw, ph);
+    // Mean line
+    cx.strokeStyle = '#ddd'; cx.lineWidth = 1; cx.setLineDash([5,3]);
+    cx.beginPath(); cx.moveTo(pad, py(0)); cx.lineTo(W-pad, py(0)); cx.stroke();
+    cx.setLineDash([]);
+    // Random walk (red)
+    cx.beginPath(); cx.strokeStyle = '#c0392b'; cx.lineWidth = 1.8;
+    rw.forEach((v,i) => { if(i===0) cx.moveTo(px(i),py(v)); else cx.lineTo(px(i),py(v)); });
+    cx.stroke();
+    // Stationary (blue)
+    cx.beginPath(); cx.strokeStyle = '#2471a3'; cx.lineWidth = 1.8;
+    stat.forEach((v,i) => { if(i===0) cx.moveTo(px(i),py(v)); else cx.lineTo(px(i),py(v)); });
+    cx.stroke();
+    cx.fillStyle = '#c0392b'; cx.font = '11px IBM Plex Mono';
+    cx.fillText('Random Walk', pad+10, 30);
+    cx.fillStyle = '#2471a3'; cx.fillText('Stationary AR(1)', pad+10, 45);
+  })();
+
+  // Fig 1.1 - Stationary vs Non-Stationary
+  (function() {
+    const cx = ctx('cvStationary'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(13), n = 150;
+    const pad = 40, pw = W-pad*2, ph = (H-60)/3 - 10;
+    const colors = ['#2471a3','#c0392b','#e67e22'];
+    const labels = ['Stationary AR(1)','Trend Non-Stationary','Random Walk'];
+    const series = [[], [], []];
+    for (let i=0; i<n; i++) {
+      if (i===0) { series[0].push(0); series[1].push(0); series[2].push(0); }
+      else {
+        series[0].push(0.6*series[0][i-1] + randn(rng));
+        series[1].push(i*0.15 + randn(rng)*3);
+        series[2].push(series[2][i-1] + randn(rng));
+      }
+    }
+    series.forEach((s,si) => {
+      const yOff = si*(ph+20) + 10;
+      const mn = Math.min(...s), mx = Math.max(...s);
+      drawGrid(cx, pad, yOff, pw, ph);
+      if (si===0) {
+        cx.strokeStyle = '#ddd'; cx.lineWidth=1; cx.setLineDash([4,3]);
+        cx.beginPath(); cx.moveTo(pad, yOff+ph/2); cx.lineTo(W-pad, yOff+ph/2); cx.stroke();
+        cx.setLineDash([]);
+      }
+      cx.beginPath(); cx.strokeStyle = colors[si]; cx.lineWidth = 1.6;
+      s.forEach((v,i) => {
+        const x = pad + (i/(n-1))*pw;
+        const y = yOff + (1-(v-mn)/(mx-mn+0.001))*ph;
+        if(i===0) cx.moveTo(x,y); else cx.lineTo(x,y);
+      });
+      cx.stroke();
+      cx.fillStyle = colors[si]; cx.font = '11px IBM Plex Mono'; cx.textAlign = 'left';
+      cx.fillText(labels[si], pad+5, yOff+14);
+    });
+  })();
+
+  // AR1 phi interactive
+  function updatePhiPlot() {
+    const sl = document.getElementById('sl_phi');
+    const phi = sl.value / 100;
+    document.getElementById('phi_val').textContent = phi.toFixed(2);
+    const cx = document.getElementById('cvAR1').getContext('2d');
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.clearRect(0,0,W,H);
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(5), n = 200;
+    const data = [randn(rng)];
+    for (let i=1; i<n; i++) data.push(phi*data[i-1] + randn(rng)*0.5);
+    const pad = 30, pw = W-pad*2, ph = H-40;
+    const mn = Math.min(...data), mx = Math.max(...data);
+    drawGrid(cx, pad, 5, pw, ph);
+    const color = Math.abs(phi) < 1 ? '#2471a3' : '#c0392b';
+    cx.beginPath(); cx.strokeStyle = color; cx.lineWidth = 1.8;
+    data.forEach((v,i) => {
+      const x = pad+(i/(n-1))*pw;
+      const y = 5+(1-(v-mn)/(mx-mn+0.001))*ph;
+      if(i===0) cx.moveTo(x,y); else cx.lineTo(x,y);
+    });
+    cx.stroke();
+    const label = document.getElementById('phi_label');
+    if (Math.abs(phi) < 0.99) label.textContent = '→ Stationary (shocks decay)';
+    else if (phi === 1.0) label.textContent = '→ UNIT ROOT — Random Walk (non-stationary)';
+    else label.textContent = '→ Near unit root — very persistent';
+  }
+  window.updatePhiPlot = updatePhiPlot;
+  updatePhiPlot();
+
+  // Fig 1.2 - Differencing
+  (function() {
+    const cx = ctx('cvDifferencing'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(22), n = 200;
+    const prices = [100];
+    for (let i=1; i<n; i++) prices.push(prices[i-1]*(1+randn(rng)*0.015));
+    const diff = prices.map((v,i) => i===0 ? 0 : Math.log(prices[i]/prices[i-1]));
+    const ph1 = (H-30)/2 - 10, ph2 = (H-30)/2 - 10;
+    const pad = 35, pw = W-pad*2;
+    function drawSeries(data, yOff, ph, color, label) {
+      const mn = Math.min(...data), mx = Math.max(...data);
+      drawGrid(cx, pad, yOff, pw, ph);
+      cx.beginPath(); cx.strokeStyle = color; cx.lineWidth = 1.8;
+      data.forEach((v,i) => {
+        const x = pad+(i/(n-1))*pw;
+        const y = yOff+(1-(v-mn)/(mx-mn+0.0001))*ph;
+        if(i===0) cx.moveTo(x,y); else cx.lineTo(x,y);
+      });
+      cx.stroke();
+      cx.fillStyle = color; cx.font = '11px IBM Plex Mono';
+      cx.fillText(label, pad+5, yOff+14);
+    }
+    drawSeries(prices, 5, ph1, '#c0392b', 'Price Level — Non-Stationary I(1)');
+    drawSeries(diff, ph1+25, ph2, '#27ae60', 'Log Returns — Stationary I(0)');
+    cx.strokeStyle = '#ccc'; cx.lineWidth=1; cx.setLineDash([4,3]);
+    const dMn = Math.min(...diff), dMx = Math.max(...diff);
+    const meanDiff = diff.reduce((a,b)=>a+b)/diff.length;
+    const meanY = (ph1+25)+(1-(meanDiff-dMn)/(dMx-dMn+0.0001))*ph2;
+    cx.beginPath(); cx.moveTo(pad, meanY); cx.lineTo(W-pad, meanY); cx.stroke();
+    cx.setLineDash([]);
+  })();
+
+  // Fig 2.1 - ACF
+  (function() {
+    const cx = ctx('cvACF'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(3), n = 300, maxLag = 25;
+    const phi = 0.75;
+    const data = [randn(rng)];
+    for (let i=1; i<n; i++) data.push(phi*data[i-1] + randn(rng));
+    const acf = [];
+    const mean = data.reduce((a,b)=>a+b)/n;
+    const denom = data.reduce((a,v)=>a+(v-mean)**2, 0);
+    for (let k=0; k<=maxLag; k++) {
+      let num = 0;
+      for (let t=k; t<n; t++) num += (data[t]-mean)*(data[t-k]-mean);
+      acf.push(num/denom);
+    }
+    const pad = 45, pw = W-pad*2, ph = H-50;
+    const confBound = 1.96/Math.sqrt(n);
+    const barW = pw/(maxLag+2);
+    // Axes
+    cx.strokeStyle = '#bbb'; cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(pad, H/2); cx.lineTo(W-pad, H/2); cx.stroke();
+    cx.beginPath(); cx.moveTo(pad, 10); cx.lineTo(pad, H-30); cx.stroke();
+    // Conf bounds
+    cx.strokeStyle = '#c0392b'; cx.setLineDash([6,4]); cx.lineWidth = 1.2;
+    const confY_pos = H/2 - confBound*(ph*0.45);
+    const confY_neg = H/2 + confBound*(ph*0.45);
+    cx.beginPath(); cx.moveTo(pad, confY_pos); cx.lineTo(W-pad, confY_pos); cx.stroke();
+    cx.beginPath(); cx.moveTo(pad, confY_neg); cx.lineTo(W-pad, confY_neg); cx.stroke();
+    cx.setLineDash([]);
+    // Bars
+    const scale = ph*0.45;
+    acf.forEach((v,k) => {
+      const x = pad + (k+0.5)*barW;
+      const barH = v*scale;
+      cx.fillStyle = Math.abs(v) > confBound ? '#2471a3' : '#a8c8e8';
+      cx.fillRect(x-barW*0.3, H/2, barW*0.6, -barH);
+      cx.strokeStyle = '#1a5276'; cx.lineWidth = 0.5;
+      cx.strokeRect(x-barW*0.3, H/2, barW*0.6, -barH);
+      if (k%5===0) {
+        cx.fillStyle = '#888'; cx.font = '10px IBM Plex Mono'; cx.textAlign = 'center';
+        cx.fillText(k, x, H-15);
+      }
+    });
+    cx.fillStyle = '#555'; cx.font = '11px IBM Plex Mono'; cx.textAlign = 'center';
+    cx.fillText('Lag (k)', W/2, H-2);
+    cx.fillStyle = '#2471a3'; cx.font = '11px IBM Plex Mono'; cx.textAlign = 'left';
+    cx.fillText('ACF: AR(1) with φ=0.75 — exponential decay pattern', pad, 25);
+    cx.fillStyle = '#c0392b'; cx.fillText('— 95% confidence bounds', pad, 40);
+  })();
+
+  // Fig 2.2 - ACF/PACF patterns
+  (function() {
+    const cx = ctx('cvACFPACF'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const halfW = W/2 - 5, maxLag = 20, n = 400;
+    const rng = seeded(99);
+    function computeACF(data, max) {
+      const mean = data.reduce((a,b)=>a+b)/data.length;
+      const denom = data.reduce((a,v)=>a+(v-mean)**2,0);
+      return Array.from({length:max+1},(_,k)=>{
+        let num=0; for(let t=k;t<data.length;t++) num+=(data[t]-mean)*(data[t-k]-mean);
+        return num/denom;
+      });
+    }
+    function computePACF(data, max) {
+      const acf = computeACF(data, max);
+      const pacf = [1];
+      for (let k=1; k<=max; k++) {
+        let phi_kk = acf[k];
+        const prevPhi = pacf.slice(1);
+        for (let j=1; j<k; j++) phi_kk -= (prevPhi[j-1]||0)*acf[k-j];
+        let denom = 1;
+        for (let j=1; j<k; j++) denom -= (prevPhi[j-1]||0)*acf[j];
+        pacf.push(phi_kk/denom);
+      }
+      return pacf;
+    }
+    const processes = [
+      {label:'AR(2): PACF cuts at lag 2', phi:[0.6,0.2], theta:[]},
+      {label:'MA(2): ACF cuts at lag 2', phi:[], theta:[0.6,0.3]}
+    ];
+    processes.forEach((proc, pi) => {
+      const data = [randn(rng), randn(rng)];
+      for (let i=2; i<n; i++) {
+        let v = randn(rng);
+        for (let j=0; j<proc.phi.length; j++) v += proc.phi[j]*(data[i-1-j]||0);
+        data.push(v);
+      }
+      const acf = computeACF(data, maxLag);
+      const pacf = computePACF(data, maxLag);
+      const confBound = 1.96/Math.sqrt(n);
+      const yOff = pi*(H/2) + 5;
+      const ph = H/2 - 35;
+      const pw2 = halfW - 45;
+      const drawACFChart = (vals, xOff, title, color) => {
+        const bw = pw2/(maxLag+2), scale = ph*0.4;
+        cx.fillStyle = '#555'; cx.font = '10px IBM Plex Mono'; cx.textAlign = 'left';
+        cx.fillText(title, xOff, yOff+12);
+        cx.strokeStyle = '#ccc'; cx.lineWidth=0.8;
+        cx.beginPath(); cx.moveTo(xOff, yOff+ph/2+20); cx.lineTo(xOff+pw2, yOff+ph/2+20); cx.stroke();
+        cx.strokeStyle = '#e74c3c'; cx.setLineDash([4,3]); cx.lineWidth=1;
+        const cy = yOff+ph/2+20;
+        cx.beginPath(); cx.moveTo(xOff, cy-confBound*scale); cx.lineTo(xOff+pw2, cy-confBound*scale); cx.stroke();
+        cx.beginPath(); cx.moveTo(xOff, cy+confBound*scale); cx.lineTo(xOff+pw2, cy+confBound*scale); cx.stroke();
+        cx.setLineDash([]);
+        vals.forEach((v,k) => {
+          if (k===0) return;
+          const x = xOff + k*bw + bw/2;
+          const barH = v*scale;
+          cx.fillStyle = Math.abs(v) > confBound ? color : color+'66';
+          cx.fillRect(x-bw*0.3, cy, bw*0.6, -barH);
+          if (k%5===0) {
+            cx.fillStyle = '#999'; cx.font = '9px IBM Plex Mono'; cx.textAlign='center';
+            cx.fillText(k, x, cy+15);
+          }
+        });
+      };
+      drawACFChart(acf, 35, proc.label + ' — ACF', '#2471a3');
+      drawACFChart(pacf, halfW+45, proc.label + ' — PACF', '#e67e22');
+    });
+  })();
+
+  // Fig 3.1 - ARIMA structure
+  (function() {
+    const cx = ctx('cvARIMA'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#1a1a2e'; cx.fillRect(0,0,W,H);
+    const boxes = [
+      {x:0.05, label:'Raw\nSeries\nI(1)', color:'#c0392b', sub:'Non-stationary'},
+      {x:0.25, label:'Difference\n(I part)', color:'#e67e22', sub:'d times'},
+      {x:0.45, label:'AR Part\np lags', color:'#2471a3', sub:'Past values'},
+      {x:0.65, label:'MA Part\nq lags', color:'#27ae60', sub:'Past shocks'},
+      {x:0.85, label:'Forecast\n+ CI', color:'#9b59b6', sub:'Future values'}
+    ];
+    boxes.forEach((b,i) => {
+      const bx = b.x*W, bw = 0.14*W, bh = H*0.6, by = H*0.2;
+      cx.fillStyle = b.color+'33';
+      cx.strokeStyle = b.color;
+      cx.lineWidth = 1.5;
+      cx.beginPath(); cx.roundRect(bx, by, bw, bh, 4); cx.fill(); cx.stroke();
+      cx.fillStyle = b.color; cx.font = 'bold 11px IBM Plex Mono'; cx.textAlign = 'center';
+      const lines = b.label.split('\n');
+      lines.forEach((l,li) => cx.fillText(l, bx+bw/2, by+20+li*16));
+      cx.fillStyle = '#666'; cx.font = '9px IBM Plex Mono';
+      cx.fillText(b.sub, bx+bw/2, by+bh-8);
+      if (i<boxes.length-1) {
+        cx.fillStyle = '#888'; cx.font = '16px sans-serif'; cx.textAlign = 'center';
+        cx.fillText('→', bx+bw+4, H/2+4);
+      }
+    });
+    cx.fillStyle = '#fff'; cx.font = '13px IBM Plex Mono'; cx.textAlign = 'center';
+    cx.fillText('ARIMA(p, d, q) Model Pipeline', W/2, H-10);
+  })();
+
+  // Fig 3.2 - ARIMA forecast
+  (function() {
+    const cx = ctx('cvARIMAfcst'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(55), n = 100, future = 25;
+    const hist = [0];
+    for (let i=1; i<n; i++) hist.push(0.65*hist[i-1] + randn(rng));
+    const lastVal = hist[n-1];
+    const fcast = [lastVal];
+    for (let i=1; i<future; i++) fcast.push(0.65*fcast[i-1]);
+    const allN = n + future;
+    const allVals = [...hist, ...fcast];
+    const mn = Math.min(...allVals)-2, mx = Math.max(...allVals)+2;
+    const pad = 35, pw = W-pad*2, ph = H-40;
+    function px(i) { return pad + (i/(allN-1))*pw; }
+    function py(v) { return 10+(1-(v-mn)/(mx-mn))*ph; }
+    drawGrid(cx, pad, 10, pw, ph);
+    // CI
+    const sigma = 0.8;
+    cx.beginPath();
+    for (let i=0; i<future; i++) {
+      const ci = sigma * Math.sqrt(i+1) * 1.96;
+      cx.lineTo(px(n+i), py(fcast[i]+ci));
+    }
+    for (let i=future-1; i>=0; i--) {
+      const ci = sigma * Math.sqrt(i+1) * 1.96;
+      cx.lineTo(px(n+i), py(fcast[i]-ci));
+    }
+    cx.closePath(); cx.fillStyle = 'rgba(192,57,43,0.15)'; cx.fill();
+    // Historical
+    cx.beginPath(); cx.strokeStyle = '#2471a3'; cx.lineWidth = 2;
+    hist.forEach((v,i) => { if(i===0) cx.moveTo(px(i),py(v)); else cx.lineTo(px(i),py(v)); });
+    cx.stroke();
+    // Forecast
+    cx.beginPath(); cx.strokeStyle = '#c0392b'; cx.lineWidth = 2; cx.setLineDash([6,4]);
+    fcast.forEach((v,i) => { if(i===0) cx.moveTo(px(n+i-1),py(hist[n-1])); else cx.lineTo(px(n+i),py(v)); });
+    cx.stroke(); cx.setLineDash([]);
+    // Divider
+    cx.strokeStyle = '#aaa'; cx.lineWidth=1; cx.setLineDash([3,3]);
+    cx.beginPath(); cx.moveTo(px(n), 10); cx.lineTo(px(n), H-30); cx.stroke();
+    cx.setLineDash([]);
+    cx.fillStyle = '#888'; cx.font = '10px IBM Plex Mono'; cx.textAlign = 'center';
+    cx.fillText('← Historical', px(n/2), H-15);
+    cx.fillText('Forecast →', px(n+future/2), H-15);
+  })();
+
+  // Fig 4.1 - Cointegration
+  (function() {
+    const cx = ctx('cvCointegration'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(42), n = 200;
+    const hw = W/2 - 10, pad = 30, pw = hw-pad*2, ph = (H-40)/2-10;
+    // Cointegrated pair
+    const trend1 = [0], X1 = [0], Y1 = [0];
+    for (let i=1; i<n; i++) {
+      trend1.push(trend1[i-1] + randn(rng)*0.8);
+      X1.push(trend1[i] + randn(rng)*0.3);
+      Y1.push(1.5*trend1[i] + 5 + randn(rng)*0.3);
+    }
+    const spread1 = Y1.map((v,i) => v - 1.5*X1[i]);
+    // Non-cointegrated pair
+    const X2 = [0], Y2 = [0];
+    for (let i=1; i<n; i++) {
+      X2.push(X2[i-1] + randn(rng));
+      Y2.push(Y2[i-1] + randn(rng));
+    }
+    const spread2 = Y2.map((v,i) => v - X2[i]);
+    function drawPair(X, Y, sp, xOff, title, isCointegrated) {
+      const all = [...X,...Y], mn=Math.min(...all), mx=Math.max(...all);
+      const sMn=Math.min(...sp), sMx=Math.max(...sp);
+      function lx(i){return xOff+pad+(i/(n-1))*pw;}
+      function ly(v,lo,hi){return 10+(1-(v-lo)/(hi-lo+0.001))*(ph*0.9);}
+      cx.fillStyle = isCointegrated?'#d5f5e3':'#fadbd8';
+      cx.fillRect(xOff, 0, hw, ph+20); cx.fillStyle='#fff';
+      cx.fillRect(xOff, ph+25, hw, ph+15);
+      cx.fillStyle = '#333'; cx.font='bold 11px IBM Plex Mono'; cx.textAlign='center';
+      cx.fillText(title, xOff+hw/2, 14);
+      cx.beginPath(); cx.strokeStyle='#2471a3'; cx.lineWidth=1.5;
+      X.forEach((v,i)=>{if(i===0)cx.moveTo(lx(i),ly(v,mn,mx));else cx.lineTo(lx(i),ly(v,mn,mx));});
+      cx.stroke();
+      cx.beginPath(); cx.strokeStyle='#c0392b'; cx.lineWidth=1.5;
+      Y.forEach((v,i)=>{if(i===0)cx.moveTo(lx(i),ly(v,mn,mx));else cx.lineTo(lx(i),ly(v,mn,mx));});
+      cx.stroke();
+      cx.fillStyle='#555'; cx.font='10px IBM Plex Mono'; cx.textAlign='left';
+      cx.fillText('Spread (Y - βX):', xOff+pad, ph+38);
+      cx.beginPath(); cx.strokeStyle='#7d3c98'; cx.lineWidth=1.5;
+      sp.forEach((v,i)=>{if(i===0)cx.moveTo(lx(i),ly(v,sMn,sMx)+ph+30);else cx.lineTo(lx(i),ly(v,sMn,sMx)+ph+30);});
+      cx.stroke();
+      if (isCointegrated) {
+        const meanY = 10+(1-(sMn+sMx)/2/2 - sMn/(sMx-sMn+0.001))*(ph*0.9)+ph+30;
+        cx.strokeStyle='#888'; cx.setLineDash([4,3]); cx.lineWidth=1;
+        cx.beginPath(); cx.moveTo(xOff+pad, ly((sMn+sMx)/2,sMn,sMx)+ph+30);
+        cx.lineTo(xOff+pad+pw, ly((sMn+sMx)/2,sMn,sMx)+ph+30); cx.stroke();
+        cx.setLineDash([]);
+        cx.fillStyle='#27ae60'; cx.font='10px IBM Plex Mono'; cx.textAlign='center';
+        cx.fillText('✅ Mean-Reverting Spread', xOff+hw/2, H-8);
+      } else {
+        cx.fillStyle='#c0392b'; cx.font='10px IBM Plex Mono'; cx.textAlign='center';
+        cx.fillText('❌ Spread Drifts Away', xOff+hw/2, H-8);
+      }
+    }
+    drawPair(X1,Y1,spread1, 0, 'Cointegrated Pair', true);
+    drawPair(X2,Y2,spread2, hw+20, 'Non-Cointegrated Pair', false);
+  })();
+
+  // Fig 4.2 - Spread Z-score
+  (function() {
+    const cx = ctx('cvSpread'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#fff'; cx.fillRect(0,0,W,H);
+    const rng = seeded(42), n = 250, phi = 0.8;
+    const spread = [0];
+    for (let i=1; i<n; i++) spread.push(phi*spread[i-1] + randn(rng)*0.5);
+    const mn = Math.min(...spread), mx = Math.max(...spread);
+    const mu = spread.reduce((a,b)=>a+b)/n;
+    const std = Math.sqrt(spread.reduce((a,v)=>a+(v-mu)**2,0)/n);
+    const zs = spread.map(v=>(v-mu)/std);
+    const pad = 40, pw = W-pad*2, ph = H-50;
+    drawGrid(cx, pad, 10, pw, ph);
+    function px(i){return pad+(i/(n-1))*pw;}
+    function py(v){return 10+(1-((v+3)/6))*ph;}
+    [2,-2,0].forEach(lv=>{
+      cx.strokeStyle=lv===0?'#aaa':'#c0392b';cx.setLineDash(lv===0?[4,3]:[6,4]);cx.lineWidth=1;
+      cx.beginPath();cx.moveTo(pad,py(lv));cx.lineTo(W-pad,py(lv));cx.stroke();
+      cx.setLineDash([]);
+      if(lv!==0){cx.fillStyle='#c0392b';cx.font='10px IBM Plex Mono';cx.textAlign='left';
+      cx.fillText(lv>0?'+2σ':'-2σ',W-pad+2,py(lv)+4);}
+    });
+    // Colored fills
+    zs.forEach((v,i)=>{
+      if(i===0)return;
+      if(v>2){cx.fillStyle='rgba(192,57,43,0.3)';cx.fillRect(px(i-1),10,px(i)-px(i-1),py(2)-10);}
+      else if(v<-2){cx.fillStyle='rgba(39,174,96,0.3)';cx.fillRect(px(i-1),py(-2),px(i)-px(i-1),10+(ph)-(py(-2)-10));}
+    });
+    cx.beginPath();cx.strokeStyle='#2471a3';cx.lineWidth=2;
+    zs.forEach((v,i)=>{if(i===0)cx.moveTo(px(i),py(v));else cx.lineTo(px(i),py(v));});
+    cx.stroke();
+    // Signals
+    zs.forEach((v,i)=>{
+      if(v>2){cx.fillStyle='#c0392b';cx.beginPath();cx.arc(px(i),py(v),4,0,Math.PI*2);cx.fill();}
+      else if(v<-2){cx.fillStyle='#27ae60';cx.beginPath();cx.arc(px(i),py(v),4,0,Math.PI*2);cx.fill();}
+    });
+    cx.fillStyle='#555';cx.font='11px IBM Plex Mono';cx.textAlign='center';
+    cx.fillText('Time', W/2, H-5);
+    cx.save();cx.translate(12,H/2);cx.rotate(-Math.PI/2);cx.fillText('Z-Score',0,0);cx.restore();
+  })();
+
+  // Fig 5.1 - Granger
+  (function() {
+    const cx = ctx('cvGranger'); if (!cx) return;
+    const W = cx.canvas.width, H = cx.canvas.height;
+    cx.fillStyle = '#1a1a2e'; cx.fillRect(0,0,W,H);
+    const boxes = [
+      {x:0.02,y:0.3,w:0.18,h:0.4,label:'Past X\n(lags 1..k)',color:'#2471a3'},
+      {x:0.02,y:0.3,w:0.18,h:0.4,label:'Past Y\n(lags 1..k)',color:'#27ae60'},
+      {x:0.28,y:0.1,w:0.2,h:0.35,label:'Model 1\n(Restricted)\nY ~ past Y only',color:'#e67e22'},
+      {x:0.28,y:0.55,w:0.2,h:0.35,label:'Model 2\n(Unrestricted)\nY ~ past Y + past X',color:'#9b59b6'},
+      {x:0.6,y:0.2,w:0.2,h:0.6,label:'F-test:\nDoes adding\nX improve\nprediction?',color:'#c0392b'},
+      {x:0.85,y:0.3,w:0.13,h:0.4,label:'p-value\n< 0.05?\n→ X Granger-\ncauses Y',color:'#f39c12'}
+    ];
+    boxes.forEach(b=>{
+      const bx=b.x*W, by=b.y*H, bw=b.w*W, bh=b.h*H;
+      cx.fillStyle=b.color+'33';cx.strokeStyle=b.color;cx.lineWidth=1.5;
+      cx.beginPath();cx.roundRect(bx,by,bw,bh,5);cx.fill();cx.stroke();
+      cx.fillStyle='#ddd';cx.font='10px IBM Plex Mono';cx.textAlign='center';
+      b.label.split('\n').forEach((l,li)=>cx.fillText(l,bx+bw/2,by+16+li*13));
+    });
+    // Arrows (simplified)
+    cx.strokeStyle='#aaa';cx.lineWidth=1.5;
+    [[0.2,0.5,0.28,0.27],[0.2,0.5,0.28,0.73],[0.48,0.27,0.6,0.5],[0.48,0.73,0.6,0.5],[0.8,0.5,0.85,0.5]].forEach(([x1,y1,x2,y2])=>{
+      cx.beginPath();cx.moveTo(x1*W,y1*H);cx.lineTo(x2*W,y2*H);cx.stroke();
+    });
+    // Labels for arrows
+    cx.fillStyle='#888';cx.font='10px IBM Plex Mono';cx.textAlign='center';
+    cx.fillText('Past Y ──→', 0.12*W, 0.22*H);
+    cx.fillText('Past Y ──→', 0.12*W, 0.78*H);
+    cx.fillText('Past X ──→', 0.12*W, 0.54*H);
+  })();
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>

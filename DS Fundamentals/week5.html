@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Markets & Instruments — Quant Engineer's Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d14;
+    --surface: #111620;
+    --surface2: #161c2a;
+    --border: #1e2840;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7fff6b;
+    --accent4: #c084fc;
+    --text: #e8edf5;
+    --text2: #8a96b0;
+    --text3: #4a5568;
+    --gold: #f5c842;
+    --red: #ff4757;
+    --green: #2ed573;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .site-header {
+    background: linear-gradient(135deg, #0a0d14 0%, #0d1525 50%, #111620 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem 0;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-top {
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .logo-badge {
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
+    color: #000; font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600; font-size: 0.7rem; padding: 0.4rem 0.8rem;
+    border-radius: 4px; white-space: nowrap; letter-spacing: 0.05em;
+    margin-top: 0.4rem;
+  }
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent4) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-text p {
+    color: var(--text2); font-size: 0.88rem; margin-top: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .progress-bar-wrap {
+    height: 3px; background: var(--border);
+    margin-top: 1.5rem; border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent4)); width: 0; transition: width 0.3s; }
+
+  /* ─── TABS ─── */
+  .tab-bar {
+    display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
+    max-width: 1400px; margin: 0 auto; padding-top: 1rem;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none; border: none; color: var(--text3);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.7rem 1.1rem; cursor: pointer; white-space: nowrap;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-btn .tab-num {
+    font-size: 0.6rem; opacity: 0.5; margin-right: 0.3rem;
+  }
+
+  /* ─── MAIN ─── */
+  main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+  /* ─── SECTION BLOCKS ─── */
+  .section-hero {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .section-hero::before {
+    content: attr(data-icon);
+    position: absolute; right: -1rem; top: -1rem;
+    font-size: 8rem; opacity: 0.03; pointer-events: none;
+  }
+  .section-hero h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    color: #fff; margin-bottom: 0.8rem;
+  }
+  .section-hero .subtitle {
+    color: var(--accent); font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .section-hero p { color: var(--text2); line-height: 1.7; font-size: 0.95rem; }
+  .hero-visual { display: flex; align-items: center; justify-content: center; }
+
+  /* ─── CARDS ─── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem; transition: all 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card h3 {
+    font-size: 1rem; font-weight: 700; margin-bottom: 0.6rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .card p { color: var(--text2); font-size: 0.88rem; line-height: 1.6; }
+  .card .tag {
+    display: inline-block; background: rgba(0,212,255,0.1); color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.5rem; border-radius: 4px; margin-bottom: 0.6rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  /* ─── CONCEPT BLOCKS ─── */
+  .concept-block {
+    background: var(--surface2); border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0; padding: 1.2rem 1.5rem; margin: 1rem 0;
+  }
+  .concept-block.warn { border-left-color: var(--gold); }
+  .concept-block.success { border-left-color: var(--green); }
+  .concept-block.danger { border-left-color: var(--red); }
+  .concept-block.purple { border-left-color: var(--accent4); }
+  .concept-block h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .concept-block p, .concept-block li { color: var(--text2); font-size: 0.88rem; line-height: 1.7; }
+  .concept-block ul { padding-left: 1.2rem; }
+
+  /* ─── SVG DIAGRAMS ─── */
+  .diagram-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+  .diagram-wrap h4 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+  }
+  svg text { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ─── FORMULA BOX ─── */
+  .formula-box {
+    background: #0d1525; border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.5rem; margin: 1rem 0;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem;
+    color: var(--gold); overflow-x: auto;
+  }
+  .formula-box .label {
+    color: var(--text3); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 0.3rem;
+  }
+
+  /* ─── COLAB BOX ─── */
+  .colab-box {
+    background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(245,200,66,0.05));
+    border: 1px solid rgba(255,107,53,0.3); border-radius: 12px;
+    padding: 1.5rem; margin: 1.5rem 0;
+  }
+  .colab-box .colab-header {
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+  .colab-badge {
+    background: #f9ab00; color: #000; font-size: 0.7rem;
+    font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .colab-box h4 { font-size: 0.95rem; color: var(--accent2); }
+  .colab-box p { color: var(--text2); font-size: 0.88rem; margin-bottom: 0.8rem; line-height: 1.6; }
+  .code-block {
+    background: #050810; border-radius: 8px; padding: 1rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    color: #a8c7fa; overflow-x: auto; white-space: pre;
+    line-height: 1.5; border: 1px solid var(--border);
+  }
+  .code-block .c { color: #4a5568; }
+  .code-block .kw { color: #c084fc; }
+  .code-block .str { color: #86efac; }
+  .code-block .num { color: #f9ab00; }
+  .code-block .fn { color: #60cdff; }
+
+  /* ─── EXERCISE BOX ─── */
+  .exercise-section { margin: 2rem 0; }
+  .exercise-section h3 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text2); margin-bottom: 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .exercise-tier { margin-bottom: 1.5rem; }
+  .tier-label {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 20px;
+    margin-bottom: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .tier-easy { background: rgba(46,213,115,0.12); color: var(--green); }
+  .tier-med { background: rgba(245,200,66,0.12); color: var(--gold); }
+  .tier-hard { background: rgba(255,71,87,0.12); color: var(--red); }
+  .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .exercise-list li {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.88rem;
+    color: var(--text2); line-height: 1.5;
+    display: flex; gap: 0.8rem; align-items: flex-start;
+  }
+  .exercise-list li::before {
+    content: attr(data-num); color: var(--text3);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem;
+    min-width: 1.5rem; margin-top: 0.05rem;
+  }
+
+  /* ─── RESOURCE LINKS ─── */
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .resource-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem 1.2rem; text-decoration: none;
+    transition: all 0.2s; display: block;
+  }
+  .resource-card:hover { border-color: var(--accent4); }
+  .resource-card .res-type {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent4); margin-bottom: 0.4rem;
+  }
+  .resource-card .res-title { font-size: 0.9rem; color: var(--text); font-weight: 600; margin-bottom: 0.2rem; }
+  .resource-card .res-desc { font-size: 0.8rem; color: var(--text2); }
+
+  /* ─── TABLE ─── */
+  .data-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+  .data-table th {
+    background: var(--surface2); color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.7rem 1rem; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); color: var(--text2); }
+  .data-table tr:hover td { background: var(--surface); }
+
+  /* ─── SECTION TITLE ─── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: #fff; margin: 2rem 0 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .subsection-title {
+    font-size: 1.1rem; font-weight: 700; color: var(--text);
+    margin: 1.5rem 0 0.8rem; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .subsection-title span { color: var(--accent); }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-block; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; padding: 0.2rem 0.5rem; border-radius: 4px;
+    letter-spacing: 0.04em; font-weight: 600;
+  }
+  .badge-blue { background: rgba(0,212,255,0.12); color: var(--accent); }
+  .badge-orange { background: rgba(255,107,53,0.12); color: var(--accent2); }
+  .badge-green { background: rgba(127,255,107,0.12); color: var(--accent3); }
+  .badge-purple { background: rgba(192,132,252,0.12); color: var(--accent4); }
+
+  /* ─── TWO COL ─── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0; }
+  @media (max-width: 700px) {
+    .two-col, .section-hero { grid-template-columns: 1fr; }
+  }
+
+  /* ─── TIMELINE ─── */
+  .timeline { position: relative; padding-left: 2rem; margin: 1rem 0; }
+  .timeline::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 1px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 1.2rem; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -1.65rem; top: 0.35rem;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+  }
+  .timeline-item h5 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .timeline-item p { font-size: 0.83rem; color: var(--text2); line-height: 1.6; }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(192,132,252,0.05));
+    border: 1px solid rgba(0,212,255,0.2); border-radius: 10px;
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0;
+    font-size: 0.9rem; color: var(--text2); line-height: 1.7;
+  }
+  .callout strong { color: var(--accent); }
+  .callout.gold { border-color: rgba(245,200,66,0.3); background: linear-gradient(135deg, rgba(245,200,66,0.05), transparent); }
+  .callout.gold strong { color: var(--gold); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* print note */
+  .offline-note {
+    background: rgba(127,255,107,0.05); border: 1px solid rgba(127,255,107,0.2);
+    border-radius: 8px; padding: 0.8rem 1.2rem; margin-bottom: 1.5rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent3);
+    display: flex; gap: 0.5rem; align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo-badge">QUANT GUIDE v1.0</div>
+    <div class="header-text">
+      <h1>Financial Markets & Instruments</h1>
+      <p>// A complete self-study guide for aspiring quant engineers · Equities · Bonds · Options · Futures · Microstructure</p>
+    </div>
+  </div>
+  <div class="tab-bar" id="tabBar">
+    <button class="tab-btn active" onclick="switchTab('prereq',this)"><span class="tab-num">00</span> Prerequisites</button>
+    <button class="tab-btn" onclick="switchTab('markets',this)"><span class="tab-num">01</span> Markets Overview</button>
+    <button class="tab-btn" onclick="switchTab('equities',this)"><span class="tab-num">02</span> Equities</button>
+    <button class="tab-btn" onclick="switchTab('bonds',this)"><span class="tab-num">03</span> Bonds</button>
+    <button class="tab-btn" onclick="switchTab('futures',this)"><span class="tab-num">04</span> Futures</button>
+    <button class="tab-btn" onclick="switchTab('options',this)"><span class="tab-num">05</span> Options</button>
+    <button class="tab-btn" onclick="switchTab('micro',this)"><span class="tab-num">06</span> Microstructure</button>
+    <button class="tab-btn" onclick="switchTab('colab',this)"><span class="tab-num">07</span> Colab Labs</button>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 0: PREREQUISITES -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-prereq">
+  <div class="offline-note">📴 This guide is 100% self-contained and works fully offline after first load. All diagrams are SVG-based.</div>
+
+  <div class="section-hero" data-icon="📐">
+    <div>
+      <div class="subtitle">Before You Begin</div>
+      <h2>Prerequisites & Foundational Concepts</h2>
+      <p>Before diving into financial instruments, you need a solid grasp of a few mathematical and economic concepts. These are the building blocks. Don't skip them — every advanced topic references these ideas directly.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <defs>
+          <linearGradient id="gPre" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.8"/>
+            <stop offset="100%" style="stop-color:#c084fc;stop-opacity:0.8"/>
+          </linearGradient>
+        </defs>
+        <!-- Stack of prerequisites -->
+        <rect x="20" y="130" width="180" height="30" rx="6" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1"/>
+        <text x="110" y="150" text-anchor="middle" fill="#00d4ff" font-size="11">Math: Algebra &amp; Stats</text>
+        <rect x="35" y="95" width="150" height="30" rx="6" fill="rgba(192,132,252,0.15)" stroke="#c084fc" stroke-width="1"/>
+        <text x="110" y="115" text-anchor="middle" fill="#c084fc" font-size="11">Time Value of Money</text>
+        <rect x="50" y="60" width="120" height="30" rx="6" fill="rgba(255,107,53,0.15)" stroke="#ff6b35" stroke-width="1"/>
+        <text x="110" y="80" text-anchor="middle" fill="#ff6b35" font-size="11">Risk &amp; Return</text>
+        <rect x="65" y="25" width="90" height="30" rx="6" fill="rgba(245,200,66,0.15)" stroke="#f5c842" stroke-width="1"/>
+        <text x="110" y="45" text-anchor="middle" fill="#f5c842" font-size="11">Supply &amp; Demand</text>
+        <!-- arrows -->
+        <line x1="110" y1="130" x2="110" y2="95" stroke="#1e2840" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="110" y1="95" x2="110" y2="60" stroke="#1e2840" stroke-width="2"/>
+        <line x1="110" y1="60" x2="110" y2="25" stroke="#1e2840" stroke-width="2"/>
+        <defs>
+          <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3 z" fill="#1e2840"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SUPPLY & DEMAND -->
+  <div class="section-title">Supply & Demand</div>
+  <div class="concept-block">
+    <h4>🛒 What is Supply & Demand? (The simplest explanation)</h4>
+    <p><strong>Demand:</strong> How many people WANT something at a given price. As price drops, more people want it. As price rises, fewer want it.<br><br>
+    <strong>Supply:</strong> How much of something SELLERS are willing to offer. Higher prices → more sellers step in. Lower prices → fewer sellers bother.<br><br>
+    <strong>Equilibrium:</strong> The price where supply equals demand. This is the "market price." In financial markets, this happens thousands of times per second.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Supply & Demand Curve</h4>
+    <svg width="100%" height="300" viewBox="0 0 500 300" style="max-width:500px;display:block;margin:auto;">
+      <defs>
+        <linearGradient id="gDemand" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ff6b35"/>
+          <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:0.4"/>
+        </linearGradient>
+      </defs>
+      <!-- axes -->
+      <line x1="60" y1="250" x2="440" y2="250" stroke="#1e2840" stroke-width="2"/>
+      <line x1="60" y1="20" x2="60" y2="250" stroke="#1e2840" stroke-width="2"/>
+      <text x="240" y="280" text-anchor="middle" fill="#4a5568" font-size="12">Quantity</text>
+      <text x="20" y="140" text-anchor="middle" fill="#4a5568" font-size="12" transform="rotate(-90,20,140)">Price</text>
+      <!-- demand curve (downward) -->
+      <path d="M90,50 Q200,140 410,240" stroke="#ff6b35" stroke-width="2.5" fill="none"/>
+      <text x="415" y="240" fill="#ff6b35" font-size="11">Demand</text>
+      <!-- supply curve (upward) -->
+      <path d="M90,240 Q200,130 410,50" stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+      <text x="415" y="55" fill="#00d4ff" font-size="11">Supply</text>
+      <!-- equilibrium -->
+      <circle cx="250" cy="150" r="6" fill="#f5c842"/>
+      <line x1="250" y1="150" x2="250" y2="250" stroke="#f5c842" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="60" y1="150" x2="250" y2="150" stroke="#f5c842" stroke-width="1" stroke-dasharray="4"/>
+      <text x="254" y="148" fill="#f5c842" font-size="11">Equilibrium Price</text>
+      <text x="248" y="265" text-anchor="middle" fill="#f5c842" font-size="11">Q*</text>
+      <text x="44" y="154" text-anchor="end" fill="#f5c842" font-size="11">P*</text>
+    </svg>
+  </div>
+
+  <!-- TIME VALUE OF MONEY -->
+  <div class="section-title">Time Value of Money (TVM)</div>
+  <div class="concept-block warn">
+    <h4>⏰ The Golden Rule of Finance</h4>
+    <p><strong>A dollar today is worth MORE than a dollar tomorrow.</strong> Why? Because if you have $1 today, you can invest it and earn returns. So future money is "discounted" to find its present value.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="formula-box">
+        <div class="label">Future Value (FV)</div>
+        FV = PV × (1 + r)ⁿ
+        <br><br>
+        <span style="color:#8a96b0;font-size:0.8rem">PV = Present Value (money today)
+r  = interest rate per period
+n  = number of periods</span>
+      </div>
+      <div class="concept-block success">
+        <h4>✅ Example</h4>
+        <p>You invest $1,000 today at 5% annual interest for 3 years:<br>
+        FV = 1000 × (1.05)³ = <strong style="color:#2ed573">$1,157.63</strong></p>
+      </div>
+    </div>
+    <div>
+      <div class="formula-box">
+        <div class="label">Present Value (PV) — Discounting</div>
+        PV = FV ÷ (1 + r)ⁿ
+        <br><br>
+        <span style="color:#8a96b0;font-size:0.8rem">Discounting: finding what a
+future payment is worth TODAY</span>
+      </div>
+      <div class="concept-block warn">
+        <h4>📌 Example</h4>
+        <p>What is $1,000 received 3 years from now worth today if r=5%?<br>
+        PV = 1000 ÷ (1.05)³ = <strong style="color:#f5c842">$863.84</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK & RETURN -->
+  <div class="section-title">Risk & Return</div>
+  <div class="concept-block purple">
+    <h4>⚖️ The Risk-Return Tradeoff</h4>
+    <p>In finance, <strong>higher potential returns always come with higher risk.</strong> A savings account gives you 2% but almost zero risk. A startup investment might give 1000% or lose everything. Understanding this tradeoff is the foundation of all investing.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">Return</div>
+      <h3>📈 What is Return?</h3>
+      <p>The gain (or loss) you make on an investment as a percentage. <br><br>
+      <strong>Return = (Ending Value − Starting Value) / Starting Value × 100%</strong><br><br>
+      If you buy a stock for $100 and sell for $115, return = 15%.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Risk</div>
+      <h3>📉 What is Risk?</h3>
+      <p>In finance, risk = <strong>uncertainty of returns</strong>. Measured as <strong>standard deviation (σ)</strong> of historical returns. High σ = big swings up AND down. This is called <em>volatility</em>.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Diversification</div>
+      <h3>🗂️ Don't Put All Eggs in One Basket</h3>
+      <p>Holding many uncorrelated assets reduces risk without reducing expected return. This is the power of diversification — the only "free lunch" in finance.</p>
+    </div>
+  </div>
+
+  <!-- BASIC STATS -->
+  <div class="section-title">Basic Statistics You Need</div>
+  <table class="data-table">
+    <thead><tr><th>Concept</th><th>Definition</th><th>Finance Use</th><th>Symbol</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Mean (Average)</strong></td><td>Sum of values ÷ count</td><td>Average daily return</td><td>μ</td></tr>
+      <tr><td><strong>Standard Deviation</strong></td><td>How spread out values are from mean</td><td>Volatility / Risk</td><td>σ</td></tr>
+      <tr><td><strong>Variance</strong></td><td>Standard deviation squared</td><td>Portfolio risk calculations</td><td>σ²</td></tr>
+      <tr><td><strong>Correlation</strong></td><td>How much two things move together (-1 to +1)</td><td>Diversification analysis</td><td>ρ</td></tr>
+      <tr><td><strong>Normal Distribution</strong></td><td>Bell curve — most values near mean</td><td>Returns modeled as normal (often)</td><td>N(μ,σ)</td></tr>
+      <tr><td><strong>Log Returns</strong></td><td>ln(P₂/P₁)</td><td>Preferred in quant finance (additive)</td><td>r_log</td></tr>
+      <tr><td><strong>Percentile / Quantile</strong></td><td>What % of data falls below a value</td><td>Value-at-Risk (VaR) calculations</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout gold">
+    <strong>🎯 Quant Tip:</strong> In quant finance, we almost always use <strong>log returns</strong> (natural log of price ratios) rather than simple returns. They're additive over time: if daily log return is r, then weekly log return is 5r. Simple returns are NOT additive. This matters enormously for modeling.
+  </div>
+
+  <!-- Logarithms -->
+  <div class="section-title">Logarithms & Exponentials (Quick Recap)</div>
+  <div class="two-col">
+    <div class="formula-box">
+      <div class="label">Key relationships</div>
+      eˣ and ln(x) are inverses
+      ln(e^x) = x
+      e^(ln x) = x
+      ln(AB) = ln(A) + ln(B)
+      ln(A/B) = ln(A) − ln(B)
+    </div>
+    <div class="concept-block">
+      <h4>Why does this matter?</h4>
+      <p>Continuous compounding uses e. The Black-Scholes model (options pricing) is built entirely on log-normal distributions and natural logarithms. You'll see <strong>ln(S/K)</strong> constantly in options formulas.</p>
+    </div>
+  </div>
+
+  <!-- EXERCISES for prereq -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Prerequisites</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">You invest $500 at 6% annual interest. Calculate the future value after 5 years using FV = PV×(1+r)^n.</li>
+        <li data-num="E2">A stock was $80 last month and is $92 today. What is the simple return? What is the log return?</li>
+        <li data-num="E3">List 3 real-world examples where supply increases and explain what happens to the equilibrium price.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">Daily returns of a stock over 5 days are: 1%, -2%, 0.5%, 3%, -1%. Calculate mean, variance, and standard deviation manually.</li>
+        <li data-num="M2">You want $10,000 in 4 years. If you can earn 7% annually, how much do you need to invest today? (Use PV formula)</li>
+        <li data-num="M3">Two stocks: Stock A has mean return 10% σ=5%. Stock B has mean return 10% σ=20%. Which would you prefer and why? What does this tell you about the Sharpe ratio?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Prove algebraically that log returns are additive over time but simple returns are not. Show the formula for multi-period log return.</li>
+        <li data-num="H2">If returns are normally distributed with μ=0.08 and σ=0.15 annually, what is the probability the annual return is negative? (Use z-score: z = (0-0.08)/0.15 and standard normal tables)</li>
+        <li data-num="H3">Research and explain: what is a "fat tail" (leptokurtosis) and why does it matter that real financial returns have fatter tails than a normal distribution predicts?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 1: MARKETS OVERVIEW -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-markets">
+  <div class="section-hero" data-icon="🏛️">
+    <div>
+      <div class="subtitle">Chapter 01</div>
+      <h2>Financial Markets — The Big Picture</h2>
+      <p>A financial market is any place (physical or digital) where buyers and sellers come to trade financial assets. Understanding the structure of markets is essential before studying specific instruments.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <rect x="60" y="10" width="100" height="40" rx="8" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="110" y="35" text-anchor="middle" fill="#00d4ff" font-size="10">FINANCIAL MARKETS</text>
+        <rect x="10" y="80" width="80" height="35" rx="6" fill="rgba(255,107,53,0.1)" stroke="#ff6b35" stroke-width="1"/>
+        <text x="50" y="102" text-anchor="middle" fill="#ff6b35" font-size="9">Capital Markets</text>
+        <rect x="130" y="80" width="80" height="35" rx="6" fill="rgba(192,132,252,0.1)" stroke="#c084fc" stroke-width="1"/>
+        <text x="170" y="102" text-anchor="middle" fill="#c084fc" font-size="9">Money Markets</text>
+        <rect x="10" y="145" width="60" height="28" rx="5" fill="rgba(245,200,66,0.1)" stroke="#f5c842" stroke-width="1"/>
+        <text x="40" y="163" text-anchor="middle" fill="#f5c842" font-size="8">Equities</text>
+        <rect x="75" y="145" width="60" height="28" rx="5" fill="rgba(46,213,115,0.1)" stroke="#2ed573" stroke-width="1"/>
+        <text x="105" y="163" text-anchor="middle" fill="#2ed573" font-size="8">Bonds</text>
+        <rect x="140" y="145" width="70" height="28" rx="5" fill="rgba(127,255,107,0.1)" stroke="#7fff6b" stroke-width="1"/>
+        <text x="175" y="163" text-anchor="middle" fill="#7fff6b" font-size="8">Derivatives</text>
+        <!-- lines -->
+        <line x1="110" y1="50" x2="50" y2="80" stroke="#1e2840" stroke-width="1.5"/>
+        <line x1="110" y1="50" x2="170" y2="80" stroke="#1e2840" stroke-width="1.5"/>
+        <line x1="50" y1="115" x2="40" y2="145" stroke="#1e2840" stroke-width="1"/>
+        <line x1="50" y1="115" x2="105" y2="145" stroke="#1e2840" stroke-width="1"/>
+        <line x1="170" y1="115" x2="175" y2="145" stroke="#1e2840" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">What is a Financial Market?</div>
+  <div class="concept-block">
+    <h4>The Simple Explanation</h4>
+    <p>Imagine a giant auction house that never closes. Millions of people — individuals, companies, banks, governments — all come to buy and sell <em>financial instruments</em> (stocks, bonds, currencies, derivatives). The market sets prices based on supply and demand, allocates capital efficiently, and allows people to manage risk.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">Primary Market</div>
+      <h3>🆕 Where Assets Are Born</h3>
+      <p>When a company sells NEW shares to investors for the first time (IPO — Initial Public Offering). The company raises capital directly. Examples: Facebook's 2012 IPO, government selling new treasury bonds.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Secondary Market</div>
+      <h3>🔄 Where Trading Happens</h3>
+      <p>After assets are created, investors trade them with EACH OTHER. The company gets no money from these trades. NYSE, NASDAQ — this is where you "buy a stock." 99% of trading volume happens here.</p>
+    </div>
+    <div class="card">
+      <div class="tag">OTC Market</div>
+      <h3>🤝 Over The Counter</h3>
+      <p>Trades that happen <em>directly between two parties</em>, not on a central exchange. Bonds, many derivatives, currencies (FX) — mostly OTC. Less transparent but more flexible. Larger notional volume than exchanges.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Types of Markets by Asset Class</div>
+
+  <div class="diagram-wrap">
+    <h4>🗺️ The Financial Market Ecosystem</h4>
+    <svg width="100%" height="380" viewBox="0 0 700 380">
+      <!-- Central hub -->
+      <circle cx="350" cy="190" r="55" fill="rgba(0,212,255,0.08)" stroke="#00d4ff" stroke-width="2"/>
+      <text x="350" y="187" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">FINANCIAL</text>
+      <text x="350" y="203" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">MARKETS</text>
+
+      <!-- Equity Market -->
+      <ellipse cx="160" cy="80" rx="70" ry="38" fill="rgba(255,107,53,0.1)" stroke="#ff6b35" stroke-width="1.5"/>
+      <text x="160" y="76" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Equity Market</text>
+      <text x="160" y="92" text-anchor="middle" fill="#ff6b35" font-size="9">NYSE, NASDAQ</text>
+      <line x1="222" y1="105" x2="308" y2="155" stroke="#1e2840" stroke-width="1.5"/>
+
+      <!-- Bond / Debt Market -->
+      <ellipse cx="540" cy="80" rx="75" ry="38" fill="rgba(192,132,252,0.1)" stroke="#c084fc" stroke-width="1.5"/>
+      <text x="540" y="76" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Bond Market</text>
+      <text x="540" y="92" text-anchor="middle" fill="#c084fc" font-size="9">Treasuries, Corp Bonds</text>
+      <line x1="475" y1="105" x2="395" y2="155" stroke="#1e2840" stroke-width="1.5"/>
+
+      <!-- Derivatives Market -->
+      <ellipse cx="540" cy="300" rx="80" ry="38" fill="rgba(245,200,66,0.1)" stroke="#f5c842" stroke-width="1.5"/>
+      <text x="540" y="296" text-anchor="middle" fill="#f5c842" font-size="11" font-weight="bold">Derivatives</text>
+      <text x="540" y="312" text-anchor="middle" fill="#f5c842" font-size="9">Options, Futures, Swaps</text>
+      <line x1="470" y1="276" x2="396" y2="226" stroke="#1e2840" stroke-width="1.5"/>
+
+      <!-- FX Market -->
+      <ellipse cx="160" cy="300" rx="70" ry="38" fill="rgba(46,213,115,0.1)" stroke="#2ed573" stroke-width="1.5"/>
+      <text x="160" y="296" text-anchor="middle" fill="#2ed573" font-size="11" font-weight="bold">FX Market</text>
+      <text x="160" y="312" text-anchor="middle" fill="#2ed573" font-size="9">EUR/USD, GBP/JPY</text>
+      <line x1="228" y1="276" x2="306" y2="225" stroke="#1e2840" stroke-width="1.5"/>
+
+      <!-- Commodity Market -->
+      <ellipse cx="350" cy="358" rx="70" ry="28" fill="rgba(127,255,107,0.1)" stroke="#7fff6b" stroke-width="1.5"/>
+      <text x="350" y="354" text-anchor="middle" fill="#7fff6b" font-size="11" font-weight="bold">Commodity</text>
+      <text x="350" y="370" text-anchor="middle" fill="#7fff6b" font-size="9">Gold, Oil, Wheat</text>
+      <line x1="350" y1="330" x2="350" y2="246" stroke="#1e2840" stroke-width="1.5"/>
+
+      <!-- Money Market -->
+      <ellipse cx="350" cy="20" rx="70" ry="25" fill="rgba(255,71,87,0.1)" stroke="#ff4757" stroke-width="1.5"/>
+      <text x="350" y="16" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="bold">Money Market</text>
+      <text x="350" y="30" text-anchor="middle" fill="#ff4757" font-size="9">T-Bills, CDs &lt;1yr</text>
+      <line x1="350" y1="45" x2="350" y2="135" stroke="#1e2840" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Key Participants -->
+  <div class="section-title">Market Participants (Who's Trading?)</div>
+  <table class="data-table">
+    <thead><tr><th>Participant</th><th>Who They Are</th><th>What They Want</th><th>Typical Scale</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-blue">Retail Investors</span></td><td>Individual people like you and me</td><td>Long-term wealth building</td><td>Small ($100–$1M)</td></tr>
+      <tr><td><span class="badge badge-orange">Institutional Investors</span></td><td>Pension funds, mutual funds, ETFs</td><td>Manage client money, beat benchmarks</td><td>Billions</td></tr>
+      <tr><td><span class="badge badge-purple">Hedge Funds</span></td><td>Private funds, sophisticated strategies</td><td>Absolute returns, exploit inefficiencies</td><td>Millions–Billions</td></tr>
+      <tr><td><span class="badge badge-green">Market Makers</span></td><td>Banks, specialist firms (Citadel, Virtu)</td><td>Profit from bid-ask spread, provide liquidity</td><td>Enormous volume</td></tr>
+      <tr><td><span class="badge badge-blue">Central Banks</span></td><td>Fed, ECB, Bank of Japan</td><td>Monetary policy, economic stability</td><td>Trillions</td></tr>
+      <tr><td><span class="badge badge-orange">Corporations</span></td><td>Companies like Apple, BP</td><td>Raise capital, hedge business risks</td><td>Millions–Billions</td></tr>
+    </tbody>
+  </table>
+
+  <!-- How prices are set -->
+  <div class="section-title">How Prices Are Set — Order Matching</div>
+  <div class="two-col">
+    <div class="concept-block">
+      <h4>📖 The Order Book</h4>
+      <p>Every exchange maintains an <strong>order book</strong> — a real-time list of all outstanding buy and sell orders for an asset. Buyers place <em>bid orders</em> (max price they'll pay). Sellers place <em>ask orders</em> (min price they'll accept).</p>
+      <br>
+      <p><strong>When a bid ≥ an ask: a TRADE happens.</strong> This is order matching — the exchange automatically executes the trade at the overlapping price.</p>
+    </div>
+    <div class="diagram-wrap" style="margin:0">
+      <h4>Sample Order Book</h4>
+      <svg width="220" height="200" viewBox="0 0 220 200">
+        <!-- ASK side (sell orders) -->
+        <text x="10" y="20" fill="#ff4757" font-size="10" font-weight="bold">ASKS (Sellers)</text>
+        <rect x="10" y="25" width="90" height="18" rx="3" fill="rgba(255,71,87,0.08)"/>
+        <text x="55" y="38" text-anchor="middle" fill="#ff4757" font-size="9">$100.30 — 500</text>
+        <rect x="10" y="46" width="90" height="18" rx="3" fill="rgba(255,71,87,0.06)"/>
+        <text x="55" y="59" text-anchor="middle" fill="#ff4757" font-size="9">$100.20 — 1200</text>
+        <rect x="10" y="67" width="90" height="18" rx="3" fill="rgba(255,71,87,0.04)"/>
+        <text x="55" y="80" text-anchor="middle" fill="#ff4757" font-size="9">$100.10 — 800</text>
+        <!-- spread -->
+        <rect x="0" y="88" width="220" height="22" fill="rgba(245,200,66,0.05)"/>
+        <text x="110" y="103" text-anchor="middle" fill="#f5c842" font-size="10">← SPREAD: $0.10 →</text>
+        <!-- BID side (buy orders) -->
+        <rect x="10" y="113" width="90" height="18" rx="3" fill="rgba(46,213,115,0.04)"/>
+        <text x="55" y="126" text-anchor="middle" fill="#2ed573" font-size="9">$100.00 — 2000</text>
+        <rect x="10" y="134" width="90" height="18" rx="3" fill="rgba(46,213,115,0.06)"/>
+        <text x="55" y="147" text-anchor="middle" fill="#2ed573" font-size="9">$99.90 — 1500</text>
+        <rect x="10" y="155" width="90" height="18" rx="3" fill="rgba(46,213,115,0.08)"/>
+        <text x="55" y="168" text-anchor="middle" fill="#2ed573" font-size="9">$99.80 — 600</text>
+        <text x="10" y="190" fill="#2ed573" font-size="10" font-weight="bold">BIDS (Buyers)</text>
+        <!-- labels -->
+        <text x="120" y="40" fill="#4a5568" font-size="8">Price — Qty</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- exercises -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Markets Overview</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">In your own words, explain the difference between primary and secondary markets using a real-world example.</li>
+        <li data-num="E2">Name 3 types of institutional investors and explain what they do with the money they manage.</li>
+        <li data-num="E3">What is the bid-ask spread? If the best bid is $50.10 and best ask is $50.15, what is the spread? What does it cost you to buy 100 shares immediately?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">Research and explain what a "dark pool" is and why institutional investors use them instead of public exchanges.</li>
+        <li data-num="M2">Look up the current market cap of the NYSE vs the global bond market. Which is larger? By how much? Why does this surprise most people?</li>
+        <li data-num="M3">Explain how a market maker profits. If a market maker buys at $10.00 and sells at $10.05, and does 10,000 transactions per day, what is their daily gross profit from spread alone?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Research the "Flash Crash of May 6, 2010." What happened to market prices in 36 minutes? What does this tell us about algorithmic trading and market microstructure?</li>
+        <li data-num="H2">Compare the structure of the NYSE (specialist system) vs NASDAQ (dealer market) vs a modern electronic ECN. How does each set prices? What are the advantages/disadvantages of each?</li>
+        <li data-num="H3">Explain Regulation NMS (National Market System) in the US. What problem was it designed to solve? Has it succeeded? Find evidence for both sides.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 2: EQUITIES -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-equities">
+  <div class="section-hero" data-icon="📈">
+    <div>
+      <div class="subtitle">Chapter 02</div>
+      <h2>Equities — Stocks & Shares</h2>
+      <p>When you own a stock, you own a piece of a real company. Equities are the most visible financial instrument — they're what most people mean when they say "the market." For quants, equities are where most strategies and models begin.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <polyline points="20,150 50,120 80,130 110,80 140,90 170,40 200,60" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+        <circle cx="170" cy="40" r="5" fill="#00d4ff"/>
+        <text x="185" y="38" fill="#00d4ff" font-size="10">ATH</text>
+        <rect x="0" y="155" width="220" height="1" fill="#1e2840"/>
+        <text x="0" y="175" fill="#4a5568" font-size="9">Time →</text>
+        <text x="0" y="10" fill="#4a5568" font-size="9">Price ↑</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">What Is a Stock?</div>
+  <div class="concept-block">
+    <h4>🏢 Ownership Explained Simply</h4>
+    <p>A company needs money to grow. Instead of borrowing (which creates debt), it can <strong>sell ownership stakes</strong> — these stakes are called <em>shares</em> or <em>stocks</em>. Each share represents a fractional ownership of the company's assets and earnings. If a company is worth $1 billion and issues 1 million shares, each share = $1,000 of company value (at book value). But market prices reflect <em>expected future earnings</em>, not just current book value.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="tag">Common Stock</div>
+      <h3>🗳️ Common Shares</h3>
+      <p>Most stocks you hear about. <strong>Voting rights</strong> (usually 1 vote per share). Receive dividends <em>after</em> preferred shareholders. In bankruptcy, paid LAST. Higher risk, higher potential reward.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Preferred Stock</div>
+      <h3>👑 Preferred Shares</h3>
+      <p><strong>Fixed dividend payments</strong> like a bond. Paid before common stockholders in bankruptcy. Usually NO voting rights. Hybrid between stock and bond. Often held by VCs in startups.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Key Equity Concepts for Quants</div>
+
+  <div class="subsection-title"><span>📊</span> Market Capitalization</div>
+  <div class="formula-box">
+    <div class="label">Market Cap Formula</div>
+    Market Cap = Share Price × Shares Outstanding
+    
+    Example: Apple shares = $190, shares outstanding = 15.4B
+    Market Cap = $190 × 15,400,000,000 = ~$2.93 Trillion
+  </div>
+  <div class="card-grid">
+    <div class="card"><div class="tag">Large-Cap</div><h3>🏦 &gt;$10B</h3><p>Apple, Microsoft, Google. Stable, liquid, lower risk. S&P 500 companies.</p></div>
+    <div class="card"><div class="tag">Mid-Cap</div><h3>🏢 $2B–$10B</h3><p>More growth potential, less liquid. Higher volatility than large-caps.</p></div>
+    <div class="card"><div class="tag">Small-Cap</div><h3>🏠 $300M–$2B</h3><p>High growth potential, illiquid, high risk. Research intensive for quants.</p></div>
+  </div>
+
+  <div class="subsection-title"><span>💰</span> Dividends</div>
+  <div class="concept-block success">
+    <h4>What are dividends?</h4>
+    <p>When a company earns profit, it can either reinvest it (retained earnings) or distribute it to shareholders. Distributions to shareholders are called <strong>dividends</strong>. Paid quarterly in the US.<br><br>
+    <strong>Dividend Yield = Annual Dividend / Share Price</strong><br>
+    If a stock pays $4/year dividend and trades at $100, dividend yield = 4%.</p>
+  </div>
+
+  <div class="subsection-title"><span>📐</span> Equity Valuation — How Do We Price a Stock?</div>
+  <div class="callout">
+    <strong>The Fundamental Question:</strong> What should you pay for a stock? Finance theory says: the price should equal the present value of all future cash flows the company will generate. This is the core of fundamental analysis.
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">P/E Ratio</div>
+      <h3>📏 Price-to-Earnings</h3>
+      <p><strong>P/E = Stock Price / Earnings Per Share (EPS)</strong><br><br>If stock = $50 and EPS = $5, P/E = 10x. "You pay $10 for every $1 of earnings." S&P 500 historical avg ≈ 16-17x. Tech stocks often 30-50x+ (growth priced in).</p>
+    </div>
+    <div class="card">
+      <div class="tag">DCF</div>
+      <h3>💸 Discounted Cash Flow</h3>
+      <p>Project future free cash flows, then discount them back to today using a discount rate (cost of capital). <strong>Intrinsic Value = Σ [FCF_t / (1+r)^t]</strong>. If intrinsic value > market price → potentially undervalued.</p>
+    </div>
+    <div class="card">
+      <div class="tag">DDM</div>
+      <h3>🌱 Dividend Discount Model</h3>
+      <p>For dividend-paying stocks: <strong>P = D₁ / (r - g)</strong><br>where D₁ = next dividend, r = required return, g = dividend growth rate. Simple but elegant — assumes dividends grow forever at rate g.</p>
+    </div>
+  </div>
+
+  <div class="subsection-title"><span>📉</span> Stock Returns — What Drives Prices?</div>
+  <div class="diagram-wrap">
+    <h4>📊 Return Components for Quants</h4>
+    <svg width="100%" height="200" viewBox="0 0 650 200">
+      <!-- Total Return breakdown -->
+      <rect x="20" y="80" width="610" height="50" rx="8" fill="rgba(0,212,255,0.05)" stroke="#00d4ff" stroke-width="1"/>
+      <text x="325" y="111" text-anchor="middle" fill="#00d4ff" font-size="13" font-weight="bold">TOTAL STOCK RETURN</text>
+
+      <!-- arrow down -->
+      <line x1="325" y1="130" x2="200" y2="165" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="325" y1="130" x2="325" y2="165" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="325" y1="130" x2="450" y2="165" stroke="#1e2840" stroke-width="1.5"/>
+
+      <rect x="100" y="165" width="200" height="30" rx="6" fill="rgba(255,107,53,0.1)" stroke="#ff6b35" stroke-width="1"/>
+      <text x="200" y="185" text-anchor="middle" fill="#ff6b35" font-size="11">Capital Gains (Price Change)</text>
+
+      <rect x="230" y="165" width="160" height="30" rx="6" fill="rgba(46,213,115,0.1)" stroke="#2ed573" stroke-width="1"/>
+      <text x="310" y="185" text-anchor="middle" fill="#2ed573" font-size="11">Dividends Received</text>
+
+      <rect x="355" y="165" width="170" height="30" rx="6" fill="rgba(192,132,252,0.1)" stroke="#c084fc" stroke-width="1"/>
+      <text x="440" y="185" text-anchor="middle" fill="#c084fc" font-size="11">Systematic Risk (Beta)</text>
+
+      <!-- above: drivers -->
+      <text x="325" y="65" text-anchor="middle" fill="#4a5568" font-size="11">Driven by: Earnings, sentiment, macro factors, supply &amp; demand for shares</text>
+      <line x1="325" y1="70" x2="325" y2="80" stroke="#1e2840" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <div class="subsection-title"><span>β</span> Beta — Systematic Risk</div>
+  <div class="two-col">
+    <div>
+      <div class="formula-box">
+        <div class="label">Beta Definition</div>
+        β = Cov(r_stock, r_market) / Var(r_market)
+        
+        β = 1.0 → moves exactly with market
+        β = 1.5 → moves 50% MORE than market
+        β = 0.5 → moves 50% LESS than market
+        β = -1.0→ moves OPPOSITE to market
+      </div>
+    </div>
+    <div class="concept-block purple">
+      <h4>Why β matters for quants</h4>
+      <p>The CAPM (Capital Asset Pricing Model) says:<br>
+      <strong>E(r) = r_f + β × (E(r_m) − r_f)</strong><br><br>
+      Expected return = risk-free rate + beta × equity risk premium<br><br>
+      This is the foundation of risk-adjusted return analysis. A quant strategy should deliver <em>alpha</em> (returns above what beta predicts).</p>
+    </div>
+  </div>
+
+  <div class="subsection-title"><span>α</span> Alpha — The Holy Grail</div>
+  <div class="concept-block warn">
+    <h4>💡 What is Alpha?</h4>
+    <p><strong>Alpha = Actual Return − Expected Return (from CAPM)</strong><br><br>
+    If CAPM predicts your stock should return 12% (based on its beta), but it actually returns 18%, you have alpha = +6%. Alpha represents <em>skill</em> or <em>informational edge</em> — returns not explained by market exposure.<br><br>
+    The entire quant finance industry is a hunt for alpha. Most retail investors have zero alpha after costs.</p>
+  </div>
+
+  <!-- Equity Indices -->
+  <div class="section-title">Stock Market Indices</div>
+  <div class="concept-block">
+    <h4>📊 What is an Index?</h4>
+    <p>An index tracks the performance of a <em>basket of stocks</em>, representing a segment of the market. You can't directly buy an index, but you can buy ETFs (Exchange-Traded Funds) that replicate it.</p>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>Index</th><th>Country</th><th># Stocks</th><th>Weighting</th><th>Tracks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>S&P 500</strong></td><td>USA</td><td>500</td><td>Market-cap weighted</td><td>Large-cap US companies</td></tr>
+      <tr><td><strong>DJIA</strong></td><td>USA</td><td>30</td><td>Price-weighted</td><td>30 major US "blue chip" companies</td></tr>
+      <tr><td><strong>NASDAQ-100</strong></td><td>USA</td><td>100</td><td>Market-cap weighted</td><td>100 largest NASDAQ non-financial stocks</td></tr>
+      <tr><td><strong>FTSE 100</strong></td><td>UK</td><td>100</td><td>Market-cap weighted</td><td>Top 100 London Stock Exchange</td></tr>
+      <tr><td><strong>Nikkei 225</strong></td><td>Japan</td><td>225</td><td>Price-weighted</td><td>225 major Tokyo Stock Exchange</td></tr>
+      <tr><td><strong>Nifty 50</strong></td><td>India</td><td>50</td><td>Free-float market-cap</td><td>50 major NSE companies</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Equities</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">A company has 50 million shares outstanding and a stock price of $24. What is its market cap? What category (small/mid/large cap) does it fall in?</li>
+        <li data-num="E2">Stock XYZ pays a quarterly dividend of $0.75 and trades at $60. Calculate the annual dividend yield.</li>
+        <li data-num="E3">If a stock has β = 1.8, the market goes up 10%, what should this stock do approximately? What if the market goes down 5%?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">Using DDM: A stock pays a dividend of $2 next year, grows dividends at 4% per year, and your required return is 9%. What is the intrinsic value? If it trades at $45, is it over or undervalued?</li>
+        <li data-num="M2">A portfolio returned 15% last year. The risk-free rate was 2%, the market returned 11%, and the portfolio's beta is 1.2. Calculate the portfolio's alpha using CAPM. What does a positive/negative alpha mean?</li>
+        <li data-num="M3">Company A: P/E = 8, growth rate = 2%. Company B: P/E = 35, growth rate = 25%. Which one is "cheaper" relative to its growth? Calculate the PEG ratio for each (PEG = P/E / growth rate).</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Build a simple 2-stock DCF model for a fictional company: project FCF for 5 years (start at $100M, grow 15% yr1-3, 10% yr4-5), then a terminal value (assume 3% perpetual growth), discount at WACC=10%. What is the total enterprise value?</li>
+        <li data-num="H2">Research the Fama-French 3-Factor Model. Why does it improve on CAPM? What are the SMB and HML factors? How would you use this to decompose a portfolio's returns?</li>
+        <li data-num="H3">Design a simple mean-reversion equity strategy: if a stock's price drops more than 2 standard deviations below its 20-day moving average, buy it. Define entry signal, exit signal, position sizing, and how you'd backtest this. What are the key risks?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 3: BONDS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-bonds">
+  <div class="section-hero" data-icon="🏦">
+    <div>
+      <div class="subtitle">Chapter 03</div>
+      <h2>Bonds — Fixed Income Instruments</h2>
+      <p>Bonds are debt instruments. When you buy a bond, you're essentially LENDING money to a government or corporation in exchange for regular interest payments (coupons) and your principal back at the end. Fixed income is actually a LARGER market than equities globally.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <!-- Bond cash flow timeline -->
+        <line x1="10" y1="100" x2="210" y2="100" stroke="#1e2840" stroke-width="2"/>
+        <!-- coupon payments -->
+        <line x1="50" y1="100" x2="50" y2="65" stroke="#c084fc" stroke-width="2"/>
+        <text x="50" y="60" text-anchor="middle" fill="#c084fc" font-size="9">$50</text>
+        <line x1="90" y1="100" x2="90" y2="65" stroke="#c084fc" stroke-width="2"/>
+        <text x="90" y="60" text-anchor="middle" fill="#c084fc" font-size="9">$50</text>
+        <line x1="130" y1="100" x2="130" y2="65" stroke="#c084fc" stroke-width="2"/>
+        <text x="130" y="60" text-anchor="middle" fill="#c084fc" font-size="9">$50</text>
+        <line x1="170" y1="100" x2="170" y2="65" stroke="#c084fc" stroke-width="2"/>
+        <text x="170" y="60" text-anchor="middle" fill="#c084fc" font-size="9">$50</text>
+        <!-- principal at maturity -->
+        <line x1="205" y1="100" x2="205" y2="40" stroke="#f5c842" stroke-width="2.5"/>
+        <text x="205" y="35" text-anchor="middle" fill="#f5c842" font-size="9">$1050</text>
+        <text x="200" y="28" text-anchor="middle" fill="#f5c842" font-size="8">Par</text>
+        <!-- initial investment -->
+        <line x1="10" y1="100" x2="10" y2="130" stroke="#ff4757" stroke-width="2"/>
+        <text x="10" y="145" text-anchor="middle" fill="#ff4757" font-size="9">-$1000</text>
+        <!-- labels -->
+        <text x="110" y="170" text-anchor="middle" fill="#4a5568" font-size="9">Time (years)</text>
+        <text x="60" y="130" fill="#c084fc" font-size="8">Coupons</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">Bond Anatomy — Every Term Explained</div>
+  <table class="data-table">
+    <thead><tr><th>Term</th><th>Simple Definition</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Face Value (Par)</strong></td><td>The amount borrowed — repaid at maturity. Standard = $1,000.</td><td>$1,000</td></tr>
+      <tr><td><strong>Coupon Rate</strong></td><td>Annual interest rate on face value. Fixed for most bonds.</td><td>5% → pays $50/year</td></tr>
+      <tr><td><strong>Coupon Payment</strong></td><td>Actual dollar amount of interest. Usually paid semi-annually.</td><td>$25 every 6 months</td></tr>
+      <tr><td><strong>Maturity Date</strong></td><td>When the bond expires and face value is returned.</td><td>"Due 2034" = expires 2034</td></tr>
+      <tr><td><strong>Yield to Maturity (YTM)</strong></td><td>The actual annual return if you hold till maturity, accounting for current price.</td><td>YTM = 4.8% (if bought at discount)</td></tr>
+      <tr><td><strong>Price</strong></td><td>Current market price. Moves OPPOSITE to yields. Can be above or below par.</td><td>$950 (discount), $1050 (premium)</td></tr>
+      <tr><td><strong>Duration</strong></td><td>Sensitivity of bond price to interest rate changes. Measured in years.</td><td>Duration = 7 → 1% rate rise ≈ 7% price fall</td></tr>
+      <tr><td><strong>Credit Rating</strong></td><td>Probability of default assessed by S&P, Moody's, Fitch.</td><td>AAA (safest) → D (defaulted)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">The #1 Bond Relationship: Price vs Yield</div>
+  <div class="concept-block danger">
+    <h4>⚠️ The Most Important Fact About Bonds</h4>
+    <p><strong>Bond prices and yields (interest rates) move in OPPOSITE directions.</strong><br><br>
+    This confuses beginners constantly. Here's the intuition:<br>
+    • You own a bond paying 5% ($50/year) that you bought for $1,000.<br>
+    • Market interest rates rise to 7%. New bonds pay $70/year.<br>
+    • Your bond (paying only $50) is now less attractive. Nobody pays $1,000 for it.<br>
+    • Price FALLS until the yield (return) matches new market rates.<br><br>
+    <strong>Higher rates → Lower bond prices. Lower rates → Higher bond prices.</strong></p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Price-Yield Relationship (Convex Curve)</h4>
+    <svg width="100%" height="280" viewBox="0 0 500 280">
+      <!-- axes -->
+      <line x1="60" y1="250" x2="460" y2="250" stroke="#1e2840" stroke-width="2"/>
+      <line x1="60" y1="10" x2="60" y2="250" stroke="#1e2840" stroke-width="2"/>
+      <text x="260" y="275" text-anchor="middle" fill="#4a5568" font-size="11">Yield →</text>
+      <text x="20" y="130" text-anchor="middle" fill="#4a5568" font-size="11" transform="rotate(-90,20,130)">Price →</text>
+      <!-- Convex curve: high price at low yield, falling as yield rises -->
+      <path d="M80,30 C120,40 160,70 200,100 S280,160 320,190 S400,230 440,245"
+            stroke="#00d4ff" stroke-width="3" fill="none"/>
+      <!-- par line -->
+      <line x1="60" y1="150" x2="460" y2="150" stroke="#1e2840" stroke-width="1" stroke-dasharray="5"/>
+      <text x="465" y="154" fill="#4a5568" font-size="9">Par ($1000)</text>
+      <!-- current yield marker -->
+      <circle cx="200" cy="100" r="6" fill="#f5c842"/>
+      <line x1="200" y1="100" x2="200" y2="250" stroke="#f5c842" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="60" y1="100" x2="200" y2="100" stroke="#f5c842" stroke-width="1" stroke-dasharray="4"/>
+      <text x="200" y="265" text-anchor="middle" fill="#f5c842" font-size="9">Low Yield → Premium</text>
+      <!-- second point -->
+      <circle cx="360" cy="200" r="6" fill="#ff4757"/>
+      <line x1="360" y1="200" x2="360" y2="250" stroke="#ff4757" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="60" y1="200" x2="360" y2="200" stroke="#ff4757" stroke-width="1" stroke-dasharray="4"/>
+      <text x="360" y="265" text-anchor="middle" fill="#ff4757" font-size="9">High Yield → Discount</text>
+      <!-- convexity note -->
+      <text x="350" y="60" fill="#c084fc" font-size="10">Convexity: curve</text>
+      <text x="350" y="73" fill="#c084fc" font-size="10">is NOT linear!</text>
+    </svg>
+  </div>
+
+  <div class="section-title">Yield to Maturity — The Key Formula</div>
+  <div class="formula-box">
+    <div class="label">YTM (Approximate Formula — exact requires iteration)</div>
+    YTM ≈ [C + (F - P)/n] / [(F + P)/2]
+    
+    Where:
+    C = Annual coupon payment
+    F = Face value ($1,000 typically)
+    P = Current market price
+    n = Years to maturity
+    
+    Example: 5% coupon bond, 10 years, trading at $950
+    YTM ≈ [50 + (1000-950)/10] / [(1000+950)/2]
+         = [50 + 5] / [975]
+         = 55 / 975 ≈ 5.64%
+  </div>
+
+  <div class="section-title">Duration — Bond's Sensitivity to Rate Changes</div>
+  <div class="concept-block purple">
+    <h4>⏱️ Duration Intuition</h4>
+    <p>Duration is the <em>weighted average time</em> to receive the bond's cash flows. But more practically for traders: <strong>duration ≈ price sensitivity to interest rate changes.</strong><br><br>
+    <strong>Modified Duration:</strong> If duration = 8 years, a 1% rise in interest rates causes approximately an 8% fall in the bond's price. A 0.25% rise causes ≈ 2% price fall.<br><br>
+    This is WHY long-term bonds are riskier than short-term bonds: they have higher duration = more sensitive to rate changes.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="label">Modified Duration & Price Change</div>
+    Modified Duration (D*) = Macaulay Duration / (1 + YTM)
+    
+    ΔP/P ≈ -D* × Δy
+    
+    Example: Bond with D* = 6, yield rises by 0.5% (50bps):
+    ΔP/P ≈ -6 × 0.005 = -0.03 = -3% price drop
+  </div>
+
+  <!-- Types of bonds -->
+  <div class="section-title">Types of Bonds</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">Government</div>
+      <h3>🏛️ Sovereign Bonds</h3>
+      <p>Issued by national governments. US Treasuries (T-Bills, T-Notes, T-Bonds), UK Gilts, Indian G-Secs. Considered near risk-free (for developed nations). Lowest yield but highest safety.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Corporate</div>
+      <h3>🏢 Corporate Bonds</h3>
+      <p>Issued by companies. Higher yield than government bonds (credit spread) to compensate for default risk. Investment-grade (BBB- and above) vs High-yield / Junk bonds (below BBB-).</p>
+    </div>
+    <div class="card">
+      <div class="tag">Municipal</div>
+      <h3>🌆 Muni Bonds</h3>
+      <p>Issued by local/state governments. Often tax-exempt in US, making effective yield higher for high-tax-bracket investors. Fund schools, roads, infrastructure.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Inflation-Linked</div>
+      <h3>📊 TIPS (US) / Linkers</h3>
+      <p>Principal adjusts with inflation. TIPS = Treasury Inflation-Protected Securities. Protect holders from inflation eroding real returns. Real yield = Nominal yield − Inflation.</p>
+    </div>
+  </div>
+
+  <!-- Yield Curve -->
+  <div class="section-title">The Yield Curve — Most Important Chart in Finance</div>
+  <div class="concept-block warn">
+    <h4>📈 What is the Yield Curve?</h4>
+    <p>A plot of bond yields across different maturities (3 months to 30 years), all for the same credit quality. It shows how interest rates vary by time horizon. The shape of the yield curve tells us A LOT about the economy.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Yield Curve Shapes</h4>
+    <svg width="100%" height="260" viewBox="0 0 660 260">
+      <!-- axes for first chart: Normal -->
+      <text x="110" y="15" text-anchor="middle" fill="#2ed573" font-size="11" font-weight="bold">Normal (Upward)</text>
+      <line x1="30" y1="220" x2="200" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="30" y1="50" x2="30" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <path d="M40,200 C70,180 110,140 185,90" stroke="#2ed573" stroke-width="2.5" fill="none"/>
+      <text x="110" y="240" text-anchor="middle" fill="#4a5568" font-size="9">Maturity →</text>
+      <text x="190" y="93" fill="#2ed573" font-size="9">30yr</text>
+      <text x="35" y="205" fill="#4a5568" font-size="8">3m</text>
+
+      <!-- Inverted -->
+      <text x="350" y="15" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="bold">Inverted (Recession Signal!)</text>
+      <line x1="260" y1="220" x2="440" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="260" y1="50" x2="260" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <path d="M270,90 C300,100 340,150 420,200" stroke="#ff4757" stroke-width="2.5" fill="none"/>
+      <text x="350" y="240" text-anchor="middle" fill="#4a5568" font-size="9">Maturity →</text>
+
+      <!-- Flat -->
+      <text x="575" y="15" text-anchor="middle" fill="#f5c842" font-size="11" font-weight="bold">Flat (Uncertainty)</text>
+      <line x1="490" y1="220" x2="660" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="490" y1="50" x2="490" y2="220" stroke="#1e2840" stroke-width="1.5"/>
+      <path d="M500,140 C530,138 570,140 640,142" stroke="#f5c842" stroke-width="2.5" fill="none"/>
+      <text x="575" y="240" text-anchor="middle" fill="#4a5568" font-size="9">Maturity →</text>
+
+      <!-- annotations -->
+      <rect x="30" y="23" width="200" height="22" rx="4" fill="rgba(46,213,115,0.05)" stroke="rgba(46,213,115,0.2)" stroke-width="1"/>
+      <text x="130" y="38" text-anchor="middle" fill="#2ed573" font-size="9">Short rates &lt; Long rates — Healthy economy</text>
+      <rect x="260" y="23" width="200" height="22" rx="4" fill="rgba(255,71,87,0.05)" stroke="rgba(255,71,87,0.2)" stroke-width="1"/>
+      <text x="360" y="38" text-anchor="middle" fill="#ff4757" font-size="9">Short rates &gt; Long rates — Recession warning!</text>
+    </svg>
+  </div>
+
+  <div class="callout gold">
+    <strong>🚨 Yield Curve Inversion:</strong> Every US recession since 1950 has been preceded by an inverted yield curve (2-year yield &gt; 10-year yield). The 2s10s spread is one of the most watched macroeconomic indicators. When short-term rates exceed long-term rates, it signals the market expects the Fed to CUT rates in the future (because a recession is coming).
+  </div>
+
+  <!-- EXERCISES -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Bonds</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">A bond has face value $1,000, coupon rate 6%, pays semi-annually, matures in 5 years. How much does the bondholder receive every 6 months? What is the total interest received over 5 years?</li>
+        <li data-num="E2">Interest rates rise from 4% to 6%. Will existing bond prices rise or fall? Explain WHY using the concept of opportunity cost.</li>
+        <li data-num="E3">What is the difference between Investment-Grade and High-Yield (junk) bonds? Name the credit rating boundary where this distinction is made.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">Use the approximate YTM formula: A bond with 8% coupon, 10 years to maturity, trading at $1,100. Calculate the approximate YTM. Is this above or below the coupon rate? Why?</li>
+        <li data-num="M2">Bond A: 5% coupon, 2-year maturity. Bond B: 5% coupon, 20-year maturity. Interest rates rise by 1%. Which bond will lose more value? Explain using duration. Which bond has higher duration?</li>
+        <li data-num="M3">A bond has Modified Duration of 7.5. If the yield falls by 0.75% (75 basis points), estimate the percentage price change. If the bond was worth $100,000, what is the new approximate value?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Build a bond pricing spreadsheet (by hand or in a notebook): For a 5-year, 6% annual coupon, $1,000 face value bond at YTMs of 4%, 5%, 6%, 7%, 8% — calculate the exact price at each yield. Plot the price-yield curve. Observe and explain the convexity.</li>
+        <li data-num="H2">Explain "Convexity" as the second-order price sensitivity of a bond. How does convexity modify the duration estimate? Why does a bond with higher convexity outperform when yields move large amounts in either direction?</li>
+        <li data-num="H3">Research "carry trade" in fixed income. How do investors exploit the yield curve slope? What risks are involved? What happened to carry trades during the 2008 financial crisis?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 4: FUTURES -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-futures">
+  <div class="section-hero" data-icon="⏩">
+    <div>
+      <div class="subtitle">Chapter 04</div>
+      <h2>Futures — Standardized Derivative Contracts</h2>
+      <p>A futures contract is an agreement to buy or sell an asset at a predetermined price on a specific future date. Futures are traded on exchanges and are critical tools for hedging and speculation. Learn futures before options — they share core concepts like leverage and margin.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <!-- Future delivery timeline -->
+        <circle cx="30" cy="90" r="20" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1.5"/>
+        <text x="30" y="87" text-anchor="middle" fill="#00d4ff" font-size="8">Today</text>
+        <text x="30" y="99" text-anchor="middle" fill="#00d4ff" font-size="7">Lock price</text>
+        <line x1="50" y1="90" x2="160" y2="90" stroke="#1e2840" stroke-width="2" stroke-dasharray="6,3"/>
+        <text x="105" y="82" text-anchor="middle" fill="#4a5568" font-size="9">Contract Period</text>
+        <circle cx="185" cy="90" r="25" fill="rgba(245,200,66,0.1)" stroke="#f5c842" stroke-width="1.5"/>
+        <text x="185" y="87" text-anchor="middle" fill="#f5c842" font-size="8">Expiry</text>
+        <text x="185" y="99" text-anchor="middle" fill="#f5c842" font-size="7">Deliver/settle</text>
+        <!-- exchange in middle -->
+        <rect x="80" y="110" width="60" height="30" rx="6" fill="rgba(192,132,252,0.1)" stroke="#c084fc" stroke-width="1"/>
+        <text x="110" y="129" text-anchor="middle" fill="#c084fc" font-size="9">Exchange</text>
+        <line x1="50" y1="100" x2="85" y2="115" stroke="#c084fc" stroke-width="1" stroke-dasharray="3"/>
+        <line x1="160" y1="100" x2="135" y2="115" stroke="#c084fc" stroke-width="1" stroke-dasharray="3"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">The Intuition Behind Futures</div>
+  <div class="concept-block">
+    <h4>🌾 A Farmer's Story (Original Use Case)</h4>
+    <p>Imagine you're a wheat farmer. It's March, and you won't harvest until August. Current wheat price = $5/bushel. You fear prices might drop to $3 by August, ruining your profits.<br><br>
+    A cereal company fears the opposite — prices might rise to $7.<br><br>
+    <strong>Solution:</strong> You both agree TODAY to trade 1,000 bushels at $5 in August. You've locked in your price (hedged). The cereal company has locked in their cost.<br><br>
+    This is a futures contract. Both parties eliminate price uncertainty. Today, futures cover everything: stock indices, oil, currencies, interest rates, cryptocurrencies.</p>
+  </div>
+
+  <div class="section-title">Key Futures Concepts</div>
+
+  <div class="subsection-title"><span>💲</span> Margin & Leverage</div>
+  <div class="concept-block danger">
+    <h4>⚠️ Futures Require Margin — NOT Full Payment</h4>
+    <p>You don't pay the full contract value upfront. You post a small <strong>initial margin</strong> (typically 5-15% of contract value). This creates enormous leverage.<br><br>
+    Example: S&P 500 E-mini futures contract ≈ $200,000 value. Initial margin ≈ $13,000 (6.5%). A 1% move in S&P = $2,000 profit or loss on your $13,000 — that's a 15% return or loss from a 1% market move!</p>
+  </div>
+
+  <div class="two-col">
+    <div class="formula-box">
+      <div class="label">Leverage & Margin</div>
+      Leverage Ratio = Contract Value / Margin Posted
+      
+      Example: 
+      Contract Value = $200,000
+      Initial Margin  = $13,000
+      Leverage Ratio  = 200,000/13,000 ≈ 15x
+      
+      Daily P&L = (Price Change) × Contract Multiplier
+    </div>
+    <div class="concept-block warn">
+      <h4>📌 Margin Call</h4>
+      <p>If losses reduce your account below the <strong>maintenance margin</strong> level, you receive a <strong>margin call</strong> — you must deposit more funds immediately or your position is liquidated. Futures traders can lose MORE than their initial deposit.</p>
+    </div>
+  </div>
+
+  <div class="subsection-title"><span>📅</span> Daily Mark-to-Market Settlement</div>
+  <div class="concept-block success">
+    <h4>🔄 How Futures Settle Daily</h4>
+    <p>Unlike stocks, futures are <strong>marked-to-market every day</strong>. Each day, the exchange calculates your profit or loss based on the day's settlement price and either credits or debits it directly to your margin account. This daily settlement is what makes futures safe — you can't accumulate large losses that a counterparty can't pay.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Daily Mark-to-Market Example (Long 1 Gold Futures Contract)</h4>
+    <svg width="100%" height="200" viewBox="0 0 650 200">
+      <!-- header row -->
+      <rect x="10" y="10" width="630" height="25" rx="4" fill="var(--surface2)"/>
+      <text x="60" y="27" text-anchor="middle" fill="#4a5568" font-size="10">Day</text>
+      <text x="200" y="27" text-anchor="middle" fill="#4a5568" font-size="10">Settlement Price</text>
+      <text x="340" y="27" text-anchor="middle" fill="#4a5568" font-size="10">Daily Change</text>
+      <text x="480" y="27" text-anchor="middle" fill="#4a5568" font-size="10">Daily P&L (1 contract × 100oz)</text>
+      <text x="590" y="27" text-anchor="middle" fill="#4a5568" font-size="10">Margin Balance</text>
+
+      <!-- rows -->
+      <text x="60" y="55" text-anchor="middle" fill="#8a96b0" font-size="10">Open</text>
+      <text x="200" y="55" text-anchor="middle" fill="#8a96b0" font-size="10">$1,900.00</text>
+      <text x="340" y="55" text-anchor="middle" fill="#8a96b0" font-size="10">—</text>
+      <text x="480" y="55" text-anchor="middle" fill="#8a96b0" font-size="10">—</text>
+      <text x="590" y="55" text-anchor="middle" fill="#f5c842" font-size="10">$12,000</text>
+
+      <text x="60" y="80" text-anchor="middle" fill="#8a96b0" font-size="10">Day 1</text>
+      <text x="200" y="80" text-anchor="middle" fill="#8a96b0" font-size="10">$1,915.00</text>
+      <text x="340" y="80" text-anchor="middle" fill="#2ed573" font-size="10">+$15.00</text>
+      <text x="480" y="80" text-anchor="middle" fill="#2ed573" font-size="10">+$1,500</text>
+      <text x="590" y="80" text-anchor="middle" fill="#2ed573" font-size="10">$13,500</text>
+
+      <text x="60" y="105" text-anchor="middle" fill="#8a96b0" font-size="10">Day 2</text>
+      <text x="200" y="105" text-anchor="middle" fill="#8a96b0" font-size="10">$1,895.00</text>
+      <text x="340" y="105" text-anchor="middle" fill="#ff4757" font-size="10">-$20.00</text>
+      <text x="480" y="105" text-anchor="middle" fill="#ff4757" font-size="10">-$2,000</text>
+      <text x="590" y="105" text-anchor="middle" fill="#ff4757" font-size="10">$11,500</text>
+
+      <text x="60" y="130" text-anchor="middle" fill="#8a96b0" font-size="10">Day 3</text>
+      <text x="200" y="130" text-anchor="middle" fill="#8a96b0" font-size="10">$1,930.00</text>
+      <text x="340" y="130" text-anchor="middle" fill="#2ed573" font-size="10">+$35.00</text>
+      <text x="480" y="130" text-anchor="middle" fill="#2ed573" font-size="10">+$3,500</text>
+      <text x="590" y="130" text-anchor="middle" fill="#2ed573" font-size="10">$15,000</text>
+
+      <!-- underlines -->
+      <line x1="10" y1="37" x2="640" y2="37" stroke="#1e2840" stroke-width="1"/>
+      <line x1="10" y1="62" x2="640" y2="62" stroke="#1e2840" stroke-width="0.5"/>
+      <line x1="10" y1="87" x2="640" y2="87" stroke="#1e2840" stroke-width="0.5"/>
+      <line x1="10" y1="112" x2="640" y2="112" stroke="#1e2840" stroke-width="0.5"/>
+      <text x="200" y="170" text-anchor="middle" fill="#4a5568" font-size="9">Note: 1 Gold contract = 100 troy ounces</text>
+    </svg>
+  </div>
+
+  <div class="subsection-title"><span>⚖️</span> Futures Pricing — The Cost of Carry Model</div>
+  <div class="formula-box">
+    <div class="label">Futures Fair Value (Cost of Carry Model)</div>
+    F = S × e^(r - q) × T      [Continuous compounding]
+    
+    F = S × (1 + r - q)^T      [Simple approximation]
+    
+    Where:
+    F = Futures price
+    S = Spot (current) price
+    r = Risk-free interest rate
+    q = Dividend yield (for equity futures) or convenience yield
+    T = Time to expiration (in years)
+    
+    Intuition: Futures price = Spot + Cost to "carry" the asset
+    (interest paid) − Benefits received (dividends, convenience)
+  </div>
+
+  <div class="concept-block">
+    <h4>🔍 Contango vs Backwardation</h4>
+    <p><strong>Contango:</strong> Futures price &gt; Spot price. Normal for most commodities (storage costs, interest). Long-term futures more expensive than near-term.<br><br>
+    <strong>Backwardation:</strong> Futures price &lt; Spot price. Happens when current demand is high (like oil shortage). Short-term futures MORE expensive than long-term. Often signals supply shortage.</p>
+  </div>
+
+  <div class="section-title">Common Futures Markets</div>
+  <table class="data-table">
+    <thead><tr><th>Asset Class</th><th>Example</th><th>Exchange</th><th>Contract Size</th><th>Quant Use</th></tr></thead>
+    <tbody>
+      <tr><td>Equity Index</td><td>E-mini S&P 500 (ES)</td><td>CME</td><td>$50 × S&P 500</td><td>Directional bets, hedging equity portfolios</td></tr>
+      <tr><td>Interest Rate</td><td>10-Yr Treasury Note (ZN)</td><td>CBOT</td><td>$100,000 face</td><td>Duration hedging, yield curve trades</td></tr>
+      <tr><td>Energy</td><td>Crude Oil (CL)</td><td>NYMEX</td><td>1,000 barrels</td><td>Commodity momentum, carry strategies</td></tr>
+      <tr><td>Metals</td><td>Gold (GC)</td><td>COMEX</td><td>100 troy oz</td><td>Safe-haven trades, inflation hedging</td></tr>
+      <tr><td>FX</td><td>EUR/USD (6E)</td><td>CME</td><td>€125,000</td><td>Carry trades, macro currency strategies</td></tr>
+      <tr><td>Agricultural</td><td>Corn (ZC)</td><td>CBOT</td><td>5,000 bushels</td><td>Seasonal strategies, weather-driven models</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection-title"><span>🛡️</span> Hedging with Futures — A Real Example</div>
+  <div class="concept-block success">
+    <h4>Portfolio Hedging Example</h4>
+    <p>You manage a $10M equity portfolio with β = 1.2. You fear a market downturn.<br><br>
+    <strong>Number of contracts to sell = (Portfolio Value × β) / (Futures Price × Multiplier)</strong><br><br>
+    If E-mini S&P 500 is at 4,500: Contract value = 4,500 × $50 = $225,000<br>
+    Contracts needed = (10,000,000 × 1.2) / 225,000 = <strong>53.3 ≈ 53 contracts to SHORT</strong><br><br>
+    If market falls 10%, your portfolio loses ~$1.2M, but your short futures gain ~$1.2M. Hedged!</p>
+  </div>
+
+  <!-- exercises -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Futures</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">Explain in simple terms why a wheat farmer would want to SELL futures contracts, while a bread company would want to BUY them. What risk does each party eliminate?</li>
+        <li data-num="E2">A crude oil futures contract is for 1,000 barrels. If you're long 1 contract at $80/barrel and prices rise to $85, what is your profit? If prices fall to $75, what is your loss?</li>
+        <li data-num="E3">What is the difference between futures and forwards? (Hint: think about exchange-traded vs OTC, standardization, and daily settlement.)</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">Use the Cost of Carry model: A stock trades at $100, risk-free rate = 5%, dividend yield = 2%. Calculate the 6-month futures fair value (T=0.5). If the futures trades at $105, is there an arbitrage? How would you exploit it?</li>
+        <li data-num="M2">An investor posts $5,000 initial margin on a futures contract worth $100,000. What is the leverage ratio? If the contract value falls 4%, what is the percentage loss relative to the margin posted? What does this illustrate about leverage risk?</li>
+        <li data-num="M3">A fund has a $5M bond portfolio with duration of 8 years. 10-year T-Bond futures have a price of $98,000 and duration of 9. How many futures contracts should be SOLD to completely hedge the interest rate risk?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Research "basis risk" in futures hedging. Why is it impossible to achieve a perfect hedge with futures? Give a concrete example where basis risk could hurt a hedger even when using the right instrument.</li>
+        <li data-num="H2">Explain the mechanics of "rolling" futures contracts. Why do commodity ETFs suffer from "roll yield" in contango markets? Quantify: if VIX futures are in 5% contango monthly, what is the annual "roll cost" of holding long VIX futures?</li>
+        <li data-num="H3">Research the 1987 "Portfolio Insurance" crash. How did programmatic selling of futures by portfolio insurers create a feedback loop that crashed the market 22% in one day? What was the microstructure mechanism?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 5: OPTIONS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-options">
+  <div class="section-hero" data-icon="⚡">
+    <div>
+      <div class="subtitle">Chapter 05</div>
+      <h2>Options — The Right, Not Obligation</h2>
+      <p>Options are the most mathematically rich financial instrument. An option gives the buyer the <em>right</em> (but not the obligation) to buy or sell an asset at a fixed price before a specific date. This optionality has value, and pricing it is where quant finance truly shines.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <!-- Call payoff diagram -->
+        <line x1="10" y1="140" x2="210" y2="140" stroke="#1e2840" stroke-width="1.5"/>
+        <line x1="10" y1="20" x2="10" y2="155" stroke="#1e2840" stroke-width="1.5"/>
+        <!-- strike -->
+        <line x1="110" y1="140" x2="110" y2="150" stroke="#f5c842" stroke-width="1.5"/>
+        <text x="110" y="165" text-anchor="middle" fill="#f5c842" font-size="9">Strike K</text>
+        <!-- payoff line: flat at 0 then rises -->
+        <polyline points="10,140 110,140 210,40" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+        <!-- premium line (cost) -->
+        <polyline points="10,160 110,160 210,60" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="5" y="40" fill="#00d4ff" font-size="8">Profit</text>
+        <text x="180" y="80" fill="#00d4ff" font-size="9">Call</text>
+        <text x="185" y="68" fill="#00d4ff" font-size="8">Payoff</text>
+        <text x="155" y="150" fill="#c084fc" font-size="8">Net P&amp;L</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">Call vs Put — The Two Basic Options</div>
+  <div class="two-col">
+    <div class="card">
+      <div class="tag" style="background:rgba(0,212,255,0.1);color:var(--accent)">CALL OPTION</div>
+      <h3>📈 Right to BUY</h3>
+      <p><strong>Buyer</strong> pays a premium to get the right to buy the underlying asset at the <em>strike price</em> on or before <em>expiration</em>.<br><br>
+      <strong>Profit when:</strong> Underlying price &gt; Strike + Premium paid<br><br>
+      You buy a call when you're BULLISH. Maximum loss = premium paid. Maximum gain = theoretically unlimited.</p>
+    </div>
+    <div class="card">
+      <div class="tag" style="background:rgba(255,71,87,0.1);color:var(--red)">PUT OPTION</div>
+      <h3>📉 Right to SELL</h3>
+      <p><strong>Buyer</strong> pays a premium to get the right to sell the underlying asset at the <em>strike price</em> on or before <em>expiration</em>.<br><br>
+      <strong>Profit when:</strong> Underlying price &lt; Strike − Premium paid<br><br>
+      You buy a put when you're BEARISH. Maximum loss = premium. Maximum gain = Strike price (if stock goes to 0).</p>
+    </div>
+  </div>
+
+  <div class="section-title">Options Terminology — Complete Glossary</div>
+  <table class="data-table">
+    <thead><tr><th>Term</th><th>Definition</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Strike Price (K)</strong></td><td>The fixed price at which the holder can buy/sell</td><td>$150 strike means you can buy AAPL at $150</td></tr>
+      <tr><td><strong>Expiration Date</strong></td><td>Last day the option can be exercised</td><td>June 20, 2025 expiry</td></tr>
+      <tr><td><strong>Premium</strong></td><td>Price paid to buy the option</td><td>$5 per share (× 100 = $500 per contract)</td></tr>
+      <tr><td><strong>ITM (In the Money)</strong></td><td>Call: Stock &gt; Strike. Put: Stock &lt; Strike. Immediate exercise value.</td><td>Call with K=$140, Stock=$155 → ITM</td></tr>
+      <tr><td><strong>ATM (At the Money)</strong></td><td>Stock price ≈ Strike price</td><td>K=$150, Stock=$150</td></tr>
+      <tr><td><strong>OTM (Out of the Money)</strong></td><td>Call: Stock &lt; Strike. Put: Stock &gt; Strike. No intrinsic value.</td><td>Call with K=$160, Stock=$150 → OTM</td></tr>
+      <tr><td><strong>American Option</strong></td><td>Can be exercised any time before expiration</td><td>Most US equity options</td></tr>
+      <tr><td><strong>European Option</strong></td><td>Can only be exercised AT expiration</td><td>Most index options (SPX)</td></tr>
+      <tr><td><strong>Intrinsic Value</strong></td><td>What the option is worth if exercised NOW</td><td>Call: max(S−K, 0). Put: max(K−S, 0)</td></tr>
+      <tr><td><strong>Time Value</strong></td><td>Premium − Intrinsic Value. Decays to zero at expiry.</td><td>Option worth $8, intrinsic = $5 → time value = $3</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Payoff Diagrams — Visualizing Options</div>
+  <div class="diagram-wrap">
+    <h4>📊 The 4 Basic Options Payoffs at Expiration</h4>
+    <svg width="100%" height="320" viewBox="0 0 700 320">
+      <!-- LONG CALL -->
+      <text x="90" y="18" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Long Call</text>
+      <line x1="15" y1="160" x2="165" y2="160" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="15" y1="60" x2="15" y2="165" stroke="#1e2840" stroke-width="1.5"/>
+      <polyline points="15,160 90,160 165,85" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+      <polyline points="15,175 90,175 165,100" fill="none" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3" opacity="0.5"/>
+      <circle cx="90" cy="160" r="3" fill="#f5c842"/>
+      <text x="90" y="178" text-anchor="middle" fill="#f5c842" font-size="8">K</text>
+      <text x="168" y="85" fill="#00d4ff" font-size="8">↑ profit</text>
+      <text x="15" y="190" fill="#4a5568" font-size="8">Loss=premium</text>
+
+      <!-- LONG PUT -->
+      <text x="265" y="18" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="bold">Long Put</text>
+      <line x1="185" y1="160" x2="345" y2="160" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="185" y1="60" x2="185" y2="165" stroke="#1e2840" stroke-width="1.5"/>
+      <polyline points="185,85 265,160 345,160" fill="none" stroke="#ff4757" stroke-width="2.5"/>
+      <polyline points="185,100 265,175 345,175" fill="none" stroke="#ff4757" stroke-width="1" stroke-dasharray="3" opacity="0.5"/>
+      <circle cx="265" cy="160" r="3" fill="#f5c842"/>
+      <text x="265" y="178" text-anchor="middle" fill="#f5c842" font-size="8">K</text>
+      <text x="185" y="87" fill="#ff4757" font-size="8">profit↑</text>
+
+      <!-- SHORT CALL -->
+      <text x="440" y="18" text-anchor="middle" fill="#c084fc" font-size="11" font-weight="bold">Short Call</text>
+      <line x1="360" y1="160" x2="515" y2="160" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="360" y1="60" x2="360" y2="250" stroke="#1e2840" stroke-width="1.5"/>
+      <polyline points="360,145 440,145 515,235" fill="none" stroke="#c084fc" stroke-width="2.5"/>
+      <circle cx="440" cy="145" r="3" fill="#f5c842"/>
+      <text x="440" y="178" text-anchor="middle" fill="#f5c842" font-size="8">K</text>
+      <text x="362" y="140" fill="#c084fc" font-size="8">Max gain=premium</text>
+      <text x="490" y="245" fill="#ff4757" font-size="8">↓ loss unlimited</text>
+
+      <!-- SHORT PUT -->
+      <text x="620" y="18" text-anchor="middle" fill="#f5c842" font-size="11" font-weight="bold">Short Put</text>
+      <line x1="540" y1="160" x2="695" y2="160" stroke="#1e2840" stroke-width="1.5"/>
+      <line x1="540" y1="60" x2="540" y2="250" stroke="#1e2840" stroke-width="1.5"/>
+      <polyline points="540,235 620,145 695,145" fill="none" stroke="#f5c842" stroke-width="2.5"/>
+      <circle cx="620" cy="145" r="3" fill="#f5c842"/>
+      <text x="620" y="178" text-anchor="middle" fill="#f5c842" font-size="8">K</text>
+      <text x="545" y="240" fill="#ff4757" font-size="8">max loss (if stock=0)</text>
+      <text x="650" y="140" fill="#f5c842" font-size="8">premium</text>
+
+      <!-- legend -->
+      <line x1="20" y1="300" x2="50" y2="300" stroke="#fff" stroke-width="1.5"/>
+      <text x="55" y="304" fill="#4a5568" font-size="9">= payoff at expiry (gross)</text>
+      <line x1="200" y1="300" x2="230" y2="300" stroke="#fff" stroke-width="1" stroke-dasharray="3"/>
+      <text x="235" y="304" fill="#4a5568" font-size="9">= net P&amp;L (after premium)</text>
+    </svg>
+  </div>
+
+  <div class="section-title">Black-Scholes Model — The Cornerstone of Options Pricing</div>
+  <div class="callout">
+    <strong>Historical Context:</strong> Fischer Black, Myron Scholes, and Robert Merton developed this model in 1973. Scholes and Merton received the Nobel Prize in Economics in 1997 (Black had died in 1995). The BSM model is the foundation of modern quantitative finance and derivatives pricing.
+  </div>
+
+  <div class="formula-box">
+    <div class="label">Black-Scholes-Merton Formula</div>
+    Call Price: C = S·N(d₁) − K·e^(-rT)·N(d₂)
+    Put Price:  P = K·e^(-rT)·N(-d₂) − S·N(-d₁)
+    
+    Where:
+    d₁ = [ln(S/K) + (r + σ²/2)·T] / (σ·√T)
+    d₂ = d₁ − σ·√T
+    
+    S = Current stock price
+    K = Strike price
+    r = Risk-free interest rate (continuous)
+    T = Time to expiration (in years)
+    σ = Implied volatility (annualized)
+    N() = Cumulative normal distribution function
+    e = Euler's number (≈ 2.71828)
+  </div>
+
+  <div class="concept-block purple">
+    <h4>🧠 BSM Assumptions (and why they're violated in practice)</h4>
+    <ul>
+      <li>Returns are <strong>log-normally distributed</strong> (Real markets have fat tails)</li>
+      <li>Volatility is <strong>constant</strong> (Real: it changes constantly — see Vol Smile)</li>
+      <li>No <strong>dividends</strong> (Extended models handle dividends)</li>
+      <li>No <strong>transaction costs</strong> (Real markets have frictions)</li>
+      <li>Can trade <strong>continuously</strong> (Real: discrete trading)</li>
+      <li>Risk-free rate is <strong>known and constant</strong></li>
+    </ul>
+  </div>
+
+  <!-- The Greeks -->
+  <div class="section-title">The Greeks — Sensitivities of Option Prices</div>
+  <div class="concept-block">
+    <h4>🔤 Why "The Greeks"?</h4>
+    <p>The Greeks measure how an option's price changes with respect to different factors. Each Greek is a partial derivative of the option price with respect to one variable. Understanding the Greeks is essential for <strong>options trading, delta hedging, and risk management</strong>.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">Δ Delta</div>
+      <h3>∂C/∂S — Price Sensitivity</h3>
+      <p>How much option price changes per $1 change in stock price.<br><br>
+      Call delta: 0 to +1. Put delta: -1 to 0.<br>
+      ATM call ≈ 0.50 (moves $0.50 per $1 stock move)<br>
+      Deep ITM call ≈ 1.0 (moves like stock)<br><br>
+      Also: probability the option expires ITM!</p>
+    </div>
+    <div class="card">
+      <div class="tag">Γ Gamma</div>
+      <h3>∂²C/∂S² — Delta's Rate of Change</h3>
+      <p>How fast delta changes with stock price. Second-order sensitivity.<br><br>
+      Highest for ATM options near expiry. Gamma tells you how much your hedge will "slip." Long gamma = you benefit from large moves (good!). Short gamma = you get hurt by large moves.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Θ Theta</div>
+      <h3>∂C/∂t — Time Decay</h3>
+      <p>How much option price decays per day as time passes. Usually negative for option BUYERS (you're losing time value every day).<br><br>
+      "Theta burn": A $5 option expiring in 30 days might lose $0.10/day. Option sellers PROFIT from theta.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Vega</div>
+      <h3>∂C/∂σ — Volatility Sensitivity</h3>
+      <p>How much option price changes per 1% change in implied volatility. (Technically not a Greek letter.)<br><br>
+      All options have positive vega — higher vol = higher option price. Buying options = long vega. You profit from vol spikes (like VIX jumping in crashes).</p>
+    </div>
+    <div class="card">
+      <div class="tag">ρ Rho</div>
+      <h3>∂C/∂r — Interest Rate Sensitivity</h3>
+      <p>How much option price changes with interest rates. Less impactful for short-dated options. More important for long-dated options (LEAPS). Call options have positive rho (benefit from rate rises).</p>
+    </div>
+  </div>
+
+  <!-- Delta Hedging -->
+  <div class="section-title">Delta Hedging — How Market Makers Stay Neutral</div>
+  <div class="concept-block success">
+    <h4>🔄 The Delta Hedging Process</h4>
+    <p>A market maker sells a call option with delta = 0.60. To be delta-neutral (no directional exposure), they BUY 60 shares of stock for every 100 options sold. If the stock moves, delta changes (gamma!), so they rebalance. This continuous rebalancing is called <strong>dynamic delta hedging</strong>.<br><br>
+    The cost of this rebalancing IS the cost of gamma — and it's essentially what the option seller receives as payment for bearing that risk. BSM shows: the fair option price = expected cost of delta hedging.</p>
+  </div>
+
+  <!-- Vol Smile -->
+  <div class="section-title">Implied Volatility & The Volatility Smile</div>
+  <div class="concept-block warn">
+    <h4>😊 What is the Vol Smile?</h4>
+    <p>If BSM were perfect, implied volatility would be the same across all strikes. But in reality, options with lower strikes (especially puts) have HIGHER implied vol than ATM options. This U-shape (or smirk) is called the <strong>volatility smile/smirk</strong>.<br><br>
+    This tells us markets know BSM is wrong — real return distributions have fat tails (tail risk). Puts are expensive because investors pay up for crash protection. This is the entire business of "volatility trading."</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Volatility Smile / Smirk</h4>
+    <svg width="100%" height="220" viewBox="0 0 500 220">
+      <line x1="60" y1="190" x2="460" y2="190" stroke="#1e2840" stroke-width="2"/>
+      <line x1="60" y1="20" x2="60" y2="190" stroke="#1e2840" stroke-width="2"/>
+      <text x="260" y="210" text-anchor="middle" fill="#4a5568" font-size="11">Strike Price (relative to ATM)</text>
+      <text x="20" y="110" text-anchor="middle" fill="#4a5568" font-size="11" transform="rotate(-90,20,110)">Implied Vol %</text>
+      <!-- equity smirk (more common) -->
+      <path d="M80,60 C120,80 160,110 200,135 S280,160 340,175 S420,182 450,185"
+            stroke="#ff4757" stroke-width="2.5" fill="none"/>
+      <text x="460" y="185" fill="#ff4757" font-size="9">Smirk (Equities)</text>
+      <!-- symmetric smile (FX) -->
+      <path d="M80,75 C120,100 160,135 200,145 S280,140 340,115 S400,85 450,70"
+            stroke="#00d4ff" stroke-width="2.5" fill="none" stroke-dasharray="6"/>
+      <text x="460" y="72" fill="#00d4ff" font-size="9">Smile (FX/Rates)</text>
+      <!-- ATM marker -->
+      <line x1="265" y1="190" x2="265" y2="200" stroke="#f5c842" stroke-width="1.5"/>
+      <text x="265" y="210" text-anchor="middle" fill="#f5c842" font-size="9">ATM</text>
+      <!-- axis labels -->
+      <text x="90" y="210" fill="#4a5568" font-size="8">Deep OTM Put</text>
+      <text x="420" y="210" fill="#4a5568" font-size="8">Deep OTM Call</text>
+      <!-- y axis ticks -->
+      <text x="50" y="190" text-anchor="end" fill="#4a5568" font-size="8">10%</text>
+      <text x="50" y="140" text-anchor="end" fill="#4a5568" font-size="8">20%</text>
+      <text x="50" y="90" text-anchor="end" fill="#4a5568" font-size="8">30%</text>
+      <text x="50" y="40" text-anchor="end" fill="#4a5568" font-size="8">40%</text>
+    </svg>
+  </div>
+
+  <!-- exercises -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Options</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">You buy a call option on stock XYZ with strike $100, premium $5, expiring in 1 month. Stock goes to $112 at expiry. What is your profit/loss per share? What if stock goes to $97?</li>
+        <li data-num="E2">Explain in one sentence each: what does it mean for an option to be ITM, ATM, and OTM? Give an example for a put option with K=$80.</li>
+        <li data-num="E3">An option has intrinsic value of $8 and trades at $11. What is its time value? What does this time value represent?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">A call option has delta=0.65. If the stock rises by $3, by approximately how much does the option price change? If an option market maker is short 1,000 calls (each covering 100 shares), how many shares must they buy to be delta-neutral?</li>
+        <li data-num="M2">Two options on same stock: Option A has theta=-0.08, Option B has theta=-0.03. If nothing else changes in 10 days, how much does each option lose in time value? Which would you prefer to BUY? Which to SELL?</li>
+        <li data-num="M3">Use the BSM formula conceptually: If implied volatility on a stock rises from 20% to 30%, will call and put prices rise or fall? Explain using vega. Who benefits from a vol spike — option buyers or sellers?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Implement the BSM formula in Python (or by hand). Calculate call and put prices for: S=100, K=100, r=0.05, T=0.25 (3 months), σ=0.20. Then calculate all five Greeks numerically by bumping each input by a small amount.</li>
+        <li data-num="H2">Explain the concept of "gamma scalping." A delta-neutral trader is long gamma (long options). When the stock moves, how does their delta change? How do they "scalp" by re-hedging? Under what vol conditions is this profitable?</li>
+        <li data-num="H3">Research "local volatility" (Dupire model) and "stochastic volatility" (Heston model). How do these improve on BSM? What real market behavior do they each try to capture? What is the key mathematical difference between them?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 6: MARKET MICROSTRUCTURE -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-micro">
+  <div class="section-hero" data-icon="🔬">
+    <div>
+      <div class="subtitle">Chapter 06</div>
+      <h2>Market Microstructure — How Markets Actually Work</h2>
+      <p>Microstructure is the study of the detailed process and mechanics of how financial assets are traded. For quants (especially HFT and execution researchers), this is where alpha lives. It's the difference between theory and the messy reality of markets.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="180" viewBox="0 0 220 180">
+        <!-- Bid-ask ladder visual -->
+        <rect x="10" y="10" width="95" height="160" rx="6" fill="var(--surface2)" stroke="var(--border)" stroke-width="1"/>
+        <rect x="115" y="10" width="95" height="160" rx="6" fill="var(--surface2)" stroke="var(--border)" stroke-width="1"/>
+        <text x="57" y="28" text-anchor="middle" fill="#2ed573" font-size="9" font-weight="bold">BIDS</text>
+        <text x="162" y="28" text-anchor="middle" fill="#ff4757" font-size="9" font-weight="bold">ASKS</text>
+        <!-- bid rows -->
+        <rect x="15" y="35" width="85" height="14" rx="3" fill="rgba(46,213,115,0.2)"/>
+        <text x="57" y="46" text-anchor="middle" fill="#2ed573" font-size="8">$49.98 — 500</text>
+        <rect x="15" y="52" width="75" height="14" rx="3" fill="rgba(46,213,115,0.15)"/>
+        <text x="50" y="63" text-anchor="middle" fill="#2ed573" font-size="8">$49.96 — 800</text>
+        <rect x="15" y="69" width="55" height="14" rx="3" fill="rgba(46,213,115,0.1)"/>
+        <text x="42" y="80" text-anchor="middle" fill="#2ed573" font-size="8">$49.94 — 200</text>
+        <!-- ask rows -->
+        <rect x="120" y="35" width="85" height="14" rx="3" fill="rgba(255,71,87,0.2)"/>
+        <text x="162" y="46" text-anchor="middle" fill="#ff4757" font-size="8">$50.00 — 300</text>
+        <rect x="120" y="52" width="75" height="14" rx="3" fill="rgba(255,71,87,0.15)"/>
+        <text x="157" y="63" text-anchor="middle" fill="#ff4757" font-size="8">$50.02 — 1000</text>
+        <rect x="120" y="69" width="65" height="14" rx="3" fill="rgba(255,71,87,0.1)"/>
+        <text x="152" y="80" text-anchor="middle" fill="#ff4757" font-size="8">$50.04 — 700</text>
+        <!-- spread -->
+        <rect x="15" y="90" width="190" height="16" rx="4" fill="rgba(245,200,66,0.08)"/>
+        <text x="110" y="102" text-anchor="middle" fill="#f5c842" font-size="8">Spread = $0.02</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section-title">The Order Book — Deep Dive</div>
+  <div class="concept-block">
+    <h4>📖 What is the Limit Order Book (LOB)?</h4>
+    <p>The central data structure of modern markets. It's a real-time, sorted list of all open <em>limit orders</em> (orders with specified price limits). The LOB determines the current price, available liquidity, and trading costs. For quants, modeling the LOB is a rich research area.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">Order Type</div>
+      <h3>📋 Market Order</h3>
+      <p>Execute immediately at the best available price. You get guaranteed execution but UNCERTAIN price. In a fast market, you may get a price far from what you expected ("slippage"). Aggressive — takes liquidity from the book.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Order Type</div>
+      <h3>🎯 Limit Order</h3>
+      <p>Execute only at your specified price or better. You get guaranteed price but UNCERTAIN execution (may never fill if price doesn't reach your limit). Passive — adds liquidity to the book. Earns maker rebates on many exchanges.</p>
+    </div>
+    <div class="card">
+      <div class="tag">Order Type</div>
+      <h3>🛡️ Stop Order</h3>
+      <p>Becomes a market order when price hits a trigger level. Used to limit losses (stop-loss) or enter on breakouts. Risk: in fast markets, stop orders can "gap" — execute far below your trigger (called "slippage").</p>
+    </div>
+  </div>
+
+  <div class="section-title">Market Microstructure Concepts for Quants</div>
+
+  <div class="subsection-title"><span>💰</span> The Bid-Ask Spread — Who Captures It & Why</div>
+  <div class="formula-box">
+    <div class="label">Bid-Ask Spread Components</div>
+    Bid-Ask Spread = Inventory Risk + Adverse Selection + Order Processing
+    
+    Inventory Risk:    MM holds shares that could move against them
+    Adverse Selection: MM might be trading with someone who KNOWS more
+    Order Processing:  System costs, regulatory fees, exchange fees
+    
+    Effective Spread ≈ 2 × |Trade Price − Midpoint|
+    Quoted Spread     = Ask Price − Bid Price
+    Relative Spread   = (Ask − Bid) / Midpoint × 100%
+  </div>
+
+  <div class="subsection-title"><span>⚡</span> High-Frequency Trading (HFT)</div>
+  <div class="concept-block purple">
+    <h4>🤖 What is HFT?</h4>
+    <p>Trading strategies executed by algorithms in microseconds (millionths of a second) to milliseconds. HFT firms use co-location (servers physically next to exchange matching engines), fiber optic and microwave networks, and custom FPGA hardware to gain speed advantages measured in nanoseconds.<br><br>
+    <strong>Main HFT strategies:</strong><br>
+    • <em>Market making:</em> Post bid and ask, earn the spread thousands of times per second<br>
+    • <em>Statistical arbitrage:</em> Exploit tiny price differences between correlated assets<br>
+    • <em>Latency arbitrage:</em> React faster to news than competitors<br>
+    • <em>Order flow toxicity detection:</em> Identify informed traders and step aside</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <h4>📊 Trade Execution Timeline — From Order to Fill</h4>
+    <svg width="100%" height="120" viewBox="0 0 700 120">
+      <!-- timeline -->
+      <line x1="20" y1="60" x2="680" y2="60" stroke="#1e2840" stroke-width="2"/>
+
+      <!-- steps -->
+      <circle cx="50" cy="60" r="12" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="50" y="65" text-anchor="middle" fill="#00d4ff" font-size="9">1</text>
+      <text x="50" y="90" text-anchor="middle" fill="#4a5568" font-size="8">Signal</text>
+      <text x="50" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Generated</text>
+
+      <circle cx="180" cy="60" r="12" fill="rgba(255,107,53,0.15)" stroke="#ff6b35" stroke-width="1.5"/>
+      <text x="180" y="65" text-anchor="middle" fill="#ff6b35" font-size="9">2</text>
+      <text x="180" y="90" text-anchor="middle" fill="#4a5568" font-size="8">Order</text>
+      <text x="180" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Created</text>
+
+      <circle cx="310" cy="60" r="12" fill="rgba(192,132,252,0.15)" stroke="#c084fc" stroke-width="1.5"/>
+      <text x="310" y="65" text-anchor="middle" fill="#c084fc" font-size="9">3</text>
+      <text x="310" y="90" text-anchor="middle" fill="#4a5568" font-size="8">OMS / Risk</text>
+      <text x="310" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Pre-trade checks</text>
+
+      <circle cx="440" cy="60" r="12" fill="rgba(245,200,66,0.15)" stroke="#f5c842" stroke-width="1.5"/>
+      <text x="440" y="65" text-anchor="middle" fill="#f5c842" font-size="9">4</text>
+      <text x="440" y="90" text-anchor="middle" fill="#4a5568" font-size="8">Network</text>
+      <text x="440" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Transmission</text>
+
+      <circle cx="570" cy="60" r="12" fill="rgba(46,213,115,0.15)" stroke="#2ed573" stroke-width="1.5"/>
+      <text x="570" y="65" text-anchor="middle" fill="#2ed573" font-size="9">5</text>
+      <text x="570" y="90" text-anchor="middle" fill="#4a5568" font-size="8">Exchange</text>
+      <text x="570" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Matching Engine</text>
+
+      <circle cx="660" cy="60" r="12" fill="rgba(127,255,107,0.15)" stroke="#7fff6b" stroke-width="1.5"/>
+      <text x="660" y="65" text-anchor="middle" fill="#7fff6b" font-size="9">6</text>
+      <text x="660" y="90" text-anchor="middle" fill="#4a5568" font-size="8">Fill</text>
+      <text x="660" y="102" text-anchor="middle" fill="#4a5568" font-size="7">Confirmed</text>
+
+      <!-- time labels -->
+      <text x="50" y="35" text-anchor="middle" fill="#4a5568" font-size="7">t=0</text>
+      <text x="310" y="35" text-anchor="middle" fill="#4a5568" font-size="7">~50–200μs</text>
+      <text x="570" y="35" text-anchor="middle" fill="#4a5568" font-size="7">~500μs–2ms</text>
+      <text x="660" y="35" text-anchor="middle" fill="#4a5568" font-size="7">~1–5ms total</text>
+    </svg>
+  </div>
+
+  <div class="subsection-title"><span>📊</span> Price Impact & Market Impact Models</div>
+  <div class="concept-block warn">
+    <h4>🌊 What is Market Impact?</h4>
+    <p>When you trade, you MOVE the market against yourself. Buying pushes prices up; selling pushes prices down. For large orders, this impact can be significant and costly.<br><br>
+    <strong>Temporary impact:</strong> Price reverts after your trade (you created temporary imbalance)<br>
+    <strong>Permanent impact:</strong> Price stays at new level (your trade conveyed information)<br><br>
+    A quant strategy with great backtested returns can fail completely once live because market impact wasn't modeled correctly.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="label">Almgren-Chriss Market Impact (Simplified)</div>
+    Total Cost = Linear Impact + Nonlinear Impact + Risk Cost
+    
+    Linear (temporary): η × σ × (v/V)
+    Nonlinear (permanent): γ × σ × (X/V)^(3/2)
+    
+    Where:
+    σ = asset volatility
+    v = trading rate (shares/time)
+    V = average daily volume
+    X = total order size
+    η, γ = impact coefficients (calibrated from data)
+    
+    Key insight: SLOWING DOWN reduces impact but increases risk
+    SPEEDING UP reduces risk but increases impact
+    Optimal execution balances both.
+  </div>
+
+  <div class="subsection-title"><span>🧮</span> VWAP, TWAP — Execution Algorithms</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="tag">VWAP</div>
+      <h3>📊 Volume Weighted Avg Price</h3>
+      <p>Execute in proportion to historical volume at each time period. Ensures you don't trade too much when volume is thin (higher impact). The standard benchmark for institutional execution. VWAP = Σ(Price × Volume) / Σ(Volume).</p>
+    </div>
+    <div class="card">
+      <div class="tag">TWAP</div>
+      <h3>⏱️ Time Weighted Avg Price</h3>
+      <p>Split order equally across time slices. Simpler than VWAP. Used when you don't want to predict volume patterns. Trades same size every N minutes. More predictable but potentially worse in low-volume periods.</p>
+    </div>
+    <div class="card">
+      <div class="tag">IS</div>
+      <h3>🎯 Implementation Shortfall</h3>
+      <p>The difference between paper portfolio return and actual return due to trading costs. Measures: bid-ask spread cost + market impact + delay cost + opportunity cost. The TRUE measure of execution quality. IS = Paper P&L − Actual P&L.</p>
+    </div>
+  </div>
+
+  <!-- Adverse Selection -->
+  <div class="subsection-title"><span>🔍</span> Adverse Selection & Informed Trading</div>
+  <div class="concept-block danger">
+    <h4>⚠️ The Adverse Selection Problem</h4>
+    <p>A market maker doesn't know if they're trading with an informed trader (who knows the true value) or an uninformed trader (random liquidity need).<br><br>
+    If an informed trader knows a stock will rise, they'll BUY from the market maker. The market maker loses money on this trade. To survive, market makers widen spreads to compensate for expected losses to informed traders.<br><br>
+    This is <strong>Glosten-Milgrom adverse selection</strong> — a cornerstone of microstructure theory. PIN (Probability of Informed Trading) is a measure of how much of the order flow is informed.</p>
+  </div>
+
+  <!-- Exercises -->
+  <div class="exercise-section">
+    <h3>// Practice Exercises — Market Microstructure</h3>
+    <div class="exercise-tier">
+      <div class="tier-label tier-easy">🟢 Easy</div>
+      <ul class="exercise-list">
+        <li data-num="E1">Stock ABC has best bid $50.10 and best ask $50.16. What is the quoted spread in dollars? What is the relative spread in basis points? If you market buy 100 shares, what price do you pay?</li>
+        <li data-num="E2">Explain the difference between a market order and a limit order. In which market condition would you prefer each? (Hint: think about fast vs. slow moving markets.)</li>
+        <li data-num="E3">What does "co-location" mean in HFT? Why would an HFT firm pay $50,000/month to rent a rack of servers inside an exchange's data center?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-med">🟡 Medium</div>
+      <ul class="exercise-list">
+        <li data-num="M1">You want to buy 1,000,000 shares of a stock that trades an average of 5,000,000 shares/day. Your order is 20% of daily volume. Why does this create market impact? Design a simple TWAP strategy to execute this over 4 hours (assume 6.5 hour trading day).</li>
+        <li data-num="M2">Calculate VWAP: A stock trades 200 shares @ $10.00, then 500 shares @ $10.05, then 300 shares @ $10.03. What is the VWAP? If you executed all 1000 shares at $10.04, did you beat or miss VWAP?</li>
+        <li data-num="M3">A market maker quotes $100.00 bid / $100.06 ask (6-cent spread). They trade 10,000 round trips/day. If 2% of trades are against informed traders (losing $0.20 per trade on average) and 98% are uninformed (earning full spread), what is the market maker's expected daily P&L?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-label tier-hard">🔴 Hard</div>
+      <ul class="exercise-list">
+        <li data-num="H1">Research the Kyle (1985) model of informed trading. Define the "lambda" (market depth) parameter. How does a monopolistic informed trader optimally trade to maximize profit while minimizing price impact? What is the key insight about information revelation over time?</li>
+        <li data-num="H2">Implement a simple optimal execution model: You need to sell X=1000 shares in T=10 periods. Assume linear temporary impact η and volatility σ. Formulate the optimization problem to minimize expected cost + risk. Solve for the optimal uniform execution rate (Almgren-Chriss simplified case).</li>
+        <li data-num="H3">Research "order flow toxicity" and the VPIN (Volume-Synchronized Probability of Informed Trading) measure. How did VPIN signal elevated toxicity before the May 2010 Flash Crash? What are the criticisms of VPIN as a predictive measure?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- TAB 7: COLAB LABS -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-colab">
+  <div class="section-hero" data-icon="💻">
+    <div>
+      <div class="subtitle">Chapter 07</div>
+      <h2>Google Colab Experiments</h2>
+      <p>Hands-on coding is essential for quant engineers. These experiments are designed to run on Google Colab (free) with no setup required. Each experiment reinforces the theory from the previous tabs. Code is complete — copy, paste, run, and experiment.</p>
+    </div>
+    <div class="hero-visual">
+      <svg width="220" height="160" viewBox="0 0 220 160">
+        <rect x="20" y="20" width="180" height="120" rx="10" fill="rgba(0,212,255,0.05)" stroke="#1e2840" stroke-width="2"/>
+        <text x="30" y="45" fill="#c084fc" font-size="10" font-family="monospace">import numpy as np</text>
+        <text x="30" y="63" fill="#c084fc" font-size="10" font-family="monospace">import pandas as pd</text>
+        <text x="30" y="81" fill="#86efac" font-size="10" font-family="monospace"># Let's build finance!</text>
+        <text x="30" y="99" fill="#60cdff" font-size="10" font-family="monospace">returns = np.random</text>
+        <text x="30" y="117" fill="#60cdff" font-size="10" font-family="monospace">  .normal(0.08, 0.2)</text>
+        <rect x="170" y="12" width="34" height="14" rx="4" fill="#f9ab00"/>
+        <text x="187" y="23" text-anchor="middle" fill="#000" font-size="8" font-weight="bold">Colab</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="callout gold">
+    <strong>🚀 Getting Started:</strong> Go to <a href="https://colab.research.google.com" target="_blank" style="color:var(--accent)">colab.research.google.com</a> → New Notebook. All experiments use standard Python libraries (numpy, pandas, matplotlib, scipy) which are pre-installed in Colab. For market data, we use <strong>yfinance</strong> — install with <code style="background:#0d1525;padding:0.1em 0.3em;border-radius:3px;font-family:monospace">!pip install yfinance</code>
+  </div>
+
+  <!-- LAB 1 -->
+  <div class="colab-box">
+    <div class="colab-header">
+      <div class="colab-badge">LAB 01</div>
+      <h4>📈 Downloading & Visualizing Real Stock Data</h4>
+    </div>
+    <p>Learn to fetch real market data using yfinance, calculate returns, and visualize price history. This is the starting point for almost all quant projects.</p>
+    <div class="code-block"><span class="c"># Install yfinance (first run only)</span>
+<span class="kw">import</span> subprocess
+subprocess.run([<span class="str">"pip"</span>, <span class="str">"install"</span>, <span class="str">"yfinance"</span>, <span class="str">"-q"</span>])
+
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="c"># 1. Download data for multiple tickers</span>
+tickers = [<span class="str">'AAPL'</span>, <span class="str">'MSFT'</span>, <span class="str">'GOOGL'</span>, <span class="str">'^GSPC'</span>]  <span class="c"># ^GSPC = S&P 500</span>
+data = yf.<span class="fn">download</span>(tickers, start=<span class="str">'2020-01-01'</span>, end=<span class="str">'2024-01-01'</span>)[<span class="str">'Adj Close'</span>]
+
+<span class="c"># 2. Calculate daily log returns</span>
+log_returns = np.<span class="fn">log</span>(data / data.<span class="fn">shift</span>(<span class="num">1</span>)).<span class="fn">dropna</span>()
+
+<span class="c"># 3. Print summary statistics</span>
+<span class="fn">print</span>(<span class="str">"=== Daily Return Statistics ==="</span>)
+<span class="fn">print</span>(f<span class="str">"Annualized Return (%) :"</span>, (log_returns.<span class="fn">mean</span>() * <span class="num">252</span> * <span class="num">100</span>).<span class="fn">round</span>(<span class="num">2</span>))
+<span class="fn">print</span>(f<span class="str">"Annualized Volatility (%):"</span>, (log_returns.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="num">252</span>) * <span class="num">100</span>).<span class="fn">round</span>(<span class="num">2</span>))
+<span class="fn">print</span>(f<span class="str">"Sharpe Ratio:"</span>, ((log_returns.<span class="fn">mean</span>() * <span class="num">252</span>) / (log_returns.<span class="fn">std</span>() * np.<span class="fn">sqrt</span>(<span class="num">252</span>))).<span class="fn">round</span>(<span class="num">3</span>))
+
+<span class="c"># 4. Plot normalized cumulative returns</span>
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="num">2</span>, <span class="num">1</span>, figsize=(<span class="num">14</span>, <span class="num">10</span>))
+
+<span class="c"># Cumulative return (rebased to 100)</span>
+((<span class="num">1</span> + log_returns).<span class="fn">cumprod</span>() * <span class="num">100</span>).<span class="fn">plot</span>(ax=ax1, linewidth=<span class="num">1.5</span>)
+ax1.<span class="fn">set_title</span>(<span class="str">'Cumulative Returns (Base=100, Jan 2020)'</span>, fontsize=<span class="num">14</span>)
+ax1.<span class="fn">set_ylabel</span>(<span class="str">'Portfolio Value'</span>)
+ax1.<span class="fn">legend</span>()
+ax1.<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+<span class="c"># Return distribution histogram</span>
+log_returns[<span class="str">'AAPL'</span>].<span class="fn">hist</span>(bins=<span class="num">80</span>, ax=ax2, alpha=<span class="num">0.7</span>, color=<span class="str">'royalblue'</span>)
+ax2.<span class="fn">axvline</span>(log_returns[<span class="str">'AAPL'</span>].<span class="fn">mean</span>(), color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>, label=<span class="str">'Mean'</span>)
+ax2.<span class="fn">set_title</span>(<span class="str">'AAPL Daily Return Distribution'</span>, fontsize=<span class="num">14</span>)
+ax2.<span class="fn">set_xlabel</span>(<span class="str">'Log Return'</span>)
+ax2.<span class="fn">legend</span>()
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="c"># 5. Correlation matrix (for diversification study)</span>
+<span class="fn">print</span>(<span class="str">"\n=== Correlation Matrix ==="</span>)
+<span class="fn">print</span>(log_returns.<span class="fn">corr</span>().<span class="fn">round</span>(<span class="num">3</span>))</div>
+  </div>
+
+  <!-- LAB 2 -->
+  <div class="colab-box">
+    <div class="colab-header">
+      <div class="colab-badge">LAB 02</div>
+      <h4>🏦 Bond Pricing & Yield Curve Analysis</h4>
+    </div>
+    <p>Build a complete bond pricing function, explore price-yield relationships, and visualize the US Treasury yield curve.</p>
+    <div class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> scipy.optimize <span class="kw">import</span> brentq
+
+<span class="c"># === PART 1: Bond Pricing Function ===</span>
+<span class="kw">def</span> <span class="fn">bond_price</span>(face_value, coupon_rate, ytm, years, freq=<span class="num">2</span>):
+    <span class="str">"""
+    Price a bond given YTM.
+    freq = payment frequency per year (2 = semi-annual)
+    """</span>
+    periods = years * freq
+    coupon = (face_value * coupon_rate) / freq
+    discount_rates = [(coupon / (<span class="num">1</span> + ytm/freq)**t) 
+                      <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, periods + <span class="num">1</span>)]
+    pv_principal = face_value / (<span class="num">1</span> + ytm/freq)**periods
+    <span class="kw">return</span> <span class="fn">sum</span>(discount_rates) + pv_principal
+
+<span class="c"># === PART 2: Price-Yield Curve ===</span>
+face = <span class="num">1000</span>
+coupon = <span class="num">0.05</span>   <span class="c"># 5% annual coupon</span>
+years = <span class="num">10</span>
+
+yields = np.<span class="fn">linspace</span>(<span class="num">0.01</span>, <span class="num">0.12</span>, <span class="num">100</span>)
+prices = [<span class="fn">bond_price</span>(face, coupon, y, years) <span class="kw">for</span> y <span class="kw">in</span> yields]
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">18</span>, <span class="num">5</span>))
+
+<span class="c"># Plot 1: Price-Yield Relationship</span>
+axes[<span class="num">0</span>].<span class="fn">plot</span>(yields * <span class="num">100</span>, prices, <span class="str">'cyan'</span>, linewidth=<span class="num">2.5</span>)
+axes[<span class="num">0</span>].<span class="fn">axhline</span>(<span class="num">1000</span>, color=<span class="str">'gray'</span>, linestyle=<span class="str">'--'</span>, alpha=<span class="num">0.5</span>, label=<span class="str">'Par ($1000)'</span>)
+axes[<span class="num">0</span>].<span class="fn">axvline</span>(<span class="num">5</span>, color=<span class="str">'orange'</span>, linestyle=<span class="str">'--'</span>, alpha=<span class="num">0.5</span>, label=<span class="str">'Coupon Rate 5%'</span>)
+axes[<span class="num">0</span>].<span class="fn">set_xlabel</span>(<span class="str">'Yield to Maturity (%)'</span>)
+axes[<span class="num">0</span>].<span class="fn">set_ylabel</span>(<span class="str">'Bond Price ($)'</span>)
+axes[<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">'Bond Price vs Yield'</span>)
+axes[<span class="num">0</span>].<span class="fn">legend</span>()
+axes[<span class="num">0</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+<span class="c"># Plot 2: Duration comparison — short vs long bonds</span>
+prices_2yr = [<span class="fn">bond_price</span>(face, coupon, y, <span class="num">2</span>) <span class="kw">for</span> y <span class="kw">in</span> yields]
+prices_30yr = [<span class="fn">bond_price</span>(face, coupon, y, <span class="num">30</span>) <span class="kw">for</span> y <span class="kw">in</span> yields]
+axes[<span class="num">1</span>].<span class="fn">plot</span>(yields * <span class="num">100</span>, prices_2yr, label=<span class="str">'2-Year Bond'</span>, color=<span class="str">'lime'</span>)
+axes[<span class="num">1</span>].<span class="fn">plot</span>(yields * <span class="num">100</span>, prices_30yr, label=<span class="str">'30-Year Bond'</span>, color=<span class="str">'red'</span>)
+axes[<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">'Duration Effect: Short vs Long Bond'</span>)
+axes[<span class="num">1</span>].<span class="fn">set_xlabel</span>(<span class="str">'YTM (%)'</span>)
+axes[<span class="num">1</span>].<span class="fn">legend</span>()
+axes[<span class="num">1</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+<span class="c"># Plot 3: Hypothetical Yield Curve shapes</span>
+maturities = [<span class="num">0.25</span>, <span class="num">0.5</span>, <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>, <span class="num">7</span>, <span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]
+normal    = [<span class="num">3.5</span>, <span class="num">3.8</span>, <span class="num">4.0</span>, <span class="num">4.2</span>, <span class="num">4.3</span>, <span class="num">4.5</span>, <span class="num">4.6</span>, <span class="num">4.8</span>, <span class="num">5.0</span>, <span class="num">5.1</span>]
+inverted  = [<span class="num">5.5</span>, <span class="num">5.4</span>, <span class="num">5.2</span>, <span class="num">5.0</span>, <span class="num">4.8</span>, <span class="num">4.5</span>, <span class="num">4.3</span>, <span class="num">4.1</span>, <span class="num">4.0</span>, <span class="num">3.9</span>]
+flat      = [<span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.6</span>, <span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.5</span>, <span class="num">4.5</span>]
+axes[<span class="num">2</span>].<span class="fn">plot</span>(maturities, normal, <span class="str">'g-o'</span>, markersize=<span class="num">4</span>, label=<span class="str">'Normal'</span>)
+axes[<span class="num">2</span>].<span class="fn">plot</span>(maturities, inverted, <span class="str">'r-s'</span>, markersize=<span class="num">4</span>, label=<span class="str">'Inverted (recession!)'</span>)
+axes[<span class="num">2</span>].<span class="fn">plot</span>(maturities, flat, <span class="str">'y--'</span>, markersize=<span class="num">4</span>, label=<span class="str">'Flat'</span>)
+axes[<span class="num">2</span>].<span class="fn">set_title</span>(<span class="str">'Yield Curve Shapes'</span>)
+axes[<span class="num">2</span>].<span class="fn">set_xlabel</span>(<span class="str">'Maturity (Years)'</span>)
+axes[<span class="num">2</span>].<span class="fn">set_ylabel</span>(<span class="str">'Yield (%)'</span>)
+axes[<span class="num">2</span>].<span class="fn">legend</span>()
+axes[<span class="num">2</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</div>
+  </div>
+
+  <!-- LAB 3 -->
+  <div class="colab-box">
+    <div class="colab-header">
+      <div class="colab-badge">LAB 03</div>
+      <h4>⚡ Black-Scholes Options Pricer + Greeks Dashboard</h4>
+    </div>
+    <p>Implement the complete Black-Scholes model, calculate all Greeks, and visualize option payoffs and sensitivity surfaces.</p>
+    <div class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">class</span> <span class="fn">BlackScholes</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, S, K, T, r, sigma):
+        <span class="str">"""
+        S: Stock price, K: Strike, T: Time to expiry (years)
+        r: Risk-free rate, sigma: Volatility
+        """</span>
+        self.S, self.K, self.T = S, K, T
+        self.r, self.sigma = r, sigma
+        self.d1 = (<span class="fn">np.log</span>(S/K) + (r + <span class="num">0.5</span>*sigma**<span class="num">2</span>)*T) / (sigma * <span class="fn">np.sqrt</span>(T))
+        self.d2 = self.d1 - sigma * <span class="fn">np.sqrt</span>(T)
+
+    <span class="kw">def</span> <span class="fn">call_price</span>(self):
+        <span class="kw">return</span> self.S * norm.<span class="fn">cdf</span>(self.d1) - self.K * np.<span class="fn">exp</span>(-self.r*self.T) * norm.<span class="fn">cdf</span>(self.d2)
+
+    <span class="kw">def</span> <span class="fn">put_price</span>(self):
+        <span class="kw">return</span> self.K * np.<span class="fn">exp</span>(-self.r*self.T) * norm.<span class="fn">cdf</span>(-self.d2) - self.S * norm.<span class="fn">cdf</span>(-self.d1)
+
+    <span class="kw">def</span> <span class="fn">delta_call</span>(self): <span class="kw">return</span> norm.<span class="fn">cdf</span>(self.d1)
+    <span class="kw">def</span> <span class="fn">delta_put</span>(self):  <span class="kw">return</span> norm.<span class="fn">cdf</span>(self.d1) - <span class="num">1</span>
+    <span class="kw">def</span> <span class="fn">gamma</span>(self):
+        <span class="kw">return</span> norm.<span class="fn">pdf</span>(self.d1) / (self.S * self.sigma * <span class="fn">np.sqrt</span>(self.T))
+    <span class="kw">def</span> <span class="fn">theta_call</span>(self):
+        t1 = -(self.S * norm.<span class="fn">pdf</span>(self.d1) * self.sigma) / (<span class="num">2</span> * <span class="fn">np.sqrt</span>(self.T))
+        t2 = -self.r * self.K * np.<span class="fn">exp</span>(-self.r*self.T) * norm.<span class="fn">cdf</span>(self.d2)
+        <span class="kw">return</span> (t1 + t2) / <span class="num">365</span>  <span class="c"># per day</span>
+    <span class="kw">def</span> <span class="fn">vega</span>(self):
+        <span class="kw">return</span> (self.S * norm.<span class="fn">pdf</span>(self.d1) * <span class="fn">np.sqrt</span>(self.T)) / <span class="num">100</span>  <span class="c"># per 1% vol</span>
+
+<span class="c"># === Example: Price a Call Option ===</span>
+bs = <span class="fn">BlackScholes</span>(S=<span class="num">100</span>, K=<span class="num">100</span>, T=<span class="num">0.25</span>, r=<span class="num">0.05</span>, sigma=<span class="num">0.20</span>)
+<span class="fn">print</span>(<span class="str">"=== Black-Scholes Option Pricing ==="</span>)
+<span class="fn">print</span>(f<span class="str">"Call Price: ${bs.call_price():.4f}"</span>)
+<span class="fn">print</span>(f<span class="str">"Put  Price: ${bs.put_price():.4f}"</span>)
+<span class="fn">print</span>(f<span class="str">"\n--- Greeks ---"</span>)
+<span class="fn">print</span>(f<span class="str">"Delta (Call): {bs.delta_call():.4f}"</span>)
+<span class="fn">print</span>(f<span class="str">"Delta (Put):  {bs.delta_put():.4f}"</span>)
+<span class="fn">print</span>(f<span class="str">"Gamma:        {bs.gamma():.4f}"</span>)
+<span class="fn">print</span>(f<span class="str">"Theta (Call): ${bs.theta_call():.4f} per day"</span>)
+<span class="fn">print</span>(f<span class="str">"Vega:         ${bs.vega():.4f} per 1% vol change"</span>)
+
+<span class="c"># === Visualization: Greeks vs Stock Price ===</span>
+stock_prices = np.<span class="fn">linspace</span>(<span class="num">60</span>, <span class="num">140</span>, <span class="num">200</span>)
+params = dict(K=<span class="num">100</span>, T=<span class="num">0.25</span>, r=<span class="num">0.05</span>, sigma=<span class="num">0.20</span>)
+
+calls  = [<span class="fn">BlackScholes</span>(S=s, **params).<span class="fn">call_price</span>() <span class="kw">for</span> s <span class="kw">in</span> stock_prices]
+puts   = [<span class="fn">BlackScholes</span>(S=s, **params).<span class="fn">put_price</span>() <span class="kw">for</span> s <span class="kw">in</span> stock_prices]
+deltas = [<span class="fn">BlackScholes</span>(S=s, **params).<span class="fn">delta_call</span>() <span class="kw">for</span> s <span class="kw">in</span> stock_prices]
+gammas = [<span class="fn">BlackScholes</span>(S=s, **params).<span class="fn">gamma</span>() <span class="kw">for</span> s <span class="kw">in</span> stock_prices]
+
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">2</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">10</span>))
+fig.<span class="fn">suptitle</span>(<span class="str">'Black-Scholes Option Sensitivities (K=100, T=3m, σ=20%)'</span>, fontsize=<span class="num">14</span>)
+
+axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">plot</span>(stock_prices, calls, <span class="str">'cyan'</span>, linewidth=<span class="num">2</span>, label=<span class="str">'Call'</span>)
+axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">plot</span>(stock_prices, puts, <span class="str">'salmon'</span>, linewidth=<span class="num">2</span>, label=<span class="str">'Put'</span>)
+axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">axvline</span>(<span class="num">100</span>, <span class="str">'--'</span>, alpha=<span class="num">0.5</span>)
+axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">'Option Prices'</span>); axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">legend</span>(); axes[<span class="num">0</span>,<span class="num">0</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+axes[<span class="num">0</span>,<span class="num">1</span>].<span class="fn">plot</span>(stock_prices, deltas, <span class="str">'lime'</span>, linewidth=<span class="num">2</span>)
+axes[<span class="num">0</span>,<span class="num">1</span>].<span class="fn">axhline</span>(<span class="num">0.5</span>, color=<span class="str">'gray'</span>, linestyle=<span class="str">'--'</span>, alpha=<span class="num">0.5</span>, label=<span class="str">'ATM Delta ≈ 0.5'</span>)
+axes[<span class="num">0</span>,<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">'Call Delta'</span>); axes[<span class="num">0</span>,<span class="num">1</span>].<span class="fn">legend</span>(); axes[<span class="num">0</span>,<span class="num">1</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+axes[<span class="num">1</span>,<span class="num">0</span>].<span class="fn">plot</span>(stock_prices, gammas, <span class="str">'orange'</span>, linewidth=<span class="num">2</span>)
+axes[<span class="num">1</span>,<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">'Gamma (peaks at ATM)'</span>); axes[<span class="num">1</span>,<span class="num">0</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+
+<span class="c"># Payoff diagram at expiry</span>
+payoff_call = np.<span class="fn">maximum</span>(stock_prices - <span class="num">100</span>, <span class="num">0</span>) - bs.<span class="fn">call_price</span>()
+payoff_put  = np.<span class="fn">maximum</span>(<span class="num">100</span> - stock_prices, <span class="num">0</span>) - bs.<span class="fn">put_price</span>()
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">plot</span>(stock_prices, payoff_call, <span class="str">'cyan'</span>, linewidth=<span class="num">2</span>, label=<span class="str">'Long Call P&L'</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">plot</span>(stock_prices, payoff_put, <span class="str">'salmon'</span>, linewidth=<span class="num">2</span>, label=<span class="str">'Long Put P&L'</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">axhline</span>(<span class="num">0</span>, color=<span class="str">'white'</span>, linewidth=<span class="num">0.5</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">'Payoff at Expiry (Net of Premium)'</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">legend</span>(); axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].<span class="fn">fill_between</span>(stock_prices, payoff_call, <span class="num">0</span>,
+                          where=payoff_call&gt;<span class="num">0</span>, alpha=<span class="num">0.1</span>, color=<span class="str">'cyan'</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</div>
+  </div>
+
+  <!-- LAB 4 -->
+  <div class="colab-box">
+    <div class="colab-header">
+      <div class="colab-badge">LAB 04</div>
+      <h4>📊 Simulating Order Books & Market Impact</h4>
+    </div>
+    <p>Build a simple limit order book simulator and visualize market impact of large trades — core microstructure concepts.</p>
+    <div class="code-block"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="c"># === Simple Order Book Simulator ===</span>
+<span class="kw">class</span> <span class="fn">OrderBook</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, mid_price=<span class="num">100.0</span>, tick_size=<span class="num">0.01</span>):
+        self.bids = defaultdict(<span class="fn">float</span>)  <span class="c"># price -> qty</span>
+        self.asks = defaultdict(<span class="fn">float</span>)
+        self.mid = mid_price
+        self.tick = tick_size
+        self.<span class="fn">_populate_book</span>()
+
+    <span class="kw">def</span> <span class="fn">_populate_book</span>(self):
+        <span class="c"># Generate realistic LOB with decreasing depth away from mid</span>
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">20</span>):
+            qty = np.random.<span class="fn">exponential</span>(<span class="num">500</span>)
+            self.bids[<span class="fn">round</span>(self.mid - i*self.tick, <span class="num">2</span>)] = qty
+            self.asks[<span class="fn">round</span>(self.mid + i*self.tick, <span class="num">2</span>)] = qty
+
+    <span class="kw">def</span> <span class="fn">best_bid</span>(self): <span class="kw">return</span> <span class="fn">max</span>(self.bids.keys())
+    <span class="kw">def</span> <span class="fn">best_ask</span>(self): <span class="kw">return</span> <span class="fn">min</span>(self.asks.keys())
+    <span class="kw">def</span> <span class="fn">spread</span>(self):   <span class="kw">return</span> self.<span class="fn">best_ask</span>() - self.<span class="fn">best_bid</span>()
+    <span class="kw">def</span> <span class="fn">midpoint</span>(self): <span class="kw">return</span> (self.<span class="fn">best_bid</span>() + self.<span class="fn">best_ask</span>()) / <span class="num">2</span>
+
+    <span class="kw">def</span> <span class="fn">market_buy</span>(self, qty):
+        <span class="str">"""Execute market buy, returns avg fill price and market impact"""</span>
+        remaining = qty
+        total_cost = <span class="num">0</span>
+        fills = []
+        initial_mid = self.<span class="fn">midpoint</span>()
+        <span class="kw">for</span> price <span class="kw">in</span> <span class="fn">sorted</span>(self.asks.keys()):
+            <span class="kw">if</span> remaining &lt;= <span class="num">0</span>: <span class="kw">break</span>
+            avail = self.asks[price]
+            fill = <span class="fn">min</span>(remaining, avail)
+            total_cost += fill * price
+            fills.<span class="fn">append</span>((price, fill))
+            self.asks[price] -= fill
+            <span class="kw">if</span> self.asks[price] &lt;= <span class="num">0</span>: <span class="kw">del</span> self.asks[price]
+            remaining -= fill
+        avg_price = total_cost / qty
+        impact = self.<span class="fn">midpoint</span>() - initial_mid
+        <span class="kw">return</span> avg_price, impact, fills
+
+<span class="c"># === Test: Market Impact of Different Order Sizes ===</span>
+order_sizes = [<span class="num">100</span>, <span class="num">500</span>, <span class="num">1000</span>, <span class="num">2000</span>, <span class="num">5000</span>, <span class="num">10000</span>]
+impacts = []
+avg_prices = []
+
+<span class="kw">for</span> size <span class="kw">in</span> order_sizes:
+    ob = <span class="fn">OrderBook</span>(<span class="num">100.0</span>, <span class="num">0.01</span>)
+    initial_ask = ob.<span class="fn">best_ask</span>()
+    avg_price, impact, _ = ob.<span class="fn">market_buy</span>(size)
+    avg_prices.<span class="fn">append</span>(avg_price)
+    impacts.<span class="fn">append</span>(impact)
+    <span class="fn">print</span>(f<span class="str">"Order: {size:6} shares | Avg Fill: ${avg_price:.4f} | Impact: {impact*100:.4f}%"</span>)
+
+<span class="c"># === Visualization ===</span>
+ob_viz = <span class="fn">OrderBook</span>(<span class="num">100.0</span>, <span class="num">0.01</span>)
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">5</span>))
+
+<span class="c"># Order Book Visualization</span>
+bid_prices = <span class="fn">sorted</span>(ob_viz.bids.keys(), reverse=<span class="kw">True</span>)[:<span class="num">10</span>]
+ask_prices = <span class="fn">sorted</span>(ob_viz.asks.keys())[:<span class="num">10</span>]
+axes[<span class="num">0</span>].<span class="fn">barh</span>([f<span class="str">"${p}"</span> <span class="kw">for</span> p <span class="kw">in</span> bid_prices],
+              [ob_viz.bids[p] <span class="kw">for</span> p <span class="kw">in</span> bid_prices],
+              color=<span class="str">'lime'</span>, alpha=<span class="num">0.7</span>, label=<span class="str">'Bids'</span>)
+axes[<span class="num">0</span>].<span class="fn">barh</span>([f<span class="str">"${p}"</span> <span class="kw">for</span> p <span class="kw">in</span> ask_prices],
+              [ob_viz.asks[p] <span class="kw">for</span> p <span class="kw">in</span> ask_prices],
+              color=<span class="str">'salmon'</span>, alpha=<span class="num">0.7</span>, label=<span class="str">'Asks'</span>)
+axes[<span class="num">0</span>].<span class="fn">set_title</span>(<span class="str">'Limit Order Book'</span>)
+axes[<span class="num">0</span>].<span class="fn">set_xlabel</span>(<span class="str">'Quantity'</span>)
+axes[<span class="num">0</span>].<span class="fn">legend</span>()
+
+<span class="c"># Market Impact vs Order Size</span>
+axes[<span class="num">1</span>].<span class="fn">plot</span>(order_sizes, [i*<span class="num">100</span> <span class="kw">for</span> i <span class="kw">in</span> impacts], <span class="str">'o-'</span>, color=<span class="str">'cyan'</span>, markersize=<span class="num">8</span>)
+axes[<span class="num">1</span>].<span class="fn">set_title</span>(<span class="str">'Market Impact vs Order Size'</span>)
+axes[<span class="num">1</span>].<span class="fn">set_xlabel</span>(<span class="str">'Order Size (shares)'</span>)
+axes[<span class="num">1</span>].<span class="fn">set_ylabel</span>(<span class="str">'Mid-Price Impact (%)'</span>)
+axes[<span class="num">1</span>].<span class="fn">grid</span>(alpha=<span class="num">0.3</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</div>
+  </div>
+
+  <!-- External Resources Section -->
+  <div class="section-title">📚 External Resources & References</div>
+
+  <div class="subsection-title"><span>📖</span> Foundational Books</div>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.amazon.com/Options-Futures-Other-Derivatives-10th/dp/013447208X" target="_blank">
+      <div class="res-type">📗 Textbook — Options & Derivatives</div>
+      <div class="res-title">Options, Futures & Other Derivatives — John Hull</div>
+      <div class="res-desc">THE bible for derivatives. Covers everything from basics to advanced pricing. Every quant has read this.</div>
+    </a>
+    <a class="resource-card" href="https://press.princeton.edu/books/hardcover/9780691132952/quantitative-risk-management" target="_blank">
+      <div class="res-type">📘 Textbook — Quant Finance</div>
+      <div class="res-title">Quantitative Risk Management — McNeil, Frey, Embrechts</div>
+      <div class="res-desc">Advanced risk measurement, copulas, extreme value theory. Graduate-level quant risk.</div>
+    </a>
+    <a class="resource-card" href="https://www.amazon.com/Market-Microstructure-Theory-Maureen-OHara/dp/0631207619" target="_blank">
+      <div class="res-type">📙 Textbook — Microstructure</div>
+      <div class="res-title">Market Microstructure Theory — Maureen O'Hara</div>
+      <div class="res-desc">The foundational academic text on market microstructure. Covers Kyle, Glosten-Milgrom models.</div>
+    </a>
+    <a class="resource-card" href="https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089" target="_blank">
+      <div class="res-type">📕 Textbook — ML Finance</div>
+      <div class="res-title">Advances in Financial Machine Learning — Lopez de Prado</div>
+      <div class="res-desc">Modern quant methods: feature engineering, ML strategies, backtesting pitfalls. Essential for modern quants.</div>
+    </a>
+  </div>
+
+  <div class="subsection-title"><span>🌐</span> Free Online Resources</div>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.coursera.org/specializations/finance" target="_blank">
+      <div class="res-type">🎓 Online Course</div>
+      <div class="res-title">Financial Markets — Yale (Coursera)</div>
+      <div class="res-desc">Robert Shiller's Yale course. Free to audit. Covers fundamentals of financial markets beautifully.</div>
+    </a>
+    <a class="resource-card" href="https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/" target="_blank">
+      <div class="res-type">🎓 MIT OpenCourseWare</div>
+      <div class="res-title">Mathematics with Applications in Finance — MIT 18.S096</div>
+      <div class="res-desc">Free MIT lectures covering probability, stochastic calculus, and derivatives pricing. Excellent for quants.</div>
+    </a>
+    <a class="resource-card" href="https://quantlib.org" target="_blank">
+      <div class="res-type">💻 Library</div>
+      <div class="res-title">QuantLib</div>
+      <div class="res-desc">The most comprehensive open-source quantitative finance library. Pricing bonds, options, interest rate models.</div>
+    </a>
+    <a class="resource-card" href="https://www.federalreserve.gov/datadownload/" target="_blank">
+      <div class="res-type">📊 Data</div>
+      <div class="res-title">Federal Reserve Data (FRED)</div>
+      <div class="res-desc">Free macro/economic data: yield curves, interest rates, inflation, GDP. Essential for macro quant research.</div>
+    </a>
+    <a class="resource-card" href="https://www.ssrn.com/index.cfm/en/" target="_blank">
+      <div class="res-type">📄 Research Papers</div>
+      <div class="res-title">SSRN — Social Science Research Network</div>
+      <div class="res-desc">Free preprints of finance research papers. Find working papers before they're published in journals.</div>
+    </a>
+    <a class="resource-card" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3820952" target="_blank">
+      <div class="res-type">📄 Must-Read Paper</div>
+      <div class="res-title">Advances in Understanding Microstructure — Bessembinder</div>
+      <div class="res-desc">Survey of modern microstructure research. Good entry point for academic literature on the topic.</div>
+    </a>
+  </div>
+
+  <div class="subsection-title"><span>🛠️</span> Interactive Visualizations & Tools</div>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.cboe.com/tools/volatility-optimizer/" target="_blank">
+      <div class="res-type">🔧 Online Tool</div>
+      <div class="res-title">CBOE Options Volatility Optimizer</div>
+      <div class="res-desc">Interactive options analysis tools. See real implied volatility surfaces, Greeks, and options chains.</div>
+    </a>
+    <a class="resource-card" href="https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield" target="_blank">
+      <div class="res-type">📊 Data Tool</div>
+      <div class="res-title">US Treasury Yield Curve — Daily Data</div>
+      <div class="res-desc">Official daily US Treasury yield curve data going back decades. Download for your own analysis.</div>
+    </a>
+    <a class="resource-card" href="https://finance.yahoo.com" target="_blank">
+      <div class="res-type">📈 Market Data</div>
+      <div class="res-title">Yahoo Finance</div>
+      <div class="res-desc">Free EOD and some intraday price data. The data source for yfinance Python library used in labs.</div>
+    </a>
+    <a class="resource-card" href="https://www.quandl.com" target="_blank">
+      <div class="res-type">📊 Data Platform</div>
+      <div class="res-title">Nasdaq Data Link (Quandl)</div>
+      <div class="res-desc">Financial, economic, and alternative data. Some free datasets. Used extensively in quant research.</div>
+    </a>
+  </div>
+</div>
+
+</main>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+}
+
+function updateProgress() {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const active = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+  const pct = ((active + 1) / tabs.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const tabs = document.querySelectorAll('.tab-btn');
+  const active = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+  if (e.key === 'ArrowRight' && active < tabs.length - 1) tabs[active + 1].click();
+  if (e.key === 'ArrowLeft' && active > 0) tabs[active - 1].click();
+});
+
+updateProgress();
+</script>
+</body>
+</html>

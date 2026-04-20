@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculus & Optimization — Quant Engineer's Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #2a3550;
+    --accent: #e8c547;
+    --accent2: #4fc3f7;
+    --accent3: #a78bfa;
+    --accent4: #34d399;
+    --text: #e8eaf0;
+    --text-dim: #8892a4;
+    --red: #f87171;
+    --orange: #fb923c;
+    --green: #34d399;
+    --blue: #4fc3f7;
+    --purple: #a78bfa;
+    --gold: #e8c547;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1525 50%, #0a1020 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 2.5rem 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(232,197,71,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(79,195,247,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(232,197,71,0.12);
+    border: 1px solid rgba(232,197,71,0.35);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+  .site-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+  .site-header h1 span { color: var(--accent); }
+  .site-header p {
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* NAV TABS */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    padding: 1.1rem 1.3rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-btn .tab-num {
+    display: inline-block;
+    background: rgba(232,197,71,0.12);
+    color: var(--accent);
+    border-radius: 2px;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
+    margin-right: 0.4rem;
+  }
+
+  /* CONTENT */
+  .tab-panel { display: none; padding: 3rem 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* TYPOGRAPHY */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  h2 .accent { color: var(--accent); }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem;
+    color: var(--accent2);
+    margin: 2.5rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin: 1.8rem 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  p { margin-bottom: 1.1rem; color: var(--text); }
+
+  .topic-intro {
+    background: linear-gradient(135deg, rgba(232,197,71,0.06), rgba(79,195,247,0.04));
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1.4rem 1.8rem;
+    margin-bottom: 2rem;
+    font-style: italic;
+    color: #c8d0dc;
+    font-size: 1.05rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .card.accent-blue { border-color: rgba(79,195,247,0.4); }
+  .card.accent-purple { border-color: rgba(167,139,250,0.4); }
+  .card.accent-green { border-color: rgba(52,211,153,0.4); }
+  .card.accent-gold { border-color: rgba(232,197,71,0.4); }
+  .card.accent-red { border-color: rgba(248,113,113,0.4); }
+
+  /* MATH BLOCKS */
+  .math-block {
+    background: #070b14;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem 1.6rem;
+    margin: 1.2rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--accent);
+    overflow-x: auto;
+    line-height: 1.9;
+  }
+  .math-block .label {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  /* SVG DIAGRAMS */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.8rem 0;
+    text-align: center;
+  }
+  .diagram-wrap figcaption {
+    margin-top: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ANALOGIES */
+  .analogy {
+    background: linear-gradient(135deg, rgba(167,139,250,0.07), rgba(52,211,153,0.04));
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 8px;
+    padding: 1.3rem 1.6rem;
+    margin: 1.3rem 0;
+  }
+  .analogy .analogy-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #050810;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent2);
+    border-radius: 6px;
+    padding: 1.2rem 1.4rem;
+    margin: 1.2rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: #b8d4f0;
+    overflow-x: auto;
+    line-height: 1.7;
+    white-space: pre;
+  }
+  .code-block .code-title {
+    display: block;
+    color: var(--accent2);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-block .kw { color: var(--accent3); }
+  .code-block .fn { color: var(--accent2); }
+  .code-block .cm { color: #4a6080; }
+  .code-block .st { color: var(--accent4); }
+  .code-block .num { color: var(--orange); }
+
+  /* RESOURCE LINKS */
+  .resources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin: 1rem 0 1.5rem;
+  }
+  .resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.45rem 0.9rem;
+    color: var(--accent2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .resource-link:hover {
+    background: rgba(79,195,247,0.1);
+    border-color: var(--accent2);
+    color: #fff;
+  }
+  .resource-link .icon { font-size: 1rem; }
+
+  /* EXERCISES */
+  .exercise-section { margin-top: 3rem; }
+  .exercise-tier {
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .tier-header {
+    padding: 0.9rem 1.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .tier-easy .tier-header { background: rgba(52,211,153,0.12); color: var(--green); }
+  .tier-medium .tier-header { background: rgba(232,197,71,0.12); color: var(--gold); }
+  .tier-hard .tier-header { background: rgba(248,113,113,0.12); color: var(--red); }
+  .tier-body {
+    padding: 1.4rem;
+    background: var(--surface);
+  }
+  .exercise-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .exercise-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .ex-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    min-width: 28px;
+    padding-top: 0.2rem;
+  }
+  .ex-content { flex: 1; }
+  .ex-content p { margin-bottom: 0.3rem; }
+  .ex-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+  }
+
+  /* COLAB EXPERIMENTS */
+  .colab-box {
+    background: linear-gradient(135deg, rgba(79,195,247,0.06), rgba(52,211,153,0.04));
+    border: 1px solid rgba(79,195,247,0.25);
+    border-radius: 8px;
+    padding: 1.6rem;
+    margin: 2rem 0;
+  }
+  .colab-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .colab-title::before {
+    content: '⚗';
+    font-size: 1rem;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 6px;
+    padding: 1.1rem 1.4rem;
+    margin: 1.2rem 0;
+    display: flex;
+    gap: 0.8rem;
+  }
+  .callout-info { background: rgba(79,195,247,0.08); border-left: 3px solid var(--accent2); }
+  .callout-warn { background: rgba(232,197,71,0.08); border-left: 3px solid var(--accent); }
+  .callout-tip { background: rgba(52,211,153,0.08); border-left: 3px solid var(--accent4); }
+  .callout-icon { font-size: 1.1rem; flex-shrink: 0; padding-top: 0.1rem; }
+  .callout p { margin: 0; font-size: 0.95rem; }
+
+  /* SECTION DIVIDER */
+  .section-div {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+
+  /* PROGRESS MAP */
+  .topic-map {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    padding: 1.2rem 1.6rem;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .map-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.77rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 3px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .map-item.done { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.3); color: var(--green); }
+  .map-item.current { background: rgba(232,197,71,0.12); border-color: rgba(232,197,71,0.4); color: var(--gold); }
+  .map-arrow { color: var(--text-dim); font-size: 0.9rem; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 1.2rem 0 1.8rem; font-size: 0.93rem; }
+  th {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.77rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-align: left;
+  }
+  td {
+    border: 1px solid var(--border);
+    padding: 0.7rem 1rem;
+    color: var(--text);
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: rgba(26,34,53,0.5); }
+
+  /* LIST */
+  ul, ol { padding-left: 1.6rem; margin-bottom: 1.1rem; }
+  li { margin-bottom: 0.5rem; }
+  li::marker { color: var(--accent); }
+
+  /* QUANT CONNECTION */
+  .quant-box {
+    background: linear-gradient(135deg, rgba(232,197,71,0.07), rgba(167,139,250,0.05));
+    border: 1px solid rgba(232,197,71,0.3);
+    border-radius: 8px;
+    padding: 1.4rem 1.6rem;
+    margin: 2rem 0;
+  }
+  .quant-box-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.77rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a4f70; }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .tab-panel { padding: 1.5rem 1.2rem 4rem; }
+    .site-header { padding: 1.8rem 1.2rem 1.5rem; }
+    .tab-btn { padding: 0.9rem 0.8rem; font-size: 0.7rem; }
+  }
+
+  /* INTERACTIVE CANVAS */
+  canvas {
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+
+  /* STEP LIST */
+  .steps { counter-reset: step; }
+  .step-item {
+    counter-increment: step;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.3rem;
+    align-items: flex-start;
+  }
+  .step-item::before {
+    content: counter(step);
+    min-width: 2rem;
+    height: 2rem;
+    background: rgba(232,197,71,0.12);
+    border: 1px solid rgba(232,197,71,0.35);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .inline-math {
+    font-family: 'IBM Plex Mono', monospace;
+    background: rgba(232,197,71,0.08);
+    color: var(--accent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-badge">Quant Engineer's Study Guide — Series 01</div>
+  <h1>Calculus &amp; <span>Optimization</span></h1>
+  <p>derivatives · gradients · lagrange multipliers · convex optimization &nbsp;|&nbsp; 100% offline, self-contained</p>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="switchTab('prereq',this)"><span class="tab-num">00</span>Prerequisites</button>
+  <button class="tab-btn" onclick="switchTab('derivatives',this)"><span class="tab-num">01</span>Derivatives</button>
+  <button class="tab-btn" onclick="switchTab('gradients',this)"><span class="tab-num">02</span>Gradients</button>
+  <button class="tab-btn" onclick="switchTab('lagrange',this)"><span class="tab-num">03</span>Lagrange</button>
+  <button class="tab-btn" onclick="switchTab('convex',this)"><span class="tab-num">04</span>Convex Opt.</button>
+  <button class="tab-btn" onclick="switchTab('colab',this)"><span class="tab-num">05</span>Colab Lab</button>
+  <button class="tab-btn" onclick="switchTab('exercises',this)"><span class="tab-num">06</span>Exercises</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 0: PREREQS -->
+<section class="tab-panel active" id="tab-prereq">
+  <div class="topic-map">
+    <span class="map-item current">Prerequisites</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Derivatives</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Gradients</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Lagrange Multipliers</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Convex Optimization</span>
+  </div>
+
+  <h2>Prerequisites: <span class="accent">Building Your Foundation</span></h2>
+  <p class="topic-intro">Before diving into calculus and optimization, you need to feel comfortable with a handful of concepts from algebra and functions. This section is a friendly refresher — skip what you know, absorb what you don't.</p>
+
+  <h3>1. Functions — What are they?</h3>
+  <p>A <strong>function</strong> is simply a machine: you put something in, it gives something back. We write <span class="inline-math">f(x)</span> — "f of x". Whatever you put in place of x, the function processes it and returns a number.</p>
+  <div class="analogy">
+    <div class="analogy-title">🧠 Analogy</div>
+    Think of a function as a vending machine. You press button <strong>x = 3</strong>, and the machine gives you <strong>f(3) = 9</strong> (if it's squaring your input). Press x = 5, get 25. Always the same rule, different inputs.
+  </div>
+  <div class="math-block">
+    <span class="label">examples of functions</span>
+    f(x) = x²          ← "square x"
+    g(x) = 2x + 5       ← "double x, then add 5"
+    h(x) = eˣ           ← "raise Euler's number to the power x"
+    p(x) = ln(x)        ← "logarithm of x"
+  </div>
+
+  <h3>2. Variables & Notation</h3>
+  <div class="card-grid">
+    <div class="card accent-blue">
+      <h4>Scalar</h4>
+      <p>A single number. E.g., x = 3.14, or the price of a stock today. One-dimensional.</p>
+    </div>
+    <div class="card accent-purple">
+      <h4>Vector</h4>
+      <p>A list of numbers. E.g., <strong>x</strong> = [1, 2, 3]. Think of it as a point in multi-dimensional space.</p>
+    </div>
+    <div class="card accent-green">
+      <h4>Matrix</h4>
+      <p>A grid of numbers. Multiple vectors stacked together. A 3×3 matrix has 9 numbers arranged in 3 rows and 3 columns.</p>
+    </div>
+  </div>
+
+  <h3>3. Limits — The Concept of "Approaching"</h3>
+  <p>A <strong>limit</strong> asks: what value does a function approach as x gets close to (but doesn't necessarily reach) some number? This is the conceptual engine behind calculus.</p>
+  <div class="math-block">
+    lim (x → 2) of f(x) = 4
+    
+    Means: as x gets closer and closer to 2, f(x) gets closer and closer to 4.
+    We don't care what happens exactly at x = 2, only near it.
+  </div>
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>You don't need to compute limits rigorously for most ML/quant work. Just understand: a derivative IS a limit — specifically a limit of a very small ratio.</p>
+  </div>
+
+  <h3>4. Slope of a Line</h3>
+  <p>The <strong>slope</strong> of a straight line tells you how steep it is: for every 1 step you take to the right, how many steps do you go up (or down)?</p>
+  <div class="math-block">
+    slope = (rise) / (run) = Δy / Δx = (y₂ - y₁) / (x₂ - x₁)
+    
+    If slope = 2: go 1 right → go 2 up. Steep upward.
+    If slope = 0: horizontal line. Flat.
+    If slope = -3: go 1 right → go 3 down. Downward.
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="420" height="260" viewBox="0 0 420 260">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#8892a4"/>
+        </marker>
+      </defs>
+      <!-- axes -->
+      <line x1="30" y1="230" x2="390" y2="230" stroke="#2a3550" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="30" y1="230" x2="30" y2="20" stroke="#2a3550" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="395" y="234" fill="#8892a4" font-family="IBM Plex Mono" font-size="11">x</text>
+      <text x="18" y="18" fill="#8892a4" font-family="IBM Plex Mono" font-size="11">y</text>
+      <!-- grid -->
+      <line x1="30" y1="130" x2="380" y2="130" stroke="#1a2235" stroke-width="1"/>
+      <!-- positive slope line -->
+      <line x1="60" y1="210" x2="320" y2="60" stroke="#e8c547" stroke-width="2.5"/>
+      <!-- rise/run indicators -->
+      <line x1="190" y1="135" x2="320" y2="135" stroke="#4fc3f7" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="320" y1="135" x2="320" y2="60" stroke="#34d399" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="220" y="152" fill="#4fc3f7" font-family="IBM Plex Mono" font-size="12">run = Δx</text>
+      <text x="325" y="103" fill="#34d399" font-family="IBM Plex Mono" font-size="12">rise = Δy</text>
+      <!-- slope label -->
+      <text x="85" y="160" fill="#e8c547" font-family="IBM Plex Mono" font-size="13">slope = Δy/Δx</text>
+      <!-- negative slope -->
+      <line x1="60" y1="70" x2="250" y2="210" stroke="#a78bfa" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="60" y="55" fill="#a78bfa" font-family="IBM Plex Mono" font-size="11">negative slope</text>
+      <!-- flat -->
+      <line x1="60" y1="230" x2="380" y2="230" stroke="#f87171" stroke-width="0"/>
+    </svg>
+    <figcaption>Fig 0.1 — Slope: rise over run. Gold = positive slope. Purple dashed = negative slope.</figcaption>
+  </div>
+
+  <h3>5. Exponentials and Logarithms</h3>
+  <p>These two functions appear constantly in quant finance and ML. They are inverses of each other.</p>
+  <div class="math-block">
+    eˣ (exponential): grows extremely fast. e ≈ 2.718...
+    ln(x) (natural log): inverse of eˣ. ln(e³) = 3.
+    
+    Key rules:
+    ln(a·b) = ln(a) + ln(b)
+    ln(aᵇ) = b·ln(a)
+    d/dx [eˣ] = eˣ  ← (the derivative of eˣ is itself — magic!)
+  </div>
+
+  <h3>6. Greek Letters You'll See Everywhere</h3>
+  <table>
+    <tr><th>Symbol</th><th>Name</th><th>Common Use</th></tr>
+    <tr><td>α (alpha)</td><td>alpha</td><td>Learning rate in optimization, significance level in stats</td></tr>
+    <tr><td>β (beta)</td><td>beta</td><td>Coefficients in regression, market sensitivity in finance</td></tr>
+    <tr><td>∇ (nabla)</td><td>del/nabla</td><td>Gradient operator — you'll see this a LOT in Tab 02</td></tr>
+    <tr><td>λ (lambda)</td><td>lambda</td><td>Lagrange multiplier (Tab 03), regularization</td></tr>
+    <tr><td>Σ (sigma)</td><td>sigma</td><td>Summation: add things up</td></tr>
+    <tr><td>∂ (partial)</td><td>partial</td><td>Partial derivative symbol (Tab 02)</td></tr>
+    <tr><td>ε (epsilon)</td><td>epsilon</td><td>A very small number, used in limits</td></tr>
+  </table>
+
+  <div class="resources">
+    <a class="resource-link" href="https://www.khanacademy.org/math/algebra" target="_blank"><span class="icon">🎓</span> Khan Academy — Algebra</a>
+    <a class="resource-link" href="https://www.desmos.com/calculator" target="_blank"><span class="icon">📊</span> Desmos (Interactive Grapher)</a>
+    <a class="resource-link" href="https://www.3blue1brown.com/topics/calculus" target="_blank"><span class="icon">🎥</span> 3Blue1Brown — Essence of Calculus</a>
+    <a class="resource-link" href="https://mathworld.wolfram.com" target="_blank"><span class="icon">📚</span> MathWorld Reference</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 1: DERIVATIVES -->
+<section class="tab-panel" id="tab-derivatives">
+  <div class="topic-map">
+    <span class="map-item done">Prerequisites ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item current">Derivatives</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Gradients</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Lagrange</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Convex Opt.</span>
+  </div>
+
+  <h2>Derivatives: <span class="accent">The Calculus of Change</span></h2>
+  <p class="topic-intro">A derivative answers one question: "How fast is this function changing right now?" It's the instantaneous slope at any point on a curve. Everything in optimization — gradient descent, Lagrange multipliers, convex analysis — is built on derivatives.</p>
+
+  <h3>What Is a Derivative, Really?</h3>
+  <p>Imagine you're driving a car. Your speedometer shows 60 mph. That's a derivative — it tells you how fast your position is changing <em>right now</em>, not over the whole trip.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">🚗 Analogy: Speed vs. Position</div>
+    <strong>Position</strong> = f(t) = where you are at time t.<br>
+    <strong>Velocity</strong> = f'(t) = how fast position is changing = the derivative.<br>
+    <strong>Acceleration</strong> = f''(t) = how fast velocity is changing = the second derivative.
+  </div>
+
+  <p>Mathematically, a derivative is computed by taking the slope of a line between two nearby points and letting those points get infinitely close:</p>
+
+  <div class="math-block">
+    <span class="label">formal definition of derivative</span>
+    f'(x) = lim(h → 0) [ f(x + h) - f(x) ] / h
+    
+    Translation:
+    • Compute the slope between point x and a nearby point x+h
+    • Make h smaller and smaller (approach zero)
+    • The value that slope approaches = the derivative at x
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="derivCanvas" width="500" height="300"></canvas>
+    <figcaption>Fig 1.1 — Interactive: The tangent line (derivative) at any point on y = x². Move mouse over canvas.</figcaption>
+  </div>
+
+  <h3>Derivative Notation</h3>
+  <p>There are three common ways to write the same thing — they all mean "derivative of f with respect to x":</p>
+  <div class="math-block">
+    f'(x)        ← Lagrange notation (most common for functions)
+    dy/dx        ← Leibniz notation (most common in optimization)
+    Df(x)        ← Operator notation
+    
+    All three say: "differentiate f with respect to x"
+  </div>
+
+  <h3>Core Differentiation Rules — Your Toolkit</h3>
+  <p>You don't need to re-derive from first principles every time. These rules let you differentiate almost anything:</p>
+
+  <div class="card-grid">
+    <div class="card accent-gold">
+      <h4>Power Rule</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [xⁿ] = n·xⁿ⁻¹</div>
+      <p style="font-size:0.88rem;margin:0">Example: d/dx [x³] = 3x²</p>
+    </div>
+    <div class="card accent-blue">
+      <h4>Constant Rule</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [c] = 0</div>
+      <p style="font-size:0.88rem;margin:0">Constants don't change, so their derivative is zero.</p>
+    </div>
+    <div class="card accent-purple">
+      <h4>Sum Rule</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [f + g] = f' + g'</div>
+      <p style="font-size:0.88rem;margin:0">Differentiate each term separately, then add.</p>
+    </div>
+    <div class="card accent-green">
+      <h4>Product Rule</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [fg] = f'g + fg'</div>
+      <p style="font-size:0.88rem;margin:0">"First times deriv of second, plus second times deriv of first"</p>
+    </div>
+    <div class="card accent-red">
+      <h4>Chain Rule</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [f(g(x))] = f'(g(x))·g'(x)</div>
+      <p style="font-size:0.88rem;margin:0">⚠️ The most important rule for ML/deep learning!</p>
+    </div>
+    <div class="card accent-blue">
+      <h4>Exponential & Log</h4>
+      <div class="math-block" style="margin:0.5rem 0">d/dx [eˣ] = eˣ
+d/dx [ln x] = 1/x</div>
+      <p style="font-size:0.88rem;margin:0">eˣ is its own derivative — incredibly special.</p>
+    </div>
+  </div>
+
+  <h3>The Chain Rule — Why It's Everything</h3>
+  <p>The chain rule handles <em>composed</em> functions — functions inside functions. Neural networks are, at their core, chains of composed functions. Backpropagation is literally just the chain rule applied recursively.</p>
+
+  <div class="math-block">
+    <span class="label">chain rule walkthrough</span>
+    Let h(x) = (3x² + 1)⁵
+    
+    Step 1: Identify outer and inner function
+      outer: f(u) = u⁵  →  f'(u) = 5u⁴
+      inner: g(x) = 3x² + 1  →  g'(x) = 6x
+    
+    Step 2: Apply chain rule
+      h'(x) = f'(g(x)) · g'(x)
+            = 5(3x² + 1)⁴ · 6x
+            = 30x(3x² + 1)⁴
+  </div>
+
+  <h3>Second Derivatives — Concavity & Curvature</h3>
+  <p>The first derivative tells you the slope. The <strong>second derivative</strong> tells you whether the slope is increasing or decreasing — in other words, whether the function is curving upward (concave up, like a bowl) or downward (concave down, like a hill).</p>
+
+  <div class="math-block">
+    f''(x) > 0  →  concave up (bowl shape) → local minimum candidate
+    f''(x) < 0  →  concave down (hill shape) → local maximum candidate
+    f''(x) = 0  →  inflection point (changes concavity)
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="480" height="240" viewBox="0 0 480 240">
+      <!-- Bowl (concave up) -->
+      <text x="80" y="20" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Concave Up (f'' > 0)</text>
+      <path d="M 20 180 Q 80 60 140 180" stroke="#34d399" stroke-width="3" fill="none"/>
+      <text x="80" y="200" fill="#34d399" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">f'' &gt; 0 → minimum</text>
+      <circle cx="80" cy="88" r="5" fill="#e8c547"/>
+      <text x="80" y="80" fill="#e8c547" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">min</text>
+      <!-- Hill (concave down) -->
+      <text x="260" y="20" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Concave Down (f'' &lt; 0)</text>
+      <path d="M 200 180 Q 260 60 320 180" stroke="#f87171" stroke-width="3" fill="none" transform="scale(1,-1) translate(0,-240)"/>
+      <path d="M 200 60 Q 260 180 320 60" stroke="#f87171" stroke-width="3" fill="none"/>
+      <circle cx="260" cy="60" r="5" fill="#e8c547"/>
+      <text x="260" y="52" fill="#e8c547" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">max</text>
+      <text x="260" y="200" fill="#f87171" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">f'' &lt; 0 → maximum</text>
+      <!-- Inflection -->
+      <text x="420" y="20" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Inflection (f'' = 0)</text>
+      <path d="M 370 180 Q 410 100 430 120 Q 450 140 470 60" stroke="#a78bfa" stroke-width="3" fill="none"/>
+      <circle cx="430" cy="120" r="5" fill="#e8c547"/>
+      <text x="430" y="112" fill="#e8c547" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">↔</text>
+      <text x="420" y="200" fill="#a78bfa" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">f'' = 0 → inflection</text>
+    </svg>
+    <figcaption>Fig 1.2 — Second derivative determines shape: bowl (min), hill (max), or inflection point.</figcaption>
+  </div>
+
+  <h3>Critical Points — Finding Extrema</h3>
+  <p>An <strong>extremum</strong> (minimum or maximum) of a function occurs where the slope is zero — the function is "flat" for an instant. These are called <strong>critical points</strong>.</p>
+
+  <div class="steps">
+    <div class="step-item">Set f'(x) = 0 and solve for x. These are your critical point candidates.</div>
+    <div class="step-item">Compute f''(x) at each critical point. If f''(x) > 0 → local min. If f''(x) < 0 → local max.</div>
+    <div class="step-item">Check boundary conditions if the domain is bounded (e.g., x ∈ [0, 10]).</div>
+  </div>
+
+  <div class="math-block">
+    <span class="label">example: find the minimum of f(x) = x² - 4x + 7</span>
+    Step 1: f'(x) = 2x - 4 = 0  →  x = 2
+    Step 2: f''(x) = 2 > 0  →  concave up → local minimum at x = 2
+    Step 3: f(2) = 4 - 8 + 7 = 3  →  minimum value is 3 at x = 2
+  </div>
+
+  <h3>Partial Derivatives — First Glimpse</h3>
+  <p>When a function takes multiple inputs, we can differentiate with respect to <em>one variable at a time</em> while treating all others as constants. This is called a <strong>partial derivative</strong> and it's the foundation of gradients (Tab 02).</p>
+
+  <div class="math-block">
+    <span class="label">partial derivatives of f(x,y) = x² + 3xy + y²</span>
+    ∂f/∂x = 2x + 3y   ← differentiate w.r.t. x, treat y as constant
+    ∂f/∂y = 3x + 2y   ← differentiate w.r.t. y, treat x as constant
+  </div>
+
+  <div class="quant-box">
+    <div class="quant-box-title">📈 Quant Finance Connection</div>
+    <p><strong>Option Greeks</strong> are literally derivatives of option prices:</p>
+    <ul style="margin:0">
+      <li><strong>Delta (Δ)</strong> = ∂V/∂S — how option price changes with stock price</li>
+      <li><strong>Gamma (Γ)</strong> = ∂²V/∂S² — second derivative; rate of change of Delta</li>
+      <li><strong>Theta (Θ)</strong> = ∂V/∂t — how option price changes with time</li>
+      <li><strong>Vega (ν)</strong> = ∂V/∂σ — sensitivity to volatility</li>
+    </ul>
+  </div>
+
+  <h3>Common Derivatives Reference Table</h3>
+  <table>
+    <tr><th>Function</th><th>Derivative</th><th>Notes</th></tr>
+    <tr><td>c (constant)</td><td>0</td><td>Constants don't change</td></tr>
+    <tr><td>xⁿ</td><td>nxⁿ⁻¹</td><td>Power rule</td></tr>
+    <tr><td>eˣ</td><td>eˣ</td><td>Self-derivative — unique property</td></tr>
+    <tr><td>aˣ</td><td>aˣ · ln(a)</td><td>General exponential</td></tr>
+    <tr><td>ln(x)</td><td>1/x</td><td>Natural log</td></tr>
+    <tr><td>sin(x)</td><td>cos(x)</td><td>Trig derivative</td></tr>
+    <tr><td>cos(x)</td><td>-sin(x)</td><td>Note the minus sign</td></tr>
+    <tr><td>σ(x) = 1/(1+e⁻ˣ)</td><td>σ(x)·(1 - σ(x))</td><td>Sigmoid — key in ML</td></tr>
+  </table>
+
+  <div class="resources">
+    <a class="resource-link" href="https://www.khanacademy.org/math/calculus-1" target="_blank"><span class="icon">🎓</span> Khan Academy — Calculus 1</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=WUvTyaaNkzM" target="_blank"><span class="icon">🎥</span> 3Blue1Brown — Derivatives Visually</a>
+    <a class="resource-link" href="https://www.wolframalpha.com" target="_blank"><span class="icon">🔢</span> Wolfram Alpha (Check your work)</a>
+    <a class="resource-link" href="https://tutorial.math.lamar.edu/Classes/CalcI/DerivativeIntro.aspx" target="_blank"><span class="icon">📖</span> Paul's Online Math Notes</a>
+    <a class="resource-link" href="https://www.desmos.com/calculator" target="_blank"><span class="icon">📊</span> Desmos — Plot and visualize</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 2: GRADIENTS -->
+<section class="tab-panel" id="tab-gradients">
+  <div class="topic-map">
+    <span class="map-item done">Prerequisites ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Derivatives ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item current">Gradients</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Lagrange</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Convex Opt.</span>
+  </div>
+
+  <h2>Gradients: <span class="accent">Direction of Steepest Ascent</span></h2>
+  <p class="topic-intro">A gradient is just a derivative for functions with multiple inputs — it's a vector of partial derivatives. While a derivative says "how steep is this 1D curve," a gradient says "which direction is steepest uphill in this multi-dimensional landscape." Gradient descent flips this: we walk downhill.</p>
+
+  <h3>From 1D Derivatives to Multi-Dimensional Gradients</h3>
+  <p>Think of a mountain range. With one variable, you could only walk north-south. A derivative told you whether north was uphill or downhill. Now with two or more variables, you can walk in any direction. The <strong>gradient</strong> is an arrow pointing in the steepest uphill direction.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">🏔️ Analogy: Mountain Hiker</div>
+    Imagine standing on a hilly terrain. Close your eyes and take one step in a completely random direction. Now imagine finding the direction where the slope is steepest — that's the direction of the gradient. If you want to reach the summit fastest, walk along the gradient. If you want to reach the valley fastest (minimize), walk <em>against</em> the gradient.
+  </div>
+
+  <h3>Definition of the Gradient</h3>
+  <p>For a function f(x₁, x₂, ..., xₙ) of n variables, the gradient is a vector of all partial derivatives:</p>
+
+  <div class="math-block">
+    <span class="label">gradient definition</span>
+    ∇f = [∂f/∂x₁, ∂f/∂x₂, ..., ∂f/∂xₙ]ᵀ
+    
+    For f(x, y):
+    ∇f = [∂f/∂x, ∂f/∂y]ᵀ
+    
+    Example: f(x,y) = x² + 3xy + y²
+    ∂f/∂x = 2x + 3y
+    ∂f/∂y = 3x + 2y
+    ∇f = [2x + 3y,  3x + 2y]ᵀ
+    
+    At point (1, 1):
+    ∇f(1,1) = [2(1) + 3(1),  3(1) + 2(1)] = [5, 5]
+    This arrow [5,5] points in the steepest uphill direction from (1,1).
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="gradientCanvas" width="500" height="320"></canvas>
+    <figcaption>Fig 2.1 — Gradient field for f(x,y) = x² + y². Each arrow shows the gradient direction (steepest ascent). The center is the minimum.</figcaption>
+  </div>
+
+  <h3>Gradient Descent — The Core of ML Training</h3>
+  <p>If the gradient points uphill, then to find the <em>minimum</em> of a function (minimize a loss function in ML), we walk in the <em>opposite direction</em> of the gradient. This is <strong>gradient descent</strong>.</p>
+
+  <div class="math-block">
+    <span class="label">gradient descent update rule</span>
+    θ_new = θ_old - α · ∇f(θ_old)
+    
+    Where:
+    θ   = parameters we're optimizing (weights, prices, etc.)
+    α   = learning rate (step size — how far to step downhill)
+    ∇f  = gradient at current position
+    
+    Intuition: "Take a step in the downhill direction, scaled by α"
+  </div>
+
+  <div class="diagram-wrap">
+    <canvas id="descentCanvas" width="500" height="320"></canvas>
+    <figcaption>Fig 2.2 — Gradient descent on f(x,y) = x² + y². Click "Run Descent" to animate the path to the minimum.</figcaption>
+  </div>
+  <div style="text-align:center;margin-top:0.8rem">
+    <button id="runDescentBtn" onclick="runDescentAnimation()" style="background:rgba(232,197,71,0.15);border:1px solid rgba(232,197,71,0.5);color:#e8c547;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;padding:0.5rem 1.4rem;border-radius:4px;cursor:pointer;letter-spacing:0.06em">▶ RUN DESCENT</button>
+    <button onclick="resetDescent()" style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);color:#4fc3f7;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;padding:0.5rem 1.4rem;border-radius:4px;cursor:pointer;margin-left:0.8rem;letter-spacing:0.06em">↺ RESET</button>
+  </div>
+
+  <h3>Learning Rate: The Critical Hyperparameter</h3>
+  <div class="card-grid">
+    <div class="card accent-red">
+      <h4>Too Large (α too big)</h4>
+      <p>You overshoot the minimum. Like jumping over the valley. The algorithm diverges and bounces around or explodes.</p>
+    </div>
+    <div class="card accent-green">
+      <h4>Just Right</h4>
+      <p>Smooth, steady convergence to the minimum. Typical starting values: 0.01, 0.001, or 0.0001.</p>
+    </div>
+    <div class="card accent-blue">
+      <h4>Too Small (α too small)</h4>
+      <p>You converge, but extremely slowly. Takes forever. In practice, computationally wasteful.</p>
+    </div>
+  </div>
+
+  <h3>The Jacobian Matrix — Gradients of Vector Functions</h3>
+  <p>When your function outputs a <em>vector</em> (not just a scalar), the gradient generalizes to a <strong>Jacobian matrix</strong>. Each row is the gradient of one output with respect to all inputs.</p>
+
+  <div class="math-block">
+    <span class="label">jacobian matrix</span>
+    For f: Rⁿ → Rᵐ  (takes n inputs, gives m outputs)
+    
+         [ ∂f₁/∂x₁  ∂f₁/∂x₂  ...  ∂f₁/∂xₙ ]
+    J =  [ ∂f₂/∂x₁  ∂f₂/∂x₂  ...  ∂f₂/∂xₙ ]
+         [ ...                              ]
+         [ ∂fₘ/∂x₁  ∂fₘ/∂x₂  ...  ∂fₘ/∂xₙ ]
+    
+    This is an m×n matrix.
+    Used extensively in neural network backpropagation.
+  </div>
+
+  <h3>The Hessian Matrix — Second-Order Information</h3>
+  <p>The <strong>Hessian</strong> is the matrix of second partial derivatives. It generalizes the second derivative to multiple dimensions and tells us about curvature — critical for determining whether a critical point is a min, max, or saddle point.</p>
+
+  <div class="math-block">
+    <span class="label">hessian matrix for f(x,y)</span>
+         [ ∂²f/∂x²    ∂²f/∂x∂y ]
+    H =  [ ∂²f/∂y∂x   ∂²f/∂y²  ]
+    
+    For f(x,y) = x² + 3xy + y²:
+    ∂²f/∂x² = 2,  ∂²f/∂y² = 2,  ∂²f/∂x∂y = 3
+    
+         [ 2  3 ]
+    H =  [ 3  2 ]
+    
+    Rules:
+    • If det(H) > 0 and ∂²f/∂x² > 0 → local minimum
+    • If det(H) > 0 and ∂²f/∂x² < 0 → local maximum
+    • If det(H) < 0 → saddle point (min in one direction, max in another)
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="420" height="200" viewBox="0 0 420 200">
+      <!-- saddle diagram -->
+      <text x="210" y="18" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Saddle Point — det(H) &lt; 0</text>
+      <!-- curved surface wireframe suggestion -->
+      <path d="M 80 150 Q 130 80 180 150 Q 230 220 280 150 Q 330 80 380 150" stroke="#a78bfa" stroke-width="2" fill="none"/>
+      <path d="M 80 110 Q 130 40 180 110 Q 230 180 280 110 Q 330 40 380 110" stroke="#a78bfa" stroke-width="1" fill="none" opacity="0.5"/>
+      <!-- saddle point marker -->
+      <circle cx="230" cy="155" r="6" fill="#e8c547" stroke="#fff" stroke-width="1.5"/>
+      <text x="230" y="178" fill="#e8c547" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">saddle point</text>
+      <text x="130" y="170" fill="#34d399" font-family="IBM Plex Mono" font-size="10">min in x-dir</text>
+      <text x="300" y="85" fill="#f87171" font-family="IBM Plex Mono" font-size="10">max in y-dir</text>
+    </svg>
+    <figcaption>Fig 2.3 — Saddle point: minimum in one direction, maximum in another. Very common in neural network loss surfaces.</figcaption>
+  </div>
+
+  <h3>Stochastic Gradient Descent (SGD) & Variants</h3>
+  <p>In practice, computing the full gradient over millions of data points is expensive. Variants of gradient descent compute approximate gradients:</p>
+
+  <table>
+    <tr><th>Method</th><th>Gradient Computed On</th><th>Speed</th><th>Stability</th></tr>
+    <tr><td>Batch GD</td><td>Full dataset</td><td>Slow</td><td>Very stable</td></tr>
+    <tr><td>Stochastic GD (SGD)</td><td>1 random sample</td><td>Fast</td><td>Noisy</td></tr>
+    <tr><td>Mini-batch GD</td><td>Small batch (32–256)</td><td>Fast</td><td>Moderate</td></tr>
+    <tr><td>Adam</td><td>Mini-batch + adaptive lr</td><td>Fast</td><td>Very stable</td></tr>
+  </table>
+
+  <div class="quant-box">
+    <div class="quant-box-title">📈 Quant Finance Connection</div>
+    <p>Portfolio optimization minimizes a risk objective over many assets. The gradient of the portfolio variance with respect to asset weights tells you exactly how to adjust each holding to reduce risk. Modern portfolio theory (Markowitz) is gradient-based optimization at its core. Factor models, risk attribution, and hedging all use gradient concepts.</p>
+  </div>
+
+  <div class="resources">
+    <a class="resource-link" href="https://www.youtube.com/watch?v=IHZwWFHWa-w" target="_blank"><span class="icon">🎥</span> 3Blue1Brown — Gradient Descent</a>
+    <a class="resource-link" href="https://playground.tensorflow.org" target="_blank"><span class="icon">🕹️</span> TensorFlow Playground (Live NN)</a>
+    <a class="resource-link" href="https://cs231n.github.io/optimization-1/" target="_blank"><span class="icon">📖</span> Stanford CS231n — Optimization</a>
+    <a class="resource-link" href="https://distill.pub/2017/momentum/" target="_blank"><span class="icon">✨</span> Distill — Momentum Explained</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 3: LAGRANGE -->
+<section class="tab-panel" id="tab-lagrange">
+  <div class="topic-map">
+    <span class="map-item done">Prerequisites ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Derivatives ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Gradients ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item current">Lagrange Multipliers</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item">Convex Opt.</span>
+  </div>
+
+  <h2>Lagrange Multipliers: <span class="accent">Constrained Optimization</span></h2>
+  <p class="topic-intro">What if you can't just wander freely looking for the minimum? Real-world problems have constraints: "you only have $1,000 to invest," "portfolio weights must sum to 1," "this protein must fit in this binding pocket." Lagrange multipliers let you find the optimal solution while respecting constraints.</p>
+
+  <h3>The Core Problem: Constrained Optimization</h3>
+  <div class="analogy">
+    <div class="analogy-title">🎒 Analogy: Hiker with a Trail</div>
+    Earlier (gradient descent) you were free to walk anywhere on the mountain. Now imagine there's a <strong>fence</strong> — a constraint — that forces you to walk along a specific trail. You want to find the <em>lowest point on that trail</em>. You can't just walk straight downhill; you must stay on the trail. Lagrange multipliers solve exactly this.
+  </div>
+
+  <div class="math-block">
+    <span class="label">constrained optimization problem</span>
+    Minimize:    f(x, y)        ← objective function
+    Subject to:  g(x, y) = 0   ← equality constraint
+    
+    Examples:
+    • Minimize portfolio variance, subject to: weights sum to 1
+    • Maximize utility, subject to: budget = $1000
+    • Minimize loss, subject to: model complexity ≤ threshold
+  </div>
+
+  <h3>The Key Insight: Gradient Alignment</h3>
+  <p>At the optimal constrained solution, something beautiful happens: <strong>the gradients of f and g must be parallel (point in the same direction)</strong>. If they weren't parallel, you could slide along the constraint and still decrease f — meaning you haven't found the minimum yet.</p>
+
+  <div class="math-block">
+    <span class="label">lagrange condition</span>
+    ∇f(x*, y*) = λ · ∇g(x*, y*)
+    
+    This says: "At the optimum, f's gradient equals λ times g's gradient"
+    λ is the Lagrange multiplier — a scalar we also solve for.
+    
+    In component form:
+    ∂f/∂x = λ · ∂g/∂x
+    ∂f/∂y = λ · ∂g/∂y
+    g(x, y) = 0    ← don't forget the constraint!
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="460" height="320" viewBox="0 0 460 320">
+      <!-- background contours (ellipses for f) -->
+      <ellipse cx="200" cy="160" rx="150" ry="110" stroke="#2a3550" stroke-width="1" fill="none"/>
+      <ellipse cx="200" cy="160" rx="100" ry="73" stroke="#2a3550" stroke-width="1" fill="none"/>
+      <ellipse cx="200" cy="160" rx="60" ry="44" stroke="#3a4560" stroke-width="1.5" fill="none"/>
+      <ellipse cx="200" cy="160" rx="28" ry="20" stroke="#4a5570" stroke-width="2" fill="none"/>
+      <!-- constraint curve (a curved line) -->
+      <path d="M 60 80 Q 180 200 340 240" stroke="#4fc3f7" stroke-width="2.5" fill="none"/>
+      <text x="345" y="248" fill="#4fc3f7" font-family="IBM Plex Mono" font-size="11">g(x,y) = 0</text>
+      <!-- optimal point (where ellipse is tangent to constraint) -->
+      <circle cx="210" cy="185" r="7" fill="#e8c547" stroke="#fff" stroke-width="2"/>
+      <text x="218" y="180" fill="#e8c547" font-family="IBM Plex Mono" font-size="11">(x*, y*)</text>
+      <!-- gradient of f at optimum -->
+      <line x1="210" y1="185" x2="240" y2="155" stroke="#34d399" stroke-width="2.5" marker-end="url(#arr)"/>
+      <text x="245" y="152" fill="#34d399" font-family="IBM Plex Mono" font-size="11">∇f</text>
+      <!-- gradient of g at optimum -->
+      <line x1="210" y1="185" x2="240" y2="155" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="255" y="168" fill="#f87171" font-family="IBM Plex Mono" font-size="11">λ·∇g  (parallel!)</text>
+      <!-- contour labels -->
+      <text x="55" y="165" fill="#8892a4" font-family="IBM Plex Mono" font-size="10">f = c₁</text>
+      <text x="105" y="135" fill="#8892a4" font-family="IBM Plex Mono" font-size="10">f = c₂</text>
+      <text x="148" y="118" fill="#8892a4" font-family="IBM Plex Mono" font-size="10">f = c₃</text>
+      <text x="100" y="295" fill="#8892a4" font-family="IBM Plex Mono" font-size="11">Contour lines of f(x,y)</text>
+    </svg>
+    <figcaption>Fig 3.1 — At the constrained optimum, ∇f (green) and ∇g (red dashed) are parallel. The constraint curve is tangent to the objective's contour.</figcaption>
+  </div>
+
+  <h3>The Lagrangian Function</h3>
+  <p>We combine the objective and constraint into one unconstrained function called the <strong>Lagrangian</strong>. We then find its critical points by setting all partial derivatives (including the derivative with respect to λ) to zero.</p>
+
+  <div class="math-block">
+    <span class="label">the lagrangian</span>
+    ℒ(x, y, λ) = f(x, y) - λ · g(x, y)
+    
+    Now take all partial derivatives and set = 0:
+    ∂ℒ/∂x = ∂f/∂x - λ·∂g/∂x = 0
+    ∂ℒ/∂y = ∂f/∂y - λ·∂g/∂y = 0
+    ∂ℒ/∂λ = -g(x, y) = 0  ← this just enforces the constraint!
+  </div>
+
+  <h3>Complete Worked Example</h3>
+  <p>Let's minimize f(x, y) = x² + y² (distance from origin) subject to g(x, y) = x + y - 1 = 0 (must lie on the line x + y = 1).</p>
+
+  <div class="math-block">
+    <span class="label">step-by-step lagrange multiplier solution</span>
+    Step 1: Write the Lagrangian
+    ℒ = x² + y² - λ(x + y - 1)
+    
+    Step 2: Set all partial derivatives = 0
+    ∂ℒ/∂x = 2x - λ = 0   → λ = 2x   ...(1)
+    ∂ℒ/∂y = 2y - λ = 0   → λ = 2y   ...(2)
+    ∂ℒ/∂λ = -(x+y-1) = 0 → x + y = 1  ...(3)
+    
+    Step 3: Solve the system
+    From (1) and (2): 2x = 2y → x = y
+    Substituting into (3): x + x = 1 → x = 1/2, y = 1/2
+    λ = 2(1/2) = 1
+    
+    Step 4: The answer
+    Optimal point: (x*, y*) = (1/2, 1/2)
+    Minimum value: f(1/2, 1/2) = (1/2)² + (1/2)² = 1/2
+    
+    Interpretation of λ = 1:
+    If we relaxed the constraint from x+y=1 to x+y=1+ε,
+    the minimum would decrease by approximately λ·ε = 1·ε.
+    λ measures the "value of relaxing the constraint."
+  </div>
+
+  <h3>Multiple Constraints</h3>
+  <p>You can have multiple equality constraints. Each one gets its own Lagrange multiplier:</p>
+
+  <div class="math-block">
+    Minimize f(x)
+    Subject to: g₁(x) = 0, g₂(x) = 0, ..., gₖ(x) = 0
+    
+    Lagrangian:
+    ℒ(x, λ₁,...,λₖ) = f(x) - λ₁g₁(x) - λ₂g₂(x) - ... - λₖgₖ(x)
+  </div>
+
+  <h3>KKT Conditions — Inequality Constraints</h3>
+  <p>Lagrange multipliers handle <em>equality</em> constraints (g = 0). The <strong>KKT (Karush-Kuhn-Tucker) conditions</strong> extend this to <em>inequality</em> constraints (g ≤ 0), which are far more common in practice.</p>
+
+  <div class="math-block">
+    <span class="label">KKT conditions for: min f(x) s.t. gᵢ(x) ≤ 0</span>
+    1. Stationarity:     ∇f(x*) + Σ μᵢ·∇gᵢ(x*) = 0
+    2. Primal Feas:      gᵢ(x*) ≤ 0  for all i
+    3. Dual Feas:        μᵢ ≥ 0       for all i
+    4. Complementarity:  μᵢ · gᵢ(x*) = 0  for all i
+    
+    Condition 4 is key: either the constraint is active (gᵢ = 0)
+    OR its multiplier is zero (μᵢ = 0). They can't both be nonzero.
+  </div>
+
+  <div class="callout callout-warn">
+    <span class="callout-icon">⚠️</span>
+    <p>KKT conditions are <em>necessary</em> for optimality (always), but only <em>sufficient</em> when the problem is convex. This is why convex optimization (Tab 04) is so powerful — KKT becomes a complete characterization.</p>
+  </div>
+
+  <div class="quant-box">
+    <div class="quant-box-title">📈 Quant Finance Connection</div>
+    <p><strong>Markowitz Portfolio Optimization:</strong> Minimize portfolio variance = wᵀΣw, subject to wᵀ1 = 1 (weights sum to 1) and wᵀμ = r (achieve target return r). This is solved exactly with Lagrange multipliers with two constraints, yielding the famous <strong>efficient frontier</strong>. Every point on the frontier is a Lagrange solution with a different target return r.</p>
+  </div>
+
+  <div class="resources">
+    <a class="resource-link" href="https://www.khanacademy.org/math/multivariable-calculus/applications-of-multivariable-derivatives/lagrange-multipliers-and-constrained-optimization/a/lagrange-multipliers-single-constraint" target="_blank"><span class="icon">🎓</span> Khan Academy — Lagrange Multipliers</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=yuqB-d5MjZA" target="_blank"><span class="icon">🎥</span> MIT OCW — Lagrange Multipliers</a>
+    <a class="resource-link" href="https://en.wikipedia.org/wiki/Karush%E2%80%93Kuhn%E2%80%93Tucker_conditions" target="_blank"><span class="icon">📖</span> KKT Conditions — Wikipedia</a>
+    <a class="resource-link" href="https://www.coursera.org/learn/mathematics-for-machine-learning-multivariate-calculus" target="_blank"><span class="icon">🎓</span> Coursera — Multivariate Calculus (Imperial)</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 4: CONVEX OPT -->
+<section class="tab-panel" id="tab-convex">
+  <div class="topic-map">
+    <span class="map-item done">Prerequisites ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Derivatives ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Gradients ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item done">Lagrange ✓</span>
+    <span class="map-arrow">→</span>
+    <span class="map-item current">Convex Optimization</span>
+  </div>
+
+  <h2>Convex Optimization: <span class="accent">When Local = Global</span></h2>
+  <p class="topic-intro">Most optimization problems are hard because every local minimum you find might not be the global minimum. Convex optimization is the golden class of problems where this ambiguity vanishes — any local minimum IS the global minimum. This property makes convex problems tractable, efficient, and reliable.</p>
+
+  <h3>What Is a Convex Set?</h3>
+  <div class="analogy">
+    <div class="analogy-title">🍇 Analogy: The Rubber Band Test</div>
+    Take two points in a set. Draw the straight line connecting them. If the entire line segment stays inside the set, the set is <strong>convex</strong>. A circle is convex. A crescent moon is not — draw a line from tip to tip and part of it falls outside.
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="460" height="180" viewBox="0 0 460 180">
+      <!-- Convex set -->
+      <ellipse cx="110" cy="90" rx="80" ry="55" fill="rgba(52,211,153,0.08)" stroke="#34d399" stroke-width="2"/>
+      <circle cx="70" cy="75" r="4" fill="#e8c547"/>
+      <circle cx="150" cy="105" r="4" fill="#e8c547"/>
+      <line x1="70" y1="75" x2="150" y2="105" stroke="#e8c547" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="110" y="168" fill="#34d399" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">✓ Convex</text>
+      <text x="110" y="25" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Line stays inside</text>
+      <!-- Non-convex set -->
+      <path d="M 280 45 Q 340 30 380 60 Q 420 90 400 120 Q 380 150 340 150 Q 300 150 280 130 Q 245 110 270 80 Q 260 65 280 45" fill="rgba(248,113,113,0.08)" stroke="#f87171" stroke-width="2"/>
+      <circle cx="290" cy="55" r="4" fill="#e8c547"/>
+      <circle cx="395" cy="115" r="4" fill="#e8c547"/>
+      <line x1="290" y1="55" x2="395" y2="115" stroke="#e8c547" stroke-width="2" stroke-dasharray="5,3"/>
+      <circle cx="340" cy="83" r="4" fill="#f87171"/>
+      <text x="348" y="78" fill="#f87171" font-family="IBM Plex Mono" font-size="9">outside!</text>
+      <text x="340" y="168" fill="#f87171" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">✗ Non-Convex</text>
+      <text x="340" y="25" fill="#8892a4" font-family="IBM Plex Mono" font-size="11" text-anchor="middle">Line escapes set</text>
+    </svg>
+    <figcaption>Fig 4.1 — Convex vs. non-convex sets. The key test: does a line between any two points stay inside?</figcaption>
+  </div>
+
+  <h3>What Is a Convex Function?</h3>
+  <p>A function is convex if the set of points <em>above</em> its graph is a convex set. Equivalently: for any two points on the function, the line segment between them lies <em>above or on</em> the function.</p>
+
+  <div class="math-block">
+    <span class="label">formal definition of convexity</span>
+    f is convex if for all x, y and t ∈ [0, 1]:
+    f(tx + (1-t)y) ≤ t·f(x) + (1-t)·f(y)
+    
+    In English: "The function value at any weighted average of x and y
+    is no more than the weighted average of the function values."
+    
+    This is the "chord lies above the curve" condition.
+  </div>
+
+  <div class="diagram-wrap">
+    <svg width="460" height="260" viewBox="0 0 460 260">
+      <!-- Axes -->
+      <line x1="40" y1="220" x2="420" y2="220" stroke="#2a3550" stroke-width="1.5"/>
+      <line x1="40" y1="220" x2="40" y2="20" stroke="#2a3550" stroke-width="1.5"/>
+      <!-- Convex function (parabola) -->
+      <path d="M 60 200 Q 230 30 400 200" stroke="#34d399" stroke-width="3" fill="none"/>
+      <!-- Chord -->
+      <line x1="100" y1="185" x2="370" y2="185" stroke="#e8c547" stroke-width="2" stroke-dasharray="6,3"/>
+      <circle cx="100" cy="185" r="5" fill="#e8c547"/>
+      <circle cx="370" cy="185" r="5" fill="#e8c547"/>
+      <!-- Midpoint on chord vs. function -->
+      <circle cx="235" cy="185" r="4" fill="#e8c547"/>
+      <circle cx="235" cy="57" r="4" fill="#34d399"/>
+      <line x1="235" y1="57" x2="235" y2="185" stroke="#4fc3f7" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <text x="240" y="125" fill="#4fc3f7" font-family="IBM Plex Mono" font-size="10">chord above</text>
+      <text x="240" y="137" fill="#4fc3f7" font-family="IBM Plex Mono" font-size="10">function ✓</text>
+      <text x="180" y="240" fill="#34d399" font-family="IBM Plex Mono" font-size="11">Convex function f(x)</text>
+      <text x="60" y="172" fill="#e8c547" font-family="IBM Plex Mono" font-size="10">x</text>
+      <text x="372" y="172" fill="#e8c547" font-family="IBM Plex Mono" font-size="10">y</text>
+      <!-- Non-convex -->
+      <path d="M 60 100 Q 120 220 200 130 Q 280 40 380 160" stroke="#f87171" stroke-width="2.5" fill="none" transform="translate(0,0)" opacity="0.4"/>
+    </svg>
+    <figcaption>Fig 4.2 — For a convex function, the chord (yellow) always lies above or on the curve (green). This is the defining property.</figcaption>
+  </div>
+
+  <h3>Why Convexity Is So Powerful</h3>
+  <div class="card-grid">
+    <div class="card accent-gold">
+      <h4>No Local Minima Traps</h4>
+      <p>Every local minimum is the global minimum. Gradient descent always finds the true optimal solution, not a suboptimal local one.</p>
+    </div>
+    <div class="card accent-green">
+      <h4>KKT = Optimality</h4>
+      <p>For convex problems, KKT conditions are both necessary AND sufficient. You can certify optimality algebraically.</p>
+    </div>
+    <div class="card accent-blue">
+      <h4>Efficient Algorithms</h4>
+      <p>Problems like Linear Programming, Quadratic Programming, and SOCP can be solved in polynomial time. Interior point methods are blazing fast.</p>
+    </div>
+    <div class="card accent-purple">
+      <h4>Duality</h4>
+      <p>Convex problems have a "dual problem" whose solution gives you a lower bound and often a certificate of optimality. No guessing.</p>
+    </div>
+  </div>
+
+  <h3>Testing Convexity</h3>
+  <div class="math-block">
+    <span class="label">how to verify convexity</span>
+    Method 1: Second Derivative Test (single variable)
+    f''(x) ≥ 0 for all x → f is convex
+    
+    Method 2: Hessian Test (multiple variables)
+    H(x) is positive semidefinite (PSD) for all x → f is convex
+    H is PSD means: all eigenvalues of H are ≥ 0
+    
+    Method 3: Known Convex Functions (memorize these!)
+    • Linear: f(x) = aᵀx + b → convex (and concave)
+    • Quadratic: f(x) = xᵀQx + bᵀx + c, Q PSD → convex
+    • Exponential: eˣ → convex
+    • Powers: |x|ᵖ for p ≥ 1 → convex
+    • Log-sum-exp: ln(Σ eˣⁱ) → convex
+    • Norm: ||x|| → convex
+    
+    Method 4: Composition Rules
+    • Sum of convex functions → convex
+    • Nonneg scaling of convex → convex
+    • Affine composition: f(Ax+b) is convex if f is convex
+  </div>
+
+  <h3>Standard Convex Optimization Problem Forms</h3>
+
+  <div class="card-grid">
+    <div class="card accent-gold">
+      <h4>Linear Programming (LP)</h4>
+      <div class="math-block" style="margin:0.5rem 0;font-size:0.85rem">min cᵀx
+s.t. Ax ≤ b
+     Cx = d</div>
+      <p style="font-size:0.85rem;margin:0">Linear objective, linear constraints. Solved by Simplex or interior point methods. Used heavily in logistics, trading, resource allocation.</p>
+    </div>
+    <div class="card accent-blue">
+      <h4>Quadratic Programming (QP)</h4>
+      <div class="math-block" style="margin:0.5rem 0;font-size:0.85rem">min (1/2)xᵀQx + cᵀx
+s.t. Ax ≤ b</div>
+      <p style="font-size:0.85rem;margin:0">Quadratic objective (Q PSD), linear constraints. Markowitz portfolio optimization is a QP. SVMs are QPs.</p>
+    </div>
+    <div class="card accent-green">
+      <h4>Second-Order Cone Program (SOCP)</h4>
+      <div class="math-block" style="margin:0.5rem 0;font-size:0.85rem">min fᵀx
+s.t. ||Aᵢx + bᵢ||₂ ≤ cᵢᵀx + dᵢ</div>
+      <p style="font-size:0.85rem;margin:0">More general than LP and QP. Used in robust optimization and risk-constrained portfolio design.</p>
+    </div>
+    <div class="card accent-purple">
+      <h4>Semidefinite Program (SDP)</h4>
+      <div class="math-block" style="margin:0.5rem 0;font-size:0.85rem">min Tr(CX)
+s.t. Tr(AᵢX) = bᵢ
+     X ⪰ 0 (PSD)</div>
+      <p style="font-size:0.85rem;margin:0">Optimization over positive semidefinite matrices. Used in covariance estimation, control theory, and combinatorial relaxations.</p>
+    </div>
+  </div>
+
+  <h3>Duality — The Mirror Problem</h3>
+  <p>Every convex optimization problem has a <strong>dual problem</strong>. The dual provides a lower bound on the optimal value. For convex problems, <strong>strong duality</strong> holds — the dual optimal equals the primal optimal.</p>
+
+  <div class="math-block">
+    <span class="label">primal-dual relationship</span>
+    Primal:  min f(x)   s.t. g(x) ≤ 0
+    Lagrangian: ℒ(x, λ) = f(x) + λᵀg(x),  λ ≥ 0
+    Dual function: q(λ) = min_x ℒ(x, λ)
+    Dual problem: max q(λ)  s.t. λ ≥ 0
+    
+    Key facts:
+    • q(λ) ≤ p* for all λ ≥ 0  (weak duality — always true)
+    • For convex problems: q(λ*) = p*  (strong duality)
+    • λ* gives the "price" of each constraint
+  </div>
+
+  <h3>Gradient Descent for Convex Functions</h3>
+  <p>When a function is convex, gradient descent is guaranteed to converge to the global minimum (given appropriate learning rate). The convergence rate depends on the problem structure:</p>
+
+  <div class="math-block">
+    <span class="label">convergence rates</span>
+    Convex + Lipschitz:         O(1/√k) iterations to ε accuracy
+    Convex + Smooth:            O(1/k)  iterations
+    Strongly convex + smooth:   O(log(1/ε)) iterations (linear convergence)
+    
+    Strong convexity: f(y) ≥ f(x) + ∇f(x)ᵀ(y-x) + (m/2)||y-x||²
+    (function curves up at least as fast as a quadratic with curvature m)
+  </div>
+
+  <div class="quant-box">
+    <div class="quant-box-title">📈 Quant Finance Connection</div>
+    <p><strong>Modern Portfolio Theory</strong> is a QP. <strong>Risk parity</strong> is an SOCP. <strong>Robust portfolio optimization</strong> under uncertainty is an SOCP or SDP. Tools like <strong>CVXPY</strong> in Python let you write these in near-mathematical notation and solve them in seconds using interior-point methods. <strong>Black-Litterman model</strong> uses convex optimization under a Bayesian framework. If you're going into quant finance, CVXPY is an essential tool.</p>
+  </div>
+
+  <div class="resources">
+    <a class="resource-link" href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank"><span class="icon">📚</span> Boyd & Vandenberghe — Convex Optimization (Free PDF)</a>
+    <a class="resource-link" href="https://www.cvxpy.org/tutorial/index.html" target="_blank"><span class="icon">🐍</span> CVXPY — Python Convex Optimization</a>
+    <a class="resource-link" href="https://www.youtube.com/playlist?list=PL3940DD956CDF0622" target="_blank"><span class="icon">🎥</span> Stanford EE364A — Boyd's Lectures</a>
+    <a class="resource-link" href="https://web.mit.edu/dimitrib/www/Convex_Opt_Slides.pdf" target="_blank"><span class="icon">📖</span> MIT — Bertsekas Slides</a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 5: COLAB -->
+<section class="tab-panel" id="tab-colab">
+  <h2>Colab <span class="accent">Experiments</span></h2>
+  <p class="topic-intro">These are hands-on experiments designed to run directly in Google Colab (free). Copy-paste the code, run each cell, observe the output, modify parameters and observe what changes. Learning by doing is irreplaceable.</p>
+
+  <div class="callout callout-tip">
+    <span class="callout-icon">💡</span>
+    <p>Go to <strong>colab.research.google.com</strong>, create a new notebook, and paste these code blocks into cells. Run each with Shift+Enter.</p>
+  </div>
+
+  <!-- EXPERIMENT 1 -->
+  <div class="colab-box">
+    <div class="colab-title">Experiment 1 — Visualizing Derivatives</div>
+    <p>Compute and plot derivatives using numerical differentiation and compare with the analytical result.</p>
+    <div class="code-block"><span class="code-title">📓 Colab Cell 1</span><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Define our function and its analytical derivative</span>
+<span class="kw">def</span> <span class="fn">f</span>(x):
+    <span class="kw">return</span> x**<span class="num">3</span> - <span class="num">4</span>*x**<span class="num">2</span> + <span class="num">5</span>*x - <span class="num">2</span>
+
+<span class="kw">def</span> <span class="fn">f_prime_analytical</span>(x):
+    <span class="kw">return</span> <span class="num">3</span>*x**<span class="num">2</span> - <span class="num">8</span>*x + <span class="num">5</span>  <span class="cm"># computed by hand</span>
+
+<span class="cm"># Numerical derivative (finite difference)</span>
+<span class="kw">def</span> <span class="fn">f_prime_numerical</span>(x, h=<span class="num">1e-5</span>):
+    <span class="kw">return</span> (f(x + h) - f(x)) / h
+
+x = np.<span class="fn">linspace</span>(<span class="num">-0.5</span>, <span class="num">3.5</span>, <span class="num">300</span>)
+fig, axes = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">5</span>))
+
+<span class="cm"># Plot function and tangent lines at critical points</span>
+axes[<span class="num">0</span>].<span class="fn">plot</span>(x, <span class="fn">f</span>(x), <span class="st">'royalblue'</span>, lw=<span class="num">2.5</span>, label=<span class="st">'f(x) = x³-4x²+5x-2'</span>)
+<span class="cm"># Mark critical points where f'(x)=0 → 3x²-8x+5=0 → x=1 or x=5/3</span>
+<span class="kw">for</span> xc <span class="kw">in</span> [<span class="num">1.0</span>, <span class="num">5</span>/<span class="num">3</span>]:
+    axes[<span class="num">0</span>].<span class="fn">axvline</span>(xc, color=<span class="st">'gold'</span>, lw=<span class="num">1</span>, ls=<span class="st">'--'</span>, alpha=<span class="num">0.7</span>)
+    axes[<span class="num">0</span>].<span class="fn">scatter</span>([xc], [<span class="fn">f</span>(xc)], color=<span class="st">'gold'</span>, s=<span class="num">80</span>, zorder=<span class="num">5</span>)
+axes[<span class="num">0</span>].<span class="fn">set_title</span>(<span class="st">'Function with critical points'</span>); axes[<span class="num">0</span>].<span class="fn">legend</span>()
+axes[<span class="num">0</span>].<span class="fn">axhline</span>(<span class="num">0</span>, color=<span class="st">'gray'</span>, lw=<span class="num">0.5</span>)
+
+<span class="cm"># Plot both derivatives (should overlap almost perfectly)</span>
+axes[<span class="num">1</span>].<span class="fn">plot</span>(x, <span class="fn">f_prime_analytical</span>(x), <span class="st">'gold'</span>, lw=<span class="num">2.5</span>, label=<span class="st">'Analytical f\'(x)'</span>)
+axes[<span class="num">1</span>].<span class="fn">plot</span>(x, [<span class="fn">f_prime_numerical</span>(xi) <span class="kw">for</span> xi <span class="kw">in</span> x], <span class="st">'tomato'</span>, lw=<span class="num">1.5</span>, ls=<span class="st">'--'</span>, label=<span class="st">'Numerical f\'(x)'</span>)
+axes[<span class="num">1</span>].<span class="fn">axhline</span>(<span class="num">0</span>, color=<span class="st">'white'</span>, lw=<span class="num">0.5</span>)
+axes[<span class="num">1</span>].<span class="fn">set_title</span>(<span class="st">'Analytical vs Numerical Derivative'</span>); axes[<span class="num">1</span>].<span class="fn">legend</span>()
+
+plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()
+<span class="cm"># Try: change the function f(x) and its derivative. See if numerical matches!</span></div>
+  </div>
+
+  <!-- EXPERIMENT 2 -->
+  <div class="colab-box">
+    <div class="colab-title">Experiment 2 — Gradient Descent from Scratch</div>
+    <p>Implement gradient descent manually on a 2D function and visualize the optimization path.</p>
+    <div class="code-block"><span class="code-title">📓 Colab Cell 2</span><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> matplotlib <span class="kw">import</span> cm
+
+<span class="cm"># Rosenbrock-like function (classic optimization test)</span>
+<span class="kw">def</span> <span class="fn">f</span>(x, y):
+    <span class="kw">return</span> (x - <span class="num">2</span>)**<span class="num">2</span> + <span class="num">3</span>*(y - x**<span class="num">2</span>)**<span class="num">2</span>
+
+<span class="kw">def</span> <span class="fn">gradient</span>(x, y):
+    dfdx = <span class="num">2</span>*(x-<span class="num">2</span>) + <span class="num">3</span>*<span class="num">2</span>*(y-x**<span class="num">2</span>)*(-<span class="num">2</span>*x)
+    dfdy = <span class="num">3</span>*<span class="num">2</span>*(y-x**<span class="num">2</span>)
+    <span class="kw">return</span> np.<span class="fn">array</span>([dfdx, dfdy])
+
+<span class="cm"># Gradient descent loop</span>
+alpha = <span class="num">0.01</span>    <span class="cm"># learning rate — try changing to 0.1 or 0.001</span>
+pos = np.<span class="fn">array</span>([<span class="num">-1.0</span>, <span class="num">3.0</span>])   <span class="cm"># starting position</span>
+path = [pos.<span class="fn">copy</span>()]
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">500</span>):
+    grad = <span class="fn">gradient</span>(*pos)
+    pos = pos - alpha * grad
+    path.<span class="fn">append</span>(pos.<span class="fn">copy</span>())
+
+path = np.<span class="fn">array</span>(path)
+
+<span class="cm"># Visualize</span>
+x_range = np.<span class="fn">linspace</span>(-<span class="num">2</span>, <span class="num">4</span>, <span class="num">200</span>)
+y_range = np.<span class="fn">linspace</span>(-<span class="num">2</span>, <span class="num">8</span>, <span class="num">200</span>)
+X, Y = np.<span class="fn">meshgrid</span>(x_range, y_range)
+Z = <span class="fn">f</span>(X, Y)
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">10</span>, <span class="num">7</span>))
+plt.<span class="fn">contourf</span>(X, Y, Z, levels=<span class="num">30</span>, cmap=<span class="st">'viridis'</span>, alpha=<span class="num">0.8</span>)
+plt.<span class="fn">colorbar</span>(label=<span class="st">'f(x,y)'</span>)
+plt.<span class="fn">contour</span>(X, Y, Z, levels=<span class="num">20</span>, colors=<span class="st">'white'</span>, alpha=<span class="num">0.3</span>, linewidths=<span class="num">0.5</span>)
+plt.<span class="fn">plot</span>(path[:,<span class="num">0</span>], path[:,<span class="num">1</span>], <span class="st">'w-o'</span>, ms=<span class="num">3</span>, lw=<span class="num">1.5</span>, label=<span class="st">'GD path'</span>)
+plt.<span class="fn">plot</span>(*path[<span class="num">0</span>], <span class="st">'rs'</span>, ms=<span class="num">12</span>, label=<span class="st">'Start'</span>)
+plt.<span class="fn">plot</span>(*path[-<span class="num">1</span>], <span class="st">'g*'</span>, ms=<span class="num">15</span>, label=<span class="st">'End'</span>)
+plt.<span class="fn">scatter</span>([<span class="num">2</span>], [<span class="num">4</span>], color=<span class="st">'gold'</span>, s=<span class="num">200</span>, marker=<span class="st">'★'</span>, zorder=<span class="num">10</span>, label=<span class="st">'True min (2,4)'</span>)
+plt.<span class="fn">legend</span>(); plt.<span class="fn">title</span>(<span class="st">f'Gradient Descent (α={alpha}), {len(path)} steps'</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">'x'</span>); plt.<span class="fn">ylabel</span>(<span class="st">'y'</span>); plt.<span class="fn">show</span>()
+<span class="cm"># Experiment: What happens with alpha=0.1? With alpha=0.0001?</span></div>
+  </div>
+
+  <!-- EXPERIMENT 3 -->
+  <div class="colab-box">
+    <div class="colab-title">Experiment 3 — Lagrange Multipliers Numerically</div>
+    <p>Solve a constrained optimization problem numerically and visualize the solution with Lagrange geometry.</p>
+    <div class="code-block"><span class="code-title">📓 Colab Cell 3</span><span class="kw">from</span> scipy.optimize <span class="kw">import</span> minimize
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Problem: minimize f(x,y) = (x-3)² + (y-2)²
+# Subject to: x + y = 3 (equality constraint)</span>
+
+<span class="kw">def</span> <span class="fn">f</span>(xy):
+    x, y = xy
+    <span class="kw">return</span> (x-<span class="num">3</span>)**<span class="num">2</span> + (y-<span class="num">2</span>)**<span class="num">2</span>
+
+constraint = {<span class="st">'type'</span>: <span class="st">'eq'</span>, <span class="st">'fun'</span>: <span class="kw">lambda</span> xy: xy[<span class="num">0</span>] + xy[<span class="num">1</span>] - <span class="num">3</span>}
+result = <span class="fn">minimize</span>(f, [<span class="num">0</span>, <span class="num">0</span>], constraints=constraint, method=<span class="st">'SLSQP'</span>)
+x_opt, y_opt = result.x
+<span class="fn">print</span>(<span class="st">f"Numerical solution: x={x_opt:.4f}, y={y_opt:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Optimal value: f = {result.fun:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Analytical solution: x=2.5, y=0.5"</span>)  <span class="cm"># verify by hand!</span>
+
+<span class="cm"># Visualize</span>
+x_range = np.<span class="fn">linspace</span>(<span class="num">-1</span>, <span class="num">5</span>, <span class="num">200</span>)
+y_range = np.<span class="fn">linspace</span>(-<span class="num">1</span>, <span class="num">4</span>, <span class="num">200</span>)
+X, Y = np.<span class="fn">meshgrid</span>(x_range, y_range)
+Z = (X-<span class="num">3</span>)**<span class="num">2</span> + (Y-<span class="num">2</span>)**<span class="num">2</span>
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">9</span>, <span class="num">7</span>))
+cs = plt.<span class="fn">contourf</span>(X, Y, Z, levels=<span class="num">25</span>, cmap=<span class="st">'plasma'</span>, alpha=<span class="num">0.7</span>)
+plt.<span class="fn">colorbar</span>(cs, label=<span class="st">'f(x,y)'</span>)
+plt.<span class="fn">contour</span>(X, Y, Z, levels=<span class="num">15</span>, colors=<span class="st">'white'</span>, alpha=<span class="num">0.4</span>, lw=<span class="num">0.5</span>)
+
+<span class="cm"># Draw constraint line x+y=3</span>
+x_line = np.<span class="fn">linspace</span>(-<span class="num">1</span>, <span class="num">4</span>, <span class="num">100</span>)
+plt.<span class="fn">plot</span>(x_line, <span class="num">3</span>-x_line, <span class="st">'cyan'</span>, lw=<span class="num">3</span>, label=<span class="st">'Constraint: x+y=3'</span>)
+plt.<span class="fn">scatter</span>([x_opt], [y_opt], color=<span class="st">'gold'</span>, s=<span class="num">250</span>, zorder=<span class="num">10</span>, label=<span class="st">f'Optimum ({x_opt:.2f},{y_opt:.2f})'</span>)
+plt.<span class="fn">scatter</span>([<span class="num">3</span>], [<span class="num">2</span>], color=<span class="st">'white'</span>, s=<span class="num">100</span>, marker=<span class="st">'*'</span>, zorder=<span class="num">9</span>, label=<span class="st">'Unconstrained min (3,2)'</span>)
+plt.<span class="fn">legend</span>(); plt.<span class="fn">title</span>(<span class="st">'Constrained Optimization via Lagrange Multipliers'</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">'x'</span>); plt.<span class="fn">ylabel</span>(<span class="st">'y'</span>); plt.<span class="fn">show</span>()</div>
+  </div>
+
+  <!-- EXPERIMENT 4 -->
+  <div class="colab-box">
+    <div class="colab-title">Experiment 4 — Convex Optimization with CVXPY</div>
+    <p>Use the CVXPY library to solve a Markowitz-style portfolio optimization problem.</p>
+    <div class="code-block"><span class="code-title">📓 Colab Cell 4 (run: !pip install cvxpy first)</span><span class="cm"># !pip install cvxpy  ← uncomment and run this first</span>
+<span class="kw">import</span> cvxpy <span class="kw">as</span> cp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+np.random.<span class="fn">seed</span>(<span class="num">42</span>)
+n_assets = <span class="num">5</span>   <span class="cm"># number of assets in portfolio</span>
+
+<span class="cm"># Generate random expected returns and covariance matrix</span>
+mu = np.random.<span class="fn">uniform</span>(<span class="num">0.05</span>, <span class="num">0.20</span>, n_assets)   <span class="cm"># expected returns</span>
+A = np.random.<span class="fn">randn</span>(n_assets, n_assets)
+Sigma = A.T @ A / n_assets + <span class="num">0.1</span> * np.<span class="fn">eye</span>(n_assets)   <span class="cm"># PSD covariance</span>
+
+<span class="cm"># CVXPY problem: minimize variance, target return r_target</span>
+w = cp.<span class="fn">Variable</span>(n_assets)   <span class="cm"># portfolio weights (our optimization variable)</span>
+
+<span class="cm"># Efficient frontier: sweep over target returns</span>
+target_returns = np.<span class="fn">linspace</span>(mu.<span class="fn">min</span>(), mu.<span class="fn">max</span>(), <span class="num">40</span>)
+frontier_risk, frontier_ret = [], []
+
+<span class="kw">for</span> r <span class="kw">in</span> target_returns:
+    constraints = [
+        cp.<span class="fn">sum</span>(w) == <span class="num">1</span>,    <span class="cm"># weights sum to 1</span>
+        mu @ w >= r,          <span class="cm"># achieve at least target return</span>
+        w >= <span class="num">0</span>               <span class="cm"># no short selling (try removing this!)</span>
+    ]
+    prob = cp.<span class="fn">Problem</span>(cp.<span class="fn">Minimize</span>(cp.<span class="fn">quad_form</span>(w, Sigma)), constraints)
+    prob.<span class="fn">solve</span>(solver=cp.OSQP, verbose=<span class="kw">False</span>)
+    <span class="kw">if</span> prob.status == <span class="st">'optimal'</span>:
+        frontier_risk.<span class="fn">append</span>(np.<span class="fn">sqrt</span>(prob.value))
+        frontier_ret.<span class="fn">append</span>(r)
+
+<span class="cm"># Individual assets</span>
+asset_risks = [np.<span class="fn">sqrt</span>(Sigma[i,i]) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_assets)]
+
+plt.<span class="fn">figure</span>(figsize=(<span class="num">10</span>, <span class="num">6</span>))
+plt.<span class="fn">plot</span>(frontier_risk, frontier_ret, <span class="st">'gold'</span>, lw=<span class="num">3</span>, label=<span class="st">'Efficient Frontier'</span>)
+plt.<span class="fn">scatter</span>(asset_risks, mu, s=<span class="num">100</span>, c=<span class="st">'cyan'</span>, zorder=<span class="num">5</span>, label=<span class="st">'Individual Assets'</span>)
+<span class="kw">for</span> i, (r, m) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">zip</span>(asset_risks, mu)):
+    plt.<span class="fn">annotate</span>(<span class="st">f'Asset {i+1}'</span>, (r, m), textcoords=<span class="st">'offset points'</span>, xytext=(<span class="num">8</span>,<span class="num">4</span>), fontsize=<span class="num">9</span>, color=<span class="st">'white'</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">'Risk (std dev)'</span>); plt.<span class="fn">ylabel</span>(<span class="st">'Expected Return'</span>)
+plt.<span class="fn">title</span>(<span class="st">'Markowitz Efficient Frontier (Convex QP)'</span>)
+plt.<span class="fn">legend</span>(); plt.<span class="fn">grid</span>(<span class="kw">True</span>, alpha=<span class="num">0.2</span>); plt.<span class="fn">show</span>()
+<span class="fn">print</span>(<span class="st">"\nOptimal weights for min-variance portfolio:"</span>)
+<span class="fn">print</span>(np.<span class="fn">round</span>(w.value, <span class="num">3</span>))</div>
+  </div>
+
+  <!-- EXPERIMENT 5 -->
+  <div class="colab-box">
+    <div class="colab-title">Experiment 5 — Automatic Differentiation with PyTorch</div>
+    <p>Use PyTorch autograd to automatically compute gradients — the foundation of all modern deep learning.</p>
+    <div class="code-block"><span class="code-title">📓 Colab Cell 5</span><span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Create a tensor with gradient tracking</span>
+x = torch.<span class="fn">tensor</span>(<span class="num">2.0</span>, requires_grad=<span class="kw">True</span>)
+
+<span class="cm"># Define a function</span>
+y = x**<span class="num">4</span> - <span class="num">3</span>*x**<span class="num">3</span> + x**<span class="num">2</span> + <span class="num">5</span>
+
+<span class="cm"># Compute gradient automatically!</span>
+y.<span class="fn">backward</span>()   <span class="cm"># dy/dx computed automatically via chain rule</span>
+
+<span class="fn">print</span>(<span class="st">f"x = {x.item()}"</span>)
+<span class="fn">print</span>(<span class="st">f"y = {y.item():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"dy/dx (autograd) = {x.grad.item():.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"dy/dx (manual: 4x³-9x²+2x = {4*8 - 9*4 + 4:.4f}) ✓"</span>)
+
+<span class="cm"># Gradient descent to minimize y=f(x)</span>
+x = torch.<span class="fn">tensor</span>([<span class="num">-0.5</span>], requires_grad=<span class="kw">True</span>)
+optimizer = torch.optim.<span class="fn">SGD</span>([x], lr=<span class="num">0.005</span>)
+history = []
+
+<span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(<span class="num">200</span>):
+    optimizer.<span class="fn">zero_grad</span>()
+    loss = x**<span class="num">4</span> - <span class="num">3</span>*x**<span class="num">3</span> + x**<span class="num">2</span> + <span class="num">5</span>
+    loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+    history.<span class="fn">append</span>(loss.<span class="fn">item</span>())
+
+x_vals = np.<span class="fn">linspace</span>(-<span class="num">1</span>, <span class="num">3</span>, <span class="num">300</span>)
+y_vals = x_vals**<span class="num">4</span> - <span class="num">3</span>*x_vals**<span class="num">3</span> + x_vals**<span class="num">2</span> + <span class="num">5</span>
+fig, (ax1, ax2) = plt.<span class="fn">subplots</span>(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">13</span>, <span class="num">5</span>))
+ax1.<span class="fn">plot</span>(x_vals, y_vals, <span class="st">'royalblue'</span>, lw=<span class="num">2</span>)
+ax1.<span class="fn">axvline</span>(x.<span class="fn">item</span>(), color=<span class="st">'gold'</span>, lw=<span class="num">2</span>, ls=<span class="st">'--'</span>, label=<span class="st">f'Found min at x={x.item():.3f}'</span>)
+ax1.<span class="fn">legend</span>(); ax1.<span class="fn">set_title</span>(<span class="st">'Function and Found Minimum'</span>)
+ax2.<span class="fn">plot</span>(history, <span class="st">'tomato'</span>); ax2.<span class="fn">set_title</span>(<span class="st">'Loss over Gradient Descent Steps'</span>)
+ax2.<span class="fn">set_xlabel</span>(<span class="st">'Step'</span>); ax2.<span class="fn">set_ylabel</span>(<span class="st">'f(x)'</span>)
+plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ TAB 6: EXERCISES -->
+<section class="tab-panel" id="tab-exercises">
+  <h2>Practice <span class="accent">Exercises</span></h2>
+  <p class="topic-intro">Three-tier system: 🟢 Easy builds intuition, 🟡 Medium builds fluency, 🔴 Hard builds mastery. Do them in order. Struggle is the mechanism of learning.</p>
+
+  <!-- DERIVATIVES EXERCISES -->
+  <h3>Topic 1: Derivatives</h3>
+
+  <div class="exercise-section">
+    <div class="exercise-tier tier-easy">
+      <div class="tier-header">🟢 Easy — Build Intuition</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">E1</div>
+          <div class="ex-content"><p>Find the derivative of f(x) = 5x³ - 2x² + 7x - 3.</p><p class="ex-hint">Hint: Apply power rule to each term separately.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E2</div>
+          <div class="ex-content"><p>Find the derivative of f(x) = eˣ + ln(x) + 4.</p><p class="ex-hint">Hint: Use the table of known derivatives.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E3</div>
+          <div class="ex-content"><p>For f(x) = x² - 6x + 9, find all critical points and determine whether each is a min or max.</p><p class="ex-hint">Hint: Set f'(x) = 0, then check f''(x).</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E4</div>
+          <div class="ex-content"><p>For f(x,y) = 2x² + 3y³ - xy, compute both partial derivatives ∂f/∂x and ∂f/∂y.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-medium">
+      <div class="tier-header">🟡 Medium — Build Fluency</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">M1</div>
+          <div class="ex-content"><p>Use the chain rule to differentiate f(x) = sin(x³ + 2x). Then verify numerically in Python: compute [f(x+h) - f(x)]/h at x = 1 with h = 1e-6.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M2</div>
+          <div class="ex-content"><p>The sigmoid function σ(x) = 1/(1+e⁻ˣ) appears in every neural network. Derive its derivative from scratch and show it equals σ(x)(1 - σ(x)). Plot both σ and σ' for x ∈ [-6, 6].</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M3</div>
+          <div class="ex-content"><p>A firm's profit is π(q) = 100q - 2q² - 500. Find the output level q* that maximizes profit. What is the maximum profit? Verify with the second derivative test.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M4</div>
+          <div class="ex-content"><p>Compute the Hessian matrix of f(x,y) = x³ + 2x²y + y². Classify the critical points as min, max, or saddle.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-hard">
+      <div class="tier-header">🔴 Hard — Build Mastery</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">H1</div>
+          <div class="ex-content"><p>Derive the derivative of the softmax function sᵢ(z) = ezᵢ/Σⱼezʲ with respect to zₖ. Show it equals sᵢ(δᵢₖ - sₖ) where δᵢₖ is the Kronecker delta. This is essential for training neural networks with cross-entropy loss.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H2</div>
+          <div class="ex-content"><p>Implement backpropagation from scratch for a 2-layer neural network with sigmoid activation on the XOR problem. Verify gradients using numerical differentiation. Show convergence.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H3</div>
+          <div class="ex-content"><p>The Black-Scholes delta is Δ = N(d₁) where d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T). Compute ∂Δ/∂S (gamma Γ) and ∂Δ/∂σ (this involves chain rule and the derivative of N, the normal CDF). Implement and plot Δ and Γ as functions of S.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-div">
+
+  <!-- GRADIENT EXERCISES -->
+  <h3>Topic 2: Gradients & Gradient Descent</h3>
+  <div class="exercise-section">
+    <div class="exercise-tier tier-easy">
+      <div class="tier-header">🟢 Easy</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">E1</div>
+          <div class="ex-content"><p>Compute ∇f at (1, 2) for f(x,y) = 3x² + 4xy - 5y².</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E2</div>
+          <div class="ex-content"><p>Starting at x₀ = 10, perform 3 manual steps of gradient descent on f(x) = x² with learning rate α = 0.1. What value do you approach?</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E3</div>
+          <div class="ex-content"><p>Compute the Jacobian matrix of f(x,y) = [x+y, x·y] at (2, 3).</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-medium">
+      <div class="tier-header">🟡 Medium</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">M1</div>
+          <div class="ex-content"><p>Implement gradient descent in Python on f(x,y) = (x-3)² + 5(y+1)². Compare three learning rates: 0.001, 0.1, 0.5. Plot the loss curves. Which converges fastest? Which diverges?</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M2</div>
+          <div class="ex-content"><p>Implement linear regression using gradient descent on a synthetic dataset (generate 100 points from y = 2x + 3 + noise). Show MSE converging to near zero.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M3</div>
+          <div class="ex-content"><p>For f(x,y) = x²y + xy², find the Hessian H, compute det(H) at (1,1), and classify the critical point. Is this a saddle point?</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-hard">
+      <div class="tier-header">🔴 Hard</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">H1</div>
+          <div class="ex-content"><p>Compare SGD, SGD with momentum, and Adam optimizer on the Rosenbrock function f(x,y) = 100(y-x²)² + (1-x)². Implement all three from scratch (no PyTorch optimizer), plot their trajectories, and record how many steps each needs to reach f &lt; 0.01.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H2</div>
+          <div class="ex-content"><p>Derive the gradient of cross-entropy loss L = -Σᵢ yᵢ log(ŷᵢ) with respect to the logits z (before softmax) in a multi-class classifier. Show the result simplifies to ŷ - y. Implement and verify with PyTorch autograd.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-div">
+
+  <!-- LAGRANGE EXERCISES -->
+  <h3>Topic 3: Lagrange Multipliers</h3>
+  <div class="exercise-section">
+    <div class="exercise-tier tier-easy">
+      <div class="tier-header">🟢 Easy</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">E1</div>
+          <div class="ex-content"><p>Minimize f(x,y) = x² + 2y² subject to x + y = 3. Set up and solve the Lagrangian system.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E2</div>
+          <div class="ex-content"><p>Verify your answer to E1 numerically using scipy.optimize.minimize with the constraint. Do the results match?</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E3</div>
+          <div class="ex-content"><p>Maximize the area of a rectangle with a fixed perimeter of P = 20. Set up as: max A = xy subject to 2x + 2y = 20. Find the optimal dimensions.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-medium">
+      <div class="tier-header">🟡 Medium</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">M1</div>
+          <div class="ex-content"><p>A utility function is U(x,y) = x^0.5 · y^0.5 (Cobb-Douglas). A consumer has budget 2x + 3y = 12. Find the utility-maximizing consumption bundle. Compute the Lagrange multiplier and interpret it economically.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M2</div>
+          <div class="ex-content"><p>Using two Lagrange multipliers, minimize f(x,y,z) = x² + y² + z² subject to x + y + z = 1 AND x - y = 0 (i.e., x = y). Solve algebraically and verify numerically.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M3</div>
+          <div class="ex-content"><p>Write out the KKT conditions for: minimize x² + y² subject to x + y ≥ 2 (inequality). Solve by KKT and verify whether the constraint is active at the solution.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-hard">
+      <div class="tier-header">🔴 Hard</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">H1</div>
+          <div class="ex-content"><p>Markowitz Portfolio: Given 3 assets with expected returns μ = [0.10, 0.15, 0.08] and covariance matrix Σ (generate a PSD one), solve the minimum-variance portfolio with wᵀ1 = 1 constraint using Lagrange multipliers analytically (derive the closed-form solution w* = Σ⁻¹1 / (1ᵀΣ⁻¹1)). Verify with CVXPY.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H2</div>
+          <div class="ex-content"><p>Derive the dual problem for the SVM (Support Vector Machine): min (1/2)||w||² s.t. yᵢ(wᵀxᵢ + b) ≥ 1. Show that the dual is: max Σαᵢ - (1/2)ΣᵢΣⱼ αᵢαⱼyᵢyⱼxᵢᵀxⱼ, s.t. Σαᵢyᵢ=0, αᵢ≥0. Implement and solve a 2D toy SVM using CVXPY.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-div">
+
+  <!-- CONVEX EXERCISES -->
+  <h3>Topic 4: Convex Optimization</h3>
+  <div class="exercise-section">
+    <div class="exercise-tier tier-easy">
+      <div class="tier-header">🟢 Easy</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">E1</div>
+          <div class="ex-content"><p>Which of these functions are convex? (a) f(x) = x², (b) f(x) = |x|, (c) f(x) = -x², (d) f(x) = x³, (e) f(x) = eˣ, (f) f(x) = ln(x) for x > 0. Justify using the second derivative test.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E2</div>
+          <div class="ex-content"><p>Is the sum of convex functions convex? Prove it using the definition f(tx+(1-t)y) ≤ tf(x)+(1-t)f(y).</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">E3</div>
+          <div class="ex-content"><p>Solve the LP: maximize 3x + 2y subject to x + y ≤ 4, x ≤ 3, y ≤ 3, x,y ≥ 0. Draw the feasible region and identify the optimal vertex.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-medium">
+      <div class="tier-header">🟡 Medium</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">M1</div>
+          <div class="ex-content"><p>Using CVXPY, solve a Lasso regression problem: min ||Ax - b||₂² + λ||x||₁ for a random dataset. Sweep λ from 0 to 1 and plot how many components of x are exactly zero (sparsity) as a function of λ.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M2</div>
+          <div class="ex-content"><p>Show that the log-sum-exp function f(x) = log(Σᵢ eˣⁱ) is convex by computing its Hessian and showing it's PSD. This function appears in logistic regression and softmax.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">M3</div>
+          <div class="ex-content"><p>Solve a water-filling problem: maximize Σᵢ log(pᵢ + nᵢ) subject to Σpᵢ ≤ P, pᵢ ≥ 0, where nᵢ are noise levels and P is total power budget. Use CVXPY. This is fundamental in information theory and wireless communications.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-tier tier-hard">
+      <div class="tier-header">🔴 Hard</div>
+      <div class="tier-body">
+        <div class="exercise-item">
+          <div class="ex-num">H1</div>
+          <div class="ex-content"><p>Implement gradient descent and Newton's method on a strongly convex quadratic f(x) = (1/2)xᵀQx - bᵀx. Measure the number of iterations to converge for both. Verify that Newton's method converges in 1 step for quadratics. Then test on a non-quadratic convex function and compare convergence rates empirically.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H2</div>
+          <div class="ex-content"><p>Implement the ADMM (Alternating Direction Method of Multipliers) algorithm to solve Lasso from scratch. Compare its convergence speed with gradient descent. ADMM is a decomposition method widely used in distributed optimization in finance and large-scale ML.</p></div>
+        </div>
+        <div class="exercise-item">
+          <div class="ex-num">H3</div>
+          <div class="ex-content"><p>Robust Portfolio Optimization: Formulate and solve min wᵀΣw subject to worst-case return (over an uncertainty set for μ) ≥ r_target. This is an SOCP. Use CVXPY and compare the resulting portfolio to the non-robust Markowitz solution. How do they differ in extreme market conditions?</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ──────────────────────── TAB SWITCHING ────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Redraw canvases
+  setTimeout(() => {
+    drawDerivCanvas();
+    drawGradientField();
+    drawDescentCanvas();
+  }, 50);
+}
+
+// ──────────────────────── CANVAS 1: DERIVATIVE TANGENT ────────────────────────
+function drawDerivCanvas() {
+  const canvas = document.getElementById('derivCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const ox = 250, oy = 220, scale = 60;
+
+  function f(x) { return x * x; }
+  function fp(x) { return 2 * x; }
+  function toC(x, y) { return [ox + x * scale, oy - y * scale]; }
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#111827';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#1a2235'; ctx.lineWidth = 1;
+  for (let i = -4; i <= 4; i++) {
+    ctx.beginPath(); ctx.moveTo(ox + i * scale, 0); ctx.lineTo(ox + i * scale, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, oy - i * scale); ctx.lineTo(W, oy - i * scale); ctx.stroke();
+  }
+  // Axes
+  ctx.strokeStyle = '#2a3550'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox, 0); ctx.lineTo(ox, H); ctx.stroke();
+  ctx.fillStyle = '#4a5570'; ctx.font = '10px IBM Plex Mono';
+  ctx.fillText('x', W - 14, oy - 6); ctx.fillText('y', ox + 6, 12);
+
+  // Function curve
+  ctx.strokeStyle = '#4fc3f7'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let px = 0; px <= W; px++) {
+    const x = (px - ox) / scale;
+    const y = f(x);
+    const [cx, cy] = toC(x, y);
+    px === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+  }
+  ctx.stroke();
+
+  // Tangent line at x = 1
+  const tx = 1;
+  const ty = f(tx);
+  const slope = fp(tx);
+  const [tcx, tcy] = toC(tx, ty);
+  // tangent: y - ty = slope*(x - tx)
+  ctx.strokeStyle = '#e8c547'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  for (let px = 0; px <= W; px++) {
+    const x = (px - ox) / scale;
+    const y = ty + slope * (x - tx);
+    const [cx, cy] = toC(x, y);
+    px === 0 ? ctx.moveTo(cx, cy) : ctx.lineTo(cx, cy);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // Point
+  ctx.fillStyle = '#e8c547';
+  ctx.beginPath(); ctx.arc(tcx, tcy, 6, 0, Math.PI * 2); ctx.fill();
+
+  // Labels
+  ctx.fillStyle = '#4fc3f7'; ctx.font = 'bold 13px IBM Plex Mono';
+  ctx.fillText('f(x) = x²', ox + 10, 40);
+  ctx.fillStyle = '#e8c547';
+  ctx.fillText("f'(1) = 2 (tangent slope)", ox - 220, oy - 80);
+  ctx.fillStyle = '#8892a4'; ctx.font = '11px IBM Plex Mono';
+  ctx.fillText('Tangent line at x=1', ox - 220, oy - 60);
+}
+
+// ──────────────────────── CANVAS 2: GRADIENT FIELD ────────────────────────
+function drawGradientField() {
+  const canvas = document.getElementById('gradientCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#111827'; ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2;
+  const scale = 55;
+  const steps = 9;
+
+  // Draw contours first
+  for (let r = 20; r <= 220; r += 30) {
+    ctx.strokeStyle = `rgba(42, 53, 80, ${0.5 + r / 500})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  // Draw gradient arrows
+  for (let xi = -4; xi <= 4; xi++) {
+    for (let yi = -3; yi <= 3; yi++) {
+      const x = xi; const y = yi;
+      if (x === 0 && y === 0) continue;
+      const gx = 2 * x; const gy = 2 * y;
+      const mag = Math.sqrt(gx * gx + gy * gy);
+      const nx = gx / mag; const ny = gy / mag;
+      const px = cx + x * scale, py = cy - y * scale;
+      const len = 18;
+      const ex = px + nx * len, ey = py - ny * len;
+
+      // Color by magnitude
+      const hue = 180 + mag * 15;
+      ctx.strokeStyle = `hsla(${hue},70%,60%,0.8)`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(ex, ey); ctx.stroke();
+      // Arrowhead
+      const angle = Math.atan2(ey - py, ex - px);
+      ctx.fillStyle = `hsla(${hue},70%,60%,0.8)`;
+      ctx.beginPath();
+      ctx.moveTo(ex, ey);
+      ctx.lineTo(ex - 6 * Math.cos(angle - 0.4), ey - 6 * Math.sin(angle - 0.4));
+      ctx.lineTo(ex - 6 * Math.cos(angle + 0.4), ey - 6 * Math.sin(angle + 0.4));
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // Minimum at center
+  ctx.fillStyle = '#e8c547';
+  ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#8892a4'; ctx.font = '11px IBM Plex Mono';
+  ctx.fillText('min at (0,0)', cx + 12, cy + 4);
+  ctx.fillStyle = '#4fc3f7'; ctx.font = 'bold 12px IBM Plex Mono';
+  ctx.fillText('∇f = [2x, 2y]  for f(x,y) = x²+y²', 15, 25);
+}
+
+// ──────────────────────── CANVAS 3: GRADIENT DESCENT ANIMATION ────────────────────────
+let descentPath = [];
+let animFrame = null;
+
+function resetDescent() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  descentPath = [];
+  drawDescentCanvas();
+  document.getElementById('runDescentBtn').textContent = '▶ RUN DESCENT';
+}
+
+function drawDescentCanvas(extraPath) {
+  const canvas = document.getElementById('descentCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#111827'; ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2, scale = 55;
+
+  // Draw filled contours
+  const levels = [0.1, 0.5, 1, 2, 3.5, 5, 7.5, 10, 15];
+  for (let i = levels.length - 1; i >= 0; i--) {
+    const r = Math.sqrt(levels[i]) * scale;
+    const t = i / levels.length;
+    ctx.fillStyle = `hsla(${220 + t * 60},50%,${10 + t * 15}%,0.8)`;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  }
+  for (let r = 10; r < 260; r += 30) {
+    ctx.strokeStyle = 'rgba(60,80,120,0.4)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  // Draw path
+  const path = extraPath || descentPath;
+  if (path.length > 1) {
+    ctx.strokeStyle = '#e8c547'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < path.length; i++) {
+      const px = cx + path[i][0] * scale;
+      const py = cy - path[i][1] * scale;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // Draw dots
+    path.forEach((p, i) => {
+      if (i % 5 === 0 || i === path.length - 1) {
+        ctx.fillStyle = i === path.length - 1 ? '#34d399' : '#e8c547';
+        ctx.beginPath();
+        ctx.arc(cx + p[0] * scale, cy - p[1] * scale, i === path.length - 1 ? 7 : 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+  }
+
+  // Start point
+  if (path.length > 0) {
+    ctx.fillStyle = '#f87171';
+    ctx.beginPath();
+    ctx.arc(cx + path[0][0] * scale, cy - path[0][1] * scale, 7, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Minimum
+  ctx.fillStyle = '#34d399';
+  ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#8892a4'; ctx.font = '11px IBM Plex Mono';
+  ctx.fillText('min (0,0)', cx + 8, cy - 8);
+  ctx.fillStyle = '#4fc3f7'; ctx.font = 'bold 12px IBM Plex Mono';
+  ctx.fillText('Gradient Descent on f(x,y) = x² + y²', 15, 25);
+  if (path.length > 1) {
+    ctx.fillStyle = '#8892a4'; ctx.font = '11px IBM Plex Mono';
+    ctx.fillText(`Step ${path.length - 1}`, W - 70, H - 12);
+  }
+}
+
+function runDescentAnimation() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  let x = 3.5, y = -3.0;
+  const alpha = 0.08;
+  descentPath = [[x, y]];
+  let step = 0;
+  const maxSteps = 80;
+  document.getElementById('runDescentBtn').textContent = '⏳ Running...';
+
+  function step_fn() {
+    const gx = 2 * x, gy = 2 * y;
+    x -= alpha * gx; y -= alpha * gy;
+    descentPath.push([x, y]);
+    drawDescentCanvas(descentPath);
+    step++;
+    if (step < maxSteps && (Math.abs(x) > 0.01 || Math.abs(y) > 0.01)) {
+      animFrame = requestAnimationFrame(step_fn);
+    } else {
+      document.getElementById('runDescentBtn').textContent = '▶ RUN DESCENT';
+    }
+  }
+  animFrame = requestAnimationFrame(step_fn);
+}
+
+// Initial draw on page load
+window.addEventListener('load', () => {
+  drawDerivCanvas();
+  drawGradientField();
+  drawDescentCanvas();
+});
+</script>
+</body>
+</html>
