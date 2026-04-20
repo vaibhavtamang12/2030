@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Derivatives Pricing — Quant Engineer's Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2332;
+    --border: #1e3050;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --card: #141d2e;
+    --glow: 0 0 30px rgba(0,212,255,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .site-header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0d1b2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 20px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-inner { max-width: 1300px; margin: 0 auto; }
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 900;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .site-subtitle { font-size: 0.78rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+  /* ─── TABS ─── */
+  .tabs-bar {
+    display: flex; gap: 0; overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    scrollbar-width: thin;
+    padding: 0 40px;
+    max-width: 100%;
+  }
+  .tabs-bar::-webkit-scrollbar { height: 3px; }
+  .tabs-bar::-webkit-scrollbar-thumb { background: var(--accent2); }
+
+  .tab-btn {
+    flex-shrink: 0;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; font-weight: 400;
+    padding: 14px 20px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--accent); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+
+  /* ─── PANELS ─── */
+  .tab-panel { display: none; max-width: 1300px; margin: 0 auto; padding: 40px 40px 80px; }
+  .tab-panel.active { display: block; }
+
+  /* ─── TYPOGRAPHY ─── */
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem; font-weight: 900;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #ffffff 30%, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem; font-weight: 700;
+    color: #fff; margin: 48px 0 16px;
+    padding-left: 14px;
+    border-left: 3px solid var(--accent);
+  }
+  h3 {
+    font-family: 'Lato', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--accent); margin: 28px 0 10px;
+    text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+  }
+  h4 {
+    font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 700;
+    color: var(--text-dim); margin: 16px 0 6px;
+  }
+  p { margin-bottom: 14px; color: var(--text-dim); font-size: 0.97rem; }
+  strong { color: var(--text); font-weight: 700; }
+  em { color: var(--accent4); font-style: normal; font-weight: 700; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,212,255,0.3); }
+  .card-accent { border-left: 4px solid var(--accent); }
+  .card-purple { border-left: 4px solid var(--accent2); }
+  .card-green { border-left: 4px solid var(--accent3); }
+  .card-yellow { border-left: 4px solid var(--accent4); }
+  .card-red { border-left: 4px solid var(--accent5); }
+
+  /* ─── CALLOUTS ─── */
+  .callout {
+    border-radius: 10px; padding: 18px 22px;
+    margin: 20px 0; font-size: 0.93rem;
+  }
+  .callout-info { background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.25); }
+  .callout-warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.25); }
+  .callout-tip  { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.25); }
+  .callout-danger{ background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); }
+  .callout-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  .callout-info .callout-label   { color: var(--accent); }
+  .callout-warn .callout-label   { color: var(--accent4); }
+  .callout-tip .callout-label    { color: var(--accent3); }
+  .callout-danger .callout-label { color: var(--accent5); }
+
+  /* ─── CODE ─── */
+  pre {
+    background: #070c14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    overflow-x: auto;
+    margin: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; color: var(--accent3); background: rgba(16,185,129,0.1); padding: 2px 6px; border-radius: 4px; }
+  pre code { background: none; padding: 0; color: #c9d1d9; }
+  .kw  { color: #ff79c6; }
+  .fn  { color: #50fa7b; }
+  .st  { color: #f1fa8c; }
+  .cm  { color: #6272a4; font-style: italic; }
+  .nm  { color: #bd93f9; }
+  .op  { color: #ff79c6; }
+
+  /* ─── FORMULA BOX ─── */
+  .formula-box {
+    background: linear-gradient(135deg, #0d1b2e, #111827);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow: var(--glow);
+  }
+  .formula-box .formula {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .formula-box .formula-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text-muted);
+    margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  /* ─── GRID LAYOUTS ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 18px 0; }
+  @media(max-width:900px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+  /* ─── EXERCISES ─── */
+  .exercise-section { margin: 30px 0; }
+  .exercise-tier {
+    border-radius: 10px; padding: 20px 24px;
+    margin-bottom: 14px;
+    border: 1px solid;
+  }
+  .tier-easy   { border-color: rgba(16,185,129,0.4);  background: rgba(16,185,129,0.05); }
+  .tier-medium { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.05); }
+  .tier-hard   { border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.05); }
+  .tier-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .tier-easy .tier-label   { color: var(--accent3); }
+  .tier-medium .tier-label { color: var(--accent4); }
+  .tier-hard .tier-label   { color: var(--accent5); }
+  .exercise-list { list-style: none; padding: 0; }
+  .exercise-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--text-dim);
+    font-size: 0.93rem;
+    display: flex; gap: 10px;
+  }
+  .exercise-list li:last-child { border-bottom: none; }
+  .ex-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--text-muted);
+    flex-shrink: 0; padding-top: 2px;
+  }
+
+  /* ─── RESOURCE LINKS ─── */
+  .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 14px; margin: 18px 0; }
+  .resource-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.2s; display: block;
+  }
+  .resource-card:hover { border-color: var(--accent); box-shadow: var(--glow); }
+  .resource-card .rc-type { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .resource-card .rc-title { font-size: 0.93rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .resource-card .rc-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* ─── DIAGRAM SVG ─── */
+  .diagram-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  /* ─── INTERACTIVE ─── */
+  .interactive-box {
+    background: var(--surface2); border: 1px solid rgba(124,58,237,0.4);
+    border-radius: 12px; padding: 24px 28px; margin: 20px 0;
+  }
+  .interactive-box h4 { color: var(--accent2); margin-bottom: 14px; }
+  .slider-row { display: flex; align-items: center; gap: 14px; margin: 10px 0; }
+  .slider-row label { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-dim); min-width: 200px; }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+  .slider-row span { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); min-width: 60px; text-align: right; }
+  .output-display {
+    background: #070c14; border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px; margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+  }
+  .out-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .out-row:last-child { border-bottom: none; }
+  .out-key { color: var(--text-muted); }
+  .out-val { color: var(--accent); font-weight: 600; }
+
+  canvas {
+    max-width: 100%; border-radius: 8px;
+    background: #070c14; border: 1px solid var(--border);
+    display: block; margin: 14px 0;
+  }
+
+  /* ─── TABLE ─── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  th {
+    background: var(--surface2); color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-dim); }
+  tr:hover td { background: rgba(0,212,255,0.03); }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .badge-blue { background: rgba(0,212,255,0.15); color: var(--accent); }
+  .badge-purple { background: rgba(124,58,237,0.2); color: #a78bfa; }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--accent4); }
+
+  /* ─── TOPIC HERO ─── */
+  .topic-hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    margin-bottom: 36px;
+    position: relative; overflow: hidden;
+  }
+  .topic-hero::before {
+    content:''; position:absolute; top:-60px; right:-60px;
+    width:200px; height:200px; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+  }
+  .topic-hero .hero-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem; font-weight: 900;
+    color: rgba(0,212,255,0.06); position: absolute; right: 40px; top: 20px;
+    line-height: 1; user-select: none;
+  }
+  .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* ─── STEP FLOW ─── */
+  .step-flow { display: flex; gap: 0; margin: 20px 0; }
+  .step { flex: 1; text-align: center; padding: 16px 10px; position: relative; }
+  .step:not(:last-child)::after {
+    content: '→';
+    position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+    color: var(--accent); font-size: 1.2rem;
+  }
+  .step-icon { font-size: 1.8rem; margin-bottom: 6px; }
+  .step-label { font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── COLAB BADGE ─── */
+  .colab-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #f9ab00; color: #000;
+    border-radius: 8px; padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700;
+    text-decoration: none; margin: 8px 4px;
+    transition: opacity 0.2s;
+  }
+  .colab-link:hover { opacity: 0.85; }
+
+  /* ─── ASSUMPTION TAG ─── */
+  .assumption-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin: 16px 0; }
+  .assumption-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    transition: border-color 0.2s;
+  }
+  .assumption-item:hover { border-color: var(--accent2); }
+  .assumption-item .ai-num { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--accent2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .assumption-item .ai-title { font-weight: 700; color: var(--text); font-size: 0.92rem; margin-bottom: 4px; }
+  .assumption-item .ai-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* ─── GREEK TABLE ─── */
+  .greek-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px 24px;
+    margin-bottom: 14px; display: flex; gap: 20px; align-items: flex-start;
+    transition: all 0.2s;
+  }
+  .greek-card:hover { border-color: rgba(0,212,255,0.3); box-shadow: var(--glow); }
+  .greek-symbol {
+    font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 900;
+    min-width: 60px; text-align: center; line-height: 1;
+  }
+  .greek-body { flex: 1; }
+  .greek-name { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .greek-formula { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); margin-bottom: 6px; }
+  .greek-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 6px; }
+  .greek-intuition { font-size: 0.85rem; color: var(--text-dim); font-style: italic; }
+
+  /* ─── BINOMIAL TREE SVG ─── */
+  .tree-svg-wrap { overflow-x: auto; margin: 16px 0; }
+
+  /* ─── PROGRESS BAR ─── */
+  .prereq-bar {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 3px 6px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted);
+    display: inline-block; margin: 3px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="header-inner">
+    <div class="site-title">∂ Derivatives Pricing — Quant Engineer's Handbook</div>
+    <div class="site-subtitle">// Black-Scholes · Greeks · Binomial Trees · Monte Carlo · Self-contained offline guide</div>
+  </div>
+</div>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('prereqs',this)">00 · Prerequisites</button>
+  <button class="tab-btn" onclick="switchTab('intro',this)">01 · Intro to Derivatives</button>
+  <button class="tab-btn" onclick="switchTab('bs',this)">02 · Black-Scholes</button>
+  <button class="tab-btn" onclick="switchTab('greeks',this)">03 · Greeks</button>
+  <button class="tab-btn" onclick="switchTab('binomial',this)">04 · Binomial Trees</button>
+  <button class="tab-btn" onclick="switchTab('montecarlo',this)">05 · Monte Carlo</button>
+  <button class="tab-btn" onclick="switchTab('connections',this)">06 · Big Picture</button>
+  <button class="tab-btn" onclick="switchTab('colab',this)">07 · Colab Notebooks</button>
+  <button class="tab-btn" onclick="switchTab('resources',this)">08 · Resources</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 0 — PREREQUISITES -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-prereqs" class="tab-panel active">
+  <div class="topic-hero">
+    <div class="hero-num">00</div>
+    <h1>Prerequisites</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Before we touch any pricing formula, you need fluency in these 8 foundational ideas. Don't skip — every single topic in this guide builds on them.</p>
+    <div class="hero-tags">
+      <span class="badge badge-green">Math</span>
+      <span class="badge badge-blue">Finance Basics</span>
+      <span class="badge badge-purple">Probability</span>
+    </div>
+  </div>
+
+  <h2>1. What is a Financial Market?</h2>
+  <p>A financial market is simply a place (physical or electronic) where buyers and sellers exchange things of value — <strong>assets</strong>. Think of it like eBay, but for stocks, bonds, currencies, and contracts.</p>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h4>Spot Market</h4>
+      <p>You buy or sell something <em>right now</em> at today's price. Example: buying Apple stock at $185 today. The transaction settles within 1-2 days.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>Derivatives Market</h4>
+      <p>You trade a <em>contract</em> whose value depends on another asset. The actual asset might not change hands at all. Example: an option to buy Apple at $200 in 3 months.</p>
+    </div>
+  </div>
+
+  <h2>2. Time Value of Money (TVM)</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">Core Idea</div>
+    <p><strong>$100 today is worth more than $100 a year from now.</strong> Why? Because you can invest $100 today and have more than $100 in a year. This single concept underpins ALL of finance.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">Future Value = PV × e<sup>r·T</sup></div>
+    <div class="formula-label">Continuous compounding · PV = Present Value · r = risk-free rate · T = time in years</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>Present Value (PV)</h4>
+      <p>How much is a future cash flow worth <em>today</em>? Discount it back: <code>PV = FV × e^(-rT)</code>. If r=5%, T=1, then $100 in 1 year = $95.12 today.</p>
+    </div>
+    <div class="card card-yellow">
+      <h4>Risk-Free Rate (r)</h4>
+      <p>The return you earn with zero risk. In practice, this is the government bond yield (e.g., US Treasury). In Black-Scholes, we use this to discount future payoffs.</p>
+    </div>
+  </div>
+
+  <h2>3. Probability Basics</h2>
+  <p>Options pricing is fundamentally about <em>expected outcomes under uncertainty</em>. You must understand these concepts cold:</p>
+
+  <table>
+    <thead><tr><th>Concept</th><th>Symbol</th><th>Plain English</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Probability</td><td>P(X)</td><td>How likely is X to happen?</td><td>P(heads) = 0.5</td></tr>
+      <tr><td>Expected Value</td><td>E[X]</td><td>Weighted average of all outcomes</td><td>E[coin toss: H=2, T=0] = 1</td></tr>
+      <tr><td>Variance</td><td>σ²</td><td>How spread out outcomes are</td><td>High variance = more uncertainty</td></tr>
+      <tr><td>Standard Deviation</td><td>σ</td><td>Square root of variance</td><td>In finance, this is "volatility"</td></tr>
+      <tr><td>Normal Distribution</td><td>N(μ,σ²)</td><td>Bell curve — symmetric around mean</td><td>IQ scores, measurement errors</td></tr>
+      <tr><td>Log-Normal</td><td>—</td><td>If X is normal, e^X is log-normal</td><td>Stock prices (can't go negative)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;">
+      <defs>
+        <linearGradient id="bellGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+      <path d="M 50 180 C 100 180 120 170 150 140 C 180 110 200 30 350 20 C 500 30 520 110 550 140 C 580 170 600 180 650 180" stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+      <path d="M 50 180 C 100 180 120 170 150 140 C 180 110 200 30 350 20 C 500 30 520 110 550 140 C 580 170 600 180 650 180 L 650 185 L 50 185 Z" fill="url(#bellGrad)"/>
+      <line x1="350" y1="20" x2="350" y2="185" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="350" y="200" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="11">μ (mean)</text>
+      <text x="50" y="15" fill="#94a3b8" font-family="JetBrains Mono" font-size="11">Normal Distribution N(μ,σ²)</text>
+      <text x="200" y="155" fill="#64748b" font-family="JetBrains Mono" font-size="10">68% within ±1σ</text>
+      <line x1="270" y1="165" x2="430" y2="165" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="350" y="162" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="9">σ ←──→ σ</text>
+    </svg>
+  </div>
+
+  <h2>4. Logarithms & Exponentials</h2>
+  <p>Black-Scholes uses <strong>natural logarithm (ln)</strong> and <strong>Euler's number (e ≈ 2.718)</strong>. Here's all you need:</p>
+  <div class="grid-3">
+    <div class="card">
+      <h4>ln(x)</h4>
+      <p>The power you raise <em>e</em> to get <em>x</em>. ln(e) = 1. ln(1) = 0. ln(100) ≈ 4.6</p>
+    </div>
+    <div class="card">
+      <h4>e^x (exp)</h4>
+      <p>Continuous growth. e^0=1, e^1≈2.718. Used for continuous compounding of interest.</p>
+    </div>
+    <div class="card">
+      <h4>Log Returns</h4>
+      <p>ln(S₁/S₀) = log return. These are additive and normally distributed — key assumption in BS.</p>
+    </div>
+  </div>
+
+  <h2>5. Calculus Intuition (Don't Fear It)</h2>
+  <div class="callout callout-tip">
+    <div class="callout-label">Quant Tip</div>
+    <p>You don't need to derive anything from scratch. You need to understand what derivatives (∂) <em>mean</em>: <strong>the rate of change</strong>. Greeks are literally just partial derivatives of the option price.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h4>Derivative (∂f/∂x)</h4>
+      <p>How much does f change when x changes by a tiny amount? Delta (Δ) in options = ∂Price/∂StockPrice. If stock goes up $1, how much does my option move?</p>
+    </div>
+    <div class="card">
+      <h4>Partial Derivative</h4>
+      <p>Same idea, but we change ONE variable while keeping others fixed. ∂V/∂S means: change in option value (V) when stock price (S) moves, holding everything else constant.</p>
+    </div>
+  </div>
+
+  <h2>6. Volatility (σ)</h2>
+  <div class="callout callout-warn">
+    <div class="callout-label">Most Important Parameter in Options</div>
+    <p>Volatility is the <strong>standard deviation of annualized log returns</strong>. It measures how wildly a stock's price moves. A stock with σ=20% is calm. σ=80% is wild (think crypto). Options on high-volatility assets cost MORE because there's more chance of a big payout.</p>
+  </div>
+
+  <div class="interactive-box">
+    <h4>🎲 Volatility Intuition Explorer</h4>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:14px;">Adjust volatility and see how it changes the spread of possible stock outcomes after 1 year.</p>
+    <div class="slider-row">
+      <label>Annual Volatility (σ)</label>
+      <input type="range" min="5" max="100" value="25" id="vol-slider" oninput="updateVolChart()">
+      <span id="vol-val">25%</span>
+    </div>
+    <div class="slider-row">
+      <label>Starting Stock Price (S₀)</label>
+      <input type="range" min="50" max="200" value="100" id="s0-slider" oninput="updateVolChart()">
+      <span id="s0-val">$100</span>
+    </div>
+    <canvas id="vol-canvas" width="700" height="180"></canvas>
+    <div class="output-display" id="vol-output"></div>
+  </div>
+
+  <h2>7. Stochastic Processes & Random Walks</h2>
+  <p>Stock prices don't move in a straight line — they <em>random walk</em>. Each day's move is unpredictable, like flipping a coin. The mathematical model is called <strong>Brownian Motion</strong>.</p>
+
+  <div class="formula-box">
+    <div class="formula">dS = μS dt + σS dW<sub>t</sub></div>
+    <div class="formula-label">Geometric Brownian Motion — The model behind Black-Scholes · dW = random Wiener process increment</div>
+  </div>
+
+  <div class="card card-accent">
+    <h4>Breaking It Down</h4>
+    <p><strong>dS</strong> = tiny change in stock price in a tiny time interval dt</p>
+    <p><strong>μS dt</strong> = the "drift" — on average, stocks trend upward (this is like expected return). This is the <em>predictable</em> part.</p>
+    <p><strong>σS dW</strong> = the "diffusion" — random shocks to price. dW ~ N(0, dt). This is the <em>unpredictable</em> part.</p>
+  </div>
+
+  <h2>8. Itô's Lemma (Just Know What It Does)</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">What You Need to Know</div>
+    <p>If a stock follows GBM, then the function of the stock price (like an option's value V) follows a specific rule for its own dynamics. Itô's Lemma gives us the formula for dV given dS. The key result: it adds an extra term <code>½σ²S²(∂²V/∂S²)</code> because randomness has a "second-order" effect. You'll see this as Gamma (Γ) later.</p>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Prerequisites</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">P.1</span>If r=5% and T=2 years, what is the present value of $1,000 received in 2 years? Use PV = 1000 × e^(-0.05×2).</li>
+        <li><span class="ex-num">P.2</span>A stock starts at $50. After 1 year it's at $55. Calculate the log return: ln(55/50).</li>
+        <li><span class="ex-num">P.3</span>Stock A has σ=10%, Stock B has σ=40%. Which option is more expensive (all else equal)? Explain why in one sentence.</li>
+        <li><span class="ex-num">P.4</span>What is E[fair coin flip: Heads = +1, Tails = -1]? What is the variance?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">P.5</span>A stock has daily log returns with mean 0 and std dev 1%. Annualize the volatility (multiply by √252). What is the annual σ?</li>
+        <li><span class="ex-num">P.6</span>If S₀=100, μ=8%, σ=20%, T=1 year, simulate one GBM path: S(T) = S₀ × exp((μ - σ²/2)T + σ√T × Z) where Z~N(0,1). Use Z=0.5.</li>
+        <li><span class="ex-num">P.7</span>Explain in your own words why stock prices are modeled as log-normal (not normal). What problem does it solve?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">P.8</span>Derive the expected value of S(T) under GBM: Show E[S(T)] = S₀ × e^(μT). Hint: use the moment generating function of the normal distribution.</li>
+        <li><span class="ex-num">P.9</span>In Python: simulate 1000 GBM paths for S₀=100, μ=5%, σ=30%, T=1. Plot the distribution of S(T) and verify it looks log-normal.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 1 — INTRO TO DERIVATIVES -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-intro" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">01</div>
+    <h1>Intro to Derivatives</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">A derivative is a contract whose value is <em>derived from</em> something else. Master this first — every pricing model is just a tool to answer one question: "What is this contract worth today?"</p>
+    <div class="hero-tags">
+      <span class="badge badge-blue">Options</span>
+      <span class="badge badge-blue">Forwards</span>
+      <span class="badge badge-blue">Payoff Diagrams</span>
+      <span class="badge badge-green">No-Arbitrage</span>
+    </div>
+  </div>
+
+  <h2>What is a Derivative?</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">One-Line Definition</div>
+    <p>A derivative is a <strong>contract</strong> between two parties whose value depends on the price of an <strong>underlying asset</strong> (stock, bond, commodity, index, currency, etc.).</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card card-accent">
+      <h4>🌽 The Insurance Analogy</h4>
+      <p>A put option is like car insurance. You pay a premium upfront. If something bad happens (price falls / car crash), you're protected. If nothing happens, you lose only the premium.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>🏠 The Real Estate Analogy</h4>
+      <p>A call option is like a deposit on a house. You pay $5K to lock in the right to buy at $400K in 6 months. If the price rises to $450K, you exercise and profit $45K. If it falls, walk away (only lose $5K).</p>
+    </div>
+    <div class="card card-green">
+      <h4>📦 Forward Contract Analogy</h4>
+      <p>Agree today to buy wheat in 3 months at a fixed price. The farmer is protected if wheat price falls. The baker is protected if wheat price rises. Both sides lock in certainty.</p>
+    </div>
+  </div>
+
+  <h2>Types of Derivatives</h2>
+  <table>
+    <thead><tr><th>Type</th><th>Obligation or Right?</th><th>Pays Off When</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Forward</strong></td><td>Both parties obligated</td><td>Always (positive or negative)</td><td>Oil forward at $80/barrel</td></tr>
+      <tr><td><strong>Future</strong></td><td>Both parties obligated + exchange-traded</td><td>Daily mark-to-market</td><td>S&P 500 futures</td></tr>
+      <tr><td><strong>Call Option</strong></td><td>Buyer has RIGHT (not obligation)</td><td>If S > K at expiry</td><td>Buy Apple at $200 in 3 months</td></tr>
+      <tr><td><strong>Put Option</strong></td><td>Buyer has RIGHT (not obligation)</td><td>If S < K at expiry</td><td>Sell Apple at $200 in 3 months</td></tr>
+      <tr><td><strong>Swap</strong></td><td>Both parties obligated</td><td>Periodic exchanges</td><td>Fixed vs floating interest rate</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Options Deep Dive</h2>
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>Call Option</h4>
+      <p><strong>Payoff at expiry:</strong> max(S - K, 0)</p>
+      <p>You have the RIGHT to <em>buy</em> the asset at strike price K. You exercise only if S > K (in-the-money). Otherwise you let it expire worthless. Profit from rising prices.</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Example: K=$100, S=$120 → Payoff = $20. K=$100, S=$80 → Payoff = $0.</p>
+    </div>
+    <div class="card card-red">
+      <h4>Put Option</h4>
+      <p><strong>Payoff at expiry:</strong> max(K - S, 0)</p>
+      <p>You have the RIGHT to <em>sell</em> the asset at strike price K. You exercise only if S < K (in-the-money). Profit from falling prices. Acts like insurance.</p>
+      <p style="font-size:0.82rem;color:var(--text-muted);">Example: K=$100, S=$80 → Payoff = $20. K=$100, S=$120 → Payoff = $0.</p>
+    </div>
+  </div>
+
+  <h3>Key Terminology</h3>
+  <table>
+    <thead><tr><th>Term</th><th>Symbol</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Underlying Price</td><td>S</td><td>Current price of the asset the option is written on</td></tr>
+      <tr><td>Strike Price</td><td>K</td><td>The pre-agreed price at which you can buy/sell</td></tr>
+      <tr><td>Expiry / Maturity</td><td>T</td><td>Time until the option expires (in years)</td></tr>
+      <tr><td>Premium / Price</td><td>V or C or P</td><td>What you pay today for the option contract</td></tr>
+      <tr><td>In-The-Money (ITM)</td><td>—</td><td>Option has positive payoff if exercised NOW</td></tr>
+      <tr><td>At-The-Money (ATM)</td><td>—</td><td>S ≈ K. Right at the border.</td></tr>
+      <tr><td>Out-of-The-Money (OTM)</td><td>—</td><td>Option would have zero payoff if exercised now</td></tr>
+      <tr><td>Intrinsic Value</td><td>—</td><td>max(S-K,0) for call. The payoff if exercised immediately.</td></tr>
+      <tr><td>Time Value</td><td>—</td><td>Premium - Intrinsic Value. The value of optionality/waiting.</td></tr>
+      <tr><td>European Option</td><td>—</td><td>Can only be exercised AT expiry</td></tr>
+      <tr><td>American Option</td><td>—</td><td>Can be exercised ANY TIME before expiry</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Payoff Diagrams — Interactive</h2>
+  <div class="interactive-box">
+    <h4>📈 Option Payoff Visualizer</h4>
+    <div class="slider-row">
+      <label>Strike Price (K)</label>
+      <input type="range" min="50" max="150" value="100" id="strike-slider" oninput="drawPayoff()">
+      <span id="strike-val">$100</span>
+    </div>
+    <div class="slider-row">
+      <label>Premium Paid</label>
+      <input type="range" min="1" max="20" value="8" id="prem-slider" oninput="drawPayoff()">
+      <span id="prem-val">$8</span>
+    </div>
+    <div style="display:flex;gap:10px;margin:10px 0;">
+      <button onclick="setPayoffType('long_call')" id="btn-lc" style="background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:6px;padding:6px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">Long Call</button>
+      <button onclick="setPayoffType('long_put')" id="btn-lp" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:6px;padding:6px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">Long Put</button>
+      <button onclick="setPayoffType('short_call')" id="btn-sc" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;border-radius:6px;padding:6px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">Short Call</button>
+      <button onclick="setPayoffType('short_put')" id="btn-sp" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;border-radius:6px;padding:6px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">Short Put</button>
+    </div>
+    <canvas id="payoff-canvas" width="700" height="260"></canvas>
+  </div>
+
+  <h2>No-Arbitrage Pricing</h2>
+  <div class="callout callout-warn">
+    <div class="callout-label">The Most Important Principle in Finance</div>
+    <p><strong>No free lunch.</strong> If you can construct two portfolios that have the exact same future payoff in ALL possible scenarios, they MUST have the same price today. If they don't, arbitrageurs will exploit the difference until prices converge.</p>
+  </div>
+
+  <div class="card card-accent">
+    <h4>Put-Call Parity</h4>
+    <p>The most famous no-arbitrage relationship: a call + present value of strike = put + stock.</p>
+    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff;padding:12px;">C + K·e<sup>-rT</sup> = P + S</div>
+    <p style="font-size:0.85rem;color:var(--text-muted);">This must hold or there's an arbitrage opportunity. If you know C, you can always find P and vice versa.</p>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Derivatives Intro</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">D.1</span>A call option has K=$50, S=$65 at expiry. What is the payoff? Is this ITM or OTM?</li>
+        <li><span class="ex-num">D.2</span>A put option has K=$80, S=$70 at expiry. What is the payoff? What is the profit if premium was $5?</li>
+        <li><span class="ex-num">D.3</span>Name 3 real-world uses of derivatives (hedging, speculation, arbitrage — give an example of each).</li>
+        <li><span class="ex-num">D.4</span>What does "buying a put" have in common with buying insurance?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">D.5</span>Draw payoff diagrams for: (a) long straddle = long call + long put same K, (b) bull spread = long call K1 + short call K2 where K1 &lt; K2.</li>
+        <li><span class="ex-num">D.6</span>Verify put-call parity: C=$10, K=$100, S=$105, r=5%, T=0.5. Find the fair put price P.</li>
+        <li><span class="ex-num">D.7</span>Why would a European option NEVER be exercised early? Why might an American put be exercised early?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">D.8</span>Construct an arbitrage strategy if put-call parity is violated: C=$12, P=$6, K=$100, S=$100, r=5%, T=1. Show each leg and profit.</li>
+        <li><span class="ex-num">D.9</span>In Python, plot the payoff profiles for all 4 basic positions (long call/put, short call/put) on one figure with S ranging from 50 to 150.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 2 — BLACK-SCHOLES -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-bs" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">02</div>
+    <h1>Black-Scholes Model</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Fischer Black, Myron Scholes, and Robert Merton cracked the options pricing problem in 1973. The formula won a Nobel Prize. Here's everything — the assumptions, the formula, and what it really means.</p>
+    <div class="hero-tags">
+      <span class="badge badge-blue">Assumptions</span>
+      <span class="badge badge-purple">BS Formula</span>
+      <span class="badge badge-green">Implied Volatility</span>
+      <span class="badge badge-yellow">Risk-Neutral Pricing</span>
+    </div>
+  </div>
+
+  <h2>The 8 Assumptions of Black-Scholes</h2>
+  <div class="callout callout-warn">
+    <div class="callout-label">Critical to Understand</div>
+    <p>The Black-Scholes formula is exact ONLY if all these assumptions hold. In reality, NONE of them hold perfectly. Understanding each assumption — and how reality violates it — is what separates a real quant from someone who just plugs numbers into a formula.</p>
+  </div>
+
+  <div class="assumption-grid">
+    <div class="assumption-item">
+      <div class="ai-num">A1</div>
+      <div class="ai-title">Geometric Brownian Motion</div>
+      <div class="ai-desc">Stock prices follow GBM with constant μ and σ. Log returns are normally distributed. Reality: fat tails, jumps (crashes) exist.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A2</div>
+      <div class="ai-title">Constant Volatility</div>
+      <div class="ai-desc">σ is fixed over the option's life. Reality: volatility changes daily — "volatility of volatility" exists. This leads to the vol smile.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A3</div>
+      <div class="ai-title">No Dividends</div>
+      <div class="ai-desc">The underlying pays no dividends during the option's life. Extensions exist for dividend-paying stocks (Merton model).</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A4</div>
+      <div class="ai-title">Constant Risk-Free Rate</div>
+      <div class="ai-desc">r is fixed and known. Reality: interest rates move. For short-dated options, this is a minor issue.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A5</div>
+      <div class="ai-title">European Exercise Only</div>
+      <div class="ai-desc">Option can only be exercised at expiry T. Black-Scholes doesn't price American options exactly. Binomial trees are needed.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A6</div>
+      <div class="ai-title">No Transaction Costs</div>
+      <div class="ai-desc">No bid-ask spread, no commissions. Reality: all real markets have frictions. Continuous hedging would be infinitely expensive.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A7</div>
+      <div class="ai-title">Continuous Trading</div>
+      <div class="ai-desc">You can trade at any moment. In practice, markets close. Jumps happen overnight. The hedge rebalancing is discrete.</div>
+    </div>
+    <div class="assumption-item">
+      <div class="ai-num">A8</div>
+      <div class="ai-title">No Arbitrage</div>
+      <div class="ai-desc">Markets are efficient — mispricings are exploited away immediately. This allows risk-neutral pricing to work.</div>
+    </div>
+  </div>
+
+  <h2>Risk-Neutral Pricing — The Magic Insight</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">The Core Trick</div>
+    <p>Under the risk-neutral measure, ALL assets grow at the risk-free rate r (not their real expected return μ). This seems wrong — why would a risky stock grow like a treasury bill? Because <strong>risk has been "priced in" to the option premium</strong>. We compute the expected payoff assuming the stock grows at r, then discount back at r. The real-world drift μ completely cancels out!</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula">V(S,t) = e<sup>-r(T-t)</sup> · E<sup>Q</sup>[max(S<sub>T</sub> - K, 0)]</div>
+    <div class="formula-label">Option price = discounted expected payoff under risk-neutral measure Q</div>
+  </div>
+
+  <h2>The Black-Scholes Formula</h2>
+  <div class="formula-box">
+    <div class="formula">C = S·N(d₁) - K·e<sup>-rT</sup>·N(d₂)</div>
+    <div style="height:12px;"></div>
+    <div class="formula">P = K·e<sup>-rT</sup>·N(-d₂) - S·N(-d₁)</div>
+    <div class="formula-label">Call (C) and Put (P) prices for European options</div>
+  </div>
+
+  <div class="formula-box" style="border-color:var(--accent2);box-shadow:0 0 30px rgba(124,58,237,0.15);">
+    <div class="formula" style="font-size:1.15rem;">d₁ = [ln(S/K) + (r + σ²/2)·T] / (σ·√T)</div>
+    <div style="height:8px;"></div>
+    <div class="formula" style="font-size:1.15rem;">d₂ = d₁ - σ·√T</div>
+    <div class="formula-label">Where N(·) = cumulative standard normal CDF</div>
+  </div>
+
+  <h3>Decoding d₁ and d₂</h3>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h4>What is N(d₂)?</h4>
+      <p>N(d₂) = the <strong>risk-neutral probability</strong> that the option expires in-the-money (S_T > K). It's the probability you "win" under the risk-neutral measure.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>What is N(d₁)?</h4>
+      <p>N(d₁) = the <strong>Delta</strong> of the call option. It tells you how many shares of stock you need to hold to perfectly hedge the call. Also called the option's "hedge ratio."</p>
+    </div>
+  </div>
+
+  <div class="card card-green">
+    <h4>Intuition for the Call Formula: C = S·N(d₁) - K·e⁻ʳᵀ·N(d₂)</h4>
+    <p><strong>S·N(d₁)</strong>: Expected value of receiving the stock, conditional on the option expiring ITM, discounted to today. N(d₁) is the probability-weighted share.</p>
+    <p><strong>K·e⁻ʳᵀ·N(d₂)</strong>: Expected value of PAYING the strike K, conditional on expiry ITM, discounted to today.</p>
+    <p>The call is worth: "what I receive (stock)" minus "what I pay (strike)" — weighted by probability of exercise.</p>
+  </div>
+
+  <h2>Parameters of Black-Scholes</h2>
+  <table>
+    <thead><tr><th>Parameter</th><th>Symbol</th><th>Effect on Call Price</th><th>Effect on Put Price</th><th>Intuition</th></tr></thead>
+    <tbody>
+      <tr><td>Stock Price</td><td>S</td><td>↑ Call price</td><td>↓ Put price</td><td>Higher S = more likely to be ITM for call</td></tr>
+      <tr><td>Strike</td><td>K</td><td>↓ Call price</td><td>↑ Put price</td><td>Higher K = harder to beat for call</td></tr>
+      <tr><td>Time to Expiry</td><td>T</td><td>↑ Call price</td><td>↑ Put price</td><td>More time = more uncertainty = more value</td></tr>
+      <tr><td>Volatility</td><td>σ</td><td>↑ Call price</td><td>↑ Put price</td><td>More volatility = more chance of big moves</td></tr>
+      <tr><td>Risk-Free Rate</td><td>r</td><td>↑ Call price</td><td>↓ Put price</td><td>Higher r = lower PV of strike K paid</td></tr>
+      <tr><td>Dividend Yield</td><td>q</td><td>↓ Call price</td><td>↑ Put price</td><td>Dividends reduce future stock price</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Interactive Black-Scholes Calculator</h2>
+  <div class="interactive-box">
+    <h4>🧮 Black-Scholes Option Pricer</h4>
+    <div class="grid-2">
+      <div>
+        <div class="slider-row"><label>Stock Price (S)</label><input type="range" min="50" max="200" value="100" id="bs-S" oninput="calcBS()"><span id="bs-S-val">$100</span></div>
+        <div class="slider-row"><label>Strike (K)</label><input type="range" min="50" max="200" value="100" id="bs-K" oninput="calcBS()"><span id="bs-K-val">$100</span></div>
+        <div class="slider-row"><label>Time to Expiry (T, years)</label><input type="range" min="0.05" max="3" step="0.05" value="1" id="bs-T" oninput="calcBS()"><span id="bs-T-val">1.00y</span></div>
+      </div>
+      <div>
+        <div class="slider-row"><label>Volatility (σ)</label><input type="range" min="5" max="100" value="20" id="bs-vol" oninput="calcBS()"><span id="bs-vol-val">20%</span></div>
+        <div class="slider-row"><label>Risk-Free Rate (r)</label><input type="range" min="0" max="15" step="0.5" value="5" id="bs-r" oninput="calcBS()"><span id="bs-r-val">5%</span></div>
+      </div>
+    </div>
+    <div class="output-display" id="bs-output"></div>
+    <canvas id="bs-canvas" width="700" height="180" style="margin-top:12px;"></canvas>
+  </div>
+
+  <h2>Implied Volatility (IV)</h2>
+  <div class="callout callout-tip">
+    <div class="callout-label">Reverse Engineering Black-Scholes</div>
+    <p>In practice, we OBSERVE market option prices and SOLVE for the volatility that would produce that price under Black-Scholes. This is <strong>Implied Volatility (IV)</strong>. It's the market's consensus forecast of future volatility. If IV > historical vol, options are "expensive." If IV &lt; historical vol, options are "cheap."</p>
+  </div>
+
+  <div class="card card-yellow">
+    <h4>The Volatility Smile / Skew</h4>
+    <p>If Black-Scholes were perfect, IV would be constant across all strikes. In reality, if you plot IV vs. Strike, you get a <em>smile</em> (higher IV for deep ITM and OTM options) or <em>skew</em> (higher IV for lower strikes in equity markets). This tells us the market doesn't believe in the lognormal assumption — it prices in tail risk.</p>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Black-Scholes</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">BS.1</span>S=$100, K=$100, T=1, r=5%, σ=20%. Compute d₁ and d₂ by hand (use a calculator for ln and √).</li>
+        <li><span class="ex-num">BS.2</span>Using the BS calculator above: what happens to call price as you increase σ from 10% to 50%? Does it increase or decrease? Why?</li>
+        <li><span class="ex-num">BS.3</span>List the 8 BS assumptions. For each, describe in one sentence how reality differs.</li>
+        <li><span class="ex-num">BS.4</span>If N(d₂) = 0.6, what does this mean in plain English?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">BS.5</span>Code the BS formula from scratch in Python using scipy.stats.norm.cdf. Verify against the interactive calculator.</li>
+        <li><span class="ex-num">BS.6</span>S=$100, K=$110, T=0.5, r=4%, σ=30%. Price both the call and put. Verify put-call parity holds.</li>
+        <li><span class="ex-num">BS.7</span>Plot call price vs. σ (from 5% to 80%) for ATM option. What shape does it have? Why is it not linear?</li>
+        <li><span class="ex-num">BS.8</span>Explain risk-neutral pricing in your own words. Why does the drift μ not appear in the BS formula?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">BS.9</span>Implement an implied volatility solver using bisection or Brent's method. Given observed call price C_mkt, find σ_implied numerically.</li>
+        <li><span class="ex-num">BS.10</span>Derive the BS formula from the risk-neutral expectation E^Q[max(S_T - K, 0)]. Show how the integral splits into two terms corresponding to S·N(d₁) and K·e^(-rT)·N(d₂).</li>
+        <li><span class="ex-num">BS.11</span>Plot the volatility smile using real options data from Yahoo Finance. Compute IV for different strikes and maturities. What patterns do you observe?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 3 — GREEKS -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-greeks" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">03</div>
+    <h1>The Greeks</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Greeks measure how sensitive an option's price is to various inputs. They're the language of every options trading desk. Master them and you can understand — and manage — any options position.</p>
+    <div class="hero-tags">
+      <span class="badge badge-blue">Delta Δ</span>
+      <span class="badge badge-purple">Gamma Γ</span>
+      <span class="badge badge-green">Vega ν</span>
+      <span class="badge badge-yellow">Theta Θ</span>
+      <span class="badge badge-blue">Rho ρ</span>
+    </div>
+  </div>
+
+  <h2>Why Greeks Matter</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">The Trading Desk View</div>
+    <p>Imagine you're running a book of thousands of options. You can't track every individual position. Instead, you aggregate your <strong>exposure to each risk factor</strong> using Greeks. "I'm long 500 Delta, short 200 Gamma, long 1M Vega." This tells you instantly: what market moves hurt you, what help you, and how to hedge.</p>
+  </div>
+
+  <div class="step-flow">
+    <div class="step"><div class="step-icon">S</div><div class="step-label">Stock moves</div></div>
+    <div class="step"><div class="step-icon">Δ</div><div class="step-label">Delta captures linear sensitivity</div></div>
+    <div class="step"><div class="step-icon">Γ</div><div class="step-label">Gamma captures curvature</div></div>
+    <div class="step"><div class="step-icon">⚠️</div><div class="step-label">P&L impact</div></div>
+  </div>
+
+  <h2>Delta (Δ)</h2>
+  <div class="greek-card">
+    <div class="greek-symbol" style="color:var(--accent);">Δ</div>
+    <div class="greek-body">
+      <div class="greek-name">Delta — The Most Important Greek</div>
+      <div class="greek-formula">Δ = ∂V/∂S = N(d₁) for calls, N(d₁)-1 for puts</div>
+      <div class="greek-desc"><strong>What it means:</strong> If stock price rises by $1, the option price changes by Δ dollars. Call Δ ∈ [0,1]. Put Δ ∈ [-1,0].</div>
+      <div class="greek-intuition">💡 Deep ITM call: Δ≈1 (moves like stock). ATM call: Δ≈0.5. Deep OTM call: Δ≈0. Delta is also approximately the probability of expiring ITM (under risk-neutral measure).</div>
+      <div style="margin-top:10px;">
+        <span class="badge badge-blue">Hedge ratio</span>
+        <span class="badge badge-green">Prob ITM (approx)</span>
+        <span class="badge badge-yellow">0 to 1 for calls</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-accent">
+    <h4>Delta Hedging — The Self-Financing Portfolio</h4>
+    <p>If you <em>sell</em> a call option, you've taken on unlimited risk (if stock soars). To hedge, you <strong>buy Δ shares of the stock</strong>. If Δ=0.6, buy 0.6 shares per call sold.</p>
+    <p>Now if stock goes up $1: Call price rises by $0.60 (loss on short call = -$0.60). Stock position gains: 0.6 × $1 = +$0.60. Net P&L ≈ 0. You're <em>delta-neutral</em>.</p>
+    <p style="color:var(--text-muted);font-size:0.85rem;">But Δ changes as S moves! So you must <em>continuously rebalance</em>. This is dynamic delta hedging — the core of the BS model.</p>
+  </div>
+
+  <h2>Gamma (Γ)</h2>
+  <div class="greek-card">
+    <div class="greek-symbol" style="color:var(--accent2);">Γ</div>
+    <div class="greek-body">
+      <div class="greek-name">Gamma — Rate of Change of Delta</div>
+      <div class="greek-formula">Γ = ∂²V/∂S² = ∂Δ/∂S = N'(d₁) / (S·σ·√T)</div>
+      <div class="greek-desc"><strong>What it means:</strong> Gamma tells you HOW FAST Delta changes as the stock moves. High Gamma = Delta is very sensitive to price moves. Gamma is always positive for long options (both calls and puts).</div>
+      <div class="greek-intuition">💡 ATM options have the highest Gamma (near expiry, Δ jumps from 0.5 to 0 or 1 very quickly). Long Gamma = you profit from BIG moves. Short Gamma = you suffer from big moves. Gamma is the "convexity" of options.</div>
+      <div style="margin-top:10px;">
+        <span class="badge badge-purple">Convexity</span>
+        <span class="badge badge-green">Max at ATM</span>
+        <span class="badge badge-yellow">Always positive (long options)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-purple">
+      <h4>Long Gamma (Bought Options)</h4>
+      <p>You own options. Big moves in either direction make you money. Your Delta automatically adjusts in your favor — as stock rises, your call Δ increases (you own more delta). As stock falls, delta decreases. You're always positioned correctly after a move.</p>
+    </div>
+    <div class="card card-red">
+      <h4>Short Gamma (Sold Options)</h4>
+      <p>You sold options. Volatile days hurt you — you must constantly re-hedge at unfavorable prices. This is the cost of collecting premium. You collect time value (Theta) but pay it back through adverse rebalancing.</p>
+    </div>
+  </div>
+
+  <h2>Theta (Θ)</h2>
+  <div class="greek-card">
+    <div class="greek-symbol" style="color:var(--accent4);">Θ</div>
+    <div class="greek-body">
+      <div class="greek-name">Theta — Time Decay</div>
+      <div class="greek-formula">Θ = ∂V/∂t (usually negative for option buyers)</div>
+      <div class="greek-desc"><strong>What it means:</strong> How much does the option price drop each day as time passes, all else equal? Typically expressed as $ per day. An option with Θ=-$0.05 loses $0.05 in value each day due to time passing.</div>
+      <div class="greek-intuition">💡 Time decay accelerates near expiry. An ATM option with 1 month left decays faster than one with 6 months left. The Gamma-Theta relationship: high Gamma comes with high Theta (you pay for convexity through time decay). Options sellers collect Theta; buyers pay it.</div>
+      <div style="margin-top:10px;">
+        <span class="badge badge-yellow">Time decay</span>
+        <span class="badge badge-blue">Neg for buyers</span>
+        <span class="badge badge-green">Accelerates near expiry</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Vega (ν)</h2>
+  <div class="greek-card">
+    <div class="greek-symbol" style="color:var(--accent3);">ν</div>
+    <div class="greek-body">
+      <div class="greek-name">Vega — Volatility Sensitivity</div>
+      <div class="greek-formula">ν = ∂V/∂σ = S·√T·N'(d₁)</div>
+      <div class="greek-desc"><strong>What it means:</strong> If implied volatility rises by 1%, the option price changes by ν dollars. Always positive for both calls and puts (higher vol = higher option prices).</div>
+      <div class="greek-intuition">💡 Long volatility (long Vega): you profit if vol rises. This is the "volatility bet" — you think the market will be more volatile than priced. Short Vega: you sell options, profiting if vol stays low or falls. Vega is largest for long-dated ATM options.</div>
+      <div style="margin-top:10px;">
+        <span class="badge badge-green">Vol sensitivity</span>
+        <span class="badge badge-blue">Always positive</span>
+        <span class="badge badge-purple">Max for ATM long-dated</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Rho (ρ)</h2>
+  <div class="greek-card">
+    <div class="greek-symbol" style="color:var(--text-dim);">ρ</div>
+    <div class="greek-body">
+      <div class="greek-name">Rho — Interest Rate Sensitivity</div>
+      <div class="greek-formula">ρ = ∂V/∂r = K·T·e^(-rT)·N(d₂) for calls</div>
+      <div class="greek-desc"><strong>What it means:</strong> If the risk-free rate rises by 1%, call price changes by ρ. Positive for calls (higher r = lower PV of strike = call cheaper to "pay for" stock). Negative for puts.</div>
+      <div class="greek-intuition">💡 Rho matters most for long-dated options or when interest rates are moving significantly. For short-term equity options, Rho is often the least important Greek to monitor.</div>
+    </div>
+  </div>
+
+  <h2>The Gamma-Theta Relationship</h2>
+  <div class="formula-box">
+    <div class="formula">Θ + ½σ²S²Γ + rSΔ - rV = 0</div>
+    <div class="formula-label">The Black-Scholes PDE — The fundamental relationship between all Greeks</div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Deep Insight</div>
+    <p>The BS PDE says: <strong>Theta (time decay) + Gamma (convexity benefit) = r × V (financing cost)</strong>. Long options gain Gamma (convexity) but lose Theta (time value). They're always in balance. This is why options pricing is really about balancing these forces.</p>
+  </div>
+
+  <h2>Greeks Summary Table</h2>
+  <table>
+    <thead><tr><th>Greek</th><th>Formula</th><th>What Changes</th><th>Call Sign</th><th>Put Sign</th><th>Max at</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Delta Δ</strong></td><td>∂V/∂S</td><td>Stock price +$1</td><td>0 to +1</td><td>-1 to 0</td><td>Deep ITM</td></tr>
+      <tr><td><strong>Gamma Γ</strong></td><td>∂²V/∂S²</td><td>Rate of delta change</td><td>+</td><td>+</td><td>ATM, near expiry</td></tr>
+      <tr><td><strong>Theta Θ</strong></td><td>∂V/∂t</td><td>Time passes 1 day</td><td>-</td><td>-</td><td>ATM, near expiry</td></tr>
+      <tr><td><strong>Vega ν</strong></td><td>∂V/∂σ</td><td>Volatility +1%</td><td>+</td><td>+</td><td>ATM, long-dated</td></tr>
+      <tr><td><strong>Rho ρ</strong></td><td>∂V/∂r</td><td>Rate +1%</td><td>+</td><td>-</td><td>Long-dated ITM</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Interactive Greeks Explorer</h2>
+  <div class="interactive-box">
+    <h4>⚡ Real-Time Greeks Calculator</h4>
+    <div class="grid-2">
+      <div>
+        <div class="slider-row"><label>S (Stock Price)</label><input type="range" min="50" max="200" value="100" id="gr-S" oninput="calcGreeks()"><span id="gr-S-val">$100</span></div>
+        <div class="slider-row"><label>K (Strike)</label><input type="range" min="50" max="200" value="100" id="gr-K" oninput="calcGreeks()"><span id="gr-K-val">$100</span></div>
+        <div class="slider-row"><label>T (Years)</label><input type="range" min="0.05" max="3" step="0.05" value="1" id="gr-T" oninput="calcGreeks()"><span id="gr-T-val">1.00y</span></div>
+      </div>
+      <div>
+        <div class="slider-row"><label>σ (Volatility)</label><input type="range" min="5" max="100" value="20" id="gr-vol" oninput="calcGreeks()"><span id="gr-vol-val">20%</span></div>
+        <div class="slider-row"><label>r (Rate)</label><input type="range" min="0" max="15" step="0.5" value="5" id="gr-r" oninput="calcGreeks()"><span id="gr-r-val">5%</span></div>
+      </div>
+    </div>
+    <canvas id="greeks-canvas" width="700" height="200" style="margin-top:12px;"></canvas>
+    <div class="output-display" id="greeks-output" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Greeks</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">G.1</span>A call option has Delta=0.65. If the stock rises by $2, approximately how much does the call price change?</li>
+        <li><span class="ex-num">G.2</span>You buy an ATM call for $5. One week later (all else equal), it's worth $4.80. Which Greek is responsible for this decline? How much time value did you lose per day?</li>
+        <li><span class="ex-num">G.3</span>Is Vega positive or negative for (a) long call, (b) short call, (c) long put, (d) short put?</li>
+        <li><span class="ex-num">G.4</span>An ATM option has Δ=0.50 and Γ=0.04. Stock moves from $100 to $102. What is the new approximate Delta?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">G.5</span>Implement all 5 Greeks in Python. Compute them for a call with S=100, K=105, T=0.5, r=4%, σ=25%. Plot Delta vs S as S goes from 60 to 140.</li>
+        <li><span class="ex-num">G.6</span>You sold 100 call options (each on 100 shares). Call Delta=0.45. How many shares must you buy to be delta-neutral? What happens to your hedge if the stock jumps $5?</li>
+        <li><span class="ex-num">G.7</span>Explain the "Gamma-Theta tradeoff" in your own words. Why do market makers who sell options accept short Gamma?</li>
+        <li><span class="ex-num">G.8</span>Plot Gamma vs S for an ATM option at T=1 month, 3 months, and 1 year. What do you observe?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">G.9</span>Simulate daily delta hedging: sell a call, hedge with Δ shares daily, rebalance each day. After 30 days, calculate total P&L. Show that it depends on realized Gamma × (actual vol² - implied vol²).</li>
+        <li><span class="ex-num">G.10</span>Construct a delta-gamma neutral portfolio using two options of different strikes. What position sizes do you need? Show the math.</li>
+        <li><span class="ex-num">G.11</span>Derive the Vega formula from the BS formula. Show ∂C/∂σ = S√T·N'(d₁).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 4 — BINOMIAL TREES -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-binomial" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">04</div>
+    <h1>Binomial Trees</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Before Black-Scholes, there was the binomial tree. It's simpler, more intuitive, and more flexible — it can price American options that BS cannot. And remarkably, as you add more steps, it converges to exactly the BS price.</p>
+    <div class="hero-tags">
+      <span class="badge badge-blue">Cox-Ross-Rubinstein</span>
+      <span class="badge badge-purple">Risk-Neutral Pricing</span>
+      <span class="badge badge-green">American Options</span>
+      <span class="badge badge-yellow">Backward Induction</span>
+    </div>
+  </div>
+
+  <h2>The Core Idea</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">How Binomial Trees Work</div>
+    <p>At each time step, the stock price can only do TWO things: go <strong>UP</strong> by factor u, or go <strong>DOWN</strong> by factor d. This creates a tree of possible future prices. We then price the option by working <strong>backward from expiry to today</strong>, computing the option value at each node using risk-neutral probabilities.</p>
+  </div>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;">
+      <!-- Step 0 -->
+      <circle cx="80" cy="160" r="28" fill="#141d2e" stroke="#00d4ff" stroke-width="2"/>
+      <text x="80" y="155" text-anchor="middle" fill="#00d4ff" font-family="JetBrains Mono" font-size="12" font-weight="600">S₀</text>
+      <text x="80" y="170" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="10">100</text>
+
+      <!-- Step 1 -->
+      <line x1="108" y1="140" x2="232" y2="80" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="108" y1="180" x2="232" y2="240" stroke="#1e3050" stroke-width="1.5"/>
+      <text x="160" y="95" fill="#10b981" font-family="JetBrains Mono" font-size="10">×u</text>
+      <text x="160" y="225" fill="#ef4444" font-family="JetBrains Mono" font-size="10">×d</text>
+
+      <circle cx="260" cy="80" r="28" fill="#141d2e" stroke="#7c3aed" stroke-width="2"/>
+      <text x="260" y="75" text-anchor="middle" fill="#7c3aed" font-family="JetBrains Mono" font-size="12" font-weight="600">Su</text>
+      <text x="260" y="90" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="10">110</text>
+
+      <circle cx="260" cy="240" r="28" fill="#141d2e" stroke="#7c3aed" stroke-width="2"/>
+      <text x="260" y="235" text-anchor="middle" fill="#7c3aed" font-family="JetBrains Mono" font-size="12" font-weight="600">Sd</text>
+      <text x="260" y="250" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="10">91</text>
+
+      <!-- Step 2 -->
+      <line x1="288" y1="60" x2="412" y2="20" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="288" y1="100" x2="412" y2="160" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="288" y1="220" x2="412" y2="160" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="288" y1="260" x2="412" y2="300" stroke="#1e3050" stroke-width="1.5"/>
+
+      <circle cx="440" cy="20" r="28" fill="#141d2e" stroke="#f59e0b" stroke-width="2"/>
+      <text x="440" y="15" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" font-weight="600">Suu</text>
+      <text x="440" y="29" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">121</text>
+
+      <circle cx="440" cy="160" r="28" fill="#141d2e" stroke="#f59e0b" stroke-width="2"/>
+      <text x="440" y="155" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" font-weight="600">Sud</text>
+      <text x="440" y="169" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">100</text>
+
+      <circle cx="440" cy="300" r="28" fill="#141d2e" stroke="#f59e0b" stroke-width="2"/>
+      <text x="440" y="295" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" font-weight="600">Sdd</text>
+      <text x="440" y="309" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">83</text>
+
+      <!-- Payoffs -->
+      <line x1="468" y1="20" x2="560" y2="20" stroke="#1e3050" stroke-width="1"/>
+      <line x1="468" y1="160" x2="560" y2="160" stroke="#1e3050" stroke-width="1"/>
+      <line x1="468" y1="300" x2="560" y2="300" stroke="#1e3050" stroke-width="1"/>
+
+      <rect x="560" y="5" width="80" height="30" rx="4" fill="rgba(16,185,129,0.2)" stroke="rgba(16,185,129,0.4)"/>
+      <text x="600" y="24" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="11">$21</text>
+      <rect x="560" y="145" width="80" height="30" rx="4" fill="rgba(100,116,139,0.2)" stroke="rgba(100,116,139,0.4)"/>
+      <text x="600" y="164" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="11">$0</text>
+      <rect x="560" y="285" width="80" height="30" rx="4" fill="rgba(100,116,139,0.2)" stroke="rgba(100,116,139,0.4)"/>
+      <text x="600" y="304" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="11">$0</text>
+
+      <text x="600" y="345" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="10">Payoff = max(S-K,0)</text>
+      <text x="600" y="358" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="10">K = $100</text>
+
+      <!-- Labels -->
+      <text x="80" y="200" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">t=0</text>
+      <text x="260" y="280" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">t=1</text>
+      <text x="440" y="335" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">t=2 (Expiry)</text>
+    </svg>
+  </div>
+
+  <h2>The Cox-Ross-Rubinstein (CRR) Model</h2>
+  <p>Cox, Ross, and Rubinstein (1979) derived specific formulas for u, d, and p that make the binomial model consistent with GBM:</p>
+
+  <div class="formula-box">
+    <div class="formula">u = e<sup>σ√Δt</sup> &nbsp;&nbsp;&nbsp; d = e<sup>-σ√Δt</sup> = 1/u</div>
+    <div style="height:10px;"></div>
+    <div class="formula">p = (e<sup>rΔt</sup> - d) / (u - d)</div>
+    <div class="formula-label">CRR parameters · Δt = T/N = length of each time step · p = risk-neutral probability of up move</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>Why e^(σ√Δt)?</h4>
+      <p>This choice of u and d makes the binomial tree's variance per step equal σ²Δt — exactly matching GBM's variance. As N→∞ (more steps), the binomial distribution converges to normal distribution, and the tree converges to the BS formula.</p>
+    </div>
+    <div class="card card-yellow">
+      <h4>Risk-Neutral Probability p</h4>
+      <p>p is chosen so that the expected return of the stock (under the tree) equals the risk-free rate r. This is the same risk-neutral pricing trick as BS. Real-world probability of up move is irrelevant!</p>
+    </div>
+  </div>
+
+  <h2>Backward Induction — Step by Step</h2>
+
+  <div class="card card-accent">
+    <h4>Algorithm</h4>
+    <p><strong>Step 1:</strong> Build the stock price tree forward: at each node (i,j), S = S₀ × u^j × d^(i-j) where i=step, j=number of up moves.</p>
+    <p><strong>Step 2:</strong> At the final nodes (expiry), compute payoff: max(S-K,0) for calls.</p>
+    <p><strong>Step 3:</strong> Work BACKWARD: at each node, V = e^(-rΔt) × [p × V_up + (1-p) × V_down].</p>
+    <p><strong>Step 4 (American options):</strong> At each node, compare backward-induced value vs. intrinsic value. V = max(intrinsic, continuation value). If intrinsic is higher → optimal to exercise early.</p>
+  </div>
+
+  <h2>Interactive Binomial Tree Pricer</h2>
+  <div class="interactive-box">
+    <h4>🌲 Binomial Tree Option Pricer</h4>
+    <div class="grid-2">
+      <div>
+        <div class="slider-row"><label>Stock Price (S)</label><input type="range" min="50" max="200" value="100" id="bt-S" oninput="calcBinomial()"><span id="bt-S-val">$100</span></div>
+        <div class="slider-row"><label>Strike (K)</label><input type="range" min="50" max="200" value="100" id="bt-K" oninput="calcBinomial()"><span id="bt-K-val">$100</span></div>
+        <div class="slider-row"><label>Volatility (σ)</label><input type="range" min="5" max="80" value="20" id="bt-vol" oninput="calcBinomial()"><span id="bt-vol-val">20%</span></div>
+      </div>
+      <div>
+        <div class="slider-row"><label>Time (T, years)</label><input type="range" min="0.1" max="3" step="0.1" value="1" id="bt-T" oninput="calcBinomial()"><span id="bt-T-val">1.0y</span></div>
+        <div class="slider-row"><label>Rate (r)</label><input type="range" min="0" max="15" step="0.5" value="5" id="bt-r" oninput="calcBinomial()"><span id="bt-r-val">5%</span></div>
+        <div class="slider-row"><label>Steps (N)</label><input type="range" min="1" max="200" value="50" id="bt-N" oninput="calcBinomial()"><span id="bt-N-val">50</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin:10px 0;">
+      <button onclick="setBTType('european_call')" id="btn-ec" style="background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.5);color:#10b981;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">European Call</button>
+      <button onclick="setBTType('european_put')" id="btn-ep" style="background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.3);color:#94a3b8;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">European Put</button>
+      <button onclick="setBTType('american_call')" id="btn-ac" style="background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.3);color:#94a3b8;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">American Call</button>
+      <button onclick="setBTType('american_put')" id="btn-ap" style="background:rgba(100,116,139,0.1);border:1px solid rgba(100,116,139,0.3);color:#94a3b8;border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.75rem;">American Put</button>
+    </div>
+    <div class="output-display" id="bt-output"></div>
+    <canvas id="bt-canvas" width="700" height="200" style="margin-top:14px;"></canvas>
+  </div>
+
+  <h2>American vs European Options in Binomial Trees</h2>
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>European Option</h4>
+      <p>At each node, value = discounted expected future value. No early exercise check needed. V(node) = e^(-rΔt)[p·V_up + (1-p)·V_down]</p>
+    </div>
+    <div class="card card-yellow">
+      <h4>American Option</h4>
+      <p>At each node: V(node) = max(intrinsic value, continuation value). Intrinsic = max(S-K,0) for call. If intrinsic > continuation → exercise now is optimal.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Early Exercise Insight</div>
+    <p>American call on non-dividend paying stock: NEVER optimal to exercise early (because the time value of money means it's always better to hold). American put: CAN be optimal to exercise early, especially deep ITM, because getting cash now and reinvesting at r is valuable.</p>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Binomial Trees</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">B.1</span>S₀=$100, u=1.1, d=0.9, r=5%, T=1 step, K=$105. Price the European call by hand using backward induction. Show all nodes.</li>
+        <li><span class="ex-num">B.2</span>With the same parameters, compute the risk-neutral probability p. Interpret it: is this the real probability of the stock going up?</li>
+        <li><span class="ex-num">B.3</span>Why does the binomial tree converge to Black-Scholes as N→∞? What does this tell us about the relationship between discrete and continuous models?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">B.4</span>Implement a 3-step binomial tree in Python. Price a European call with S=100, K=100, σ=20%, r=5%, T=1. Verify against Black-Scholes.</li>
+        <li><span class="ex-num">B.5</span>Add American put pricing to your code. Find the optimal early exercise boundary by noting which nodes show early exercise.</li>
+        <li><span class="ex-num">B.6</span>Plot convergence: price a European call using N=1,2,5,10,25,50,100,200 steps. How many steps do you need to be within 1 cent of BS?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">B.7</span>Price a barrier option (knock-out call: option dies if S hits a barrier H) using a binomial tree. Show how to incorporate the barrier condition at each node.</li>
+        <li><span class="ex-num">B.8</span>Derive the CRR parameters u=e^(σ√Δt) by matching the first and second moments of the binomial distribution to GBM. Show all algebra.</li>
+        <li><span class="ex-num">B.9</span>Implement a dividend-paying binomial tree (discrete dividend). Compare price with and without dividends for a deep ITM call.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 5 — MONTE CARLO -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-montecarlo" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">05</div>
+    <h1>Monte Carlo Pricing</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">When no closed-form formula exists and trees are too slow, Monte Carlo simulation saves the day. Simulate thousands of possible future paths, average the payoffs, discount back. Brute force — but elegantly powerful.</p>
+    <div class="hero-tags">
+      <span class="badge badge-blue">Path Simulation</span>
+      <span class="badge badge-purple">Law of Large Numbers</span>
+      <span class="badge badge-green">Variance Reduction</span>
+      <span class="badge badge-yellow">Exotic Options</span>
+    </div>
+  </div>
+
+  <h2>The Core Idea</h2>
+  <div class="callout callout-info">
+    <div class="callout-label">Monte Carlo Principle</div>
+    <p>The option price is an expected value: V = e^(-rT) × E^Q[Payoff(S_T)]. We can <em>estimate</em> any expected value by: (1) generate many random samples from the distribution, (2) compute payoff for each, (3) average them, (4) discount. By the Law of Large Numbers, this average converges to the true expected value as N→∞.</p>
+  </div>
+
+  <div class="step-flow">
+    <div class="step"><div class="step-icon">🎲</div><div class="step-label">Generate N random paths</div></div>
+    <div class="step"><div class="step-icon">💰</div><div class="step-label">Compute payoff per path</div></div>
+    <div class="step"><div class="step-icon">📊</div><div class="step-label">Average payoffs</div></div>
+    <div class="step"><div class="step-icon">⏪</div><div class="step-label">Discount to today</div></div>
+  </div>
+
+  <h2>Simulating GBM Paths</h2>
+  <p>Under the risk-neutral measure Q, the stock follows:</p>
+
+  <div class="formula-box">
+    <div class="formula">S(t + Δt) = S(t) × exp[(r - σ²/2)Δt + σ√Δt × Z]</div>
+    <div class="formula-label">GBM discretization · Z ~ N(0,1) i.i.d. at each step</div>
+  </div>
+
+  <div class="card card-accent">
+    <h4>Why (r - σ²/2) and not r?</h4>
+    <p>This is the Itô correction term. Because we're dealing with a <em>log-normal</em> process, the log-mean of S(T) is (r - σ²/2)T, not rT. Without the correction, we'd overestimate E[S(T)]. With it, E[S(T)] = S₀·e^(rT) exactly as required.</p>
+  </div>
+
+  <pre><code><span class="cm"># Monte Carlo option pricer — Clean Python implementation</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">monte_carlo_european</span>(S, K, T, r, sigma, n_paths=100_000, option_type=<span class="st">'call'</span>):
+    <span class="st">"""
+    Price European option using Monte Carlo simulation.
+    
+    Args:
+        S: Stock price today
+        K: Strike price
+        T: Time to maturity (years)
+        r: Risk-free rate (decimal)
+        sigma: Volatility (decimal)
+        n_paths: Number of simulated paths
+        option_type: 'call' or 'put'
+    
+    Returns:
+        price: Option price estimate
+        std_error: Standard error of estimate
+    """</span>
+    <span class="cm"># Generate n_paths standard normal samples</span>
+    Z = np.random.standard_normal(n_paths)
+    
+    <span class="cm"># Simulate terminal stock price under risk-neutral measure</span>
+    S_T = S * np.exp((r - <span class="nm">0.5</span> * sigma**<span class="nm">2</span>) * T + sigma * np.sqrt(T) * Z)
+    
+    <span class="cm"># Compute payoffs</span>
+    <span class="kw">if</span> option_type == <span class="st">'call'</span>:
+        payoffs = np.maximum(S_T - K, <span class="nm">0</span>)
+    <span class="kw">else</span>:
+        payoffs = np.maximum(K - S_T, <span class="nm">0</span>)
+    
+    <span class="cm"># Discount expected payoff to today</span>
+    price = np.exp(-r * T) * np.mean(payoffs)
+    std_error = np.exp(-r * T) * np.std(payoffs) / np.sqrt(n_paths)
+    
+    <span class="kw">return</span> price, std_error
+
+<span class="cm"># Example usage</span>
+price, se = monte_carlo_european(<span class="nm">100</span>, <span class="nm">100</span>, <span class="nm">1.0</span>, <span class="nm">0.05</span>, <span class="nm">0.20</span>)
+<span class="fn">print</span>(<span class="st">f"Call price: ${price:.4f} ± ${se:.4f}"</span>)
+</code></pre>
+
+  <h2>Accuracy and Convergence</h2>
+  <div class="card card-yellow">
+    <h4>Monte Carlo Error</h4>
+    <p>Standard Error = σ_payoff / √N. To halve the error, you need 4× more paths. This is called the <em>√N convergence</em>. For 1 decimal place accuracy, you typically need ~10,000 paths. For 2 decimal places, ~1,000,000.</p>
+  </div>
+
+  <h2>Variance Reduction Techniques</h2>
+  <p>Since MC is slow (√N convergence), we use tricks to get better accuracy with fewer paths:</p>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h4>Antithetic Variates</h4>
+      <p>For every random number Z, also use -Z. These two paths are negatively correlated, reducing variance. Implementation: generate N/2 normal samples Z, also price using -Z, average all N payoffs. Gets you ~2× variance reduction for free.</p>
+      <pre style="font-size:0.75rem;padding:12px;"><code>Z = np.random.standard_normal(n//2)
+Z_all = np.concatenate([Z, -Z])
+S_T = S * np.exp((r - 0.5*sig**2)*T + sig*np.sqrt(T)*Z_all)</code></pre>
+    </div>
+    <div class="card card-purple">
+      <h4>Control Variates</h4>
+      <p>Use a known analytical result to correct MC estimates. For a call, the geometric average option has an exact formula. Estimate the correction needed for arithmetic average using the difference. Often achieves 10-100× variance reduction.</p>
+    </div>
+    <div class="card card-accent">
+      <h4>Quasi-Random (Low-Discrepancy Sequences)</h4>
+      <p>Instead of pseudo-random numbers, use Sobol or Halton sequences which fill space more uniformly. Can achieve O(1/N) convergence instead of O(1/√N) for well-behaved integrals.</p>
+    </div>
+    <div class="card card-yellow">
+      <h4>Importance Sampling</h4>
+      <p>Sample more heavily from the region that matters most (near the strike for OTM options). Dramatically reduces noise for out-of-the-money options which rarely get exercised.</p>
+    </div>
+  </div>
+
+  <h2>Path-Dependent Options — Where MC Shines</h2>
+  <div class="callout callout-tip">
+    <div class="callout-label">Monte Carlo's Superpower</div>
+    <p>Black-Scholes gives a formula only for European options. Binomial trees struggle with options that depend on the full price path. Monte Carlo handles ANY payoff structure by just simulating the full path and computing whatever payoff function you define.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <h4>Asian Option</h4>
+      <p>Payoff depends on <em>average</em> price over the life. max(S_avg - K, 0). Common in commodity markets. No closed form → Monte Carlo needed.</p>
+    </div>
+    <div class="card">
+      <h4>Barrier Option</h4>
+      <p>Option activates or deactivates when price hits a barrier. Knock-out call: if S > H at any point, option dies. Must simulate daily.</p>
+    </div>
+    <div class="card">
+      <h4>Lookback Option</h4>
+      <p>Payoff depends on the minimum or maximum price over the period. max(S_max - K, 0). Requires tracking S_max along each path.</p>
+    </div>
+  </div>
+
+  <pre><code><span class="cm"># Asian Option — Monte Carlo with full path simulation</span>
+<span class="kw">def</span> <span class="fn">asian_call_mc</span>(S, K, T, r, sigma, n_paths=<span class="nm">50_000</span>, n_steps=<span class="nm">252</span>):
+    dt = T / n_steps
+    payoffs = np.zeros(n_paths)
+    
+    <span class="kw">for</span> i <span class="kw">in</span> range(n_paths):
+        path = [S]
+        <span class="kw">for</span> _ <span class="kw">in</span> range(n_steps):
+            Z = np.random.standard_normal()
+            S_next = path[-<span class="nm">1</span>] * np.exp((r - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*dt + sigma*np.sqrt(dt)*Z)
+            path.append(S_next)
+        
+        avg_price = np.mean(path)
+        payoffs[i] = max(avg_price - K, <span class="nm">0</span>)
+    
+    <span class="kw">return</span> np.exp(-r * T) * np.mean(payoffs)
+
+<span class="cm"># Vectorized version (much faster — always vectorize!)</span>
+<span class="kw">def</span> <span class="fn">asian_call_vectorized</span>(S, K, T, r, sigma, n_paths=<span class="nm">50_000</span>, n_steps=<span class="nm">252</span>):
+    dt = T / n_steps
+    Z = np.random.standard_normal((n_paths, n_steps))
+    increments = (r - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*dt + sigma*np.sqrt(dt)*Z
+    log_prices = np.log(S) + np.cumsum(increments, axis=<span class="nm">1</span>)
+    prices = np.exp(log_prices)
+    avg_prices = np.mean(prices, axis=<span class="nm">1</span>)
+    payoffs = np.maximum(avg_prices - K, <span class="nm">0</span>)
+    <span class="kw">return</span> np.exp(-r * T) * np.mean(payoffs)
+</code></pre>
+
+  <h2>Interactive Monte Carlo Simulator</h2>
+  <div class="interactive-box">
+    <h4>🎲 Live Path Simulator</h4>
+    <div class="slider-row">
+      <label>Stock Price (S)</label>
+      <input type="range" min="50" max="200" value="100" id="mc-S" oninput="runMC()">
+      <span id="mc-S-val">$100</span>
+    </div>
+    <div class="slider-row">
+      <label>Strike (K)</label>
+      <input type="range" min="50" max="200" value="100" id="mc-K" oninput="runMC()">
+      <span id="mc-K-val">$100</span>
+    </div>
+    <div class="slider-row">
+      <label>Volatility (σ)</label>
+      <input type="range" min="5" max="80" value="20" id="mc-vol" oninput="runMC()">
+      <span id="mc-vol-val">20%</span>
+    </div>
+    <div class="slider-row">
+      <label>Number of Paths</label>
+      <input type="range" min="10" max="500" step="10" value="50" id="mc-N" oninput="runMC()">
+      <span id="mc-N-val">50</span>
+    </div>
+    <button onclick="runMC()" style="background:rgba(0,212,255,0.2);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:8px 18px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.78rem;margin:8px 0;">▶ Simulate Paths</button>
+    <canvas id="mc-canvas" width="700" height="240"></canvas>
+    <div class="output-display" id="mc-output"></div>
+  </div>
+
+  <div class="exercise-section">
+    <h2>Practice Exercises — Monte Carlo</h2>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">🟢 Tier 1 — Easy</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">M.1</span>By hand (or calculator): if a stock has S₀=100, σ=20%, r=5%, T=1. Use the GBM formula with Z=1.5 to get ONE simulated S(T). What is the payoff of a call with K=100?</li>
+        <li><span class="ex-num">M.2</span>In Python, simulate 1000 paths of the same stock. What fraction ended above K=100? Compare to N(d₂) from Black-Scholes.</li>
+        <li><span class="ex-num">M.3</span>What does "variance reduction" mean? Why do we care about it in Monte Carlo? Name two methods.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">🟡 Tier 2 — Medium</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">M.4</span>Implement the antithetic variates method and compare its standard error to plain MC with the same number of function evaluations.</li>
+        <li><span class="ex-num">M.5</span>Price an Asian call option (arithmetic average) with S=100, K=100, σ=20%, r=5%, T=1, 252 steps. How does it compare to the European call price? Why is it cheaper?</li>
+        <li><span class="ex-num">M.6</span>Plot MC estimate vs. number of paths (N=100 to 100,000). Show that the error decreases as 1/√N by plotting on log-log scale.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">🔴 Tier 3 — Hard</div>
+      <ul class="exercise-list">
+        <li><span class="ex-num">M.7</span>Price a down-and-out barrier call (barrier H=85, K=100) using MC with 252 daily steps. Compare with analytical barrier formula.</li>
+        <li><span class="ex-num">M.8</span>Implement Longstaff-Schwartz (LSM) algorithm to price an American put using Monte Carlo. This is the industry standard method for complex American options.</li>
+        <li><span class="ex-num">M.9</span>Price an option under Heston stochastic volatility: dv = κ(θ-v)dt + ξ√v dW_v where v is variance. Use Monte Carlo to simulate correlated (S,v) paths.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 6 — BIG PICTURE -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-connections" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">06</div>
+    <h1>The Big Picture</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">How do all these pieces fit together? See the full map of derivatives pricing — how every concept connects, when to use each model, and what your journey as a quant looks like from here.</p>
+  </div>
+
+  <h2>The Unified Map</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;">
+      <!-- GBM at top -->
+      <rect x="250" y="10" width="200" height="50" rx="8" fill="#141d2e" stroke="#00d4ff" stroke-width="2"/>
+      <text x="350" y="32" text-anchor="middle" fill="#00d4ff" font-family="JetBrains Mono" font-size="12" font-weight="600">GBM / Stochastic Process</text>
+      <text x="350" y="48" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="10">dS = μS dt + σS dW</text>
+
+      <!-- Arrow down to 3 models -->
+      <line x1="350" y1="60" x2="350" y2="90" stroke="#1e3050" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="350" y1="90" x2="130" y2="90" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="350" y1="90" x2="350" y2="90" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="350" y1="90" x2="570" y2="90" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="130" y1="90" x2="130" y2="130" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="350" y1="90" x2="350" y2="130" stroke="#1e3050" stroke-width="1.5"/>
+      <line x1="570" y1="90" x2="570" y2="130" stroke="#1e3050" stroke-width="1.5"/>
+
+      <!-- 3 Model Boxes -->
+      <rect x="40" y="130" width="180" height="60" rx="8" fill="#141d2e" stroke="#7c3aed" stroke-width="2"/>
+      <text x="130" y="155" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono" font-size="11" font-weight="600">Black-Scholes</text>
+      <text x="130" y="170" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Analytical, European only</text>
+      <text x="130" y="182" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Exact formula, instant</text>
+
+      <rect x="260" y="130" width="180" height="60" rx="8" fill="#141d2e" stroke="#f59e0b" stroke-width="2"/>
+      <text x="350" y="155" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="11" font-weight="600">Binomial Tree</text>
+      <text x="350" y="170" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Discrete, American OK</text>
+      <text x="350" y="182" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Converges to BS</text>
+
+      <rect x="480" y="130" width="180" height="60" rx="8" fill="#141d2e" stroke="#10b981" stroke-width="2"/>
+      <text x="570" y="155" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="11" font-weight="600">Monte Carlo</text>
+      <text x="570" y="170" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Simulation, any payoff</text>
+      <text x="570" y="182" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Slow but flexible</text>
+
+      <!-- Greeks box -->
+      <rect x="150" y="240" width="200" height="50" rx="8" fill="#141d2e" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="250" y="262" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="11" font-weight="600">Greeks (Δ,Γ,ν,Θ,ρ)</text>
+      <text x="250" y="278" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Risk sensitivities → Hedging</text>
+
+      <!-- Arrows to Greeks -->
+      <line x1="130" y1="190" x2="200" y2="240" stroke="#1e3050" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="350" y1="190" x2="280" y2="240" stroke="#1e3050" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- Exotic box -->
+      <rect x="380" y="240" width="200" height="50" rx="8" fill="#141d2e" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="480" y="262" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono" font-size="11" font-weight="600">Exotic Options</text>
+      <text x="480" y="278" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Asian, Barrier, Lookback</text>
+
+      <line x1="570" y1="190" x2="510" y2="240" stroke="#1e3050" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- Real world box -->
+      <rect x="150" y="340" width="400" height="60" rx="8" fill="#0d1b2e" stroke="#1e3050" stroke-width="1"/>
+      <text x="350" y="365" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="11" font-weight="600">Real World Extensions</text>
+      <text x="350" y="382" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="9">Heston Stochastic Vol · Jump Diffusion · SABR · Local Vol · Rough Vol</text>
+
+      <line x1="250" y1="290" x2="300" y2="340" stroke="#1e3050" stroke-width="1" stroke-dasharray="2,4"/>
+      <line x1="480" y1="290" x2="420" y2="340" stroke="#1e3050" stroke-width="1" stroke-dasharray="2,4"/>
+
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#1e3050"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h2>When to Use Which Model?</h2>
+  <table>
+    <thead><tr><th>Situation</th><th>Best Tool</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Quick European vanilla price</td><td><strong>Black-Scholes</strong></td><td>Instant analytical formula, exact under assumptions</td></tr>
+      <tr><td>American option (early exercise)</td><td><strong>Binomial Tree</strong></td><td>Can check early exercise at every node</td></tr>
+      <tr><td>Path-dependent option (Asian, Barrier)</td><td><strong>Monte Carlo</strong></td><td>Only method that handles arbitrary path-dependent payoffs</td></tr>
+      <tr><td>High-dimensional option (basket, correlation)</td><td><strong>Monte Carlo</strong></td><td>Scales well; trees explode in multiple dimensions</td></tr>
+      <tr><td>Greeks computation (fast)</td><td><strong>Black-Scholes</strong></td><td>Analytical Greeks; no numerical differentiation needed</td></tr>
+      <tr><td>Stochastic volatility model</td><td><strong>Monte Carlo or PDE</strong></td><td>No closed form for most SV models except Heston approximations</td></tr>
+      <tr><td>Interest rate derivatives</td><td><strong>Trees or MC</strong></td><td>Short rate trees (Hull-White) or MC for complex models</td></tr>
+    </tbody>
+  </table>
+
+  <h2>How Everything Connects</h2>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h4>GBM → Black-Scholes → Greeks</h4>
+      <p>GBM is the assumption about how stock prices move. BS solves the resulting PDE to get an exact formula. Greeks are the partial derivatives of that formula — they tell you how the price changes with each input. This chain is one coherent mathematical framework.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>Binomial Tree → BS in the limit</h4>
+      <p>As N→∞, the binomial tree's probability distribution converges to log-normal. The tree price converges to the BS price. This shows that BS and the binomial model are the same model — just continuous vs discrete versions.</p>
+    </div>
+    <div class="card card-green">
+      <h4>Monte Carlo → BS verification</h4>
+      <p>You can derive the BS formula from MC: simulate millions of GBM paths, compute discounted average payoff. This equals the BS price. MC and BS are just two ways to evaluate the same risk-neutral expectation.</p>
+    </div>
+    <div class="card card-yellow">
+      <h4>Implied Volatility → Reality check</h4>
+      <p>Real market prices are put back into the BS formula to extract implied vol. The resulting "vol surface" (IV vs Strike vs Maturity) reveals everything BS gets wrong — fat tails, vol of vol, skew — and guides construction of better models.</p>
+    </div>
+  </div>
+
+  <h2>Your Quant Learning Roadmap</h2>
+  <div class="card" style="border-color:var(--accent2);">
+    <h4 style="color:var(--accent2);">Level 1 — Foundation (This Guide)</h4>
+    <p>GBM, Black-Scholes, Greeks, Binomial Trees, Monte Carlo. Time: 2-4 weeks.</p>
+    <h4 style="color:var(--accent2);margin-top:14px;">Level 2 — Advanced Modeling</h4>
+    <p>Stochastic volatility (Heston, SABR), local volatility, jump-diffusion (Merton), interest rate models (Vasicek, Hull-White, LMM). Time: 2-3 months.</p>
+    <h4 style="color:var(--accent2);margin-top:14px;">Level 3 — Implementation & Quant Skills</h4>
+    <p>Numerical methods (FDM, PDE solving), calibration, risk management (VaR, CVA, XVA), algorithmic trading. Time: 3-6 months.</p>
+    <h4 style="color:var(--accent2);margin-top:14px;">Level 4 — Industry</h4>
+    <p>C++ for pricing engines, QuantLib, real-time Greeks, regulatory capital, structured products. Time: ongoing.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 7 — COLAB NOTEBOOKS -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-colab" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">07</div>
+    <h1>Colab Experiments</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Learning by doing. Each experiment below is a standalone Python exercise you can run on Google Colab — copy the code, paste it in a new Colab notebook, and run it.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-label">How to Use These</div>
+    <p>Go to <strong>colab.research.google.com</strong> → New notebook → paste the code below. No installation needed. All libraries (numpy, scipy, matplotlib) are pre-installed in Colab.</p>
+    <a class="colab-link" href="https://colab.research.google.com/notebook#create=true" target="_blank">▶ Open New Colab Notebook</a>
+  </div>
+
+  <h2>Experiment 1 — GBM Path Simulation</h2>
+  <div class="card card-accent">
+    <p><strong>Goal:</strong> Visualize how stock prices evolve as random walks. See the effect of volatility and drift on price paths.</p>
+  </div>
+  <pre><code><span class="cm"># EXPERIMENT 1: GBM Path Simulation</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+matplotlib.rcParams[<span class="st">'figure.figsize'</span>] = (<span class="nm">14</span>, <span class="nm">5</span>)
+<span class="kw">import</span> matplotlib
+matplotlib.style.use(<span class="st">'dark_background'</span>)
+
+S0 = <span class="nm">100</span>; mu = <span class="nm">0.08</span>; sigma = <span class="nm">0.25</span>
+T = <span class="nm">1</span>; n_steps = <span class="nm">252</span>; n_paths = <span class="nm">100</span>
+
+dt = T / n_steps
+t = np.linspace(<span class="nm">0</span>, T, n_steps + <span class="nm">1</span>)
+
+fig, axes = plt.subplots(<span class="nm">1</span>, <span class="nm">2</span>, figsize=(<span class="nm">14</span>, <span class="nm">5</span>))
+
+<span class="cm"># Left: multiple paths</span>
+<span class="kw">for</span> _ <span class="kw">in</span> range(n_paths):
+    Z = np.random.standard_normal(n_steps)
+    increments = (mu - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*dt + sigma*np.sqrt(dt)*Z
+    log_S = np.log(S0) + np.concatenate([[<span class="nm">0</span>], np.cumsum(increments)])
+    axes[<span class="nm">0</span>].plot(t, np.exp(log_S), alpha=<span class="nm">0.3</span>, linewidth=<span class="nm">0.8</span>)
+
+axes[<span class="nm">0</span>].axhline(S0, color=<span class="st">'cyan'</span>, linestyle=<span class="st">'--'</span>, linewidth=<span class="nm">1.5</span>, label=<span class="st">f'S₀={S0}'</span>)
+axes[<span class="nm">0</span>].set_title(<span class="st">f'{n_paths} GBM Paths (μ={mu}, σ={sigma})'</span>)
+axes[<span class="nm">0</span>].set_xlabel(<span class="st">'Time (years)'</span>); axes[<span class="nm">0</span>].legend()
+
+<span class="cm"># Right: terminal distribution</span>
+N_large = <span class="nm">10000</span>
+Z = np.random.standard_normal(N_large)
+S_T = S0 * np.exp((mu - <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T + sigma*np.sqrt(T)*Z)
+axes[<span class="nm">1</span>].hist(S_T, bins=<span class="nm">100</span>, color=<span class="st">'#00d4ff'</span>, alpha=<span class="nm">0.7</span>, edgecolor=<span class="st">'none'</span>)
+axes[<span class="nm">1</span>].axvline(np.median(S_T), color=<span class="st">'yellow'</span>, label=<span class="st">f'Median: {np.median(S_T):.1f}'</span>)
+axes[<span class="nm">1</span>].axvline(np.mean(S_T), color=<span class="st">'orange'</span>, label=<span class="st">f'Mean: {np.mean(S_T):.1f}'</span>)
+axes[<span class="nm">1</span>].set_title(<span class="st">'Terminal Price Distribution (Log-Normal)'</span>)
+axes[<span class="nm">1</span>].legend(); plt.tight_layout(); plt.show()
+
+<span class="fn">print</span>(<span class="st">f"Theoretical mean: S0*exp(μT) = {S0*np.exp(mu*T):.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Simulated mean: {np.mean(S_T):.2f}"</span>)
+</code></pre>
+
+  <h2>Experiment 2 — Black-Scholes From Scratch</h2>
+  <pre><code><span class="cm"># EXPERIMENT 2: Complete Black-Scholes Implementation</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">def</span> <span class="fn">bs_price</span>(S, K, T, r, sigma, option=<span class="st">'call'</span>):
+    <span class="kw">if</span> T <= <span class="nm">0</span>: <span class="kw">return</span> max(S-K, <span class="nm">0</span>) <span class="kw">if</span> option==<span class="st">'call'</span> <span class="kw">else</span> max(K-S, <span class="nm">0</span>)
+    d1 = (np.log(S/K) + (r + <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="kw">if</span> option == <span class="st">'call'</span>:
+        <span class="kw">return</span> S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+    <span class="kw">else</span>:
+        <span class="kw">return</span> K*np.exp(-r*T)*norm.cdf(-d2) - S*norm.cdf(-d1)
+
+<span class="kw">def</span> <span class="fn">bs_greeks</span>(S, K, T, r, sigma):
+    d1 = (np.log(S/K) + (r + <span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    call_delta = norm.cdf(d1)
+    put_delta = call_delta - <span class="nm">1</span>
+    gamma = norm.pdf(d1) / (S * sigma * np.sqrt(T))
+    vega = S * np.sqrt(T) * norm.pdf(d1) / <span class="nm">100</span>  <span class="cm"># per 1% vol change</span>
+    call_theta = (-(S*norm.pdf(d1)*sigma)/(2*np.sqrt(T)) - r*K*np.exp(-r*T)*norm.cdf(d2)) / <span class="nm">365</span>
+    call_rho = K*T*np.exp(-r*T)*norm.cdf(d2) / <span class="nm">100</span>
+    <span class="kw">return</span> {<span class="st">'delta_call'</span>:call_delta, <span class="st">'delta_put'</span>:put_delta,
+            <span class="st">'gamma'</span>:gamma, <span class="st">'vega'</span>:vega, <span class="st">'theta_call'</span>:call_theta, <span class="st">'rho'</span>:call_rho}
+
+<span class="cm"># Plot: Call price as function of stock price</span>
+S_range = np.linspace(<span class="nm">60</span>, <span class="nm">140</span>, <span class="nm">200</span>)
+K, T, r, sigma = <span class="nm">100</span>, <span class="nm">1.0</span>, <span class="nm">0.05</span>, <span class="nm">0.20</span>
+
+call_prices = [bs_price(s, K, T, r, sigma, <span class="st">'call'</span>) <span class="kw">for</span> s <span class="kw">in</span> S_range]
+put_prices  = [bs_price(s, K, T, r, sigma, <span class="st">'put'</span>)  <span class="kw">for</span> s <span class="kw">in</span> S_range]
+intrinsic_c = np.maximum(S_range - K, <span class="nm">0</span>)
+
+plt.figure(figsize=(<span class="nm">10</span>, <span class="nm">5</span>))
+plt.plot(S_range, call_prices, label=<span class="st">'Call Price'</span>, color=<span class="st">'#00d4ff'</span>, lw=<span class="nm">2</span>)
+plt.plot(S_range, put_prices, label=<span class="st">'Put Price'</span>, color=<span class="st">'#ef4444'</span>, lw=<span class="nm">2</span>)
+plt.plot(S_range, intrinsic_c, label=<span class="st">'Call Intrinsic'</span>, color=<span class="st">'#10b981'</span>, lw=<span class="nm">1</span>, ls=<span class="st">'--'</span>)
+plt.axvline(K, color=<span class="st">'gray'</span>, ls=<span class="st">':'</span>); plt.xlabel(<span class="st">'Stock Price'</span>); plt.ylabel(<span class="st">'Price'</span>)
+plt.title(<span class="st">'Black-Scholes Option Prices'</span>); plt.legend(); plt.grid(alpha=<span class="nm">0.3</span>); plt.show()
+<span class="fn">print</span>(<span class="st">f"ATM Call: ${bs_price(100,K,T,r,sigma,'call'):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Greeks: {bs_greeks(100,K,T,r,sigma)}"</span>)
+</code></pre>
+
+  <h2>Experiment 3 — Delta Hedging Simulation</h2>
+  <pre><code><span class="cm"># EXPERIMENT 3: Delta Hedging P&L Simulation</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np; <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm; <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+S0,K,T,r,sigma_bs = <span class="nm">100</span>,<span class="nm">100</span>,<span class="nm">1.0</span>,<span class="nm">0.05</span>,<span class="nm">0.20</span>
+sigma_real = <span class="nm">0.25</span>  <span class="cm"># actual volatility different from implied!</span>
+n_steps = <span class="nm">252</span>
+dt = T/n_steps
+
+<span class="kw">def</span> <span class="fn">bs</span>(S,K,T,r,s): d1=(np.log(S/K)+(r+<span class="nm">0.5</span>*s**<span class="nm">2</span>)*T)/(s*np.sqrt(T+<span class="nm">1e-9</span>)); <span class="kw">return</span> norm.cdf(d1)
+
+n_sim = <span class="nm">500</span>; final_pnls = []
+<span class="kw">for</span> _ <span class="kw">in</span> range(n_sim):
+    S = S0; t = T; hedge = bs(S,K,T,r,sigma_bs); cash = -bs_price(S,K,T,r,sigma_bs,<span class="st">'call'</span>) + hedge*S
+    <span class="kw">for</span> step <span class="kw">in</span> range(n_steps):
+        Z = np.random.standard_normal()
+        S_new = S*np.exp((r-<span class="nm">0.5</span>*sigma_real**<span class="nm">2</span>)*dt + sigma_real*np.sqrt(dt)*Z)
+        cash = cash*np.exp(r*dt) - (bs(S_new,K,T-step*dt,r,sigma_bs)-hedge)*S_new
+        hedge = bs(S_new,K,T-step*dt,r,sigma_bs); S = S_new
+    final_pnls.append(cash - max(S-K,<span class="nm">0</span>))
+
+plt.hist(final_pnls, bins=<span class="nm">50</span>, color=<span class="st">'#7c3aed'</span>, alpha=<span class="nm">0.8</span>)
+plt.axvline(<span class="nm">0</span>, color=<span class="st">'cyan'</span>, ls=<span class="st">'--'</span>); plt.xlabel(<span class="st">'Hedge P&L'</span>)
+plt.title(<span class="st">f'Delta Hedge P&L Distribution\nσ_BS={sigma_bs} vs σ_real={sigma_real}'</span>); plt.show()
+<span class="fn">print</span>(<span class="st">f"Mean P&L: {np.mean(final_pnls):.4f}, Std: {np.std(final_pnls):.4f}"</span>)
+</code></pre>
+
+  <h2>Experiment 4 — Binomial Tree Convergence</h2>
+  <pre><code><span class="cm"># EXPERIMENT 4: Binomial Tree → Black-Scholes Convergence</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np; <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm; <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="kw">def</span> <span class="fn">binomial_european</span>(S, K, T, r, sigma, N, option=<span class="st">'call'</span>):
+    dt=T/N; u=np.exp(sigma*np.sqrt(dt)); d=<span class="nm">1</span>/u
+    p=(np.exp(r*dt)-d)/(u-d); disc=np.exp(-r*dt)
+    prices = np.array([S*u**j*d**(N-j) <span class="kw">for</span> j <span class="kw">in</span> range(N+<span class="nm">1</span>)])
+    V = np.maximum(prices-K,<span class="nm">0</span>) <span class="kw">if</span> option==<span class="st">'call'</span> <span class="kw">else</span> np.maximum(K-prices,<span class="nm">0</span>)
+    <span class="kw">for</span> _ <span class="kw">in</span> range(N): V = disc*(p*V[<span class="nm">1</span>:] + (<span class="nm">1</span>-p)*V[:-<span class="nm">1</span>])
+    <span class="kw">return</span> V[<span class="nm">0</span>]
+
+S,K,T,r,sigma = <span class="nm">100</span>,<span class="nm">100</span>,<span class="nm">1.0</span>,<span class="nm">0.05</span>,<span class="nm">0.20</span>
+d1=(np.log(S/K)+(r+<span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T)/(sigma*np.sqrt(T)); d2=d1-sigma*np.sqrt(T)
+bs_call = S*norm.cdf(d1)-K*np.exp(-r*T)*norm.cdf(d2)
+
+steps = [<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">5</span>,<span class="nm">10</span>,<span class="nm">25</span>,<span class="nm">50</span>,<span class="nm">100</span>,<span class="nm">200</span>,<span class="nm">500</span>]
+prices = [binomial_european(S,K,T,r,sigma,N) <span class="kw">for</span> N <span class="kw">in</span> steps]
+
+plt.figure(figsize=(<span class="nm">10</span>,<span class="nm">4</span>))
+plt.semilogx(steps, prices, <span class="st">'o-'</span>, color=<span class="st">'#f59e0b'</span>, lw=<span class="nm">2</span>, label=<span class="st">'Binomial'</span>)
+plt.axhline(bs_call, color=<span class="st">'#00d4ff'</span>, ls=<span class="st">'--'</span>, lw=<span class="nm">2</span>, label=<span class="st">f'BS = {bs_call:.4f}'</span>)
+plt.xlabel(<span class="st">'Number of Steps (log scale)'</span>); plt.ylabel(<span class="st">'Call Price'</span>)
+plt.title(<span class="st">'Binomial Tree Convergence to Black-Scholes'</span>); plt.legend(); plt.grid(alpha=<span class="nm">0.3</span>); plt.show()
+</code></pre>
+
+  <h2>Experiment 5 — Monte Carlo vs Black-Scholes</h2>
+  <pre><code><span class="cm"># EXPERIMENT 5: Monte Carlo accuracy with variance reduction</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np; <span class="kw">from</span> scipy.stats <span class="kw">import</span> norm; <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+S,K,T,r,sigma = <span class="nm">100</span>,<span class="nm">100</span>,<span class="nm">1.0</span>,<span class="nm">0.05</span>,<span class="nm">0.20</span>
+d1=(np.log(S/K)+(r+<span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T)/(sigma*np.sqrt(T)); d2=d1-sigma*np.sqrt(T)
+bs_exact = S*norm.cdf(d1)-K*np.exp(-r*T)*norm.cdf(d2)
+
+sizes = [<span class="nm">100</span>,<span class="nm">500</span>,<span class="nm">1000</span>,<span class="nm">5000</span>,<span class="nm">10000</span>,<span class="nm">50000</span>,<span class="nm">100000</span>]
+mc_errors, anti_errors = [], []
+
+<span class="kw">for</span> n <span class="kw">in</span> sizes:
+    Z = np.random.standard_normal(n)
+    ST = S*np.exp((r-<span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T + sigma*np.sqrt(T)*Z)
+    mc_errors.append(abs(np.exp(-r*T)*np.mean(np.maximum(ST-K,<span class="nm">0</span>))-bs_exact))
+    
+    Zh = np.random.standard_normal(n//<span class="nm">2</span>)
+    ST2=S*np.exp((r-<span class="nm">0.5</span>*sigma**<span class="nm">2</span>)*T+sigma*np.sqrt(T)*np.r_[Zh,-Zh])
+    anti_errors.append(abs(np.exp(-r*T)*np.mean(np.maximum(ST2-K,<span class="nm">0</span>))-bs_exact))
+
+plt.loglog(sizes, mc_errors, <span class="st">'o-'</span>, label=<span class="st">'Plain MC'</span>, color=<span class="st">'#ef4444'</span>)
+plt.loglog(sizes, anti_errors, <span class="st">'s-'</span>, label=<span class="st">'Antithetic'</span>, color=<span class="st">'#10b981'</span>)
+plt.loglog(sizes, [<span class="nm">10</span>/np.sqrt(n) <span class="kw">for</span> n <span class="kw">in</span> sizes], <span class="st">'--'</span>, color=<span class="st">'gray'</span>, label=<span class="st">'1/√N reference'</span>)
+plt.xlabel(<span class="st">'Paths (N)'</span>); plt.ylabel(<span class="st">'|Error|'</span>)
+plt.title(<span class="st">'MC Convergence: Plain vs Antithetic Variates'</span>); plt.legend(); plt.grid(alpha=<span class="nm">0.3</span>); plt.show()
+</code></pre>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- TAB 8 — RESOURCES -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="tab-resources" class="tab-panel">
+  <div class="topic-hero">
+    <div class="hero-num">08</div>
+    <h1>Resources & References</h1>
+    <p style="color:var(--text-dim);max-width:700px;font-size:1.05rem;">Curated external resources — simulators, textbooks, courses, and tools — to deepen every topic in this guide. All links open in a new tab.</p>
+  </div>
+
+  <h2>Interactive Visualizations & Simulators</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.optionsprofitcalculator.com" target="_blank">
+      <div class="rc-type">🔧 Interactive Tool</div>
+      <div class="rc-title">Options Profit Calculator</div>
+      <div class="rc-desc">Visualize P&L diagrams for any options strategy with real Greeks.</div>
+    </a>
+    <a class="resource-card" href="https://optionstrat.com" target="_blank">
+      <div class="rc-type">📊 Strategy Builder</div>
+      <div class="rc-title">OptionStrat</div>
+      <div class="rc-desc">Build options strategies, see payoff diagrams and Greeks visually.</div>
+    </a>
+    <a class="resource-card" href="https://www.wolframalpha.com/input?i=black+scholes" target="_blank">
+      <div class="rc-type">🧮 Calculator</div>
+      <div class="rc-title">Wolfram Alpha — BS Calculator</div>
+      <div class="rc-desc">Compute Black-Scholes prices and Greeks online, step by step.</div>
+    </a>
+    <a class="resource-card" href="https://explorabl.es" target="_blank">
+      <div class="rc-type">🎮 Interactive</div>
+      <div class="rc-title">Explorable Explanations</div>
+      <div class="rc-desc">Beautiful interactive math explanations relevant to probability and stochastic processes.</div>
+    </a>
+    <a class="resource-card" href="https://www.geogebra.org/calculator" target="_blank">
+      <div class="rc-type">📐 Math Viz</div>
+      <div class="rc-title">GeoGebra</div>
+      <div class="rc-desc">Plot the normal distribution, payoff diagrams, and explore calculus visually.</div>
+    </a>
+    <a class="resource-card" href="https://seeing-theory.brown.edu" target="_blank">
+      <div class="rc-type">🎲 Probability</div>
+      <div class="rc-title">Seeing Theory (Brown University)</div>
+      <div class="rc-desc">Stunning interactive probability theory — normal distributions, CLT, and more.</div>
+    </a>
+  </div>
+
+  <h2>Essential Textbooks</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.amazon.com/Options-Futures-Other-Derivatives-John/dp/0136939891" target="_blank">
+      <div class="rc-type">📚 Textbook — Beginner/Intermediate</div>
+      <div class="rc-title">Hull — Options, Futures & Other Derivatives</div>
+      <div class="rc-desc">The industry standard. Chapter 13-19 cover everything in this guide. Get the latest edition.</div>
+    </a>
+    <a class="resource-card" href="https://www.amazon.com/Paul-Wilmott-Quantitative-Finance-Set/dp/0470018704" target="_blank">
+      <div class="rc-type">📚 Textbook — Advanced</div>
+      <div class="rc-title">Wilmott on Quantitative Finance</div>
+      <div class="rc-desc">3-volume bible of quant finance. Deep dives on PDE methods, models, and real-world applications.</div>
+    </a>
+    <a class="resource-card" href="https://www.amazon.com/Stochastic-Calculus-Finance-Binomial-Springer/dp/0387401008" target="_blank">
+      <div class="rc-type">📚 Textbook — Mathematical</div>
+      <div class="rc-title">Shreve — Stochastic Calculus for Finance I & II</div>
+      <div class="rc-desc">The rigorous mathematical treatment. Vol I = binomial trees. Vol II = continuous time. Masterclass.</div>
+    </a>
+    <a class="resource-card" href="https://www.amazon.com/Python-Finance-Mastering-Data-Driven/dp/1492024333" target="_blank">
+      <div class="rc-type">📚 Textbook — Python</div>
+      <div class="rc-title">Hilpisch — Python for Finance</div>
+      <div class="rc-desc">Implement every pricing model in Python. Great complement to Hull for quantitative implementation.</div>
+    </a>
+  </div>
+
+  <h2>Online Courses & Lectures</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.coursera.org/learn/financial-engineering-intro" target="_blank">
+      <div class="rc-type">🎓 Course</div>
+      <div class="rc-title">Coursera — Financial Engineering (Columbia)</div>
+      <div class="rc-desc">Free audit. Covers BS, trees, Monte Carlo rigorously with homeworks.</div>
+    </a>
+    <a class="resource-card" href="https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/" target="_blank">
+      <div class="rc-type">🎓 Free Course</div>
+      <div class="rc-title">MIT OCW — Math for Finance</div>
+      <div class="rc-desc">Full lecture videos from MIT. Topics: stochastic calculus, derivatives pricing, risk management.</div>
+    </a>
+    <a class="resource-card" href="https://www.youtube.com/playlist?list=PLUl4u3cNGP63ctJIEC1UnZ0btsphnnoHR" target="_blank">
+      <div class="rc-type">▶ YouTube</div>
+      <div class="rc-title">MIT 18.S096 Lectures (YouTube)</div>
+      <div class="rc-desc">The full MIT math finance course on YouTube. Free forever.</div>
+    </a>
+    <a class="resource-card" href="https://www.edx.org/learn/finance/new-york-institute-of-finance-financial-derivatives" target="_blank">
+      <div class="rc-type">🎓 Course</div>
+      <div class="rc-title">edX — Financial Derivatives (NYIF)</div>
+      <div class="rc-desc">Practical derivatives course covering options, swaps, and structured products.</div>
+    </a>
+  </div>
+
+  <h2>Python Libraries for Quant Finance</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://quantlib.org" target="_blank">
+      <div class="rc-type">🐍 Library</div>
+      <div class="rc-title">QuantLib</div>
+      <div class="rc-desc">The industry standard open-source library for derivatives pricing. C++ core with Python bindings (QuantLib-Python).</div>
+    </a>
+    <a class="resource-card" href="https://github.com/vollib/vollib" target="_blank">
+      <div class="rc-type">🐍 Library</div>
+      <div class="rc-title">vollib — Volatility & Options</div>
+      <div class="rc-desc">Pure Python BS pricing, implied vol, and Greeks. Great for learning and rapid prototyping.</div>
+    </a>
+    <a class="resource-card" href="https://scipy.org" target="_blank">
+      <div class="rc-type">🔢 Library</div>
+      <div class="rc-title">SciPy</div>
+      <div class="rc-desc">scipy.stats.norm gives CDF and PDF. scipy.optimize for implied vol solving. Core quant tool.</div>
+    </a>
+    <a class="resource-card" href="https://numpy.org" target="_blank">
+      <div class="rc-type">🔢 Library</div>
+      <div class="rc-title">NumPy</div>
+      <div class="rc-desc">Vectorized Monte Carlo simulation. Essential for fast options pricing.</div>
+    </a>
+  </div>
+
+  <h2>Simulators for Greeks & BS</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.desmos.com/calculator" target="_blank">
+      <div class="rc-type">📈 Grapher</div>
+      <div class="rc-title">Desmos Calculator</div>
+      <div class="rc-desc">Plot BS formula, payoff diagrams, normal CDF interactively. Perfect for visual learners.</div>
+    </a>
+    <a class="resource-card" href="https://marketsurge.investors.com" target="_blank">
+      <div class="rc-type">📊 Market Data</div>
+      <div class="rc-title">Market Data for IV</div>
+      <div class="rc-desc">Look up real implied volatility surfaces for major stocks and indices.</div>
+    </a>
+    <a class="resource-card" href="https://finance.yahoo.com/quote/SPY/options/" target="_blank">
+      <div class="rc-type">📊 Real Options</div>
+      <div class="rc-title">Yahoo Finance Options Chain</div>
+      <div class="rc-desc">Real market option prices for SPY. Use to practice computing implied vol manually.</div>
+    </a>
+  </div>
+
+  <h2>Academic Papers (Free)</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://www.jstor.org/stable/1831029" target="_blank">
+      <div class="rc-type">📄 Original Paper</div>
+      <div class="rc-title">Black & Scholes (1973)</div>
+      <div class="rc-desc">The original paper: "The Pricing of Options and Corporate Liabilities." Read history firsthand.</div>
+    </a>
+    <a class="resource-card" href="https://onlinelibrary.wiley.com/doi/abs/10.1002/9781119202073.ch7" target="_blank">
+      <div class="rc-type">📄 Paper</div>
+      <div class="rc-title">Cox, Ross, Rubinstein (1979)</div>
+      <div class="rc-desc">The original binomial tree paper. Short and readable — worth going through.</div>
+    </a>
+    <a class="resource-card" href="https://arxiv.org/abs/cond-mat/0012369" target="_blank">
+      <div class="rc-type">📄 arXiv</div>
+      <div class="rc-title">Wilmott's Introductory Survey</div>
+      <div class="rc-desc">Free introductory survey of quantitative finance on arXiv. Covers all models in one paper.</div>
+    </a>
+  </div>
+
+  <h2>Quant Communities</h2>
+  <div class="resource-grid">
+    <a class="resource-card" href="https://quant.stackexchange.com" target="_blank">
+      <div class="rc-type">💬 Forum</div>
+      <div class="rc-title">Quant StackExchange</div>
+      <div class="rc-desc">The best Q&A site for quantitative finance. Ask any model/pricing question here.</div>
+    </a>
+    <a class="resource-card" href="https://www.reddit.com/r/quant" target="_blank">
+      <div class="rc-type">💬 Community</div>
+      <div class="rc-title">r/quant</div>
+      <div class="rc-desc">Industry discussions, career advice, and technical topics from working quants.</div>
+    </a>
+    <a class="resource-card" href="https://wilmott.com/forums" target="_blank">
+      <div class="rc-type">💬 Forum</div>
+      <div class="rc-title">Wilmott Forums</div>
+      <div class="rc-desc">Technical quant discussions. Very active, high signal-to-noise ratio.</div>
+    </a>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- JAVASCRIPT -->
+<!-- ════════════════════════════════════════════════════════ -->
+<script>
+// ─── TAB SWITCHING ───────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── NORMAL DISTRIBUTION HELPERS ─────────────────────────
+function normalCDF(x) {
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const sign = x < 0 ? -1 : 1; const ax = Math.abs(x);
+  const t = 1 / (1 + p * ax);
+  const poly = (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t;
+  return 0.5 * (1 + sign * (1 - poly * Math.exp(-ax*ax)));
+}
+function normalPDF(x) { return Math.exp(-0.5*x*x) / Math.sqrt(2*Math.PI); }
+
+function bsPrice(S, K, T, r, sigma, type) {
+  if (T <= 0) return type === 'call' ? Math.max(S-K, 0) : Math.max(K-S, 0);
+  const d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*Math.sqrt(T));
+  const d2 = d1 - sigma*Math.sqrt(T);
+  if (type === 'call') return S*normalCDF(d1) - K*Math.exp(-r*T)*normalCDF(d2);
+  return K*Math.exp(-r*T)*normalCDF(-d2) - S*normalCDF(-d1);
+}
+
+function bsD1D2(S, K, T, r, sigma) {
+  const d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*Math.sqrt(T));
+  const d2 = d1 - sigma*Math.sqrt(T);
+  return { d1, d2 };
+}
+
+function bsGreeks(S, K, T, r, sigma) {
+  const { d1, d2 } = bsD1D2(S, K, T, r, sigma);
+  const callDelta = normalCDF(d1);
+  const putDelta = callDelta - 1;
+  const gamma = normalPDF(d1) / (S * sigma * Math.sqrt(T));
+  const vega = S * Math.sqrt(T) * normalPDF(d1) / 100;
+  const callTheta = (-(S * normalPDF(d1) * sigma) / (2 * Math.sqrt(T)) - r * K * Math.exp(-r*T) * normalCDF(d2)) / 365;
+  const putTheta  = (-(S * normalPDF(d1) * sigma) / (2 * Math.sqrt(T)) + r * K * Math.exp(-r*T) * normalCDF(-d2)) / 365;
+  const callRho = K * T * Math.exp(-r*T) * normalCDF(d2) / 100;
+  return { callDelta, putDelta, gamma, vega, callTheta, putTheta, callRho, d1, d2 };
+}
+
+// ─── VOLATILITY EXPLORER ─────────────────────────────────
+function updateVolChart() {
+  const sigma = +document.getElementById('vol-slider').value / 100;
+  const S0 = +document.getElementById('s0-slider').value;
+  document.getElementById('vol-val').textContent = (sigma*100).toFixed(0)+'%';
+  document.getElementById('s0-val').textContent = '$'+S0;
+
+  const canvas = document.getElementById('vol-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 700; canvas.width = W;
+  ctx.clearRect(0, 0, W, 180);
+
+  // Draw normal distribution of terminal prices
+  const mu = 0.05; const T = 1;
+  const logMean = Math.log(S0) + (mu - 0.5*sigma*sigma)*T;
+  const logStd = sigma*Math.sqrt(T);
+
+  const xMin = S0 * 0.3, xMax = S0 * 2.5;
+  const points = 300;
+  const dx = (xMax - xMin) / points;
+  let maxY = 0;
+  const ys = [];
+  for (let i = 0; i <= points; i++) {
+    const x = xMin + i*dx;
+    const logX = Math.log(x);
+    const y = Math.exp(-0.5*((logX-logMean)/logStd)**2) / (x*logStd*Math.sqrt(2*Math.PI));
+    ys.push(y); maxY = Math.max(maxY, y);
+  }
+
+  const pad = 20;
+  const scaleX = x => pad + (x - xMin) / (xMax - xMin) * (W - 2*pad);
+  const scaleY = y => 160 - y / maxY * 130;
+
+  ctx.beginPath(); ctx.moveTo(scaleX(xMin), 160);
+  for (let i = 0; i <= points; i++) {
+    ctx.lineTo(scaleX(xMin + i*dx), scaleY(ys[i]));
+  }
+  ctx.lineTo(scaleX(xMax), 160); ctx.closePath();
+  const grad = ctx.createLinearGradient(0, 0, 0, 180);
+  grad.addColorStop(0, 'rgba(0,212,255,0.5)'); grad.addColorStop(1, 'rgba(0,212,255,0.02)');
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Median line
+  const median = Math.exp(logMean);
+  ctx.strokeStyle = '#f59e0b'; ctx.setLineDash([4,3]); ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(scaleX(median), 10); ctx.lineTo(scaleX(median), 160); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#64748b'; ctx.font = '10px JetBrains Mono'; ctx.textAlign = 'center';
+  ctx.fillText(`Median ≈ $${median.toFixed(1)}`, scaleX(median), 12);
+  ctx.fillText(`σ=${(sigma*100).toFixed(0)}%`, W/2, 170);
+
+  const pct10 = Math.exp(logMean - 1.28*logStd);
+  const pct90 = Math.exp(logMean + 1.28*logStd);
+  document.getElementById('vol-output').innerHTML =
+    `<div class="out-row"><span class="out-key">Starting Price</span><span class="out-val">$${S0}</span></div>
+     <div class="out-row"><span class="out-key">Median in 1yr</span><span class="out-val">$${median.toFixed(2)}</span></div>
+     <div class="out-row"><span class="out-key">10th Percentile</span><span class="out-val">$${pct10.toFixed(2)}</span></div>
+     <div class="out-row"><span class="out-key">90th Percentile</span><span class="out-val">$${pct90.toFixed(2)}</span></div>
+     <div class="out-row"><span class="out-key">80% range</span><span class="out-val">$${pct10.toFixed(1)} — $${pct90.toFixed(1)}</span></div>`;
+}
+
+// ─── PAYOFF DIAGRAM ───────────────────────────────────────
+let payoffType = 'long_call';
+function setPayoffType(t) { payoffType = t; drawPayoff(); }
+function drawPayoff() {
+  const K = +document.getElementById('strike-slider').value;
+  const prem = +document.getElementById('prem-slider').value;
+  document.getElementById('strike-val').textContent = '$'+K;
+  document.getElementById('prem-val').textContent = '$'+prem;
+  const canvas = document.getElementById('payoff-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 700; canvas.width = W;
+  ctx.clearRect(0, 0, W, 260);
+
+  const sMin = 50, sMax = 160, n = 200;
+  const pad = { l:50, r:20, t:20, b:40 };
+  const W2 = W - pad.l - pad.r, H2 = 260 - pad.t - pad.b;
+
+  function payoff(S, type, K, p) {
+    if (type==='long_call')  return Math.max(S-K,0)-p;
+    if (type==='long_put')   return Math.max(K-S,0)-p;
+    if (type==='short_call') return p-Math.max(S-K,0);
+    if (type==='short_put')  return p-Math.max(K-S,0);
+  }
+
+  const prices = Array.from({length:n+1},(_,i)=>sMin+i*(sMax-sMin)/n);
+  const pnls = prices.map(s=>payoff(s,payoffType,K,prem));
+  const maxP = Math.max(...pnls, 20), minP = Math.min(...pnls, -20);
+  const rng = maxP - minP;
+
+  const sx = s => pad.l + (s-sMin)/(sMax-sMin)*W2;
+  const sy = p => pad.t + H2 - (p-minP)/rng*H2;
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+  for(let v=-50;v<=100;v+=10){
+    ctx.beginPath();ctx.moveTo(pad.l,sy(v));ctx.lineTo(W-pad.r,sy(v));ctx.stroke();
+  }
+
+  // Zero line
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(pad.l,sy(0));ctx.lineTo(W-pad.r,sy(0));ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Payoff curve
+  const colors = {long_call:'#10b981',long_put:'#ef4444',short_call:'#00d4ff',short_put:'#f59e0b'};
+  ctx.strokeStyle = colors[payoffType]; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  prices.forEach((s,i)=>{
+    const py = sy(pnls[i]);
+    i===0?ctx.moveTo(sx(s),py):ctx.lineTo(sx(s),py);
+  });
+  ctx.stroke();
+
+  // Fill above/below zero
+  ctx.beginPath();
+  prices.forEach((s,i)=>i===0?ctx.moveTo(sx(s),sy(pnls[i])):ctx.lineTo(sx(s),sy(pnls[i])));
+  ctx.lineTo(sx(sMax),sy(0));ctx.lineTo(sx(sMin),sy(0));ctx.closePath();
+  const grad=ctx.createLinearGradient(0,sy(maxP),0,sy(0));
+  grad.addColorStop(0,colors[payoffType]+'55');grad.addColorStop(1,'transparent');
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Strike line
+  ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(sx(K),pad.t);ctx.lineTo(sx(K),260-pad.b);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle='#64748b';ctx.font='10px JetBrains Mono';ctx.textAlign='center';
+  ctx.fillText('Stock Price at Expiry',W/2,255);
+  ctx.fillText(`K=${K}`,sx(K),pad.t);
+  ctx.textAlign='right';ctx.fillStyle='#94a3b8';
+  ctx.save();ctx.translate(15,130);ctx.rotate(-Math.PI/2);ctx.fillText('P&L',0,0);ctx.restore();
+}
+
+// ─── BLACK-SCHOLES CALCULATOR ────────────────────────────
+function calcBS() {
+  const S=+document.getElementById('bs-S').value,K=+document.getElementById('bs-K').value;
+  const T=+document.getElementById('bs-T').value,sigma=+document.getElementById('bs-vol').value/100;
+  const r=+document.getElementById('bs-r').value/100;
+  document.getElementById('bs-S-val').textContent='$'+S;
+  document.getElementById('bs-K-val').textContent='$'+K;
+  document.getElementById('bs-T-val').textContent=T.toFixed(2)+'y';
+  document.getElementById('bs-vol-val').textContent=(sigma*100).toFixed(0)+'%';
+  document.getElementById('bs-r-val').textContent=(r*100).toFixed(1)+'%';
+
+  const call=bsPrice(S,K,T,r,sigma,'call'),put=bsPrice(S,K,T,r,sigma,'put');
+  const {d1,d2}=bsD1D2(S,K,T,r,sigma);
+  const probITM=normalCDF(d2)*100;
+
+  document.getElementById('bs-output').innerHTML=
+    `<div class="out-row"><span class="out-key">Call Price (C)</span><span class="out-val">$${call.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Put Price (P)</span><span class="out-val">$${put.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">d₁</span><span class="out-val">${d1.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">d₂</span><span class="out-val">${d2.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">N(d₁) = Call Delta</span><span class="out-val">${normalCDF(d1).toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">N(d₂) = Risk-Neutral P(ITM)</span><span class="out-val">${probITM.toFixed(2)}%</span></div>
+     <div class="out-row"><span class="out-key">Moneyness (S/K)</span><span class="out-val">${(S/K).toFixed(4)}</span></div>`;
+
+  // Chart: call price vs S
+  const canvas=document.getElementById('bs-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||700;canvas.width=W;
+  ctx.clearRect(0,0,W,180);
+  const sRange=Array.from({length:200},(_,i)=>S*0.5+i*(S*1.5-S*0.5)/200);
+  const callP=sRange.map(s=>bsPrice(s,K,T,r,sigma,'call'));
+  const putP=sRange.map(s=>bsPrice(s,K,T,r,sigma,'put'));
+  const intrinsic=sRange.map(s=>Math.max(s-K,0));
+  const maxVal=Math.max(...callP,20);
+  const px=s=>30+(s-sRange[0])/(sRange[sRange.length-1]-sRange[0])*(W-50);
+  const py=v=>160-v/maxVal*140;
+
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=0.8;
+  for(let v=0;v<=maxVal;v+=5){ctx.beginPath();ctx.moveTo(30,py(v));ctx.lineTo(W-20,py(v));ctx.stroke();}
+
+  function drawLine(data,color){
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
+    data.forEach((v,i)=>i===0?ctx.moveTo(px(sRange[i]),py(v)):ctx.lineTo(px(sRange[i]),py(v)));
+    ctx.stroke();
+  }
+  drawLine(callP,'#00d4ff');drawLine(putP,'#ef4444');drawLine(intrinsic,'rgba(16,185,129,0.5)');
+
+  // Current price marker
+  const curX=px(S);
+  ctx.strokeStyle='rgba(245,158,11,0.5)';ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(curX,10);ctx.lineTo(curX,160);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#f59e0b';ctx.font='10px JetBrains Mono';ctx.textAlign='center';ctx.fillText(`S=${S}`,curX,10);
+
+  ctx.fillStyle='#00d4ff';ctx.fillText('Call',curX+40,py(call)-5);
+  ctx.fillStyle='#ef4444';ctx.fillText('Put',curX-40,py(put)-5);
+}
+
+// ─── GREEKS CALCULATOR ────────────────────────────────────
+function calcGreeks() {
+  const S=+document.getElementById('gr-S').value,K=+document.getElementById('gr-K').value;
+  const T=+document.getElementById('gr-T').value,sigma=+document.getElementById('gr-vol').value/100;
+  const r=+document.getElementById('gr-r').value/100;
+  document.getElementById('gr-S-val').textContent='$'+S;
+  document.getElementById('gr-K-val').textContent='$'+K;
+  document.getElementById('gr-T-val').textContent=T.toFixed(2)+'y';
+  document.getElementById('gr-vol-val').textContent=(sigma*100).toFixed(0)+'%';
+  document.getElementById('gr-r-val').textContent=(r*100).toFixed(1)+'%';
+
+  const g=bsGreeks(S,K,T,r,sigma);
+  document.getElementById('greeks-output').innerHTML=
+    `<div class="out-row"><span class="out-key">Δ Call Delta</span><span class="out-val">${g.callDelta.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Δ Put Delta</span><span class="out-val">${g.putDelta.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Γ Gamma</span><span class="out-val">${g.gamma.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">ν Vega (per 1% σ)</span><span class="out-val">$${g.vega.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Θ Theta/day (call)</span><span class="out-val">$${g.callTheta.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Θ Theta/day (put)</span><span class="out-val">$${g.putTheta.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">ρ Rho (per 1% r)</span><span class="out-val">$${g.callRho.toFixed(4)}</span></div>`;
+
+  // Plot Delta vs S
+  const canvas=document.getElementById('greeks-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||700;canvas.width=W;
+  ctx.clearRect(0,0,W,200);
+  const sRange=Array.from({length:200},(_,i)=>50+i*2);
+  const deltas=sRange.map(s=>T>0?bsGreeks(s,K,T,r,sigma).callDelta:+(s>K));
+  const gammas=sRange.map(s=>T>0?bsGreeks(s,K,T,r,sigma).gamma*100:0);
+  const px=s=>20+(s-50)/(50+200-50)*(W-40);
+  const pd=d=>180-d*160;
+  const pg=g=>180-g*60;
+
+  ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.lineWidth=0.8;
+  for(let v=0;v<=1;v+=0.25){ctx.beginPath();ctx.moveTo(20,pd(v));ctx.lineTo(W-20,pd(v));ctx.stroke();}
+
+  // Delta
+  ctx.strokeStyle='#00d4ff';ctx.lineWidth=2.5;ctx.beginPath();
+  deltas.forEach((d,i)=>i===0?ctx.moveTo(px(sRange[i]),pd(d)):ctx.lineTo(px(sRange[i]),pd(d)));
+  ctx.stroke();
+
+  // Gamma (scaled)
+  ctx.strokeStyle='#7c3aed';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();
+  gammas.forEach((g,i)=>i===0?ctx.moveTo(px(sRange[i]),pg(g)):ctx.lineTo(px(sRange[i]),pg(g)));
+  ctx.stroke();ctx.setLineDash([]);
+
+  // Current S
+  ctx.strokeStyle='rgba(245,158,11,0.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(px(S),20);ctx.lineTo(px(S),180);ctx.stroke();
+
+  ctx.fillStyle='#00d4ff';ctx.font='11px JetBrains Mono';ctx.textAlign='left';ctx.fillText('— Delta',20,15);
+  ctx.fillStyle='#7c3aed';ctx.fillText('-- Gamma×100',100,15);
+  ctx.fillStyle='#64748b';ctx.textAlign='center';ctx.fillText('Stock Price',W/2,198);
+}
+
+// ─── BINOMIAL TREE ───────────────────────────────────────
+let btType = 'european_call';
+function setBTType(t) {
+  btType=t;
+  ['btn-ec','btn-ep','btn-ac','btn-ap'].forEach(id=>document.getElementById(id).style.background='rgba(100,116,139,0.1)');
+  const map={european_call:'btn-ec',european_put:'btn-ep',american_call:'btn-ac',american_put:'btn-ap'};
+  document.getElementById(map[t]).style.background='rgba(0,212,255,0.2)';
+  calcBinomial();
+}
+function calcBinomial() {
+  const S=+document.getElementById('bt-S').value,K=+document.getElementById('bt-K').value;
+  const sigma=+document.getElementById('bt-vol').value/100,T=+document.getElementById('bt-T').value;
+  const r=+document.getElementById('bt-r').value/100,N=+document.getElementById('bt-N').value;
+  document.getElementById('bt-S-val').textContent='$'+S;
+  document.getElementById('bt-K-val').textContent='$'+K;
+  document.getElementById('bt-vol-val').textContent=(sigma*100).toFixed(0)+'%';
+  document.getElementById('bt-T-val').textContent=T.toFixed(1)+'y';
+  document.getElementById('bt-r-val').textContent=(r*100).toFixed(1)+'%';
+  document.getElementById('bt-N-val').textContent=N;
+
+  const dt=T/N,u=Math.exp(sigma*Math.sqrt(dt)),d=1/u,p=(Math.exp(r*dt)-d)/(u-d);
+  const disc=Math.exp(-r*dt);
+  const isCall=btType.includes('call'),isAmer=btType.includes('american');
+
+  // Terminal prices
+  let V=Array.from({length:N+1},(_,j)=>{
+    const sT=S*Math.pow(u,j)*Math.pow(d,N-j);
+    return isCall?Math.max(sT-K,0):Math.max(K-sT,0);
+  });
+
+  // Backward induction
+  let earlyExCount=0;
+  for(let step=N-1;step>=0;step--){
+    V=Array.from({length:step+1},(_,j)=>{
+      const cont=disc*(p*V[j+1]+(1-p)*V[j]);
+      if(isAmer){
+        const sN=S*Math.pow(u,j)*Math.pow(d,step-j);
+        const intrin=isCall?Math.max(sN-K,0):Math.max(K-sN,0);
+        if(intrin>cont){earlyExCount++;return intrin;}
+      }
+      return cont;
+    });
+  }
+
+  const btPrice=V[0];
+  const bsEquiv=bsPrice(S,K,T,r,sigma,isCall?'call':'put');
+
+  document.getElementById('bt-output').innerHTML=
+    `<div class="out-row"><span class="out-key">Binomial Price (N=${N})</span><span class="out-val">$${btPrice.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Black-Scholes European</span><span class="out-val">$${bsEquiv.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Difference |BT - BS|</span><span class="out-val">$${Math.abs(btPrice-bsEquiv).toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Up Factor (u)</span><span class="out-val">${u.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Down Factor (d)</span><span class="out-val">${d.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Risk-Neutral p</span><span class="out-val">${p.toFixed(4)}</span></div>
+     ${isAmer?`<div class="out-row"><span class="out-key">Early Exercise Nodes</span><span class="out-val">${earlyExCount}</span></div>`:''}`;
+
+  // Convergence chart
+  const canvas=document.getElementById('bt-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||700;canvas.width=W;
+  ctx.clearRect(0,0,W,200);
+  const steps=[1,2,5,10,20,50,100,200];
+  const prices=steps.map(n=>{
+    const dt2=T/n,u2=Math.exp(sigma*Math.sqrt(dt2)),d2=1/u2,p2=(Math.exp(r*dt2)-d2)/(u2-d2);
+    const disc2=Math.exp(-r*dt2);
+    let V2=Array.from({length:n+1},(_,j)=>{
+      const sT=S*Math.pow(u2,j)*Math.pow(d2,n-j);
+      return isCall?Math.max(sT-K,0):Math.max(K-sT,0);
+    });
+    for(let step=n-1;step>=0;step--){
+      V2=Array.from({length:step+1},(_,j)=>{
+        const cont=disc2*(p2*V2[j+1]+(1-p2)*V2[j]);
+        if(isAmer){const sN=S*Math.pow(u2,j)*Math.pow(d2,step-j);const intrin=isCall?Math.max(sN-K,0):Math.max(K-sN,0);return Math.max(cont,intrin);}
+        return cont;
+      });
+    }
+    return V2[0];
+  });
+
+  const allP=[...prices,bsEquiv],maxP=Math.max(...allP)*1.1,minP=Math.min(...allP)*0.9;
+  const px=i=>30+i*(W-60)/7;
+  const py=v=>180-(v-minP)/(maxP-minP)*160;
+
+  ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();
+  prices.forEach((pr,i)=>i===0?ctx.moveTo(px(i),py(pr)):ctx.lineTo(px(i),py(pr)));
+  ctx.stroke();
+  ctx.fillStyle='#f59e0b';
+  prices.forEach((pr,i)=>{ctx.beginPath();ctx.arc(px(i),py(pr),4,0,Math.PI*2);ctx.fill();});
+
+  ctx.strokeStyle='#00d4ff';ctx.setLineDash([5,4]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(30,py(bsEquiv));ctx.lineTo(W-20,py(bsEquiv));ctx.stroke();ctx.setLineDash([]);
+
+  ctx.fillStyle='#64748b';ctx.font='9px JetBrains Mono';ctx.textAlign='center';
+  steps.forEach((n,i)=>ctx.fillText(n,px(i),195));
+  ctx.fillText('Steps',W/2,195);
+  ctx.fillStyle='#00d4ff';ctx.textAlign='right';ctx.fillText(`BS=${bsEquiv.toFixed(2)}`,W-25,py(bsEquiv)-4);
+}
+
+// ─── MONTE CARLO ─────────────────────────────────────────
+function randn() {
+  let u=0,v=0;
+  while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function runMC() {
+  const S=+document.getElementById('mc-S').value,K=+document.getElementById('mc-K').value;
+  const sigma=+document.getElementById('mc-vol').value/100,N=+document.getElementById('mc-N').value;
+  document.getElementById('mc-S-val').textContent='$'+S;
+  document.getElementById('mc-K-val').textContent='$'+K;
+  document.getElementById('mc-vol-val').textContent=(sigma*100).toFixed(0)+'%';
+  document.getElementById('mc-N-val').textContent=N;
+  const r=0.05,T=1,steps=52;
+  const dt=T/steps;
+  const paths=[];
+  const payoffs=[];
+  for(let i=0;i<N;i++){
+    let s=S,path=[s];
+    for(let j=0;j<steps;j++){const z=randn();s=s*Math.exp((r-0.5*sigma*sigma)*dt+sigma*Math.sqrt(dt)*z);path.push(s);}
+    paths.push(path);payoffs.push(Math.max(s-K,0));
+  }
+  const price=Math.exp(-r*T)*payoffs.reduce((a,b)=>a+b,0)/N;
+  const bsEquiv=bsPrice(S,K,T,r,sigma,'call');
+
+  const canvas=document.getElementById('mc-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||700;canvas.width=W;
+  ctx.clearRect(0,0,W,240);
+  const allP=paths.flat();
+  const minS=Math.min(...allP)*0.95,maxS=Math.max(...allP)*1.05;
+  const px=i=>10+i/(steps)*(W-20);
+  const py=s=>230-(s-minS)/(maxS-minS)*215;
+
+  paths.forEach((path,pi)=>{
+    const itm=path[path.length-1]>K;
+    ctx.strokeStyle=itm?'rgba(16,185,129,0.3)':'rgba(239,68,68,0.2)';
+    ctx.lineWidth=0.8;ctx.beginPath();
+    path.forEach((s,i)=>i===0?ctx.moveTo(px(i),py(s)):ctx.lineTo(px(i),py(s)));
+    ctx.stroke();
+  });
+
+  // Strike line
+  if(K>=minS&&K<=maxS){
+    ctx.strokeStyle='rgba(245,158,11,0.5)';ctx.setLineDash([4,3]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(10,py(K));ctx.lineTo(W-10,py(K));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#f59e0b';ctx.font='10px JetBrains Mono';ctx.textAlign='left';ctx.fillText(`K=$${K}`,12,py(K)-3);
+  }
+
+  document.getElementById('mc-output').innerHTML=
+    `<div class="out-row"><span class="out-key">MC Price (${N} paths)</span><span class="out-val">$${price.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Black-Scholes</span><span class="out-val">$${bsEquiv.toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">Error</span><span class="out-val">$${Math.abs(price-bsEquiv).toFixed(4)}</span></div>
+     <div class="out-row"><span class="out-key">% ITM paths (green)</span><span class="out-val">${(payoffs.filter(p=>p>0).length/N*100).toFixed(1)}%</span></div>`;
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(()=>{
+    updateVolChart();
+    drawPayoff();
+    calcBS();
+    calcGreeks();
+    calcBinomial();
+    runMC();
+  }, 100);
+});
+</script>
+</body>
+</html>
