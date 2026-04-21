@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backtesting Methodology — Quant Engineering Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:wght@300;400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1528;
+    --bg3: #141b30;
+    --surface: #1a2340;
+    --surface2: #1e2a4a;
+    --border: #2a3a5c;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7fff6b;
+    --accent4: #ffbb35;
+    --text: #e8edf5;
+    --text2: #a8b8d0;
+    --text3: #6a7d99;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --serif: 'Fraunces', serif;
+    --radius: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1a35 50%, #0a1428 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 20%;
+    width: 300px; height: 200px;
+    background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .header-sub {
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--text2);
+    font-weight: 300;
+    margin-bottom: 24px;
+    max-width: 600px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .meta-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    letter-spacing: 1px;
+  }
+  .meta-pill.level { border-color: var(--accent3); color: var(--accent3); }
+  .meta-pill.topic { border-color: var(--border); color: var(--text3); }
+  .meta-pill.offline { border-color: var(--accent4); color: var(--accent4); }
+
+  /* ─── TABS ─── */
+  .tab-bar {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: relative;
+    z-index: 2;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text3);
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn:hover { color: var(--text2); background: rgba(255,255,255,0.03); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(0,212,255,0.05);
+  }
+  .tab-btn .tab-num {
+    font-size: 9px;
+    opacity: 0.5;
+    margin-right: 6px;
+  }
+
+  /* ─── CONTENT ─── */
+  .content-area {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+  .tab-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── SECTIONS ─── */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.7;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3::before {
+    content: '';
+    width: 3px;
+    height: 18px;
+    background: var(--accent2);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  h4 {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent4);
+    margin: 18px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text2);
+    margin-bottom: 14px;
+  }
+
+  strong { color: var(--text); }
+
+  /* ─── CALLOUT BOXES ─── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 20px 0;
+    border-left: 3px solid;
+    background: var(--bg3);
+  }
+  .callout.info { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .callout.warning { border-color: var(--accent2); background: rgba(255,107,53,0.05); }
+  .callout.success { border-color: var(--accent3); background: rgba(127,255,107,0.05); }
+  .callout.tip { border-color: var(--accent4); background: rgba(255,187,53,0.05); }
+  .callout-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .callout.info .callout-title { color: var(--accent); }
+  .callout.warning .callout-title { color: var(--accent2); }
+  .callout.success .callout-title { color: var(--accent3); }
+  .callout.tip .callout-title { color: var(--accent4); }
+  .callout p { margin-bottom: 0; font-size: 14px; }
+  .callout p + p { margin-top: 8px; }
+
+  /* ─── CODE BLOCKS ─── */
+  .code-block {
+    background: #070b14;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .lang-tag {
+    position: absolute;
+    top: 0; right: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    background: var(--surface);
+    padding: 3px 10px;
+    border-radius: 0 var(--radius) 0 var(--radius);
+    letter-spacing: 1px;
+  }
+  .code-block pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c9d1d9;
+    white-space: pre;
+  }
+  .kw { color: #ff7b72; }
+  .fn { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .num { color: #f8c555; }
+  .cmt { color: #6a7d99; font-style: italic; }
+  .var { color: #79c0ff; }
+  .op { color: #ff7b72; }
+
+  /* ─── DIAGRAMS ─── */
+  .diagram-container {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  .diagram-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  /* SVG Diagrams */
+  svg text { font-family: var(--mono); }
+
+  /* ─── VISUAL CARDS ─── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; color: #fff; }
+  .card-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ─── TIMELINE ─── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 20px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+  }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .timeline-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+  .timeline-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ─── EXERCISE TIERS ─── */
+  .exercise-tier {
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 16px 0;
+    border: 1px solid;
+  }
+  .tier-easy { border-color: var(--accent3); background: rgba(127,255,107,0.04); }
+  .tier-medium { border-color: var(--accent4); background: rgba(255,187,53,0.04); }
+  .tier-hard { border-color: var(--accent2); background: rgba(255,107,53,0.04); }
+
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .tier-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .tier-easy .tier-badge { background: rgba(127,255,107,0.15); color: var(--accent3); }
+  .tier-medium .tier-badge { background: rgba(255,187,53,0.15); color: var(--accent4); }
+  .tier-hard .tier-badge { background: rgba(255,107,53,0.15); color: var(--accent2); }
+  .tier-title { font-weight: 600; font-size: 15px; }
+
+  .exercise-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .exercise-list li {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.6;
+    padding-left: 20px;
+    position: relative;
+  }
+  .exercise-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  /* ─── COLAB BADGE ─── */
+  .colab-box {
+    background: linear-gradient(135deg, rgba(245,124,0,0.1), rgba(245,124,0,0.05));
+    border: 1px solid rgba(245,124,0,0.3);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 20px 0;
+  }
+  .colab-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .colab-icon {
+    width: 28px; height: 28px;
+    background: #F9AB00;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .colab-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #F9AB00;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .colab-box p { font-size: 14px; margin-bottom: 10px; }
+  .colab-box p:last-child { margin-bottom: 0; }
+
+  /* ─── RESOURCE LINKS ─── */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .resource-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+  }
+  .resource-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .resource-type {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .resource-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .resource-desc { font-size: 12px; color: var(--text3); }
+
+  /* ─── ANALOGY BOX ─── */
+  .analogy {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin: 20px 0;
+    border-top: 2px solid var(--accent4);
+  }
+  .analogy-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent4);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .analogy p { font-size: 14px; font-style: italic; color: var(--text2); margin-bottom: 0; }
+
+  /* ─── TABLE ─── */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .styled-table th {
+    background: var(--surface);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,58,92,0.5);
+    color: var(--text2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ─── FORMULA ─── */
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    margin: 16px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .formula-label { font-size: 11px; color: var(--text3); margin-bottom: 8px; text-align: left; text-transform: uppercase; letter-spacing: 2px; }
+  .formula-desc { font-size: 12px; color: var(--text3); margin-top: 8px; text-align: left; font-family: var(--sans); font-style: italic; }
+
+  /* ─── STEP FLOW ─── */
+  .step-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(42,58,92,0.4);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    opacity: 0.4;
+    min-width: 36px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+  .step-content { flex: 1; }
+  .step-title { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  /* ─── PREREQ BADGE ─── */
+  .prereq-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 24px;
+  }
+  .prereq-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .prereq-tag::before { content: '⚡'; font-size: 10px; }
+
+  /* ─── HIGHLIGHT ─── */
+  .hl { color: var(--accent); font-weight: 600; }
+  .hl2 { color: var(--accent2); font-weight: 600; }
+  .hl3 { color: var(--accent3); font-weight: 600; }
+  .hl4 { color: var(--accent4); font-weight: 600; }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ─── PROGRESS MAP ─── */
+  .progress-map {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pm-item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .pm-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .pm-node:hover { border-color: var(--accent); }
+  .pm-node.current { border-color: var(--accent); background: rgba(0,212,255,0.08); color: var(--accent); }
+  .pm-node .pm-num { font-family: var(--mono); font-size: 10px; color: var(--text3); display: block; }
+  .pm-arrow {
+    width: 32px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 600px) {
+    header { padding: 24px 20px 0; }
+    .content-area { padding: 24px 16px 60px; }
+    h2 { font-size: 22px; }
+    .tab-btn { padding: 10px 14px; font-size: 11px; }
+  }
+
+  /* ─── INTERACTIVE DEMO ─── */
+  .demo-container {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 20px 0;
+  }
+  .demo-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .demo-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .demo-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .demo-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .demo-btn.primary { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+  label { font-size: 13px; color: var(--text2); }
+  input[type=range] { accent-color: var(--accent); }
+  select {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  canvas { display: block; width: 100%; border-radius: 4px; }
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .stat-item { background: var(--surface); border-radius: 6px; padding: 10px 16px; flex: 1; min-width: 120px; }
+  .stat-label { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px; }
+  .stat-val { font-family: var(--mono); font-size: 18px; font-weight: 600; }
+  .stat-val.green { color: var(--accent3); }
+  .stat-val.red { color: var(--accent2); }
+  .stat-val.blue { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Quantitative Engineering · Study Guide</div>
+  <h1>Backtesting Methodology</h1>
+  <p class="header-sub">A complete, self-contained guide to Walk-Forward Analysis, Look-Ahead Bias, and Transaction Cost Modeling — for first-time quant engineers.</p>
+  <div class="header-meta">
+    <span class="meta-pill level">Beginner → Intermediate</span>
+    <span class="meta-pill topic">Backtesting</span>
+    <span class="meta-pill topic">Walk-Forward Analysis</span>
+    <span class="meta-pill topic">Look-Ahead Bias</span>
+    <span class="meta-pill topic">Transaction Costs</span>
+    <span class="meta-pill offline">100% Offline</span>
+  </div>
+  <nav class="tab-bar" id="tabBar">
+    <button class="tab-btn active" onclick="showTab('tab0', this)"><span class="tab-num">00</span> Roadmap</button>
+    <button class="tab-btn" onclick="showTab('tab1', this)"><span class="tab-num">01</span> Prerequisites</button>
+    <button class="tab-btn" onclick="showTab('tab2', this)"><span class="tab-num">02</span> Backtesting Basics</button>
+    <button class="tab-btn" onclick="showTab('tab3', this)"><span class="tab-num">03</span> Look-Ahead Bias</button>
+    <button class="tab-btn" onclick="showTab('tab4', this)"><span class="tab-num">04</span> Transaction Costs</button>
+    <button class="tab-btn" onclick="showTab('tab5', this)"><span class="tab-num">05</span> Walk-Forward Analysis</button>
+    <button class="tab-btn" onclick="showTab('tab6', this)"><span class="tab-num">06</span> Interactive Labs</button>
+    <button class="tab-btn" onclick="showTab('tab7', this)"><span class="tab-num">07</span> Practice Exercises</button>
+    <button class="tab-btn" onclick="showTab('tab8', this)"><span class="tab-num">08</span> Resources</button>
+  </nav>
+</header>
+
+<main class="content-area">
+
+<!-- ══════════════════════════════════════════════ TAB 0: ROADMAP -->
+<div id="tab0" class="tab-panel active">
+  <div class="section">
+    <div class="section-label">Start Here</div>
+    <h2>Your Learning Roadmap</h2>
+    <p>Welcome! This guide is designed so that <strong>every concept builds on the previous one</strong>. Before learning to walk forward, you need to know what backtesting is. Before backtesting, you need to understand the data and statistics behind it. Follow this path:</p>
+
+    <div class="progress-map">
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab1')"><span class="pm-num">STEP 01</span>Prerequisites</div></div>
+      <div class="pm-arrow">→</div>
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab2')"><span class="pm-num">STEP 02</span>Backtesting Basics</div></div>
+      <div class="pm-arrow">→</div>
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab3')"><span class="pm-num">STEP 03</span>Look-Ahead Bias</div></div>
+      <div class="pm-arrow">→</div>
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab4')"><span class="pm-num">STEP 04</span>Transaction Costs</div></div>
+      <div class="pm-arrow">→</div>
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab5')"><span class="pm-num">STEP 05</span>Walk-Forward</div></div>
+      <div class="pm-arrow">→</div>
+      <div class="pm-item"><div class="pm-node" onclick="showTabById('tab6')"><span class="pm-num">STEP 06</span>Labs + Exercises</div></div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-title">💡 How to Use This Guide</div>
+      <p>Each tab is <strong>self-contained</strong> — read it top to bottom. Concepts are explained with plain English first, then with visuals, then with code. Every tab ends with Colab experiments and exercises. Don't skip tabs — each concept is a foundation for the next.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>What You'll Be Able to Do After This Guide</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🔬</div>
+        <div class="card-title">Design Valid Backtests</div>
+        <div class="card-desc">Build a backtesting framework that simulates trading strategies on historical data without cheating.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🕵️</div>
+        <div class="card-title">Spot & Eliminate Bias</div>
+        <div class="card-desc">Identify all forms of look-ahead bias — the #1 cause of strategies that look great in backtesting but fail in live trading.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💸</div>
+        <div class="card-title">Model Real Costs</div>
+        <div class="card-desc">Incorporate commissions, spreads, slippage, and market impact to see true, realistic returns.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚶</div>
+        <div class="card-title">Run Walk-Forward Tests</div>
+        <div class="card-desc">Use the gold standard technique to validate that your strategy generalizes to unseen market conditions.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>The Big Picture: Why This All Matters</h3>
+    <div class="analogy">
+      <div class="analogy-label">🎭 The Core Problem</div>
+      <p>Imagine you're trying to predict tomorrow's weather. You have 10 years of weather data. You build a model that predicts the weather perfectly... but you accidentally used tomorrow's temperature to predict today's rain. That's look-ahead bias — using future information you wouldn't have had at the time. Walk-forward analysis is like testing your weather model on months it has never seen before, to prove it actually works.</p>
+    </div>
+
+    <div class="diagram-container">
+      <div class="diagram-title">The Journey from Data to a Robust Strategy</div>
+      <svg viewBox="0 0 800 160" width="100%" style="max-width:800px; display:block; margin:0 auto;">
+        <!-- Raw Data -->
+        <rect x="10" y="60" width="120" height="40" rx="6" fill="#1a2340" stroke="#2a3a5c"/>
+        <text x="70" y="84" text-anchor="middle" fill="#a8b8d0" font-size="12">Raw Market Data</text>
+        <!-- Arrow -->
+        <path d="M130 80 L155 80" stroke="#2a3a5c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- Clean -->
+        <rect x="155" y="60" width="110" height="40" rx="6" fill="#1a2340" stroke="#2a3a5c"/>
+        <text x="210" y="84" text-anchor="middle" fill="#a8b8d0" font-size="12">Clean + Align</text>
+        <!-- Arrow -->
+        <path d="M265 80 L290 80" stroke="#2a3a5c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- No Bias -->
+        <rect x="290" y="60" width="120" height="40" rx="6" fill="#1a2340" stroke="#ff6b35"/>
+        <text x="350" y="79" text-anchor="middle" fill="#ff6b35" font-size="11">Remove Look-</text>
+        <text x="350" y="93" text-anchor="middle" fill="#ff6b35" font-size="11">Ahead Bias</text>
+        <!-- Arrow -->
+        <path d="M410 80 L435 80" stroke="#2a3a5c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- Costs -->
+        <rect x="435" y="60" width="120" height="40" rx="6" fill="#1a2340" stroke="#ffbb35"/>
+        <text x="495" y="79" text-anchor="middle" fill="#ffbb35" font-size="11">Add Transaction</text>
+        <text x="495" y="93" text-anchor="middle" fill="#ffbb35" font-size="11">Costs</text>
+        <!-- Arrow -->
+        <path d="M555 80 L580 80" stroke="#2a3a5c" stroke-width="2" marker-end="url(#arr)"/>
+        <!-- WFA -->
+        <rect x="580" y="60" width="120" height="40" rx="6" fill="#1a2340" stroke="#00d4ff"/>
+        <text x="640" y="79" text-anchor="middle" fill="#00d4ff" font-size="11">Walk-Forward</text>
+        <text x="640" y="93" text-anchor="middle" fill="#00d4ff" font-size="11">Validation</text>
+        <!-- Arrow def -->
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#2a3a5c"/>
+          </marker>
+        </defs>
+        <!-- Labels -->
+        <text x="70" y="118" text-anchor="middle" fill="#6a7d99" font-size="10">Step 1</text>
+        <text x="210" y="118" text-anchor="middle" fill="#6a7d99" font-size="10">Step 2</text>
+        <text x="350" y="118" text-anchor="middle" fill="#ff6b35" font-size="10">Step 3 ← Critical</text>
+        <text x="495" y="118" text-anchor="middle" fill="#ffbb35" font-size="10">Step 4</text>
+        <text x="640" y="118" text-anchor="middle" fill="#00d4ff" font-size="10">Step 5 ← Gold Standard</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 1: PREREQUISITES -->
+<div id="tab1" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Foundation Knowledge</div>
+    <h2>Prerequisites You Need First</h2>
+    <p>Before diving into backtesting, you need to understand the building blocks. This tab explains everything from scratch — even if you've never traded before.</p>
+
+    <div class="prereq-list">
+      <span class="prereq-tag">What is a Trading Strategy?</span>
+      <span class="prereq-tag">Time Series Data</span>
+      <span class="prereq-tag">Returns & Profit/Loss</span>
+      <span class="prereq-tag">Basic Statistics (Mean, Std Dev)</span>
+      <span class="prereq-tag">Python Pandas Basics</span>
+      <span class="prereq-tag">Overfitting vs Generalization</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>1. What is a Trading Strategy?</h3>
+    <div class="analogy">
+      <div class="analogy-label">🍕 Simple Analogy</div>
+      <p>A trading strategy is like a recipe. It tells you: "When these specific ingredients (market conditions) appear, do this action (buy or sell), and when something else happens, do the opposite." A good recipe works reliably. A bad recipe only worked once.</p>
+    </div>
+    <p>In quantitative finance, a <strong>trading strategy</strong> is a set of <strong>precise, mathematical rules</strong> that decide:</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📈</div>
+        <div class="card-title">Entry Signal</div>
+        <div class="card-desc">When to BUY an asset. Example: "Buy when the 10-day average price crosses above the 50-day average."</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📉</div>
+        <div class="card-title">Exit Signal</div>
+        <div class="card-desc">When to SELL. Example: "Sell when the price drops 5% below where we bought it."</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <div class="card-title">Position Sizing</div>
+        <div class="card-desc">How much to buy. Example: "Never put more than 10% of your capital in one trade."</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛑</div>
+        <div class="card-title">Risk Management</div>
+        <div class="card-desc">Limits to protect capital. Example: "Stop all trading if total losses exceed 20%."</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>2. Understanding Time Series Data</h3>
+    <p>Financial data is a <strong>time series</strong> — a sequence of values recorded over time. Each row in your data represents one moment in time.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">OHLCV Candlestick Data — What Each Column Means</div>
+      <svg viewBox="0 0 760 220" width="100%" style="max-width:760px; display:block; margin:0 auto;">
+        <!-- Table header -->
+        <rect x="10" y="10" width="740" height="32" rx="4" fill="#1e2a4a"/>
+        <text x="70" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">DATE</text>
+        <text x="200" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">OPEN</text>
+        <text x="320" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">HIGH</text>
+        <text x="430" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">LOW</text>
+        <text x="540" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">CLOSE</text>
+        <text x="660" y="31" text-anchor="middle" fill="#6a7d99" font-size="11" font-weight="bold">VOLUME</text>
+        <!-- Row 1 -->
+        <rect x="10" y="42" width="740" height="28" fill="#0f1528"/>
+        <text x="70" y="60" text-anchor="middle" fill="#a8b8d0" font-size="11">2024-01-15</text>
+        <text x="200" y="60" text-anchor="middle" fill="#00d4ff" font-size="11">$148.50</text>
+        <text x="320" y="60" text-anchor="middle" fill="#7fff6b" font-size="11">$151.20</text>
+        <text x="430" y="60" text-anchor="middle" fill="#ff6b35" font-size="11">$147.10</text>
+        <text x="540" y="60" text-anchor="middle" fill="#ffbb35" font-size="11">$150.80</text>
+        <text x="660" y="60" text-anchor="middle" fill="#a8b8d0" font-size="11">42.3M</text>
+        <!-- Row 2 -->
+        <rect x="10" y="70" width="740" height="28" fill="#141b30"/>
+        <text x="70" y="88" text-anchor="middle" fill="#a8b8d0" font-size="11">2024-01-16</text>
+        <text x="200" y="88" text-anchor="middle" fill="#00d4ff" font-size="11">$150.80</text>
+        <text x="320" y="88" text-anchor="middle" fill="#7fff6b" font-size="11">$153.00</text>
+        <text x="430" y="88" text-anchor="middle" fill="#ff6b35" font-size="11">$149.50</text>
+        <text x="540" y="88" text-anchor="middle" fill="#ffbb35" font-size="11">$152.40</text>
+        <text x="660" y="88" text-anchor="middle" fill="#a8b8d0" font-size="11">38.1M</text>
+        <!-- Annotations -->
+        <text x="70" y="125" text-anchor="middle" fill="#6a7d99" font-size="10">When the</text>
+        <text x="70" y="137" text-anchor="middle" fill="#6a7d99" font-size="10">day started</text>
+        <text x="200" y="125" text-anchor="middle" fill="#00d4ff" font-size="10">Opening</text>
+        <text x="200" y="137" text-anchor="middle" fill="#00d4ff" font-size="10">price</text>
+        <text x="320" y="125" text-anchor="middle" fill="#7fff6b" font-size="10">Highest price</text>
+        <text x="320" y="137" text-anchor="middle" fill="#7fff6b" font-size="10">of the day</text>
+        <text x="430" y="125" text-anchor="middle" fill="#ff6b35" font-size="10">Lowest price</text>
+        <text x="430" y="137" text-anchor="middle" fill="#ff6b35" font-size="10">of the day</text>
+        <text x="540" y="125" text-anchor="middle" fill="#ffbb35" font-size="10">Closing</text>
+        <text x="540" y="137" text-anchor="middle" fill="#ffbb35" font-size="10">price</text>
+        <text x="660" y="125" text-anchor="middle" fill="#a8b8d0" font-size="10">Shares</text>
+        <text x="660" y="137" text-anchor="middle" fill="#a8b8d0" font-size="10">traded</text>
+        <!-- Arrows up from cells to labels -->
+        <line x1="70" y1="98" x2="70" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="200" y1="98" x2="200" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="320" y1="98" x2="320" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="430" y1="98" x2="430" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="540" y1="98" x2="540" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="660" y1="98" x2="660" y2="118" stroke="#3a4a6c" stroke-width="1" stroke-dasharray="3,2"/>
+        <!-- Note -->
+        <text x="380" y="185" text-anchor="middle" fill="#6a7d99" font-size="11" font-style="italic">Note: Open of today = Close of yesterday (approximately). This is critical to understand for look-ahead bias!</text>
+      </svg>
+    </div>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠️ Key Insight</div>
+      <p>The <strong>CLOSE price is only known AFTER the day ends.</strong> This seems obvious, but many beginners accidentally use today's close price to make a trading decision that was supposed to happen at the start of the day. That's look-ahead bias — and it will ruin your backtest.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>3. Returns: How Profit & Loss Is Measured</h3>
+    <p>A <strong>return</strong> measures how much an investment grew or shrank over a period. There are two types you'll always use:</p>
+
+    <div class="formula-box">
+      <div class="formula-label">Simple Return</div>
+      Return = (Price_End - Price_Start) / Price_Start × 100%
+      <div class="formula-desc">Example: Buy at $100, sell at $110 → Return = (110-100)/100 = 10%</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">Log Return (used in quant finance)</div>
+      Log Return = ln(Price_End / Price_Start)
+      <div class="formula-desc">Log returns are additive across time — if daily log return = 0.01, then 252-day return ≈ 252 × 0.01 = 2.52 (252%). Simpler to work with mathematically.</div>
+    </div>
+
+    <div class="code-block">
+      <span class="lang-tag">PYTHON</span>
+      <pre><span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+
+<span class="cmt"># Sample price series (closing prices)</span>
+<span class="var">prices</span> = <span class="var">pd</span>.<span class="fn">Series</span>([<span class="num">100</span>, <span class="num">102</span>, <span class="num">101</span>, <span class="num">105</span>, <span class="num">103</span>, <span class="num">108</span>])
+
+<span class="cmt"># Simple daily returns</span>
+<span class="var">simple_returns</span> = <span class="var">prices</span>.<span class="fn">pct_change</span>()
+<span class="cmt"># Output: [NaN, 0.02, -0.0098, 0.0396, -0.019, 0.0485]</span>
+
+<span class="cmt"># Log returns (preferred in quant finance)</span>
+<span class="var">log_returns</span> = <span class="var">np</span>.<span class="fn">log</span>(<span class="var">prices</span> / <span class="var">prices</span>.<span class="fn">shift</span>(<span class="num">1</span>))
+
+<span class="cmt"># Cumulative return (total growth from start)</span>
+<span class="var">cumulative</span> = (<span class="num">1</span> + <span class="var">simple_returns</span>).<span class="fn">cumprod</span>() - <span class="num">1</span>
+<span class="fn">print</span>(<span class="str">f"Total return: {cumulative.iloc[-1]:.2%}"</span>)  <span class="cmt"># → 8.00%</span></pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>4. Key Statistics You Must Know</h3>
+    <table class="styled-table">
+      <thead>
+        <tr><th>Metric</th><th>What it Measures</th><th>Formula</th><th>Good Value (typically)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Mean Return</strong></td><td>Average daily/monthly return</td><td>Σ(returns) / n</td><td>Positive → strategy makes money</td></tr>
+        <tr><td><strong>Std Deviation</strong></td><td>How volatile (unpredictable) returns are</td><td>√(Σ(r - mean)² / n)</td><td>Lower is less risky</td></tr>
+        <tr><td><strong>Sharpe Ratio</strong></td><td>Return per unit of risk taken</td><td>(Mean - RiskFree) / StdDev × √252</td><td>> 1.0 is decent, > 2.0 is great</td></tr>
+        <tr><td><strong>Max Drawdown</strong></td><td>Worst peak-to-trough loss</td><td>Max(peak - trough) / peak</td><td>Lower is better; < 20% is good</td></tr>
+        <tr><td><strong>Win Rate</strong></td><td>% of trades that are profitable</td><td>Winning Trades / Total Trades</td><td>> 50% but depends on risk/reward</td></tr>
+      </tbody>
+    </table>
+
+    <div class="formula-box">
+      <div class="formula-label">Sharpe Ratio — The Most Important Single Number in Backtesting</div>
+      Sharpe = (Mean Annual Return − Risk-Free Rate) / Annual Std Deviation
+      <div class="formula-desc">√252 converts daily returns to annual. Risk-free rate ≈ Treasury bill rate (~5% in 2024). A Sharpe > 1 means your strategy earns more than 1 unit of return per unit of risk. That's the bare minimum for most professional quants.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>5. Overfitting — The Biggest Enemy</h3>
+    <div class="analogy">
+      <div class="analogy-label">📚 Overfitting Analogy</div>
+      <p>Imagine you study for an exam by memorizing the exact answers to last year's paper — not understanding the concepts. You score 100% on that old paper, but fail the real exam because the questions are different. That's <strong>overfitting</strong>. In trading, a strategy that is over-tuned to past data will look amazing historically but fail in the future.</p>
+    </div>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Underfitting vs Good Fit vs Overfitting</div>
+      <svg viewBox="0 0 720 180" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Underfitting -->
+        <text x="120" y="20" text-anchor="middle" fill="#ff6b35" font-size="12" font-weight="bold">UNDERFITTING</text>
+        <text x="120" y="34" text-anchor="middle" fill="#6a7d99" font-size="10">(too simple)</text>
+        <!-- scatter dots -->
+        <circle cx="60" cy="120" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="80" cy="90" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="100" cy="100" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="120" cy="70" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="140" cy="80" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="160" cy="60" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="180" cy="50" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <!-- simple line -->
+        <line x1="50" y1="130" x2="190" y2="40" stroke="#ff6b35" stroke-width="2.5"/>
+
+        <!-- Good Fit -->
+        <text x="370" y="20" text-anchor="middle" fill="#7fff6b" font-size="12" font-weight="bold">GOOD FIT</text>
+        <text x="370" y="34" text-anchor="middle" fill="#6a7d99" font-size="10">(captures the trend)</text>
+        <circle cx="310" cy="120" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="330" cy="90" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="350" cy="100" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="370" cy="70" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="390" cy="80" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="410" cy="60" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="430" cy="50" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <!-- smooth curve -->
+        <path d="M300 125 Q340 105 370 75 Q400 55 440 45" stroke="#7fff6b" stroke-width="2.5" fill="none"/>
+
+        <!-- Overfitting -->
+        <text x="620" y="20" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">OVERFITTING</text>
+        <text x="620" y="34" text-anchor="middle" fill="#6a7d99" font-size="10">(memorizes noise)</text>
+        <circle cx="560" cy="120" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="580" cy="90" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="600" cy="100" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="620" cy="70" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="640" cy="80" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="660" cy="60" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <circle cx="680" cy="50" r="4" fill="#a8b8d0" opacity="0.7"/>
+        <!-- wiggly curve through all points -->
+        <path d="M555 122 C565 118 570 88 580 88 C585 88 595 104 600 100 C605 96 615 68 620 70 C625 72 635 82 640 80 C645 78 655 58 660 60 C665 62 675 52 680 50" stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+        <!-- Labels bottom -->
+        <text x="120" y="162" text-anchor="middle" fill="#ff6b35" font-size="10">Works on new data: ❌</text>
+        <text x="370" y="162" text-anchor="middle" fill="#7fff6b" font-size="10">Works on new data: ✅</text>
+        <text x="620" y="162" text-anchor="middle" fill="#00d4ff" font-size="10">Works on new data: ❌</text>
+      </svg>
+    </div>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠️ Why This Matters for Backtesting</div>
+      <p>Every parameter you tune on historical data (e.g., "use 14-day lookback instead of 10-day because it scored better") moves you toward overfitting. Walk-forward analysis is specifically designed to detect and prevent this. We'll cover it in detail in Tab 05.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="colab-box">
+      <div class="colab-header">
+        <div class="colab-icon">▶</div>
+        <div class="colab-title">Colab Experiment — Prerequisites</div>
+      </div>
+      <p><strong>Experiment P-1: Load & Explore OHLCV Data</strong></p>
+      <p>Open Google Colab (<a href="https://colab.research.google.com" target="_blank" style="color:var(--accent)">colab.research.google.com</a>) and run this code to download real stock data and explore the structure:</p>
+      <div class="code-block">
+        <span class="lang-tag">COLAB</span>
+        <pre><span class="cmt"># Install yfinance for free stock data</span>
+<span class="op">!</span><span class="var">pip install yfinance</span>
+
+<span class="kw">import</span> <span class="var">yfinance</span> <span class="kw">as</span> <span class="var">yf</span>
+<span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="cmt"># Download 2 years of Apple stock data</span>
+<span class="var">df</span> = <span class="var">yf</span>.<span class="fn">download</span>(<span class="str">'AAPL'</span>, <span class="var">start</span>=<span class="str">'2022-01-01'</span>, <span class="var">end</span>=<span class="str">'2024-01-01'</span>)
+
+<span class="fn">print</span>(<span class="str">"Shape:"</span>, <span class="var">df</span>.<span class="var">shape</span>)  <span class="cmt"># rows x columns</span>
+<span class="fn">print</span>(<span class="var">df</span>.<span class="fn">head</span>())
+
+<span class="cmt"># Compute daily returns</span>
+<span class="var">df</span>[<span class="str">'Return'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">pct_change</span>()
+
+<span class="cmt"># Key statistics</span>
+<span class="fn">print</span>(<span class="str">f"\nMean daily return: {df['Return'].mean():.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Std dev: {df['Return'].std():.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Annualized Sharpe (approx): {df['Return'].mean()/df['Return'].std()*252**0.5:.2f}"</span>)
+
+<span class="cmt"># Plot cumulative returns</span>
+<span class="var">cum_ret</span> = (<span class="num">1</span> + <span class="var">df</span>[<span class="str">'Return'</span>]).<span class="fn">cumprod</span>()
+<span class="var">cum_ret</span>.<span class="fn">plot</span>(<span class="var">title</span>=<span class="str">'AAPL Cumulative Returns 2022-2024'</span>, <span class="var">figsize</span>=(<span class="num">12</span>,<span class="num">4</span>))
+<span class="var">plt</span>.<span class="fn">ylabel</span>(<span class="str">'Growth of $1'</span>)
+<span class="var">plt</span>.<span class="fn">show</span>()</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 2: BACKTESTING BASICS -->
+<div id="tab2" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Core Concept</div>
+    <h2>Backtesting: Testing Strategies on the Past</h2>
+    <p><strong>Backtesting</strong> is the process of simulating how a trading strategy would have performed if you had actually traded it historically. Instead of risking real money to test an idea, you "replay" the past with your strategy turned on, and measure the results.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">🎮 Video Game Analogy</div>
+      <p>Backtesting is like playing a sports video game where you simulate historical matches. You set your team's tactics (the strategy), then the simulation replays past games and tells you your score. But if the game cheat-codes and shows you future moves before you decide — your win rate is meaningless. This is exactly what look-ahead bias does.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>The Backtesting Simulation Loop</h3>
+    <p>At its core, every backtest is just a <strong>loop through time</strong>, making decisions at each step using only information available at that moment:</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">The Core Backtesting Loop</div>
+      <svg viewBox="0 0 720 320" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6a7d99"/>
+          </marker>
+          <marker id="arr3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#00d4ff"/>
+          </marker>
+        </defs>
+        <!-- Center loop circle -->
+        <circle cx="360" cy="160" r="35" fill="none" stroke="#2a3a5c" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="360" y="155" text-anchor="middle" fill="#6a7d99" font-size="10">TIME</text>
+        <text x="360" y="168" text-anchor="middle" fill="#6a7d99" font-size="10">LOOP</text>
+        <!-- Step boxes -->
+        <!-- 1: Get data -->
+        <rect x="50" y="40" width="160" height="50" rx="6" fill="#1a2340" stroke="#00d4ff"/>
+        <text x="130" y="60" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">1. Get Data for Day T</text>
+        <text x="130" y="75" text-anchor="middle" fill="#a8b8d0" font-size="10">Only data up to and</text>
+        <text x="130" y="86" text-anchor="middle" fill="#a8b8d0" font-size="10">including today</text>
+        <!-- 2: Compute signals -->
+        <rect x="510" y="40" width="160" height="50" rx="6" fill="#1a2340" stroke="#7fff6b"/>
+        <text x="590" y="60" text-anchor="middle" fill="#7fff6b" font-size="12" font-weight="bold">2. Compute Signals</text>
+        <text x="590" y="75" text-anchor="middle" fill="#a8b8d0" font-size="10">Indicators, moving</text>
+        <text x="590" y="86" text-anchor="middle" fill="#a8b8d0" font-size="10">averages, etc.</text>
+        <!-- 3: Decide action -->
+        <rect x="510" y="230" width="160" height="50" rx="6" fill="#1a2340" stroke="#ffbb35"/>
+        <text x="590" y="250" text-anchor="middle" fill="#ffbb35" font-size="12" font-weight="bold">3. Generate Orders</text>
+        <text x="590" y="265" text-anchor="middle" fill="#a8b8d0" font-size="10">Buy / Sell / Hold</text>
+        <text x="590" y="276" text-anchor="middle" fill="#a8b8d0" font-size="10">based on signal</text>
+        <!-- 4: Execute -->
+        <rect x="50" y="230" width="160" height="50" rx="6" fill="#1a2340" stroke="#ff6b35"/>
+        <text x="130" y="250" text-anchor="middle" fill="#ff6b35" font-size="12" font-weight="bold">4. Execute + Record</text>
+        <text x="130" y="265" text-anchor="middle" fill="#a8b8d0" font-size="10">Apply costs, update</text>
+        <text x="130" y="276" text-anchor="middle" fill="#a8b8d0" font-size="10">portfolio P&amp;L</text>
+        <!-- Arrows -->
+        <path d="M210 65 L505 65" stroke="#6a7d99" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <path d="M590 90 L590 225" stroke="#6a7d99" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <path d="M510 255 L215 255" stroke="#6a7d99" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <path d="M130 225 L130 95" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr3)"/>
+        <!-- Back loop label -->
+        <text x="70" y="172" fill="#00d4ff" font-size="10">T = T + 1</text>
+        <text x="63" y="183" fill="#00d4ff" font-size="10">(next day)</text>
+        <!-- Warning -->
+        <rect x="230" y="130" width="200" height="55" rx="6" fill="rgba(255,107,53,0.1)" stroke="#ff6b35" stroke-width="1"/>
+        <text x="330" y="150" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">⚠️ KEY RULE</text>
+        <text x="330" y="165" text-anchor="middle" fill="#a8b8d0" font-size="10">At time T, you can ONLY</text>
+        <text x="330" y="177" text-anchor="middle" fill="#a8b8d0" font-size="10">use data from T and before!</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Your First Real Backtest: Moving Average Crossover</h3>
+    <p>The simplest and most classic strategy. Buy when the fast (short) moving average crosses above the slow (long) moving average. Sell when it crosses below.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">📊 What is a Moving Average?</div>
+      <p>A moving average smooths out price noise. The "20-day moving average" on a given day is simply the average of the last 20 closing prices. It tells you the trend. A faster (shorter) MA reacts quickly to price changes; a slower one shows the longer trend.</p>
+    </div>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Moving Average Crossover Signal</div>
+      <svg viewBox="0 0 720 220" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Axes -->
+        <line x1="50" y1="180" x2="700" y2="180" stroke="#2a3a5c" stroke-width="1"/>
+        <line x1="50" y1="20" x2="50" y2="180" stroke="#2a3a5c" stroke-width="1"/>
+        <text x="375" y="198" text-anchor="middle" fill="#6a7d99" font-size="11">Time (days) →</text>
+        <text x="25" y="100" text-anchor="middle" fill="#6a7d99" font-size="11" transform="rotate(-90 25 100)">Price ($)</text>
+        <!-- Noisy price line -->
+        <polyline points="50,140 70,125 90,135 110,120 130,110 150,120 170,108 190,95 210,105 230,90 250,80 270,90 290,85 310,95 330,85 350,70 370,75 390,65 410,70 430,55 450,60 470,45 490,52 510,40 530,35 550,40 570,30 590,25 610,35 630,30 650,20 670,25 690,18" stroke="#3a4a6c" stroke-width="1" fill="none" opacity="0.6"/>
+        <!-- Slow MA (50-day) -->
+        <polyline points="50,138 100,128 150,118 200,100 250,85 300,88 350,75 400,65 450,56 500,44 550,36 600,28 650,22 690,19" stroke="#ff6b35" stroke-width="2.5" fill="none"/>
+        <!-- Fast MA (10-day) -->
+        <polyline points="50,134 80,122 110,112 140,108 170,104 200,92 230,84 260,78 290,84 320,88 350,72 380,63 410,62 440,52 470,44 500,38 530,33 560,28 590,22 620,28 650,18 690,15" stroke="#00d4ff" stroke-width="2" fill="none"/>
+        <!-- BUY signal -->
+        <line x1="200" y1="30" x2="200" y2="180" stroke="#7fff6b" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+        <text x="200" y="25" text-anchor="middle" fill="#7fff6b" font-size="11" font-weight="bold">BUY ↑</text>
+        <circle cx="200" cy="92" r="7" fill="none" stroke="#7fff6b" stroke-width="2"/>
+        <!-- SELL signal -->
+        <line x1="310" y1="30" x2="310" y2="180" stroke="#ff6b35" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+        <text x="310" y="25" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">SELL ↓</text>
+        <circle cx="310" cy="88" r="7" fill="none" stroke="#ff6b35" stroke-width="2"/>
+        <!-- BUY 2 -->
+        <line x1="410" y1="30" x2="410" y2="180" stroke="#7fff6b" stroke-width="1" stroke-dasharray="4,3" opacity="0.6"/>
+        <text x="410" y="25" text-anchor="middle" fill="#7fff6b" font-size="11" font-weight="bold">BUY ↑</text>
+        <circle cx="410" cy="62" r="7" fill="none" stroke="#7fff6b" stroke-width="2"/>
+        <!-- Legend -->
+        <line x1="480" y1="175" x2="510" y2="175" stroke="#3a4a6c" stroke-width="1.5"/>
+        <text x="515" y="178" fill="#6a7d99" font-size="10">Price</text>
+        <line x1="540" y1="175" x2="570" y2="175" stroke="#00d4ff" stroke-width="2"/>
+        <text x="575" y="178" fill="#00d4ff" font-size="10">Fast MA (10d)</text>
+        <line x1="480" y1="163" x2="510" y2="163" stroke="#ff6b35" stroke-width="2"/>
+        <text x="515" y="166" fill="#ff6b35" font-size="10">Slow MA (50d)</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <span class="lang-tag">PYTHON — MINIMAL BACKTEST</span>
+      <pre><span class="kw">import</span> <span class="var">yfinance</span> <span class="kw">as</span> <span class="var">yf</span>
+<span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="cmt"># ── 1. LOAD DATA ──────────────────────────────────────────────</span>
+<span class="var">df</span> = <span class="var">yf</span>.<span class="fn">download</span>(<span class="str">'SPY'</span>, <span class="var">start</span>=<span class="str">'2015-01-01'</span>, <span class="var">end</span>=<span class="str">'2023-12-31'</span>)
+<span class="var">df</span> = <span class="var">df</span>[[<span class="str">'Close'</span>]].<span class="fn">copy</span>()
+
+<span class="cmt"># ── 2. COMPUTE SIGNALS ────────────────────────────────────────</span>
+<span class="var">df</span>[<span class="str">'MA_fast'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="num">10</span>).<span class="fn">mean</span>()  <span class="cmt"># 10-day MA</span>
+<span class="var">df</span>[<span class="str">'MA_slow'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="num">50</span>).<span class="fn">mean</span>()  <span class="cmt"># 50-day MA</span>
+
+<span class="cmt"># Signal: 1 = long (hold), 0 = flat (no position)</span>
+<span class="var">df</span>[<span class="str">'signal'</span>] = <span class="var">np</span>.<span class="fn">where</span>(<span class="var">df</span>[<span class="str">'MA_fast'</span>] > <span class="var">df</span>[<span class="str">'MA_slow'</span>], <span class="num">1</span>, <span class="num">0</span>)
+
+<span class="cmt"># IMPORTANT: Shift signal by 1 day!</span>
+<span class="cmt"># We can only ACT on tomorrow's open using today's signal.</span>
+<span class="cmt"># This single line prevents a common form of look-ahead bias!</span>
+<span class="var">df</span>[<span class="str">'position'</span>] = <span class="var">df</span>[<span class="str">'signal'</span>].<span class="fn">shift</span>(<span class="num">1</span>)
+
+<span class="cmt"># ── 3. COMPUTE RETURNS ────────────────────────────────────────</span>
+<span class="var">df</span>[<span class="str">'market_return'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">pct_change</span>()
+<span class="var">df</span>[<span class="str">'strat_return'</span>]  = <span class="var">df</span>[<span class="str">'position'</span>] * <span class="var">df</span>[<span class="str">'market_return'</span>]
+
+<span class="cmt"># ── 4. PERFORMANCE METRICS ────────────────────────────────────</span>
+<span class="var">total_ret</span>  = (<span class="num">1</span> + <span class="var">df</span>[<span class="str">'strat_return'</span>]).<span class="fn">cumprod</span>().<span class="fn">iloc</span>[-<span class="num">1</span>] - <span class="num">1</span>
+<span class="var">ann_sharpe</span> = <span class="var">df</span>[<span class="str">'strat_return'</span>].<span class="fn">mean</span>() / <span class="var">df</span>[<span class="str">'strat_return'</span>].<span class="fn">std</span>() * <span class="num">252</span>**<span class="num">0.5</span>
+
+<span class="fn">print</span>(<span class="str">f"Total Return: {total_ret:.2%}"</span>)
+<span class="fn">print</span>(<span class="str">f"Annualized Sharpe: {ann_sharpe:.2f}"</span>)
+
+<span class="cmt"># ── 5. PLOT ───────────────────────────────────────────────────</span>
+<span class="var">fig</span>, <span class="var">ax</span> = <span class="var">plt</span>.<span class="fn">subplots</span>(<span class="var">figsize</span>=(<span class="num">14</span>, <span class="num">5</span>))
+(<span class="num">1</span> + <span class="var">df</span>[<span class="str">'strat_return'</span>]).<span class="fn">cumprod</span>().<span class="fn">plot</span>(<span class="var">ax</span>=<span class="var">ax</span>, <span class="var">label</span>=<span class="str">'Strategy'</span>, <span class="var">color</span>=<span class="str">'cyan'</span>)
+(<span class="num">1</span> + <span class="var">df</span>[<span class="str">'market_return'</span>]).<span class="fn">cumprod</span>().<span class="fn">plot</span>(<span class="var">ax</span>=<span class="var">ax</span>, <span class="var">label</span>=<span class="str">'Buy & Hold'</span>, <span class="var">color</span>=<span class="str">'orange'</span>, <span class="var">alpha</span>=<span class="num">0.6</span>)
+<span class="var">ax</span>.<span class="fn">legend</span>()
+<span class="var">ax</span>.<span class="fn">set_title</span>(<span class="str">'MA Crossover Backtest vs Buy-and-Hold'</span>)
+<span class="var">plt</span>.<span class="fn">show</span>()</pre>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-title">✅ Notice the .shift(1) Line</div>
+      <p>That single <code>df['position'] = df['signal'].shift(1)</code> is doing critical work. Without it, we'd be using today's signal to trade today — but the signal is computed using today's closing price which we'd only know after the market closes. The shift ensures we only trade on information from the previous day. This is our first defense against look-ahead bias!</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Types of Backtests</h3>
+    <table class="styled-table">
+      <thead><tr><th>Type</th><th>Description</th><th>When to Use</th><th>Complexity</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Vectorized</strong></td><td>Compute all signals at once using arrays. Fast but requires care about look-ahead bias.</td><td>Initial idea testing, simple strategies</td><td>⭐ Easy</td></tr>
+        <tr><td><strong>Event-Driven</strong></td><td>Simulate market event by event, mimicking real execution. More realistic.</td><td>Complex strategies, live-trading deployment</td><td>⭐⭐⭐ Hard</td></tr>
+        <tr><td><strong>Walk-Forward</strong></td><td>Repeatedly re-train and re-test on rolling windows of time.</td><td>Validation and preventing overfitting</td><td>⭐⭐ Medium</td></tr>
+        <tr><td><strong>Monte Carlo</strong></td><td>Run thousands of randomized simulations to understand the distribution of outcomes.</td><td>Risk analysis and stress testing</td><td>⭐⭐ Medium</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 3: LOOK-AHEAD BIAS -->
+<div id="tab3" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Critical Error #1</div>
+    <h2>Look-Ahead Bias: Using the Future to Predict Itself</h2>
+    <p><strong>Look-ahead bias</strong> occurs when a backtest accidentally uses information that would NOT have been available at the time of a trading decision. It's the #1 reason why backtests look amazing but strategies fail in live trading.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">🏇 Horse Racing Analogy</div>
+      <p>Imagine you're betting on horse races. Look-ahead bias is like looking at the race results first, then going back and "predicting" the winner. Of course you'd be 100% accurate! But that's not a prediction — it's cheating. A real prediction must be made BEFORE the race happens, using only information available at that moment.</p>
+    </div>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠️ The Devastating Effect</div>
+      <p>A strategy with look-ahead bias might show a Sharpe Ratio of 3.0 (extraordinary!) in backtesting. In live trading, the same strategy might produce a Sharpe of -0.5 (losing money). The gap isn't because markets changed — it's because the backtest was cheating.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>The 5 Most Common Types of Look-Ahead Bias</h3>
+    <div class="step-flow">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Signal-Execution Lag (The .shift() Problem)</div>
+          <div class="step-desc">You compute a signal using today's closing price, then trade at today's closing price — which is impossible! By the time you know the close, the market is already closed. Fix: always shift signals by 1 period before computing returns.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Data Snooping / Curve Fitting</div>
+          <div class="step-desc">You test 1,000 parameter combinations on your full dataset, pick the best one (say, MA(23,47)), and report its results. But those parameters were chosen because they fit the past perfectly — they won't generalize. Fix: use a separate out-of-sample test set you never touched during optimization.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Survivorship Bias</div>
+          <div class="step-desc">You backtest a strategy on "the S&P 500 components" — but you use TODAY's list of companies. Companies that went bankrupt years ago aren't in that list. Your strategy has unknowingly selected only survivors, making past results look better than they were. Fix: use a point-in-time index membership database.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Using Future-Adjusted Prices Without Care</div>
+          <div class="step-desc">Most data providers give "split-adjusted" historical prices — they retroactively adjust all past prices for stock splits and dividends. If you use these to compute signals without care, you're using information about future corporate actions. Fix: use a "point-in-time" or "raw" price for signal generation, only use adjusted prices for return calculations.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <div class="step-title">Normalizing Entire Dataset Before Splitting</div>
+          <div class="step-desc">Many ML practitioners normalize data (e.g., fit a StandardScaler on ALL data including test set), then split. This leaks statistics from the future into the past. Fix: always fit your scaler/normalizer ONLY on training data, then apply to test data.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Visual: How Signal-Execution Lag Works</h3>
+    <div class="diagram-container">
+      <div class="diagram-title">Wrong vs Correct: The Signal Execution Timeline</div>
+      <svg viewBox="0 0 720 280" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Timeline labels -->
+        <text x="30" y="30" fill="#6a7d99" font-size="11">Monday</text>
+        <text x="190" y="30" fill="#6a7d99" font-size="11">Tuesday</text>
+        <text x="360" y="30" fill="#6a7d99" font-size="11">Wednesday</text>
+        <text x="540" y="30" fill="#6a7d99" font-size="11">Thursday</text>
+        <!-- Vertical day separators -->
+        <line x1="165" y1="35" x2="165" y2="270" stroke="#1e2a4a" stroke-width="1"/>
+        <line x1="340" y1="35" x2="340" y2="270" stroke="#1e2a4a" stroke-width="1"/>
+        <line x1="515" y1="35" x2="515" y2="270" stroke="#1e2a4a" stroke-width="1"/>
+
+        <!-- WRONG WAY -->
+        <text x="10" y="65" fill="#ff6b35" font-size="12" font-weight="bold">❌ WRONG (Look-Ahead Bias)</text>
+        <!-- Monday close -->
+        <rect x="30" y="75" width="120" height="30" rx="4" fill="#1a2340" stroke="#2a3a5c"/>
+        <text x="90" y="94" text-anchor="middle" fill="#a8b8d0" font-size="11">Monday Close: $100</text>
+        <!-- Signal computed same day -->
+        <rect x="200" y="75" width="130" height="30" rx="4" fill="rgba(255,107,53,0.15)" stroke="#ff6b35"/>
+        <text x="265" y="89" text-anchor="middle" fill="#ff6b35" font-size="11">Signal computed AND</text>
+        <text x="265" y="103" text-anchor="middle" fill="#ff6b35" font-size="10">trade executed Tuesday</text>
+        <!-- Arrow -->
+        <path d="M155 90 L195 90" stroke="#ff6b35" stroke-width="2" marker-end="url(#arr2)"/>
+        <!-- Tuesday close used for signal -->
+        <rect x="355" y="75" width="140" height="30" rx="4" fill="rgba(255,107,53,0.1)" stroke="#ff6b35"/>
+        <text x="425" y="89" text-anchor="middle" fill="#ff6b35" font-size="11">⚠️ Uses Tuesday's</text>
+        <text x="425" y="103" text-anchor="middle" fill="#ff6b35" font-size="10">CLOSE to trade Tuesday!</text>
+        <!-- Impossible label -->
+        <text x="540" y="90" fill="#ff6b35" font-size="12" font-style="italic">Impossible!</text>
+        <text x="540" y="105" fill="#ff6b35" font-size="11">Market is closed</text>
+
+        <!-- CORRECT WAY -->
+        <text x="10" y="155" fill="#7fff6b" font-size="12" font-weight="bold">✅ CORRECT (.shift(1))</text>
+        <!-- Monday close -->
+        <rect x="30" y="165" width="120" height="30" rx="4" fill="#1a2340" stroke="#2a3a5c"/>
+        <text x="90" y="184" text-anchor="middle" fill="#a8b8d0" font-size="11">Monday Close: $100</text>
+        <!-- Signal computed Monday night -->
+        <rect x="30" y="205" width="120" height="30" rx="4" fill="rgba(127,255,107,0.1)" stroke="#7fff6b"/>
+        <text x="90" y="219" text-anchor="middle" fill="#7fff6b" font-size="10">Signal = BUY</text>
+        <text x="90" y="231" text-anchor="middle" fill="#7fff6b" font-size="10">(computed after close)</text>
+        <!-- Arrow to Tuesday -->
+        <path d="M155 220 L195 200" stroke="#7fff6b" stroke-width="2" marker-end="url(#arr2)"/>
+        <!-- Tuesday execution -->
+        <rect x="200" y="165" width="130" height="30" rx="4" fill="rgba(127,255,107,0.15)" stroke="#7fff6b"/>
+        <text x="265" y="179" text-anchor="middle" fill="#7fff6b" font-size="11">Execute at Tuesday</text>
+        <text x="265" y="193" text-anchor="middle" fill="#7fff6b" font-size="10">OPEN — realistic!</text>
+        <!-- tick -->
+        <text x="540" y="185" fill="#7fff6b" font-size="20">✓</text>
+        <text x="540" y="205" fill="#7fff6b" font-size="11">Signal uses</text>
+        <text x="540" y="218" fill="#7fff6b" font-size="11">only past data</text>
+
+        <!-- Divider -->
+        <line x1="10" y1="145" x2="710" y2="145" stroke="#2a3a5c" stroke-width="0.5" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Code Example: Look-Ahead Bias in Action</h3>
+    <div class="code-block">
+      <span class="lang-tag">PYTHON — BIAS DEMONSTRATION</span>
+      <pre><span class="kw">import</span> <span class="var">yfinance</span> <span class="kw">as</span> <span class="var">yf</span>
+<span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+
+<span class="var">df</span> = <span class="var">yf</span>.<span class="fn">download</span>(<span class="str">'AAPL'</span>, <span class="var">start</span>=<span class="str">'2015-01-01'</span>, <span class="var">end</span>=<span class="str">'2023-12-31'</span>)
+<span class="var">df</span>[<span class="str">'MA10'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="num">10</span>).<span class="fn">mean</span>()
+<span class="var">df</span>[<span class="str">'MA50'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="num">50</span>).<span class="fn">mean</span>()
+<span class="var">df</span>[<span class="str">'daily_return'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">pct_change</span>()
+
+<span class="cmt"># ❌ BIASED VERSION — uses same-day signal to trade same day</span>
+<span class="var">df</span>[<span class="str">'biased_signal'</span>] = <span class="var">np</span>.<span class="fn">where</span>(<span class="var">df</span>[<span class="str">'MA10'</span>] > <span class="var">df</span>[<span class="str">'MA50'</span>], <span class="num">1</span>, <span class="num">0</span>)
+<span class="var">biased_return</span> = (<span class="var">df</span>[<span class="str">'biased_signal'</span>] * <span class="var">df</span>[<span class="str">'daily_return'</span>]).<span class="fn">sum</span>()
+
+<span class="cmt"># ✅ CORRECT VERSION — signal from yesterday, execute today</span>
+<span class="var">df</span>[<span class="str">'correct_signal'</span>] = <span class="var">np</span>.<span class="fn">where</span>(<span class="var">df</span>[<span class="str">'MA10'</span>] > <span class="var">df</span>[<span class="str">'MA50'</span>], <span class="num">1</span>, <span class="num">0</span>).<span class="fn">shift</span>(<span class="num">1</span>)
+<span class="var">correct_return</span> = (<span class="var">df</span>[<span class="str">'correct_signal'</span>] * <span class="var">df</span>[<span class="str">'daily_return'</span>]).<span class="fn">sum</span>()
+
+<span class="fn">print</span>(<span class="str">f"❌ Biased return:  {biased_return:.2%}"</span>)   <span class="cmt"># Usually looks AMAZING</span>
+<span class="fn">print</span>(<span class="str">f"✅ Correct return: {correct_return:.2%}"</span>)  <span class="cmt"># Usually lower, but REAL</span>
+<span class="fn">print</span>(<span class="str">f"\nBias inflation: {biased_return - correct_return:.2%}"</span>)
+<span class="cmt"># The difference is pure fantasy — it doesn't exist in reality!</span></pre>
+    </div>
+
+    <div class="callout tip">
+      <div class="callout-title">💡 Survivorship Bias Fix in Practice</div>
+      <p>When backtesting on a group of stocks (like the S&P 500), always use <strong>historical index constituents</strong>, not today's current components. The Quandl/Sharadar dataset or CRSP in the US provides point-in-time membership data. For a beginner project, stick to a single well-known stock (AAPL, SPY) to avoid this issue entirely.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>ML-Specific Look-Ahead Bias: The Scaler Problem</h3>
+    <p>If you're using machine learning for your strategy, there's a particularly sneaky form of look-ahead bias:</p>
+    <div class="code-block">
+      <span class="lang-tag">PYTHON — ML BIAS EXAMPLE</span>
+      <pre><span class="kw">from</span> <span class="var">sklearn.preprocessing</span> <span class="kw">import</span> <span class="var">StandardScaler</span>
+<span class="kw">from</span> <span class="var">sklearn.model_selection</span> <span class="kw">import</span> <span class="var">train_test_split</span>
+
+<span class="cmt"># Suppose X is your feature matrix of 5 years of daily data</span>
+
+<span class="cmt">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="cmt"># ❌ WRONG — scales ALL data before splitting</span>
+<span class="var">scaler</span> = <span class="var">StandardScaler</span>()
+<span class="var">X_scaled</span> = <span class="var">scaler</span>.<span class="fn">fit_transform</span>(<span class="var">X</span>)     <span class="cmt"># Uses future stats!</span>
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X_scaled</span>, <span class="var">y</span>, <span class="var">shuffle</span>=<span class="kw">False</span>)  <span class="cmt"># Too late!</span>
+
+<span class="cmt">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="cmt"># ✅ CORRECT — split first, then scale using only train data</span>
+<span class="var">X_train</span>, <span class="var">X_test</span>, <span class="var">y_train</span>, <span class="var">y_test</span> = <span class="fn">train_test_split</span>(
+    <span class="var">X</span>, <span class="var">y</span>, <span class="var">shuffle</span>=<span class="kw">False</span>, <span class="var">test_size</span>=<span class="num">0.2</span>)
+
+<span class="var">scaler</span> = <span class="var">StandardScaler</span>()
+<span class="var">X_train_scaled</span> = <span class="var">scaler</span>.<span class="fn">fit_transform</span>(<span class="var">X_train</span>)  <span class="cmt"># Fit on train only!</span>
+<span class="var">X_test_scaled</span>  = <span class="var">scaler</span>.<span class="fn">transform</span>(<span class="var">X_test</span>)       <span class="cmt"># Apply (don't fit) on test!</span></pre>
+    </div>
+
+    <div class="colab-box">
+      <div class="colab-header">
+        <div class="colab-icon">▶</div>
+        <div class="colab-title">Colab Experiment — Quantify Look-Ahead Bias</div>
+      </div>
+      <p><strong>Experiment L-1: See how much bias inflates performance</strong></p>
+      <p>Copy the bias demonstration code above into Colab. Then answer: How much does the biased version outperform the correct version? Try it with different assets (MSFT, TSLA, QQQ). Is the bias always in the same direction? What does that tell you?</p>
+      <p><strong>Experiment L-2: Survivorship Bias Demo</strong> — Download today's S&P 500 components and backtest on them, then compare with a fixed universe from 5 years ago. See the performance difference.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 4: TRANSACTION COSTS -->
+<div id="tab4" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Reality Check</div>
+    <h2>Transaction Cost Modeling: What Trades Actually Cost</h2>
+    <p>Even a perfect, bias-free backtest can mislead you if it ignores the real costs of trading. <strong>Transaction costs</strong> are the various "frictions" that eat into your returns every time you buy or sell. They seem small — but for an active strategy, they can turn a winning system into a losing one.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">🏠 Real Estate Analogy</div>
+      <p>Imagine buying and selling houses. Even if you perfectly time the market (buy low, sell high), you also pay: agent commission (2-3%), title fees, taxes, inspection costs, etc. After all these costs, many "profitable" house flips actually lose money. Trading has similar frictions. Ignoring them in your backtest is like doing your real estate math without any of those fees.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>The Four Components of Transaction Costs</h3>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Transaction Cost Anatomy — What Happens When You Place an Order</div>
+      <svg viewBox="0 0 720 260" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Order book visual -->
+        <!-- Bids -->
+        <rect x="30" y="40" width="150" height="180" rx="6" fill="#0f1528" stroke="#2a3a5c"/>
+        <text x="105" y="30" text-anchor="middle" fill="#7fff6b" font-size="11" font-weight="bold">BIDS (Buyers)</text>
+        <rect x="40" y="52" width="130" height="22" rx="3" fill="rgba(127,255,107,0.15)"/>
+        <text x="100" y="67" text-anchor="middle" fill="#7fff6b" font-size="11">$149.95 × 500</text>
+        <rect x="40" y="78" width="130" height="22" rx="3" fill="rgba(127,255,107,0.1)"/>
+        <text x="100" y="93" text-anchor="middle" fill="#7fff6b" font-size="11">$149.90 × 1200</text>
+        <rect x="40" y="104" width="130" height="22" rx="3" fill="rgba(127,255,107,0.07)"/>
+        <text x="100" y="119" text-anchor="middle" fill="#7fff6b" font-size="11">$149.85 × 800</text>
+        <rect x="40" y="130" width="130" height="22" rx="3" fill="rgba(127,255,107,0.04)"/>
+        <text x="100" y="145" text-anchor="middle" fill="#7fff6b" font-size="11">$149.80 × 2000</text>
+        <rect x="40" y="156" width="130" height="22" rx="3" fill="rgba(127,255,107,0.02)"/>
+        <text x="100" y="171" text-anchor="middle" fill="#7fff6b" font-size="11">$149.75 × 500</text>
+        <!-- Spread indicator -->
+        <rect x="200" y="75" width="120" height="110" rx="6" fill="rgba(255,187,53,0.05)" stroke="#ffbb35" stroke-dasharray="4,2"/>
+        <text x="260" y="100" text-anchor="middle" fill="#ffbb35" font-size="11" font-weight="bold">BID-ASK</text>
+        <text x="260" y="114" text-anchor="middle" fill="#ffbb35" font-size="11" font-weight="bold">SPREAD</text>
+        <text x="260" y="132" text-anchor="middle" fill="#ffbb35" font-size="11">$150.05 − $149.95</text>
+        <text x="260" y="146" text-anchor="middle" fill="#ffbb35" font-size="11">= $0.10 per share</text>
+        <text x="260" y="162" text-anchor="middle" fill="#ffbb35" font-size="10">You pay this to trade</text>
+        <text x="260" y="174" text-anchor="middle" fill="#ffbb35" font-size="10">immediately</text>
+        <!-- Asks -->
+        <rect x="340" y="40" width="150" height="180" rx="6" fill="#0f1528" stroke="#2a3a5c"/>
+        <text x="415" y="30" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">ASKS (Sellers)</text>
+        <rect x="350" y="52" width="130" height="22" rx="3" fill="rgba(255,107,53,0.15)"/>
+        <text x="415" y="67" text-anchor="middle" fill="#ff6b35" font-size="11">$150.05 × 300</text>
+        <rect x="350" y="78" width="130" height="22" rx="3" fill="rgba(255,107,53,0.1)"/>
+        <text x="415" y="93" text-anchor="middle" fill="#ff6b35" font-size="11">$150.10 × 900</text>
+        <rect x="350" y="104" width="130" height="22" rx="3" fill="rgba(255,107,53,0.07)"/>
+        <text x="415" y="119" text-anchor="middle" fill="#ff6b35" font-size="11">$150.20 × 1500</text>
+        <rect x="350" y="130" width="130" height="22" rx="3" fill="rgba(255,107,53,0.04)"/>
+        <text x="415" y="145" text-anchor="middle" fill="#ff6b35" font-size="11">$150.35 × 600</text>
+        <rect x="350" y="156" width="130" height="22" rx="3" fill="rgba(255,107,53,0.02)"/>
+        <text x="415" y="171" text-anchor="middle" fill="#ff6b35" font-size="11">$150.50 × 2200</text>
+        <!-- Market impact -->
+        <rect x="515" y="40" width="180" height="90" rx="6" fill="rgba(0,212,255,0.05)" stroke="#00d4ff"/>
+        <text x="605" y="60" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Market Impact</text>
+        <text x="605" y="76" text-anchor="middle" fill="#a8b8d0" font-size="10">Large orders eat through</text>
+        <text x="605" y="90" text-anchor="middle" fill="#a8b8d0" font-size="10">multiple price levels,</text>
+        <text x="605" y="104" text-anchor="middle" fill="#a8b8d0" font-size="10">getting worse fills</text>
+        <text x="605" y="118" text-anchor="middle" fill="#00d4ff" font-size="10">(slippage)</text>
+        <!-- Commission -->
+        <rect x="515" y="145" width="180" height="75" rx="6" fill="rgba(127,255,107,0.05)" stroke="#7fff6b"/>
+        <text x="605" y="163" text-anchor="middle" fill="#7fff6b" font-size="11" font-weight="bold">Commission</text>
+        <text x="605" y="179" text-anchor="middle" fill="#a8b8d0" font-size="10">Fixed fee per trade</text>
+        <text x="605" y="193" text-anchor="middle" fill="#a8b8d0" font-size="10">or % of trade value</text>
+        <text x="605" y="207" text-anchor="middle" fill="#7fff6b" font-size="10">e.g. $0 or 0.01-0.1%</text>
+      </svg>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <div class="card-title">Commission</div>
+        <div class="card-desc">A fee charged by your broker per trade. Most retail brokers now charge $0 (Robinhood, IBKR Lite). Institutional brokers charge 0.01-0.05 cents per share. Always matters in high-frequency strategies.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">↔️</div>
+        <div class="card-title">Bid-Ask Spread</div>
+        <div class="card-desc">The difference between the price you can buy at (ask) and sell at (bid). For liquid stocks like AAPL it's ~$0.01. For small-cap stocks it can be 1-5%. You pay this every time you enter AND exit a trade.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌊</div>
+        <div class="card-title">Slippage</div>
+        <div class="card-desc">The difference between the price when you decide to trade and the price you actually get. By the time your order reaches the market, prices may have moved. Worse in volatile, illiquid markets.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌍</div>
+        <div class="card-title">Market Impact</div>
+        <div class="card-desc">Large orders move the market against you. Buying 1 million shares of a stock pushes the price up as you buy. You pay more than the initial price. Relevant for institutional (large) traders.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Transaction Cost Models: Simple to Complex</h3>
+    <p>You can model costs at different levels of sophistication. Start simple, add complexity as needed:</p>
+
+    <h4>Model 1: Fixed Cost Per Trade (Simplest)</h4>
+    <div class="formula-box">
+      <div class="formula-label">Fixed Cost Model</div>
+      Net Return per trade = Gross Return − Cost_per_trade / Position_Value
+      <div class="formula-desc">Best for: simple strategies with infrequent trades. Use when broker charges $0 commission and spread is negligible (large-cap stocks).</div>
+    </div>
+
+    <h4>Model 2: Proportional Cost (Most Common)</h4>
+    <div class="formula-box">
+      <div class="formula-label">Proportional Cost Model</div>
+      Net Return = Gross Return − (spread/2 + commission) × 2 × turnover_rate
+      <div class="formula-desc">For each round trip (buy + sell), you pay spread/2 twice plus commission twice. If spread = 0.02% and commission = 0.01%, total round-trip cost = 0.06%.</div>
+    </div>
+
+    <h4>Model 3: Square-Root Market Impact (Advanced)</h4>
+    <div class="formula-box">
+      <div class="formula-label">Almgren-Chriss Market Impact</div>
+      Impact = σ × √(Q / V_daily) × sign(Q)
+      <div class="formula-desc">σ = daily volatility, Q = order size, V_daily = average daily volume. This captures that large orders have non-linear cost — twice the size costs more than twice as much.</div>
+    </div>
+
+    <div class="code-block">
+      <span class="lang-tag">PYTHON — TRANSACTION COST MODELS</span>
+      <pre><span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+
+<span class="kw">def</span> <span class="fn">apply_transaction_costs</span>(<span class="var">returns</span>, <span class="var">positions</span>,
+                             <span class="var">commission</span>=<span class="num">0.001</span>,   <span class="cmt"># 0.1% of trade value</span>
+                             <span class="var">spread</span>=<span class="num">0.0002</span>):    <span class="cmt"># 0.02% (2 bps) half-spread</span>
+    <span class="str">"""
+    Apply realistic transaction costs to backtest returns.
+    
+    Parameters:
+    -----------
+    returns   : pd.Series — daily gross returns
+    positions : pd.Series — daily position (1=long, 0=flat, -1=short)
+    commission: float     — commission as fraction of trade value
+    spread    : float     — half bid-ask spread as fraction
+    """</span>
+    <span class="cmt"># Detect trades: when position changes, a trade occurred</span>
+    <span class="var">trades</span> = <span class="var">positions</span>.<span class="fn">diff</span>().<span class="fn">abs</span>()  <span class="cmt"># Magnitude of position change</span>
+    
+    <span class="cmt"># Total cost per trade = commission + spread (paid on entry AND exit)</span>
+    <span class="var">total_cost_per_unit</span> = <span class="var">commission</span> + <span class="var">spread</span>
+    
+    <span class="cmt"># Cost = cost_per_unit × size of trade</span>
+    <span class="var">cost_series</span> = <span class="var">trades</span> * <span class="var">total_cost_per_unit</span>
+    
+    <span class="cmt"># Net return = gross return − cost</span>
+    <span class="var">net_returns</span> = <span class="var">returns</span> - <span class="var">cost_series</span>
+    
+    <span class="kw">return</span> <span class="var">net_returns</span>, <span class="var">cost_series</span>
+
+<span class="cmt"># Example usage with our MA crossover strategy from Tab 2:</span>
+<span class="var">gross_returns</span> = <span class="var">df</span>[<span class="str">'position'</span>] * <span class="var">df</span>[<span class="str">'market_return'</span>]
+<span class="var">net_returns</span>, <span class="var">costs</span> = <span class="fn">apply_transaction_costs</span>(
+    <span class="var">gross_returns</span>, <span class="var">df</span>[<span class="str">'position'</span>],
+    <span class="var">commission</span>=<span class="num">0.0</span>,    <span class="cmt"># Zero commission (retail broker)</span>
+    <span class="var">spread</span>=<span class="num">0.00005</span>    <span class="cmt"># 0.5 bps half-spread for liquid stock</span>
+)
+
+<span class="fn">print</span>(<span class="str">f"Total trades: {(df['position'].diff().abs() > 0).sum()}"</span>)
+<span class="fn">print</span>(<span class="str">f"Total cost drag: {costs.sum():.4%}"</span>)
+<span class="fn">print</span>(<span class="str">f"Gross Sharpe: {gross_returns.mean()/gross_returns.std()*252**0.5:.2f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Net Sharpe:   {net_returns.mean()/net_returns.std()*252**0.5:.2f}"</span>)</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Realistic Cost Benchmarks (2024)</h3>
+    <table class="styled-table">
+      <thead><tr><th>Asset / Broker Type</th><th>Commission</th><th>Bid-Ask Spread</th><th>Slippage</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>US Large-Cap (AAPL, SPY) — Retail</td><td>$0</td><td>0.01-0.05%</td><td>0-0.02%</td><td>Zero commission era since 2019</td></tr>
+        <tr><td>US Small-Cap — Retail</td><td>$0</td><td>0.1-1%</td><td>0.05-0.5%</td><td>Spread dominates; often not worth trading</td></tr>
+        <tr><td>Crypto (BTC, ETH) — Retail</td><td>0.05-0.5%</td><td>0.02-0.1%</td><td>0.05-0.2%</td><td>Varies greatly by exchange</td></tr>
+        <tr><td>US Equities — Institutional</td><td>0.001-0.005%</td><td>0.005-0.02%</td><td>0.01-0.05%</td><td>Professional infrastructure</td></tr>
+        <tr><td>Futures (ES, NQ) — Retail</td><td>$0.85-$2.50/contract</td><td>0.01%</td><td>0.01-0.05%</td><td>Very liquid; low spread</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warning">
+      <div class="callout-title">⚠️ The Turnover Problem</div>
+      <p>Suppose your strategy makes 1,000 trades per year. Even at a tiny 0.05% total cost per round-trip, your annual cost drag = 1,000 × 0.05% = <strong>50% per year</strong>. Your strategy needs to make >50% just to break even! This is why high-frequency strategies require either very low costs or very high edge per trade.</p>
+    </div>
+
+    <div class="colab-box">
+      <div class="colab-header">
+        <div class="colab-icon">▶</div>
+        <div class="colab-title">Colab Experiment — Cost Sensitivity Analysis</div>
+      </div>
+      <p><strong>Experiment C-1:</strong> Take the MA crossover strategy from Tab 2. Apply the <code>apply_transaction_costs</code> function above. Vary the cost from 0% to 0.5% per trade. Plot how the Sharpe ratio changes. Find the "break-even" cost where the strategy becomes unprofitable.</p>
+      <p><strong>Experiment C-2: Turnover Calculator</strong> — Count how many trades per year your strategy makes. Multiply by different cost assumptions. How does the most active strategy you can think of compare to the least active?</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 5: WALK-FORWARD ANALYSIS -->
+<div id="tab5" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Gold Standard Validation</div>
+    <h2>Walk-Forward Analysis: Truly Proving Your Strategy Works</h2>
+    <p><strong>Walk-Forward Analysis (WFA)</strong> is the most rigorous method to validate a trading strategy. It simulates how you would actually develop and deploy a strategy: train it on a window of past data, optimize parameters, then test on the immediately following out-of-sample period — then repeat, rolling forward through time.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">🎓 Exam Analogy</div>
+      <p>Imagine a student who studies for 3 months, then takes an exam on material they've never seen — and repeats this process 10 times. If they consistently score well on each unseen exam, we can be confident they actually understand the material — not just memorized one past paper. That's walk-forward analysis: repeatedly testing on unseen data windows.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>The Core Concept: Train-Test Windows Rolling Through Time</h3>
+    <div class="diagram-container">
+      <div class="diagram-title">Walk-Forward Analysis: Rolling Windows Explained</div>
+      <svg viewBox="0 0 720 310" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Full timeline -->
+        <text x="30" y="20" fill="#6a7d99" font-size="11">TOTAL AVAILABLE DATA (e.g. 5 years)</text>
+        <rect x="30" y="30" width="660" height="20" rx="3" fill="#1a2340" stroke="#2a3a5c"/>
+        <text x="360" y="45" text-anchor="middle" fill="#6a7d99" font-size="10">Jan 2018 ─────────────────────────── Dec 2022</text>
+
+        <!-- Window 1 -->
+        <text x="30" y="80" fill="#a8b8d0" font-size="11">Window 1:</text>
+        <rect x="30" y="88" width="330" height="28" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"/>
+        <text x="195" y="107" text-anchor="middle" fill="#00d4ff" font-size="11">TRAINING (In-Sample) — 18 months</text>
+        <rect x="362" y="88" width="110" height="28" rx="4" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="417" y="107" text-anchor="middle" fill="#7fff6b" font-size="11">TEST (OOS)</text>
+        <!-- Result -->
+        <text x="490" y="107" fill="#a8b8d0" font-size="10">→ Record OOS performance</text>
+
+        <!-- Window 2 -->
+        <text x="30" y="148" fill="#a8b8d0" font-size="11">Window 2:</text>
+        <rect x="80" y="156" width="330" height="28" rx="4" fill="rgba(0,212,255,0.12)" stroke="#00d4ff"/>
+        <text x="245" y="175" text-anchor="middle" fill="#00d4ff" font-size="11">TRAINING (In-Sample) — 18 months</text>
+        <rect x="412" y="156" width="110" height="28" rx="4" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="467" y="175" text-anchor="middle" fill="#7fff6b" font-size="11">TEST (OOS)</text>
+        <text x="540" y="175" fill="#a8b8d0" font-size="10">→ Record OOS performance</text>
+
+        <!-- Window 3 -->
+        <text x="30" y="216" fill="#a8b8d0" font-size="11">Window 3:</text>
+        <rect x="130" y="224" width="330" height="28" rx="4" fill="rgba(0,212,255,0.09)" stroke="#00d4ff"/>
+        <text x="295" y="243" text-anchor="middle" fill="#00d4ff" font-size="11">TRAINING (In-Sample) — 18 months</text>
+        <rect x="462" y="224" width="110" height="28" rx="4" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="517" y="243" text-anchor="middle" fill="#7fff6b" font-size="11">TEST (OOS)</text>
+
+        <!-- Combined OOS result -->
+        <text x="30" y="285" fill="#ffbb35" font-size="11" font-weight="bold">FINAL WFA RESULT</text>
+        <text x="30" y="300" fill="#a8b8d0" font-size="10">= Concatenate all OOS periods → True, unbiased performance estimate</text>
+
+        <!-- Dashed lines showing shift -->
+        <line x1="362" y1="120" x2="412" y2="156" stroke="#6a7d99" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="412" y1="188" x2="462" y2="224" stroke="#6a7d99" stroke-width="1" stroke-dasharray="3,2"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Anchored vs Rolling Walk-Forward</h3>
+    <p>There are two variations. The difference is whether the training window grows or stays fixed as you move forward:</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Anchored vs Rolling Training Windows</div>
+      <svg viewBox="0 0 720 220" width="100%" style="max-width:720px; display:block; margin:0 auto;">
+        <!-- Anchored -->
+        <text x="30" y="20" fill="#ffbb35" font-size="12" font-weight="bold">ANCHORED (Expanding Window)</text>
+        <rect x="30" y="30" width="200" height="22" rx="3" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"/>
+        <rect x="232" y="30" width="60" height="22" rx="3" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="312" y="45" fill="#a8b8d0" font-size="10">2 years train, test Q1</text>
+
+        <rect x="30" y="60" width="260" height="22" rx="3" fill="rgba(0,212,255,0.12)" stroke="#00d4ff"/>
+        <rect x="292" y="60" width="60" height="22" rx="3" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="372" y="75" fill="#a8b8d0" font-size="10">2.25 years train, test Q2</text>
+
+        <rect x="30" y="90" width="320" height="22" rx="3" fill="rgba(0,212,255,0.09)" stroke="#00d4ff"/>
+        <rect x="352" y="90" width="60" height="22" rx="3" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+        <text x="432" y="105" fill="#a8b8d0" font-size="10">2.5 years train, test Q3</text>
+
+        <text x="30" y="130" fill="#6a7d99" font-size="10">✅ More data over time | ⚠️ Old data may dilute recent patterns</text>
+
+        <!-- Divider -->
+        <line x1="30" y1="140" x2="690" y2="140" stroke="#2a3a5c" stroke-width="0.5"/>
+
+        <!-- Rolling -->
+        <text x="30" y="160" fill="#00d4ff" font-size="12" font-weight="bold">ROLLING (Fixed Window)</text>
+        <rect x="30" y="170" width="200" height="22" rx="3" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"/>
+        <rect x="232" y="170" width="60" height="22" rx="3" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+
+        <rect x="80" y="197" width="200" height="22" rx="3" fill="rgba(0,212,255,0.12)" stroke="#00d4ff"/>
+        <rect x="282" y="197" width="60" height="22" rx="3" fill="rgba(127,255,107,0.2)" stroke="#7fff6b"/>
+
+        <text x="390" y="183" fill="#6a7d99" font-size="10">Fixed 2-year training window</text>
+        <text x="390" y="210" fill="#6a7d99" font-size="10">slides forward by 3 months</text>
+        <text x="390" y="218" fill="#6a7d99" font-size="10">✅ Always uses same data amount | ⚠️ Discards oldest data</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Full Walk-Forward Implementation</h3>
+    <div class="code-block">
+      <span class="lang-tag">PYTHON — COMPLETE WFA IMPLEMENTATION</span>
+      <pre><span class="kw">import</span> <span class="var">yfinance</span> <span class="kw">as</span> <span class="var">yf</span>
+<span class="kw">import</span> <span class="var">pandas</span> <span class="kw">as</span> <span class="var">pd</span>
+<span class="kw">import</span> <span class="var">numpy</span> <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> <span class="var">matplotlib.pyplot</span> <span class="kw">as</span> <span class="var">plt</span>
+<span class="kw">from</span> <span class="var">itertools</span> <span class="kw">import</span> <span class="var">product</span>
+
+<span class="cmt"># ── LOAD DATA ──────────────────────────────────────────────────</span>
+<span class="var">df</span> = <span class="var">yf</span>.<span class="fn">download</span>(<span class="str">'SPY'</span>, <span class="var">start</span>=<span class="str">'2015-01-01'</span>, <span class="var">end</span>=<span class="str">'2023-12-31'</span>)
+<span class="var">df</span>[<span class="str">'return'</span>] = <span class="var">df</span>[<span class="str">'Close'</span>].<span class="fn">pct_change</span>()
+<span class="var">df</span> = <span class="var">df</span>.<span class="fn">dropna</span>()
+
+<span class="kw">def</span> <span class="fn">run_strategy</span>(<span class="var">data</span>, <span class="var">fast</span>, <span class="var">slow</span>):
+    <span class="str">"""Compute MA crossover strategy returns for given parameters."""</span>
+    <span class="var">ma_fast</span> = <span class="var">data</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="var">fast</span>).<span class="fn">mean</span>()
+    <span class="var">ma_slow</span> = <span class="var">data</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="var">slow</span>).<span class="fn">mean</span>()
+    <span class="var">signal</span>  = (<span class="var">ma_fast</span> > <span class="var">ma_slow</span>).<span class="fn">astype</span>(<span class="var">float</span>).<span class="fn">shift</span>(<span class="num">1</span>)  <span class="cmt"># No look-ahead!</span>
+    <span class="var">ret</span> = <span class="var">signal</span> * <span class="var">data</span>[<span class="str">'return'</span>]
+    <span class="kw">return</span> <span class="var">ret</span>.<span class="fn">mean</span>() / <span class="var">ret</span>.<span class="fn">std</span>() * <span class="num">252</span>**<span class="num">0.5</span>  <span class="cmt"># Sharpe</span>
+
+<span class="kw">def</span> <span class="fn">optimize_params</span>(<span class="var">train_data</span>):
+    <span class="str">"""Grid search for best MA parameters on training set."""</span>
+    <span class="var">fast_range</span> = [<span class="num">5</span>, <span class="num">10</span>, <span class="num">15</span>, <span class="num">20</span>]
+    <span class="var">slow_range</span> = [<span class="num">30</span>, <span class="num">40</span>, <span class="num">50</span>, <span class="num">60</span>, <span class="num">80</span>]
+    <span class="var">best_sharpe</span> = -<span class="var">np</span>.<span class="var">inf</span>
+    <span class="var">best_params</span> = (<span class="num">10</span>, <span class="num">50</span>)
+    <span class="kw">for</span> <span class="var">fast</span>, <span class="var">slow</span> <span class="kw">in</span> <span class="fn">product</span>(<span class="var">fast_range</span>, <span class="var">slow_range</span>):
+        <span class="var">sharpe</span> = <span class="fn">run_strategy</span>(<span class="var">train_data</span>, <span class="var">fast</span>, <span class="var">slow</span>)
+        <span class="kw">if</span> <span class="var">sharpe</span> > <span class="var">best_sharpe</span>:
+            <span class="var">best_sharpe</span>, <span class="var">best_params</span> = <span class="var">sharpe</span>, (<span class="var">fast</span>, <span class="var">slow</span>)
+    <span class="kw">return</span> <span class="var">best_params</span>
+
+<span class="cmt"># ── WALK-FORWARD ANALYSIS ──────────────────────────────────────</span>
+<span class="var">TRAIN_MONTHS</span> = <span class="num">18</span>   <span class="cmt"># 18 months training</span>
+<span class="var">TEST_MONTHS</span>  = <span class="num">3</span>    <span class="cmt"># 3 months testing (OOS)</span>
+<span class="var">STEP_MONTHS</span>  = <span class="num">3</span>    <span class="cmt"># Step forward 3 months each iteration</span>
+
+<span class="var">oos_results</span> = []   <span class="cmt"># Out-of-sample returns</span>
+<span class="var">windows</span>     = []   <span class="cmt"># Track each window's metadata</span>
+
+<span class="cmt"># Convert months to trading days (approx 21 days/month)</span>
+<span class="var">TRAIN_DAYS</span> = <span class="var">TRAIN_MONTHS</span> * <span class="num">21</span>
+<span class="var">TEST_DAYS</span>  = <span class="var">TEST_MONTHS</span>  * <span class="num">21</span>
+<span class="var">STEP_DAYS</span>  = <span class="var">STEP_MONTHS</span>  * <span class="num">21</span>
+
+<span class="var">start</span> = <span class="num">0</span>
+<span class="kw">while</span> <span class="var">start</span> + <span class="var">TRAIN_DAYS</span> + <span class="var">TEST_DAYS</span> <= <span class="fn">len</span>(<span class="var">df</span>):
+    <span class="cmt"># Slice train and test windows</span>
+    <span class="var">train</span> = <span class="var">df</span>.<span class="fn">iloc</span>[<span class="var">start</span> : <span class="var">start</span> + <span class="var">TRAIN_DAYS</span>]
+    <span class="var">test</span>  = <span class="var">df</span>.<span class="fn">iloc</span>[<span class="var">start</span> + <span class="var">TRAIN_DAYS</span> : <span class="var">start</span> + <span class="var">TRAIN_DAYS</span> + <span class="var">TEST_DAYS</span>]
+    
+    <span class="cmt"># Optimize on training data ONLY</span>
+    <span class="var">best_fast</span>, <span class="var">best_slow</span> = <span class="fn">optimize_params</span>(<span class="var">train</span>)
+    
+    <span class="cmt"># Evaluate on test data using those optimized params</span>
+    <span class="var">ma_fast</span> = <span class="var">test</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="var">best_fast</span>).<span class="fn">mean</span>()
+    <span class="var">ma_slow</span> = <span class="var">test</span>[<span class="str">'Close'</span>].<span class="fn">rolling</span>(<span class="var">best_slow</span>).<span class="fn">mean</span>()
+    <span class="var">signal</span>  = (<span class="var">ma_fast</span> > <span class="var">ma_slow</span>).<span class="fn">astype</span>(<span class="var">float</span>).<span class="fn">shift</span>(<span class="num">1</span>)
+    <span class="var">oos_ret</span> = <span class="var">signal</span> * <span class="var">test</span>[<span class="str">'return'</span>]
+    
+    <span class="var">oos_results</span>.<span class="fn">append</span>(<span class="var">oos_ret</span>)
+    <span class="var">windows</span>.<span class="fn">append</span>({
+        <span class="str">'start'</span>: <span class="var">train</span>.<span class="var">index</span>[<span class="num">0</span>], <span class="str">'end'</span>: <span class="var">test</span>.<span class="var">index</span>[-<span class="num">1</span>],
+        <span class="str">'best_fast'</span>: <span class="var">best_fast</span>, <span class="str">'best_slow'</span>: <span class="var">best_slow</span>
+    })
+    <span class="var">start</span> += <span class="var">STEP_DAYS</span>
+
+<span class="cmt"># ── COMBINE ALL OOS RESULTS ────────────────────────────────────</span>
+<span class="var">all_oos</span> = <span class="var">pd</span>.<span class="fn">concat</span>(<span class="var">oos_results</span>)
+<span class="var">oos_sharpe</span> = <span class="var">all_oos</span>.<span class="fn">mean</span>() / <span class="var">all_oos</span>.<span class="fn">std</span>() * <span class="num">252</span>**<span class="num">0.5</span>
+<span class="fn">print</span>(<span class="str">f"WFA Out-of-Sample Sharpe: {oos_sharpe:.2f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Number of windows tested: {len(oos_results)}"</span>)
+
+<span class="cmt"># Plot OOS equity curve</span>
+(<span class="num">1</span> + <span class="var">all_oos</span>).<span class="fn">cumprod</span>().<span class="fn">plot</span>(<span class="var">title</span>=<span class="str">'Walk-Forward Out-of-Sample Equity Curve'</span>)
+<span class="var">plt</span>.<span class="fn">show</span>()</pre>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Interpreting Walk-Forward Results</h3>
+    <p>After running your WFA, you need to interpret what the results mean. Look for these signals:</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <div class="card-title">WFA Efficiency Ratio</div>
+        <div class="card-desc">OOS Sharpe / IS Sharpe. A ratio > 0.5 is generally good. Means your OOS performance is at least half of your in-sample performance. Values near 1.0 indicate minimal overfitting.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📉</div>
+        <div class="card-title">Parameter Stability</div>
+        <div class="card-desc">Do the optimal parameters change wildly from window to window? If so, the strategy is too sensitive to the specific training period (overfitting). Stable parameters across windows = robust strategy.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Consistency</div>
+        <div class="card-desc">Is OOS performance positive across MOST windows, or just some? A strategy that wins 7 out of 10 windows is more trustworthy than one that wins 1 window by a huge amount.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌡️</div>
+        <div class="card-title">Regime Sensitivity</div>
+        <div class="card-desc">Does the strategy fail in specific market regimes (e.g., 2020 COVID crash, 2022 bear market)? This is important information — it tells you when to stop trading the strategy.</div>
+      </div>
+    </div>
+
+    <div class="formula-box">
+      <div class="formula-label">WFA Efficiency Ratio (Key Metric)</div>
+      WFA Efficiency = OOS_Sharpe / IS_Sharpe × 100%
+      <div class="formula-desc">Example: IS Sharpe = 2.0, OOS Sharpe = 0.8 → Efficiency = 40%. This means 40% of in-sample performance persists out-of-sample. Values below 25% suggest severe overfitting. Values above 75% suggest a genuinely robust strategy.</div>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-title">✅ Walk-Forward vs Simple Train-Test Split</div>
+      <p>A simple train-test split (80% train, 20% test) only gives you ONE test period. That test period might happen to be unusual (e.g., just a bull market). Walk-forward analysis gives you MANY test periods across different market regimes — giving you much higher confidence in your results. This is why it's the industry gold standard.</p>
+    </div>
+
+    <div class="colab-box">
+      <div class="colab-header">
+        <div class="colab-icon">▶</div>
+        <div class="colab-title">Colab Experiment — Walk-Forward Analysis</div>
+      </div>
+      <p><strong>Experiment W-1: Run the full WFA code above.</strong> Experiment with different training/testing window sizes. How does the WFA Efficiency Ratio change? Try 12-month training with 1-month test vs 24-month training with 6-month test.</p>
+      <p><strong>Experiment W-2: Parameter Stability Chart.</strong> After running WFA, plot the optimal fast/slow MA parameters for each window. Are they stable? What does instability tell you?</p>
+      <p><strong>Experiment W-3: Anchored vs Rolling.</strong> Modify the code to use an anchored (expanding) window instead of rolling. Compare the final OOS Sharpe ratios. Which performs better on SPY?</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 6: INTERACTIVE LABS -->
+<div id="tab6" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Hands-On</div>
+    <h2>Interactive Labs & Simulations</h2>
+    <p>Experiment with the concepts directly in your browser. These simulations run live — adjust the parameters and see the results update instantly.</p>
+  </div>
+
+  <div class="section">
+    <h3>Lab 1: Backtest Performance Simulator</h3>
+    <p>Simulate a simple MA crossover strategy and see how costs affect performance.</p>
+    <div class="demo-container">
+      <div class="demo-title">📊 Backtest Simulator</div>
+      <div class="demo-controls">
+        <label>Fast MA: <span id="fastVal">10</span></label>
+        <input type="range" id="fastMA" min="3" max="30" value="10" oninput="updateSim()">
+        <label>Slow MA: <span id="slowVal">50</span></label>
+        <input type="range" id="slowMA" min="20" max="100" value="50" oninput="updateSim()">
+        <label>Cost/trade (%): <span id="costVal">0.10</span></label>
+        <input type="range" id="costSlider" min="0" max="100" value="10" oninput="updateSim()">
+        <button class="demo-btn primary" onclick="regeneratePrices()">🎲 New Market</button>
+      </div>
+      <canvas id="simCanvas" height="200"></canvas>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-label">STRATEGY RETURN</div><div class="stat-val blue" id="stratRet">—</div></div>
+        <div class="stat-item"><div class="stat-label">BUY & HOLD</div><div class="stat-val" id="bHoldRet">—</div></div>
+        <div class="stat-item"><div class="stat-label">SHARPE RATIO</div><div class="stat-val blue" id="sharpeVal">—</div></div>
+        <div class="stat-item"><div class="stat-label">TOTAL TRADES</div><div class="stat-val" id="tradeCount">—</div></div>
+        <div class="stat-item"><div class="stat-label">COST DRAG</div><div class="stat-val red" id="costDrag">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Lab 2: Look-Ahead Bias Detector</h3>
+    <p>See the direct impact of look-ahead bias on the same strategy.</p>
+    <div class="demo-container">
+      <div class="demo-title">🕵️ Look-Ahead Bias Detector</div>
+      <div class="demo-controls">
+        <button class="demo-btn" id="biasToggle" onclick="toggleBias()">Toggle Bias ON/OFF</button>
+        <span id="biasStatus" style="color:var(--accent3); font-family:var(--mono); font-size:13px;">Bias: OFF (correct)</span>
+      </div>
+      <canvas id="biasCanvas" height="180"></canvas>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-label">BIASED RETURN</div><div class="stat-val red" id="biasedRet">—</div></div>
+        <div class="stat-item"><div class="stat-label">UNBIASED RETURN</div><div class="stat-val green" id="unbiasedRet">—</div></div>
+        <div class="stat-item"><div class="stat-label">INFLATION (FAKE ALPHA)</div><div class="stat-val red" id="inflationVal">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Lab 3: Walk-Forward Windows Visualizer</h3>
+    <p>See how walk-forward windows slice through your data.</p>
+    <div class="demo-container">
+      <div class="demo-title">🚶 Walk-Forward Window Visualizer</div>
+      <div class="demo-controls">
+        <label>Training months: <span id="trainMonthsVal">18</span></label>
+        <input type="range" id="trainMonths" min="6" max="36" value="18" oninput="updateWFA()">
+        <label>Test months: <span id="testMonthsVal">3</span></label>
+        <input type="range" id="testMonths" min="1" max="12" value="3" oninput="updateWFA()">
+        <select id="wfaType" onchange="updateWFA()">
+          <option value="rolling">Rolling Window</option>
+          <option value="anchored">Anchored Window</option>
+        </select>
+      </div>
+      <canvas id="wfaCanvas" height="180"></canvas>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-label">NUMBER OF WINDOWS</div><div class="stat-val blue" id="numWindows">—</div></div>
+        <div class="stat-item"><div class="stat-label">TOTAL OOS COVERAGE</div><div class="stat-val green" id="oosCoverage">—</div></div>
+        <div class="stat-item"><div class="stat-label">DATA USED FOR TEST</div><div class="stat-val" id="testPct">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 7: EXERCISES -->
+<div id="tab7" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Practice Problems</div>
+    <h2>Exercises: 3 Tiers of Difficulty</h2>
+    <p>Work through these exercises in order. Each builds on the previous. Do them in Google Colab. The goal is not just to get the answer, but to understand <em>why</em> the answer is what it is.</p>
+  </div>
+
+  <hr class="divider">
+  <h3>🟢 Prerequisites Exercises</h3>
+
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header"><span class="tier-badge">EASY</span><span class="tier-title">P-E1: Load & Describe Data</span></div>
+    <ul class="exercise-list">
+      <li>Download 3 years of daily OHLCV data for any stock using <code>yfinance</code>.</li>
+      <li>Calculate and print: mean daily return, standard deviation, max single-day gain, max single-day loss.</li>
+      <li>Plot the closing price and cumulative return on the same chart (two y-axes).</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header"><span class="tier-badge">MEDIUM</span><span class="tier-title">P-M1: Build a Return Dashboard</span></div>
+    <ul class="exercise-list">
+      <li>Download 5 stocks: AAPL, MSFT, GOOGL, TSLA, SPY. Compute daily returns for each.</li>
+      <li>Compute the Sharpe ratio (annualized, risk-free = 5%) for each stock individually.</li>
+      <li>Build a correlation matrix between all 5 return series and visualize it as a heatmap using seaborn.</li>
+      <li>Which pair of stocks is most correlated? What does that mean for diversification?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header"><span class="tier-badge">HARD</span><span class="tier-title">P-H1: Rolling Statistics Explorer</span></div>
+    <ul class="exercise-list">
+      <li>For SPY (2015-2023), compute rolling 252-day (1-year) Sharpe ratio at each point in time. Plot it.</li>
+      <li>Compute rolling 90-day max drawdown and plot it. When was the worst drawdown period?</li>
+      <li>Identify the 5 calendar periods where rolling Sharpe was negative for more than 60 consecutive days. What market events coincide with these periods?</li>
+      <li>Build a function <code>performance_report(returns)</code> that takes a return series and prints a full formatted report (total return, CAGR, Sharpe, max drawdown, win rate, best/worst month).</li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+  <h3>📈 Backtesting Basics Exercises</h3>
+
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header"><span class="tier-badge">EASY</span><span class="tier-title">B-E1: First Backtest</span></div>
+    <ul class="exercise-list">
+      <li>Implement the MA(10, 50) crossover strategy from Tab 2 on MSFT (2018-2023).</li>
+      <li>Print: total return, number of trades, win rate of individual trades, Sharpe ratio.</li>
+      <li>Plot the strategy's cumulative return against buy-and-hold.</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header"><span class="tier-badge">MEDIUM</span><span class="tier-title">B-M1: Parameter Grid Search</span></div>
+    <ul class="exercise-list">
+      <li>Test all combinations of fast MA in [5, 10, 15, 20, 25] and slow MA in [30, 50, 70, 100, 150] on AAPL (2015-2022).</li>
+      <li>Create a heatmap of Sharpe ratios for each parameter combination.</li>
+      <li>What is the best performing combination? Now test that combination on 2022-2023 data (out-of-sample). Does it still perform well? Why or why not?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header"><span class="tier-badge">HARD</span><span class="tier-title">B-H1: Multi-Strategy Backtester</span></div>
+    <ul class="exercise-list">
+      <li>Implement 3 strategies: MA crossover, RSI mean-reversion (buy when RSI &lt; 30, sell when RSI &gt; 70), and momentum (buy top 20% of 3-month returns, sell bottom 20%).</li>
+      <li>Run all 3 on SPY (2010-2023). Compare their Sharpe ratios, max drawdowns, and correlation of daily returns.</li>
+      <li>Build a simple equal-weight portfolio combining all 3 strategies. Does diversifying across strategies improve the Sharpe ratio?</li>
+      <li>Implement a drawdown-based stop: halt each strategy if it experiences a 10% drawdown within any 90-day period. Re-enable it after 30 days. How does this affect overall performance?</li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+  <h3>🕵️ Look-Ahead Bias Exercises</h3>
+
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header"><span class="tier-badge">EASY</span><span class="tier-title">L-E1: Bias Quantification</span></div>
+    <ul class="exercise-list">
+      <li>Take any strategy. Run it TWICE — once with the <code>.shift(1)</code> (correct) and once without (biased).</li>
+      <li>What is the difference in total return? Difference in Sharpe ratio?</li>
+      <li>Repeat for 5 different assets. Does the bias always inflate performance in the same direction?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header"><span class="tier-badge">MEDIUM</span><span class="tier-title">L-M1: ML Pipeline Bias</span></div>
+    <ul class="exercise-list">
+      <li>Create a feature matrix of 20 technical indicators for SPY. Build a simple logistic regression to predict "up day" or "down day".</li>
+      <li>Train with the <em>wrong</em> way (normalize all data, then split). Record test accuracy.</li>
+      <li>Train with the <em>correct</em> way (split first, normalize only on train). Record test accuracy.</li>
+      <li>What is the accuracy inflation from the biased approach? Is the correct model actually predictive?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header"><span class="tier-badge">HARD</span><span class="tier-title">L-H1: Survivorship Bias Study</span></div>
+    <ul class="exercise-list">
+      <li>Download the current S&P 500 components. Backtest a simple momentum strategy (monthly rebalance, buy top 20 performers over past 12 months) from 2015-2023 using CURRENT components.</li>
+      <li>Now try to estimate the survivorship bias: randomly drop 10% of stocks from your universe to simulate companies that may have been delisted. Re-run the backtest 100 times with different random drops (Monte Carlo).</li>
+      <li>Plot the distribution of outcomes. How much does your reported performance likely overstate real performance?</li>
+      <li>Write a 1-page analysis explaining why survivorship bias is so hard to fully eliminate in retail backtesting.</li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+  <h3>💸 Transaction Cost Exercises</h3>
+
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header"><span class="tier-badge">EASY</span><span class="tier-title">C-E1: Apply Costs to a Strategy</span></div>
+    <ul class="exercise-list">
+      <li>Take your MA crossover strategy. Apply transaction costs of 0.05% per trade (realistic for retail).</li>
+      <li>How does the net Sharpe change? What if costs were 0.1%? 0.5%?</li>
+      <li>Find the "break-even" cost where the strategy's Sharpe becomes 0 (unprofitable).</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header"><span class="tier-badge">MEDIUM</span><span class="tier-title">C-M1: Cost Sensitivity Surface</span></div>
+    <ul class="exercise-list">
+      <li>For a momentum strategy that trades monthly vs weekly vs daily, compute net Sharpe as a function of cost level (0% to 1%).</li>
+      <li>Plot all three lines on the same chart. At what cost level does each frequency become unprofitable?</li>
+      <li>Which strategy is most "cost robust"? Why does trading frequency interact with costs so dramatically?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header"><span class="tier-badge">HARD</span><span class="tier-title">C-H1: Realistic Cost Model</span></div>
+    <ul class="exercise-list">
+      <li>Implement a full transaction cost model that includes: (a) a fixed commission of $1 per trade, (b) a proportional spread cost of 0.02%, (c) a slippage model that scales with volatility (higher volatility = more slippage).</li>
+      <li>For the slippage, use: slippage = 0.1 × daily_volatility × sign(trade). Apply it to several strategies.</li>
+      <li>Build a function that, given a strategy's return series, estimates the "maximum viable cost" — the highest cost level at which the strategy remains profitable (Sharpe > 0.5).</li>
+      <li>Run this analysis across 10 different strategies with varying frequencies. Create a scatter plot of "trade frequency vs maximum viable cost".</li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+  <h3>🚶 Walk-Forward Analysis Exercises</h3>
+
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header"><span class="tier-badge">EASY</span><span class="tier-title">W-E1: First Walk-Forward</span></div>
+    <ul class="exercise-list">
+      <li>Run the WFA code from Tab 5 on SPY. Reproduce the equity curve.</li>
+      <li>Count how many windows had positive OOS performance vs negative. What % were positive?</li>
+      <li>Compute the WFA Efficiency Ratio (OOS Sharpe / best IS Sharpe from any window).</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header"><span class="tier-badge">MEDIUM</span><span class="tier-title">W-M1: Window Size Sensitivity</span></div>
+    <ul class="exercise-list">
+      <li>Run WFA with training windows of 6, 12, 18, 24, and 36 months. For each, record the OOS Sharpe.</li>
+      <li>Plot OOS Sharpe vs training window size. Is there an optimal training window?</li>
+      <li>Repeat for 3 different assets (e.g., SPY, GLD, TLT). Does the optimal window size differ by asset?</li>
+    </ul>
+  </div>
+
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header"><span class="tier-badge">HARD</span><span class="tier-title">W-H1: Full WFA Framework</span></div>
+    <ul class="exercise-list">
+      <li>Build a complete WFA framework that: (a) optimizes over multiple strategy types (MA crossover, RSI, momentum), (b) picks the best strategy for each training window, (c) applies transaction costs to OOS results.</li>
+      <li>Implement a "regime filter": add a feature that detects whether the market is trending or range-bound (e.g., using ADX), and only trade the strategy appropriate for each regime.</li>
+      <li>Compare this regime-aware WFA to a naive (no regime filter) WFA. Does regime awareness improve OOS Sharpe?</li>
+      <li>Implement the "combinatorial purged cross-validation" (CPCV) concept — split the data into 5 non-overlapping blocks, train on all combinations of 4 blocks, test on the 5th. Average across all combinations. Compare to standard WFA.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 8: RESOURCES -->
+<div id="tab8" class="tab-panel">
+  <div class="section">
+    <div class="section-label">Further Learning</div>
+    <h2>External Resources & References</h2>
+    <p>These are carefully curated resources to deepen your knowledge. Start with the free ones, then invest in the books when you're ready to go deeper.</p>
+  </div>
+
+  <div class="section">
+    <h3>📚 Books (Essential Reading)</h3>
+    <div class="resource-grid">
+      <a href="https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089" target="_blank" class="resource-card">
+        <div class="resource-type">BOOK · ADVANCED</div>
+        <div class="resource-name">Advances in Financial Machine Learning</div>
+        <div class="resource-desc">Marcos Lopez de Prado. The bible for ML-based quant strategies. Contains rigorous treatment of backtesting pitfalls including CPCV. Required reading for serious quants.</div>
+      </a>
+      <a href="https://www.amazon.com/Algorithmic-Trading-Winning-Strategies-Rationale/dp/1118460146" target="_blank" class="resource-card">
+        <div class="resource-type">BOOK · BEGINNER-FRIENDLY</div>
+        <div class="resource-name">Algorithmic Trading</div>
+        <div class="resource-desc">Ernest Chan. Practical, Python-friendly introduction to backtesting. Covers mean reversion, momentum strategies, and basic risk management. Great starting point.</div>
+      </a>
+      <a href="https://www.amazon.com/Quantitative-Trading-Build-Algorithmic-Business/dp/0470284889" target="_blank" class="resource-card">
+        <div class="resource-type">BOOK · BEGINNER</div>
+        <div class="resource-name">Quantitative Trading</div>
+        <div class="resource-desc">Ernest Chan. His first book — even more beginner-friendly. Excellent chapter on avoiding common backtesting errors. Start here before "Algorithmic Trading".</div>
+      </a>
+      <a href="https://www.amazon.com/Evidence-Based-Technical-Analysis-Scientific-Statistical/dp/0470008741" target="_blank" class="resource-card">
+        <div class="resource-type">BOOK · INTERMEDIATE</div>
+        <div class="resource-name">Evidence-Based Technical Analysis</div>
+        <div class="resource-desc">David Aronson. Rigorous statistical approach to testing trading rules. Excellent coverage of data snooping bias and proper hypothesis testing for strategies.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🌐 Online Courses & Platforms</h3>
+    <div class="resource-grid">
+      <a href="https://www.quantconnect.com/learning" target="_blank" class="resource-card">
+        <div class="resource-type">PLATFORM · FREE</div>
+        <div class="resource-name">QuantConnect Learn</div>
+        <div class="resource-desc">The best free platform for learning algorithmic trading. Cloud-based backtesting with Python/C#. Has structured courses and thousands of example strategies.</div>
+      </a>
+      <a href="https://quantlib.org/" target="_blank" class="resource-card">
+        <div class="resource-type">LIBRARY · FREE · ADVANCED</div>
+        <div class="resource-name">QuantLib</div>
+        <div class="resource-desc">Industry-standard library for quantitative finance. Used at major banks. Overkill for beginners but good to know about for derivatives pricing and advanced risk models.</div>
+      </a>
+      <a href="https://zipline.io/" target="_blank" class="resource-card">
+        <div class="resource-type">LIBRARY · FREE</div>
+        <div class="resource-name">Zipline (Quantopian)</div>
+        <div class="resource-desc">Python backtesting library originally from Quantopian. Event-driven architecture prevents look-ahead bias by design. Good for learning correct backtesting structure.</div>
+      </a>
+      <a href="https://backtrader.com/" target="_blank" class="resource-card">
+        <div class="resource-type">LIBRARY · FREE</div>
+        <div class="resource-name">Backtrader</div>
+        <div class="resource-desc">Popular Python backtesting framework with excellent documentation. More accessible than Zipline. Good for learning event-driven backtesting concepts.</div>
+      </a>
+      <a href="https://www.vectorbt.pro/" target="_blank" class="resource-card">
+        <div class="resource-type">LIBRARY · FREE TIER</div>
+        <div class="resource-name">VectorBT</div>
+        <div class="resource-desc">Ultra-fast vectorized backtesting in Python using NumPy. Great for parameter optimization over thousands of combinations. Used by researchers for walk-forward analysis at scale.</div>
+      </a>
+      <a href="https://www.coursera.org/specializations/machine-learning-trading" target="_blank" class="resource-card">
+        <div class="resource-type">COURSE · PAID</div>
+        <div class="resource-name">ML for Trading (Coursera)</div>
+        <div class="resource-desc">Georgia Tech's course on ML for trading. Covers feature engineering, backtesting methodology, and basic ML models for finance. Available on Coursera with audit option.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>📄 Academic Papers (Free)</h3>
+    <div class="resource-grid">
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2308659" target="_blank" class="resource-card">
+        <div class="resource-type">PAPER · FOUNDATIONAL</div>
+        <div class="resource-name">"The Backtest Overfitting Problem" — Bailey et al.</div>
+        <div class="resource-desc">Seminal paper introducing the Probability of Backtest Overfitting (PBO) metric. Free on SSRN. Explains mathematically how multiple testing leads to false discoveries in backtesting.</div>
+      </a>
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3257497" target="_blank" class="resource-card">
+        <div class="resource-type">PAPER · ADVANCED</div>
+        <div class="resource-name">"Combinatorial Purged CV" — Lopez de Prado</div>
+        <div class="resource-desc">Introduces CPCV as an improvement over standard walk-forward analysis. Advanced but important for understanding the state-of-the-art in backtesting validation. Free on SSRN.</div>
+      </a>
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2534636" target="_blank" class="resource-card">
+        <div class="resource-type">PAPER · INTERMEDIATE</div>
+        <div class="resource-name">"Pseudo-Mathematics and Financial Charlatanism"</div>
+        <div class="resource-desc">Lopez de Prado. Accessible paper on how data snooping creates the illusion of profitable strategies. Essential reading to understand why most published strategies don't work.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🎥 YouTube Channels & Videos</h3>
+    <div class="resource-grid">
+      <a href="https://www.youtube.com/@QuantPy" target="_blank" class="resource-card">
+        <div class="resource-type">YOUTUBE · FREE</div>
+        <div class="resource-name">QuantPy Channel</div>
+        <div class="resource-desc">Python-focused quantitative finance tutorials. Great videos on backtesting frameworks, portfolio construction, and risk metrics. Beginner-friendly with code walkthroughs.</div>
+      </a>
+      <a href="https://www.youtube.com/c/RobertMarto" target="_blank" class="resource-card">
+        <div class="resource-type">YOUTUBE · FREE</div>
+        <div class="resource-name">Robert Marto — Algorithmic Trading</div>
+        <div class="resource-desc">Practical algorithmic trading tutorials with Python. Covers backtesting frameworks, QuantConnect tutorials, and real strategy implementations step by step.</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=ARrNEP4lFiQ" target="_blank" class="resource-card">
+        <div class="resource-type">VIDEO · LECTURE</div>
+        <div class="resource-name">Marcos Lopez de Prado — Financial ML</div>
+        <div class="resource-desc">Free lecture by the leading expert on ML in finance. Covers backtesting pitfalls, correct validation methodology, and the problems with classical backtesting approaches.</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>🔧 Data Sources for Your Projects</h3>
+    <table class="styled-table">
+      <thead><tr><th>Source</th><th>Data Type</th><th>Cost</th><th>Python Access</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Yahoo Finance (yfinance)</strong></td><td>Daily OHLCV, dividends, splits</td><td>Free</td><td><code>pip install yfinance</code></td></tr>
+        <tr><td><strong>Alpha Vantage</strong></td><td>Intraday, fundamentals, forex</td><td>Free tier (5 calls/min)</td><td><code>pip install alpha_vantage</code></td></tr>
+        <tr><td><strong>Quandl/Nasdaq Data Link</strong></td><td>Futures, alternatives, macro</td><td>Free + paid tiers</td><td><code>pip install nasdaqdatalink</code></td></tr>
+        <tr><td><strong>FRED (Federal Reserve)</strong></td><td>Macro economic data</td><td>Free</td><td><code>pip install fredapi</code></td></tr>
+        <tr><td><strong>Binance API</strong></td><td>Crypto OHLCV, orderbook</td><td>Free</td><td><code>pip install python-binance</code></td></tr>
+        <tr><td><strong>CRSP (via university)</strong></td><td>Point-in-time equity data, survivorship-free</td><td>Subscription (most universities have access)</td><td>Custom API</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>📋 Quick Reference Cheat Sheet</h3>
+    <div class="callout info">
+      <div class="callout-title">📌 Backtesting Checklist — Use Before Every Backtest</div>
+      <p>□ Signal shifted by 1 period before computing returns (.shift(1))?<br>
+      □ Using point-in-time data (no future data in the feature computation)?<br>
+      □ Normalizer/scaler fit ONLY on training data, applied to test data?<br>
+      □ Universe defined at each point in time (no survivorship bias)?<br>
+      □ Transaction costs included (commission + spread + slippage)?<br>
+      □ Out-of-sample period reserved and never touched during optimization?<br>
+      □ Walk-forward validation run (not just a single train-test split)?<br>
+      □ WFA Efficiency Ratio computed and > 40%?<br>
+      □ Parameter stability checked across WFA windows?<br>
+      □ Results interpreted relative to appropriate benchmark?</p>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── TAB NAVIGATION ──────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showTabById(id) {
+  const idx = parseInt(id.replace('tab',''));
+  const btns = document.querySelectorAll('.tab-btn');
+  showTab(id, btns[idx]);
+}
+
+// ── SIMULATION ENGINE ───────────────────────────────────────────
+let priceData = [];
+const N = 300;
+
+function generatePrices() {
+  let prices = [100];
+  for (let i = 1; i < N; i++) {
+    const drift = 0.0003;
+    const vol = 0.015;
+    const noise = (Math.random() - 0.5) * 2 * vol;
+    // Add occasional trend shifts
+    const trend = i > 100 && i < 180 ? 0.002 : (i > 200 ? -0.001 : 0);
+    prices.push(prices[i-1] * (1 + drift + trend + noise));
+  }
+  return prices;
+}
+
+function movingAverage(data, window) {
+  return data.map((_, i) => {
+    if (i < window - 1) return null;
+    const slice = data.slice(i - window + 1, i + 1);
+    return slice.reduce((a, b) => a + b, 0) / window;
+  });
+}
+
+function runBacktest(prices, fast, slow, costPct, biased = false) {
+  const maFast = movingAverage(prices, fast);
+  const maSlow = movingAverage(prices, slow);
+  
+  let equity = [1], position = 0, trades = 0, totalCost = 0;
+  let stratReturns = [];
+  
+  for (let i = 1; i < prices.length; i++) {
+    const ret = (prices[i] - prices[i-1]) / prices[i-1];
+    const sigIdx = biased ? i : i - 1;
+    
+    let newPos = position;
+    if (sigIdx > 0 && maFast[sigIdx] !== null && maSlow[sigIdx] !== null) {
+      newPos = maFast[sigIdx] > maSlow[sigIdx] ? 1 : 0;
+    }
+    
+    const tradeMagnitude = Math.abs(newPos - position);
+    const cost = tradeMagnitude * costPct;
+    if (tradeMagnitude > 0) trades++;
+    totalCost += cost;
+    
+    position = newPos;
+    const stratRet = position * ret - cost;
+    stratReturns.push(stratRet);
+    equity.push(equity[equity.length-1] * (1 + stratRet));
+  }
+  
+  const mean = stratReturns.reduce((a,b) => a+b, 0) / stratReturns.length;
+  const variance = stratReturns.reduce((a,b) => a + (b-mean)**2, 0) / stratReturns.length;
+  const sharpe = variance > 0 ? (mean / Math.sqrt(variance)) * Math.sqrt(252) : 0;
+  
+  return { equity, trades, totalCost, sharpe, returns: stratReturns };
+}
+
+function regeneratePrices() {
+  priceData = generatePrices();
+  updateSim();
+  updateBias();
+}
+
+function updateSim() {
+  if (!priceData.length) return;
+  const fast = parseInt(document.getElementById('fastMA').value);
+  const slow = parseInt(document.getElementById('slowMA').value);
+  const costPct = parseInt(document.getElementById('costSlider').value) / 10000;
+  
+  document.getElementById('fastVal').textContent = fast;
+  document.getElementById('slowVal').textContent = slow;
+  document.getElementById('costVal').textContent = (costPct * 100).toFixed(2);
+  
+  if (fast >= slow) { document.getElementById('fastMA').value = slow - 1; return updateSim(); }
+  
+  const result = runBacktest(priceData, fast, slow, costPct);
+  const bHold = priceData[priceData.length-1] / priceData[0] - 1;
+  const stratTotal = result.equity[result.equity.length-1] - 1;
+  
+  document.getElementById('stratRet').textContent = (stratTotal*100).toFixed(1)+'%';
+  document.getElementById('stratRet').className = 'stat-val ' + (stratTotal > 0 ? 'green' : 'red');
+  document.getElementById('bHoldRet').textContent = (bHold*100).toFixed(1)+'%';
+  document.getElementById('bHoldRet').className = 'stat-val ' + (bHold > 0 ? 'green' : 'red');
+  document.getElementById('sharpeVal').textContent = result.sharpe.toFixed(2);
+  document.getElementById('sharpeVal').className = 'stat-val ' + (result.sharpe > 0 ? 'blue' : 'red');
+  document.getElementById('tradeCount').textContent = result.trades;
+  document.getElementById('costDrag').textContent = (result.totalCost*100).toFixed(2)+'%';
+  
+  drawSimChart(result.equity, priceData);
+}
+
+function drawSimChart(equity, prices) {
+  const canvas = document.getElementById('simCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 200 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 200;
+  
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, W, H);
+  
+  const bhold = prices.map(p => p / prices[0]);
+  
+  const drawLine = (data, color, label) => {
+    const min = Math.min(...data), max = Math.max(...data);
+    const range = max - min || 1;
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    data.forEach((v, i) => {
+      const x = (i / (data.length - 1)) * (W - 20) + 10;
+      const y = H - 20 - ((v - min) / range) * (H - 40);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  };
+  
+  drawLine(bhold, 'rgba(255,107,53,0.5)', 'B&H');
+  drawLine(equity, '#00d4ff', 'Strategy');
+  
+  // Labels
+  ctx.font = '11px IBM Plex Mono, monospace';
+  ctx.fillStyle = '#00d4ff';
+  ctx.fillText('Strategy', 12, 16);
+  ctx.fillStyle = 'rgba(255,107,53,0.8)';
+  ctx.fillText('Buy & Hold', 90, 16);
+  
+  // Grid lines
+  ctx.strokeStyle = 'rgba(42,58,92,0.3)';
+  ctx.lineWidth = 0.5;
+  for (let i = 1; i < 5; i++) {
+    const y = (H - 20) * i / 5 + 10;
+    ctx.beginPath();
+    ctx.moveTo(10, y);
+    ctx.lineTo(W - 10, y);
+    ctx.stroke();
+  }
+}
+
+// ── BIAS DEMO ───────────────────────────────────────────────────
+let biasOn = false;
+
+function toggleBias() {
+  biasOn = !biasOn;
+  document.getElementById('biasStatus').textContent = biasOn ? 'Bias: ON (cheating)' : 'Bias: OFF (correct)';
+  document.getElementById('biasStatus').style.color = biasOn ? 'var(--accent2)' : 'var(--accent3)';
+  updateBias();
+}
+
+function updateBias() {
+  if (!priceData.length) return;
+  const fast = 10, slow = 50;
+  const correct = runBacktest(priceData, fast, slow, 0, false);
+  const biased = runBacktest(priceData, fast, slow, 0, true);
+  
+  const correctRet = correct.equity[correct.equity.length-1] - 1;
+  const biasedRet = biased.equity[biased.equity.length-1] - 1;
+  const inflation = biasedRet - correctRet;
+  
+  document.getElementById('biasedRet').textContent = (biasedRet*100).toFixed(1)+'%';
+  document.getElementById('unbiasedRet').textContent = (correctRet*100).toFixed(1)+'%';
+  document.getElementById('inflationVal').textContent = '+' + (inflation*100).toFixed(1)+'%';
+  
+  drawBiasChart(biasOn ? biased.equity : correct.equity, biasOn);
+}
+
+function drawBiasChart(equity, isBiased) {
+  const canvas = document.getElementById('biasCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 180 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 180;
+  
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, W, H);
+  
+  const min = Math.min(...equity), max = Math.max(...equity);
+  const range = max - min || 1;
+  const color = isBiased ? '#ff6b35' : '#7fff6b';
+  
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  equity.forEach((v, i) => {
+    const x = (i / (equity.length - 1)) * (W - 20) + 10;
+    const y = H - 20 - ((v - min) / range) * (H - 40);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  
+  ctx.font = '12px IBM Plex Mono, monospace';
+  ctx.fillStyle = color;
+  ctx.fillText(isBiased ? '⚠️ BIASED EQUITY CURVE' : '✅ CORRECT EQUITY CURVE', 12, 18);
+}
+
+// ── WFA VISUALIZER ──────────────────────────────────────────────
+function updateWFA() {
+  const trainM = parseInt(document.getElementById('trainMonths').value);
+  const testM = parseInt(document.getElementById('testMonths').value);
+  const type = document.getElementById('wfaType').value;
+  
+  document.getElementById('trainMonthsVal').textContent = trainM;
+  document.getElementById('testMonthsVal').textContent = testM;
+  
+  const totalMonths = 60; // 5 years
+  const stepM = testM;
+  
+  let windows = [];
+  let start = 0;
+  while (start + trainM + testM <= totalMonths) {
+    const trainStart = type === 'anchored' ? 0 : start;
+    windows.push({ trainStart, trainEnd: start + trainM, testStart: start + trainM, testEnd: start + trainM + testM });
+    start += stepM;
+  }
+  
+  const oosMonths = windows.length > 0 ? windows[windows.length-1].testEnd - windows[0].testStart : 0;
+  document.getElementById('numWindows').textContent = windows.length;
+  document.getElementById('oosCoverage').textContent = oosMonths + ' mo';
+  document.getElementById('testPct').textContent = ((oosMonths / totalMonths) * 100).toFixed(0) + '%';
+  
+  drawWFAChart(windows, totalMonths, type);
+}
+
+function drawWFAChart(windows, totalMonths, type) {
+  const canvas = document.getElementById('wfaCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 180 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 180;
+  
+  ctx.fillStyle = '#070b14';
+  ctx.fillRect(0, 0, W, H);
+  
+  const margin = { left: 50, right: 20, top: 20, bottom: 30 };
+  const chartW = W - margin.left - margin.right;
+  const rowH = Math.min(25, (H - margin.top - margin.bottom) / Math.max(windows.length, 1) - 4);
+  
+  // Draw each window
+  windows.forEach((w, i) => {
+    const y = margin.top + i * (rowH + 4);
+    
+    // Train block
+    const tx1 = margin.left + (w.trainStart / totalMonths) * chartW;
+    const tx2 = margin.left + (w.trainEnd / totalMonths) * chartW;
+    ctx.fillStyle = `rgba(0,212,255,${0.15 - i*0.005})`;
+    ctx.strokeStyle = '#00d4ff';
+    ctx.lineWidth = 0.5;
+    ctx.fillRect(tx1, y, tx2 - tx1, rowH);
+    ctx.strokeRect(tx1, y, tx2 - tx1, rowH);
+    
+    // Test block
+    const testX1 = margin.left + (w.testStart / totalMonths) * chartW;
+    const testX2 = margin.left + (w.testEnd / totalMonths) * chartW;
+    ctx.fillStyle = 'rgba(127,255,107,0.25)';
+    ctx.strokeStyle = '#7fff6b';
+    ctx.fillRect(testX1, y, testX2 - testX1, rowH);
+    ctx.strokeRect(testX1, y, testX2 - testX1, rowH);
+    
+    // Row label
+    ctx.fillStyle = '#6a7d99';
+    ctx.font = '9px IBM Plex Mono, monospace';
+    ctx.fillText('W'+(i+1), 5, y + rowH/2 + 3);
+  });
+  
+  // X-axis
+  ctx.strokeStyle = '#2a3a5c';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin.left, H - margin.bottom);
+  ctx.lineTo(W - margin.right, H - margin.bottom);
+  ctx.stroke();
+  
+  // X labels
+  ctx.fillStyle = '#6a7d99';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  for (let m = 0; m <= totalMonths; m += 12) {
+    const x = margin.left + (m / totalMonths) * chartW;
+    ctx.fillText('Y'+(m/12+2018), x - 10, H - 8);
+    ctx.beginPath();
+    ctx.moveTo(x, H - margin.bottom - 3);
+    ctx.lineTo(x, H - margin.bottom + 3);
+    ctx.stroke();
+  }
+  
+  // Legend
+  ctx.fillStyle = '#00d4ff'; ctx.fillRect(W - 140, 8, 10, 10);
+  ctx.fillStyle = '#a8b8d0'; ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillText('Training', W - 126, 17);
+  ctx.fillStyle = '#7fff6b'; ctx.fillRect(W - 140, 24, 10, 10);
+  ctx.fillStyle = '#a8b8d0';
+  ctx.fillText('Test (OOS)', W - 126, 33);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  regeneratePrices();
+  updateWFA();
+});
+
+window.addEventListener('resize', () => {
+  if (priceData.length) {
+    updateSim();
+    updateBias();
+    updateWFA();
+  }
+});
+</script>
+</body>
+</html>
