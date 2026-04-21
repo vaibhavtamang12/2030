@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML for Finance: Quant Engineer's Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --accent4: #10b981;
+    --accent5: #f59e0b;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --text-dim: #94a3b8;
+    --glow: rgba(0,212,255,0.15);
+    --font-mono: 'Space Mono', monospace;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1b2a 40%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 80% 60% at 60% -10%, rgba(0,212,255,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 90% 80%, rgba(124,58,237,0.07) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
+    border-radius:20px; padding:5px 14px; font-size:11px;
+    font-family:var(--font-mono); color:var(--accent); letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:16px;
+  }
+  .hero-badge span { width:6px;height:6px;border-radius:50%;background:var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .hero h1 {
+    font-family:var(--font-display); font-size:clamp(28px,4vw,52px);
+    font-weight:900; line-height:1.1; margin-bottom:10px;
+    background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #7c3aed 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .hero-sub { color:var(--text-dim); font-size:15px; max-width:600px; margin-bottom:20px; }
+  .hero-meta { display:flex; gap:24px; flex-wrap:wrap; }
+  .hero-meta-item { display:flex; align-items:center; gap:6px; font-size:12px; font-family:var(--font-mono); color:var(--text-muted); }
+  .hero-meta-item strong { color:var(--text-dim); }
+
+  /* ── TABS ── */
+  .tab-nav {
+    display:flex; gap:0; overflow-x:auto; background:var(--surface);
+    border-bottom:1px solid var(--border); padding:0 24px;
+    position:sticky; top:0; z-index:100;
+    scrollbar-width:none;
+  }
+  .tab-nav::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    flex-shrink:0; padding:14px 18px; font-family:var(--font-mono);
+    font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--text-muted); background:none; border:none; cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+    transition:all .2s; white-space:nowrap;
+  }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  /* ── LAYOUT ── */
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .page { max-width:1100px; margin:0 auto; padding:40px 32px 80px; }
+
+  /* ── SECTION COMPONENTS ── */
+  .section-title {
+    font-family:var(--font-display); font-size:clamp(22px,3vw,36px);
+    font-weight:900; margin-bottom:6px; color:#fff;
+  }
+  .section-subtitle { color:var(--text-dim); margin-bottom:32px; font-size:15px; }
+
+  h2 { font-family:var(--font-display); font-size:24px; font-weight:600; margin:40px 0 12px; color:#fff; }
+  h3 { font-family:var(--font-body); font-size:17px; font-weight:600; margin:28px 0 8px; color:var(--accent); }
+  h4 { font-size:14px; font-weight:600; color:var(--text-dim); margin:16px 0 6px; text-transform:uppercase; letter-spacing:.08em; font-family:var(--font-mono); }
+  p { margin-bottom:12px; color:var(--text-dim); }
+  ul,ol { padding-left:20px; margin-bottom:12px; color:var(--text-dim); }
+  li { margin-bottom:5px; }
+  strong { color:var(--text); font-weight:600; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+
+  /* Cards */
+  .card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:24px; margin-bottom:20px;
+  }
+  .card-accent { border-left:3px solid var(--accent); }
+  .card-warn  { border-left:3px solid var(--accent2); }
+  .card-purple{ border-left:3px solid var(--accent3); }
+  .card-green { border-left:3px solid var(--accent4); }
+  .card-gold  { border-left:3px solid var(--accent5); }
+
+  .callout {
+    border-radius:10px; padding:16px 20px; margin:20px 0;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .callout-info  { background:rgba(0,212,255,.07); border:1px solid rgba(0,212,255,.2); }
+  .callout-warn  { background:rgba(255,107,53,.07); border:1px solid rgba(255,107,53,.2); }
+  .callout-tip   { background:rgba(16,185,129,.07); border:1px solid rgba(16,185,129,.2); }
+  .callout-icon  { font-size:18px; flex-shrink:0; margin-top:2px; }
+  .callout-body  { color:var(--text-dim); font-size:14px; }
+  .callout-body strong { color:var(--text); }
+
+  /* Code */
+  pre {
+    background:#060c18; border:1px solid var(--border); border-radius:10px;
+    padding:20px 24px; overflow-x:auto; margin:16px 0;
+    font-family:var(--font-mono); font-size:12.5px; line-height:1.8;
+    color:#a5f3fc;
+  }
+  code {
+    font-family:var(--font-mono); font-size:12.5px;
+    background:rgba(0,212,255,.08); padding:2px 6px; border-radius:4px; color:var(--accent);
+  }
+  .comment { color:#4b5563; }
+  .kw { color:#c084fc; }
+  .str { color:#86efac; }
+  .num { color:#fbbf24; }
+  .fn  { color:#60a5fa; }
+
+  /* Diagram */
+  .diagram {
+    background:#060c18; border:1px solid var(--border); border-radius:12px;
+    padding:28px; margin:20px 0; overflow-x:auto; text-align:center;
+  }
+  .diagram svg { max-width:100%; height:auto; }
+
+  /* Formula */
+  .formula {
+    background:#060c18; border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:16px 24px; margin:16px 0;
+    font-family:var(--font-mono); font-size:13px; color:#c4b5fd;
+    text-align:center; line-height:2;
+  }
+
+  /* Grid */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px; }
+  @media(max-width:700px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+  /* Badges */
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:20px;
+    font-size:11px; font-family:var(--font-mono); font-weight:700;
+    text-transform:uppercase; letter-spacing:.05em;
+  }
+  .badge-easy   { background:rgba(16,185,129,.15); color:#10b981; border:1px solid rgba(16,185,129,.3); }
+  .badge-medium { background:rgba(245,158,11,.15); color:#f59e0b; border:1px solid rgba(245,158,11,.3); }
+  .badge-hard   { background:rgba(255,107,53,.15);  color:#ff6b35; border:1px solid rgba(255,107,53,.3); }
+  .badge-prereq { background:rgba(124,58,237,.15); color:#a78bfa; border:1px solid rgba(124,58,237,.3); }
+
+  /* Exercise box */
+  .exercise {
+    border:1px solid var(--border); border-radius:10px;
+    padding:20px; margin:12px 0; background:var(--surface2);
+  }
+  .exercise-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .exercise-title { font-weight:600; color:var(--text); font-size:15px; }
+
+  /* Resource link */
+  .resource-link {
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    margin-bottom:8px; color:var(--text-dim); font-size:14px;
+    transition:all .2s; text-decoration:none;
+  }
+  .resource-link:hover { border-color:var(--accent); color:var(--text); background:rgba(0,212,255,.05); text-decoration:none; }
+  .resource-link-icon { font-size:18px; flex-shrink:0; }
+  .resource-link-meta { font-size:11px; font-family:var(--font-mono); color:var(--text-muted); margin-top:2px; }
+
+  /* Timeline / flow */
+  .flow { display:flex; flex-direction:column; gap:0; margin:20px 0; }
+  .flow-step {
+    display:flex; gap:16px; padding:16px 0;
+    border-left:2px solid var(--border); margin-left:12px; padding-left:24px;
+    position:relative;
+  }
+  .flow-step::before {
+    content:attr(data-n); position:absolute; left:-14px; top:16px;
+    width:24px; height:24px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-family:var(--font-mono); color:var(--accent);
+    font-weight:700;
+  }
+  .flow-step-body h4 { margin-top:0; }
+
+  /* Table */
+  .table-wrap { overflow-x:auto; margin:16px 0; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { background:var(--surface2); color:var(--text-dim); font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); }
+  td { padding:10px 14px; border-bottom:1px solid rgba(30,45,69,.5); color:var(--text-dim); }
+  tr:hover td { background:rgba(0,212,255,.02); }
+
+  /* Number highlight */
+  .num-big {
+    font-family:var(--font-display); font-size:36px; font-weight:900;
+    color:var(--accent); display:block; line-height:1;
+  }
+
+  /* Progress bar */
+  .roadmap { display:flex; gap:0; flex-wrap:wrap; margin:20px 0; }
+  .roadmap-step {
+    flex:1; min-width:120px; padding:14px; text-align:center;
+    background:var(--surface); border:1px solid var(--border);
+    font-size:11px; font-family:var(--font-mono); color:var(--text-muted);
+    position:relative; cursor:default;
+  }
+  .roadmap-step:not(:last-child)::after {
+    content:'→'; position:absolute; right:-10px; top:50%; transform:translateY(-50%);
+    color:var(--accent); font-size:16px; z-index:1;
+  }
+  .roadmap-step.active { background:rgba(0,212,255,.08); border-color:rgba(0,212,255,.3); color:var(--accent); }
+  .roadmap-step .rs-label { font-size:12px; color:var(--text); font-family:var(--font-body); margin-top:4px; font-weight:500; }
+
+  /* Scrollspy progress */
+  .progress-bar {
+    position:fixed; top:0; left:0; height:2px;
+    background:linear-gradient(90deg, var(--accent), var(--accent3));
+    z-index:999; transition:width .1s;
+    width:0%;
+  }
+
+  hr { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+  .highlight-box {
+    background:linear-gradient(135deg, rgba(0,212,255,.05), rgba(124,58,237,.05));
+    border:1px solid rgba(0,212,255,.15); border-radius:12px;
+    padding:24px; margin:20px 0;
+  }
+
+  .colab-box {
+    background:linear-gradient(135deg, rgba(245,158,11,.06), rgba(255,107,53,.04));
+    border:1px solid rgba(245,158,11,.25); border-radius:12px;
+    padding:20px 24px; margin:20px 0;
+  }
+  .colab-box-header {
+    display:flex; align-items:center; gap:10px; margin-bottom:12px;
+    font-family:var(--font-mono); font-size:12px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--accent5); font-weight:700;
+  }
+
+  /* SVG diagram colors */
+  .node { fill:#111827; stroke:var(--border); stroke-width:1.5; rx:8; }
+  .node-accent { fill:rgba(0,212,255,.12); stroke:rgba(0,212,255,.4); }
+  .node-purple { fill:rgba(124,58,237,.12); stroke:rgba(124,58,237,.4); }
+  .node-green  { fill:rgba(16,185,129,.12); stroke:rgba(16,185,129,.4); }
+  .node-orange { fill:rgba(255,107,53,.12); stroke:rgba(255,107,53,.4); }
+  .arrow { stroke:var(--text-muted); stroke-width:1.5; fill:none; marker-end:url(#arr); }
+  .arrow-accent { stroke:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span></span> Quant Engineering Study Guide</div>
+  <h1>ML for Finance</h1>
+  <p class="hero-sub">A complete self-contained guide to Supervised Learning, Regression, Classification, Feature Engineering, and Purged Cross-Validation for aspiring Quant Engineers.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">📚 <strong>8 Modules</strong></div>
+    <div class="hero-meta-item">🧪 <strong>Colab Experiments</strong></div>
+    <div class="hero-meta-item">🎯 <strong>3-Tier Exercises</strong></div>
+    <div class="hero-meta-item">📶 <strong>Beginner → Quant</strong></div>
+    <div class="hero-meta-item">💾 <strong>100% Offline</strong></div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" onclick="showTab('prereq')">0 · Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('supervised')">1 · Supervised Learning</button>
+  <button class="tab-btn" onclick="showTab('regression')">2 · Regression</button>
+  <button class="tab-btn" onclick="showTab('classification')">3 · Classification</button>
+  <button class="tab-btn" onclick="showTab('features')">4 · Feature Engineering</button>
+  <button class="tab-btn" onclick="showTab('purgecv')">5 · Purged CV</button>
+  <button class="tab-btn" onclick="showTab('integration')">6 · Putting It Together</button>
+  <button class="tab-btn" onclick="showTab('resources')">7 · Resources</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     TAB 0: PREREQUISITES
+══════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-prereq">
+<div class="page">
+
+  <p class="section-title">Prerequisites</p>
+  <p class="section-subtitle">Before diving in, let's make sure the foundation is solid. Every concept here is explained simply from scratch.</p>
+
+  <div class="roadmap">
+    <div class="roadmap-step active"><span>📐</span><div class="rs-label">Math Basics</div></div>
+    <div class="roadmap-step active"><span>📊</span><div class="rs-label">Stats 101</div></div>
+    <div class="roadmap-step active"><span>🐍</span><div class="rs-label">Python</div></div>
+    <div class="roadmap-step active"><span>🐼</span><div class="rs-label">Pandas/NumPy</div></div>
+    <div class="roadmap-step active"><span>💹</span><div class="rs-label">Finance Basics</div></div>
+    <div class="roadmap-step"><span>🤖</span><div class="rs-label">ML Core</div></div>
+  </div>
+
+  <h2>Math You Need (Explained Simply)</h2>
+
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>Linear Algebra in 2 Minutes</h3>
+      <p>Think of a <strong>vector</strong> as a list of numbers — like a stock's features: <code>[price, volume, volatility]</code>. A <strong>matrix</strong> is a table of such vectors — one row per stock, one column per feature. ML uses matrix math to find patterns across thousands of stocks simultaneously.</p>
+      <div class="formula">
+        X = [[101, 5000, 0.2],<br>
+             [98,  3200, 0.15],<br>   
+             [205, 8900, 0.31]]<br>
+        <span style="color:#64748b;font-size:11px">3 stocks × 3 features matrix</span>
+      </div>
+    </div>
+    <div class="card card-purple">
+      <h3>Calculus in 2 Minutes</h3>
+      <p>A <strong>derivative</strong> tells you how fast something changes. In ML, we use it to figure out: "if I tweak this parameter slightly, does my model get better or worse?" This is called <strong>gradient descent</strong> — the engine behind almost all ML learning.</p>
+      <div class="formula">
+        slope = Δy / Δx<br>
+        "How does my error change<br>as I change my weight?"
+      </div>
+    </div>
+  </div>
+
+  <h2>Statistics Foundations</h2>
+
+  <div class="card card-green">
+    <h3>The 5 Stats Concepts Every Quant Needs</h3>
+    <div class="grid-2">
+      <div>
+        <h4>1. Mean & Variance</h4>
+        <p><strong>Mean</strong> = average value of returns. <strong>Variance</strong> = how spread out those returns are (risk!). Standard deviation = √variance = the usual "volatility" number in finance.</p>
+        <div class="formula">μ = (1/n) Σxᵢ<br>σ² = (1/n) Σ(xᵢ - μ)²</div>
+      </div>
+      <div>
+        <h4>2. Correlation</h4>
+        <p>How much do two things move together? -1 = perfectly opposite, 0 = no relation, +1 = move in lockstep. Crucial for diversification and understanding feature relationships.</p>
+        <div class="formula">ρ = Cov(X,Y) / (σ_X × σ_Y)</div>
+      </div>
+      <div>
+        <h4>3. Probability Distribution</h4>
+        <p>A mathematical description of all possible outcomes and their likelihoods. Stock returns roughly follow a <strong>normal distribution</strong> — bell shaped, though real returns have "fat tails" (more extreme events than normal predicts).</p>
+      </div>
+      <div>
+        <h4>4. p-value & Significance</h4>
+        <p>Asks: "Could this pattern I found be just random noise?" A p-value of 0.05 means there's only a 5% chance the result happened by accident. Critical for validating trading signals.</p>
+      </div>
+    </div>
+    <div>
+      <h4>5. Overfitting Intuition</h4>
+      <p>Imagine memorising every question from a past exam vs. truly understanding the material. A model that <strong>overfits</strong> memorises the training data but fails on new unseen data. In trading, this is catastrophic — your strategy looks great in backtest but loses money live.</p>
+    </div>
+  </div>
+
+  <h2>Python Crash Course for ML</h2>
+  <pre><span class="comment"># ── Essential libraries for this guide ──────────────────────────────</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np          <span class="comment"># Fast numerical arrays and math</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd         <span class="comment"># DataFrames — like Excel but in code</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt  <span class="comment"># Plotting</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+
+<span class="comment"># Creating data</span>
+prices = np.array([<span class="num">100</span>, <span class="num">102</span>, <span class="num">99</span>, <span class="num">105</span>, <span class="num">103</span>])
+returns = np.diff(prices) / prices[:-<span class="num">1</span>]   <span class="comment"># [0.02, -0.03, 0.06, -0.02]</span>
+
+<span class="comment"># DataFrames — the workhorse of financial data</span>
+df = pd.DataFrame({
+    <span class="str">'price'</span>: prices,
+    <span class="str">'volume'</span>: [<span class="num">1000</span>, <span class="num">1200</span>, <span class="num">900</span>, <span class="num">1500</span>, <span class="num">1100</span>]
+})
+print(df.describe())   <span class="comment"># Shows mean, std, min, max automatically</span></pre>
+
+  <h2>Financial Concepts You'll Encounter</h2>
+  <div class="grid-3">
+    <div class="card">
+      <h4>Returns</h4>
+      <p>The percentage change in price: <code>(P_t - P_{t-1}) / P_{t-1}</code>. This is the target variable most quant ML models predict.</p>
+    </div>
+    <div class="card">
+      <h4>Alpha</h4>
+      <p>Return above the market benchmark. A trading strategy with "positive alpha" makes money beyond just riding the market up.</p>
+    </div>
+    <div class="card">
+      <h4>Signal</h4>
+      <p>Any measurable indicator that predicts future price movement — momentum, earnings surprises, sentiment scores. ML finds signals automatically.</p>
+    </div>
+    <div class="card">
+      <h4>Sharpe Ratio</h4>
+      <p>Return / Risk = (mean return - risk free rate) / std of returns. Higher = better risk-adjusted performance.</p>
+    </div>
+    <div class="card">
+      <h4>Look-ahead Bias</h4>
+      <p>Using future information to make a decision in the past during backtesting. The cardinal sin of quant research — makes fake performance look real.</p>
+    </div>
+    <div class="card">
+      <h4>Time Series</h4>
+      <p>Data indexed by time — e.g., daily prices for 5 years. Unlike random data, time series has serial correlation: yesterday's price affects today's.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">🎯</div>
+    <div class="callout-body"><strong>You're ready when:</strong> You can load a CSV of stock prices in pandas, calculate returns, and plot a histogram of them. If that sounds achievable, you're good to start Tab 1!</div>
+  </div>
+
+  <h2>🧪 Colab Experiment: Your First Financial Dataset</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Google Colab Experiment #0 — Setup & Exploration</div>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:10px;">Open <a href="https://colab.research.google.com" target="_blank">colab.research.google.com</a> → New Notebook → paste and run:</p>
+    <pre><span class="comment"># Install financial data library</span>
+!pip install yfinance -q
+
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="comment"># Download Apple's stock data</span>
+aapl = yf.download(<span class="str">'AAPL'</span>, start=<span class="str">'2020-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+print(aapl.head())
+print(<span class="str">"\nShape:"</span>, aapl.shape)
+
+<span class="comment"># Calculate daily returns</span>
+aapl[<span class="str">'Return'</span>] = aapl[<span class="str">'Close'</span>].pct_change()
+
+<span class="comment"># Plot price and return distribution</span>
+fig, axes = plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">4</span>))
+
+aapl[<span class="str">'Close'</span>].plot(ax=axes[<span class="num">0</span>], title=<span class="str">'AAPL Price'</span>, color=<span class="str">'#00d4ff'</span>)
+aapl[<span class="str">'Return'</span>].hist(ax=axes[<span class="num">1</span>], bins=<span class="num">50</span>, color=<span class="str">'#7c3aed'</span>,
+                   title=<span class="str">'Return Distribution'</span>, edgecolor=<span class="str">'black'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="comment"># Key statistics</span>
+print(<span class="str">"Mean daily return:"</span>, aapl[<span class="str">'Return'</span>].mean())
+print(<span class="str">"Daily volatility:"</span>, aapl[<span class="str">'Return'</span>].std())
+print(<span class="str">"Annual Sharpe (approx):"</span>, 
+      aapl[<span class="str">'Return'</span>].mean() / aapl[<span class="str">'Return'</span>].std() * np.sqrt(<span class="num">252</span>))</pre>
+    <a href="https://colab.research.google.com/github/codeananda/bitcoin_price_predictor/blob/main/bitcoin_price_predictor.ipynb" target="_blank" class="resource-link" style="margin-top:12px">
+      <span class="resource-link-icon">🔗</span>
+      <div>Open similar starter notebook on Colab<div class="resource-link-meta">Google Colab · Finance ML example</div></div>
+    </a>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E0.1 — Statistics Calculator</span></div>
+    <p>Load any stock's CSV (or use yfinance). Calculate: mean daily return, standard deviation, and the percentage of days with positive returns. Print them neatly.</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E0.2 — Correlation Matrix</span></div>
+    <p>Download 5 stocks (AAPL, MSFT, GOOG, JPM, GS). Calculate their daily returns. Plot a correlation heatmap using seaborn. Which pairs are most correlated? What does this mean for portfolio diversification?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E0.3 — Fat Tails vs Normal</span></div>
+    <p>For any stock with 5+ years of data: (1) Plot actual return distribution vs a fitted normal distribution on the same chart. (2) Calculate kurtosis. (3) Count how many returns fall more than 3 standard deviations away and compare to what the normal distribution predicts. Write 3 sentences about what this means for risk models that assume normality.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 1: SUPERVISED LEARNING
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-supervised">
+<div class="page">
+
+  <p class="section-title">Supervised Learning</p>
+  <p class="section-subtitle">The core paradigm: teaching a computer by showing it examples with correct answers.</p>
+
+  <h2>What Is Supervised Learning? (The Big Idea)</h2>
+  <div class="highlight-box">
+    <p><strong>The human analogy:</strong> Imagine you're training a new analyst. You show them 1,000 historical trades with outcomes — "this setup led to a +3% gain, this one led to a -5% loss." After seeing enough examples, they start to learn the patterns and can predict what will happen in new, unseen situations. That's exactly what supervised learning does — except the "analyst" is a mathematical function.</p>
+  </div>
+
+  <div class="card card-accent">
+    <h3>The Formal Definition</h3>
+    <p>Given a dataset of <strong>inputs</strong> (features X) and <strong>known outputs</strong> (labels y), find a function <em>f</em> such that:</p>
+    <div class="formula">f(X) ≈ y<br><br>
+    Where X = features (what you know) and y = target (what you want to predict)</div>
+    <p>After training, you use <em>f</em> to predict y for new data points where y is unknown.</p>
+  </div>
+
+  <h2>The ML Workflow — Step by Step</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 820 120" xmlns="http://www.w3.org/2000/svg" style="max-width:820px;width:100%">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+        </marker>
+      </defs>
+      <!-- Boxes -->
+      <rect x="10" y="30" width="110" height="56" rx="8" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+      <text x="65" y="54" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="11">Raw Data</text>
+      <text x="65" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Prices, Vol,</text>
+      <text x="65" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Earnings</text>
+
+      <rect x="155" y="30" width="110" height="56" rx="8" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+      <text x="210" y="54" text-anchor="middle" fill="#f59e0b" font-family="Space Mono" font-size="11">Features</text>
+      <text x="210" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Engineer</text>
+      <text x="210" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Signals</text>
+
+      <rect x="300" y="30" width="110" height="56" rx="8" fill="rgba(124,58,237,0.1)" stroke="rgba(124,58,237,0.4)" stroke-width="1.5"/>
+      <text x="355" y="54" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="11">Split Data</text>
+      <text x="355" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Train /</text>
+      <text x="355" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Test Set</text>
+
+      <rect x="445" y="30" width="110" height="56" rx="8" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
+      <text x="500" y="54" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="11">Train Model</text>
+      <text x="500" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Fit f(X) on</text>
+      <text x="500" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">training data</text>
+
+      <rect x="590" y="30" width="110" height="56" rx="8" fill="rgba(255,107,53,0.1)" stroke="rgba(255,107,53,0.4)" stroke-width="1.5"/>
+      <text x="645" y="54" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="11">Evaluate</text>
+      <text x="645" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Test on held-</text>
+      <text x="645" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">out data</text>
+
+      <rect x="735" y="30" width="75" height="56" rx="8" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+      <text x="772" y="54" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="11">Deploy</text>
+      <text x="772" y="70" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Live</text>
+      <text x="772" y="82" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Trading</text>
+
+      <!-- Arrows -->
+      <line x1="120" y1="58" x2="153" y2="58" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="265" y1="58" x2="298" y2="58" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="410" y1="58" x2="443" y2="58" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="555" y1="58" x2="588" y2="58" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="700" y1="58" x2="733" y2="58" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <h2>Supervised Learning in Finance: Two Types</h2>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>🔢 Regression — Predict Numbers</h3>
+      <p>Output is a <strong>continuous number</strong>. You're predicting <em>how much</em>.</p>
+      <ul>
+        <li>Predict next week's stock return: <em>+1.3%</em></li>
+        <li>Predict portfolio volatility: <em>0.18</em></li>
+        <li>Forecast earnings per share: <em>$4.22</em></li>
+        <li>Price an option contract: <em>$12.50</em></li>
+      </ul>
+      <p>Loss function: <strong>Mean Squared Error (MSE)</strong></p>
+    </div>
+    <div class="card card-orange" style="border-left:3px solid var(--accent2)">
+      <h3>🏷️ Classification — Predict Categories</h3>
+      <p>Output is a <strong>discrete category</strong>. You're predicting <em>which bucket</em>.</p>
+      <ul>
+        <li>Will stock go <em>up</em> or <em>down</em> tomorrow?</li>
+        <li>Is this company likely to <em>default</em>?</li>
+        <li>Buy / Hold / Sell signal</li>
+        <li>Is market regime <em>trending</em> or <em>mean-reverting</em>?</li>
+      </ul>
+      <p>Loss function: <strong>Cross-Entropy / Accuracy</strong></p>
+    </div>
+  </div>
+
+  <h2>The Train/Test Split — The Most Important Concept</h2>
+  <div class="card card-warn">
+    <h3>Why You Must Never Train and Test on the Same Data</h3>
+    <p>If you study the answers to a test, you'll score 100%. But you haven't actually learned anything. Same with ML — a model that has "seen" the test data will appear brilliant but fail in the real world.</p>
+    <div class="diagram" style="padding:16px">
+      <svg viewBox="0 0 700 80" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+        <!-- Timeline -->
+        <rect x="20" y="20" width="420" height="40" rx="6" fill="rgba(0,212,255,0.12)" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+        <text x="230" y="43" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="11">TRAINING SET (80%)</text>
+        <text x="230" y="57" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Model learns from this — Jan 2015 to Dec 2022</text>
+
+        <rect x="450" y="20" width="240" height="40" rx="6" fill="rgba(255,107,53,0.12)" stroke="rgba(255,107,53,0.4)" stroke-width="1.5"/>
+        <text x="570" y="43" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="11">TEST SET (20%)</text>
+        <text x="570" y="57" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Evaluate here — Jan 2023 to Dec 2023</text>
+
+        <!-- Time arrow -->
+        <line x1="20" y1="10" x2="690" y2="10" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="20" y="8" fill="#4b5563" font-size="9" font-family="Space Mono">TIME →</text>
+      </svg>
+    </div>
+    <div class="callout callout-warn" style="margin:0">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body"><strong>Finance-specific rule:</strong> Always split by time, never randomly. If you randomly mix training and test data in a time series, future information leaks into the past — that's look-ahead bias!</div>
+    </div>
+  </div>
+
+  <h2>Bias vs. Variance — The Core Trade-off</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <!-- Left: High Bias (Underfitting) -->
+      <rect x="20" y="20" width="200" height="160" rx="10" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+      <text x="120" y="45" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="11">HIGH BIAS</text>
+      <text x="120" y="62" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">(Underfitting)</text>
+      <!-- Simple line on noisy data -->
+      <circle cx="60" cy="110" r="3" fill="#f59e0b"/><circle cx="75" cy="95" r="3" fill="#f59e0b"/><circle cx="90" cy="130" r="3" fill="#f59e0b"/>
+      <circle cx="105" cy="105" r="3" fill="#f59e0b"/><circle cx="120" cy="120" r="3" fill="#f59e0b"/><circle cx="135" cy="90" r="3" fill="#f59e0b"/>
+      <circle cx="150" cy="115" r="3" fill="#f59e0b"/><circle cx="165" cy="100" r="3" fill="#f59e0b"/>
+      <line x1="60" y1="112" x2="165" y2="108" stroke="#00d4ff" stroke-width="2"/>
+      <text x="120" y="165" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Too simple, misses patterns</text>
+      <text x="120" y="178" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Model: Linear only</text>
+
+      <!-- Middle: Just Right -->
+      <rect x="250" y="20" width="200" height="160" rx="10" fill="rgba(16,185,129,0.05)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+      <text x="350" y="45" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="11">BALANCED ✓</text>
+      <text x="350" y="62" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">(Good fit)</text>
+      <circle cx="290" cy="115" r="3" fill="#f59e0b"/><circle cx="305" cy="100" r="3" fill="#f59e0b"/><circle cx="320" cy="128" r="3" fill="#f59e0b"/>
+      <circle cx="335" cy="108" r="3" fill="#f59e0b"/><circle cx="350" cy="118" r="3" fill="#f59e0b"/><circle cx="365" cy="95" r="3" fill="#f59e0b"/>
+      <circle cx="380" cy="112" r="3" fill="#f59e0b"/><circle cx="395" cy="103" r="3" fill="#f59e0b"/>
+      <path d="M290,115 Q320,92 350,118 Q380,110 395,103" stroke="#10b981" stroke-width="2" fill="none"/>
+      <text x="350" y="165" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Captures real pattern</text>
+      <text x="350" y="178" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Generalises to new data</text>
+
+      <!-- Right: High Variance (Overfitting) -->
+      <rect x="480" y="20" width="200" height="160" rx="10" fill="rgba(255,107,53,0.05)" stroke="rgba(255,107,53,0.2)" stroke-width="1"/>
+      <text x="580" y="45" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="11">HIGH VARIANCE</text>
+      <text x="580" y="62" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">(Overfitting)</text>
+      <circle cx="520" cy="115" r="3" fill="#f59e0b"/><circle cx="535" cy="100" r="3" fill="#f59e0b"/><circle cx="550" cy="128" r="3" fill="#f59e0b"/>
+      <circle cx="565" cy="108" r="3" fill="#f59e0b"/><circle cx="580" cy="118" r="3" fill="#f59e0b"/><circle cx="595" cy="95" r="3" fill="#f59e0b"/>
+      <circle cx="610" cy="112" r="3" fill="#f59e0b"/><circle cx="625" cy="103" r="3" fill="#f59e0b"/>
+      <path d="M520,115 L535,100 L550,128 L565,108 L580,118 L595,95 L610,112 L625,103" stroke="#ff6b35" stroke-width="2" fill="none"/>
+      <text x="580" y="165" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">Memorised noise as signal</text>
+      <text x="580" y="178" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Fails on new data</text>
+    </svg>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Bias = Underfitting</h4>
+      <p>Model too simple. Like a trader who only looks at price and ignores everything else. Makes systematic errors — even on training data.</p>
+      <p><strong>Fix:</strong> More complex model, more features</p>
+    </div>
+    <div class="card">
+      <h4>Variance = Overfitting</h4>
+      <p>Model too complex. Like a trader who creates a rule for every specific historical day. Works perfectly in backtest, fails live.</p>
+      <p><strong>Fix:</strong> Regularisation, more data, cross-validation</p>
+    </div>
+  </div>
+
+  <h2>🧪 Colab Experiment: Bias-Variance Tradeoff</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Experiment #1 — Visualise Overfitting</div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> PolynomialFeatures
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> make_pipeline
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+
+<span class="comment"># Simulate noisy stock return data</span>
+np.random.seed(<span class="num">42</span>)
+X = np.linspace(<span class="num">0</span>, <span class="num">10</span>, <span class="num">30</span>).reshape(-<span class="num">1</span>, <span class="num">1</span>)
+y = np.<span class="fn">sin</span>(X.ravel()) + np.random.normal(<span class="num">0</span>, <span class="num">0.3</span>, <span class="num">30</span>)
+
+<span class="comment"># Test data (unseen)</span>
+X_test = np.linspace(<span class="num">0</span>, <span class="num">10</span>, <span class="num">100</span>).reshape(-<span class="num">1</span>, <span class="num">1</span>)
+y_test = np.<span class="fn">sin</span>(X_test.ravel())
+
+fig, axes = plt.subplots(<span class="num">1</span>, <span class="num">3</span>, figsize=(<span class="num">15</span>, <span class="num">4</span>))
+
+<span class="kw">for</span> i, degree <span class="kw">in</span> enumerate([<span class="num">1</span>, <span class="num">4</span>, <span class="num">15</span>]):
+    model = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+    model.fit(X, y)
+    y_pred_train = model.predict(X)
+    y_pred_test  = model.predict(X_test)
+    
+    train_mse = mean_squared_error(y, y_pred_train)
+    test_mse  = mean_squared_error(y_test, y_pred_test)
+    
+    axes[i].scatter(X, y, color=<span class="str">'#f59e0b'</span>, s=<span class="num">20</span>, label=<span class="str">'Train data'</span>)
+    axes[i].plot(X_test, y_pred_test, color=[<span class="str">'#00d4ff'</span>,<span class="str">'#10b981'</span>,<span class="str">'#ff6b35'</span>][i], lw=<span class="num">2</span>)
+    labels = [<span class="str">'Underfitting (degree=1)'</span>, <span class="str">'Good Fit (degree=4)'</span>, <span class="str">'Overfitting (degree=15)'</span>]
+    axes[i].set_title(<span class="str">f'{labels[i]}\nTrain MSE: {train_mse:.3f} | Test MSE: {test_mse:.3f}'</span>)
+    axes[i].set_facecolor(<span class="str">'#0a0e1a'</span>)
+
+plt.tight_layout()
+plt.show()</pre>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E1.1 — Classify the Task</span></div>
+    <p>For each scenario, state whether it's regression or classification AND what the features (X) and target (y) would be: (a) Predict next quarter's EPS for Tesla, (b) Predict if a mortgage will default, (c) Predict how much a bond's yield will change given a Fed rate hike, (d) Predict which of 3 market regimes (bull/bear/sideways) we're in.</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E1.2 — Train/Test Split</span></div>
+    <p>Using AAPL data (2015–2023): create a feature "5-day momentum" = today's price / price 5 days ago. Create a binary target: 1 if next day's return > 0, else 0. Split by time (80/20). Train a logistic regression. Compare train accuracy vs test accuracy. Interpret the gap.</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E1.3 — Bias-Variance Experiment</span></div>
+    <p>Using 10 stocks: create momentum features at lags 1, 5, 10, 20, 60 days. Train models of increasing complexity (linear regression, decision tree at depths 2, 5, 10, 20). For each model, plot both training and test R² vs complexity. Identify the "sweet spot." Write a paragraph explaining what you observe and why it matters for a trading strategy.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 2: REGRESSION
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-regression">
+<div class="page">
+
+  <p class="section-title">Regression</p>
+  <p class="section-subtitle">Predicting continuous numbers — the workhorse of quantitative return forecasting.</p>
+
+  <h2>Linear Regression — The Foundation</h2>
+  <div class="highlight-box">
+    <p><strong>The idea:</strong> Find the best straight line through your data. Given a stock's momentum score, what return can we expect? The line gives us our prediction. "Linear" means we assume the relationship between features and target is a straight line (or hyperplane in multiple dimensions).</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>Simple Linear Regression</h3>
+      <p>One feature → one target. Like predicting next month's return from last month's return.</p>
+      <div class="formula">ŷ = β₀ + β₁x<br><br>
+      β₀ = intercept (baseline prediction)<br>
+      β₁ = coefficient (how much y changes per unit x)<br>
+      ŷ = predicted value</div>
+      <p>Example: <code>next_return = 0.001 + 0.15 × momentum</code></p>
+    </div>
+    <div class="card card-purple">
+      <h3>Multiple Linear Regression</h3>
+      <p>Many features → one target. More realistic for finance.</p>
+      <div class="formula">ŷ = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ<br><br>
+      Example (3 features):<br>
+      return = 0.001<br>
+            + 0.12 × momentum<br>
+            - 0.08 × volatility<br>
+            + 0.05 × value_signal</div>
+    </div>
+  </div>
+
+  <h2>How Does It "Learn"? Ordinary Least Squares</h2>
+  <div class="card">
+    <h3>The Loss Function — What We're Minimising</h3>
+    <p>Linear regression finds the β values that minimise the <strong>Mean Squared Error (MSE)</strong> — the average of all squared differences between predictions and actuals.</p>
+    <div class="formula">
+      MSE = (1/n) × Σ(yᵢ - ŷᵢ)²<br><br>
+      Residual = yᵢ - ŷᵢ  (actual minus predicted)<br>
+      We square it so: positives and negatives don't cancel,<br>large errors are penalised more
+    </div>
+    <div class="diagram">
+      <svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:100%">
+        <defs><marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#64748b"/></marker></defs>
+        <!-- Axes -->
+        <line x1="50" y1="170" x2="470" y2="170" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="50" y1="170" x2="50" y2="20"  stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <text x="475" y="174" fill="#4b5563" font-size="10" font-family="Space Mono">X</text>
+        <text x="38"  y="18"  fill="#4b5563" font-size="10" font-family="Space Mono">y</text>
+        <!-- Best fit line -->
+        <line x1="70" y1="150" x2="450" y2="50" stroke="#00d4ff" stroke-width="2"/>
+        <!-- Data points with residuals -->
+        <circle cx="100" cy="120" r="5" fill="#f59e0b"/>
+        <line x1="100" y1="120" x2="100" y2="137" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <circle cx="100" cy="140" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+
+        <circle cx="200" cy="100" r="5" fill="#f59e0b"/>
+        <line x1="200" y1="100" x2="200" y2="113" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <circle cx="200" cy="114" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+
+        <circle cx="280" cy="105" r="5" fill="#f59e0b"/>
+        <line x1="280" y1="91" x2="280" y2="105" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <circle cx="280" cy="91" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+
+        <circle cx="380" cy="62" r="5" fill="#f59e0b"/>
+        <line x1="380" y1="62" x2="380" y2="71" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="3,2"/>
+        <circle cx="380" cy="71" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+
+        <text x="290" y="130" fill="#ff6b35" font-size="10" font-family="Space Mono">residuals</text>
+        <text x="380" y="190" fill="#00d4ff" font-size="10" font-family="DM Sans">Best-fit line (ŷ)</text>
+        <text x="100" y="190" fill="#f59e0b" font-size="10" font-family="DM Sans">Actual points (y)</text>
+      </svg>
+    </div>
+  </div>
+
+  <h2>Evaluation Metrics for Regression</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>Formula</th><th>Range</th><th>Finance Use</th></tr></thead>
+      <tbody>
+        <tr><td><strong>MSE</strong></td><td>mean((y - ŷ)²)</td><td>0 to ∞ (lower=better)</td><td>Training objective, penalises large errors</td></tr>
+        <tr><td><strong>RMSE</strong></td><td>√MSE</td><td>0 to ∞ (lower=better)</td><td>Same units as target (e.g., return %)</td></tr>
+        <tr><td><strong>MAE</strong></td><td>mean(|y - ŷ|)</td><td>0 to ∞ (lower=better)</td><td>Less sensitive to outlier returns</td></tr>
+        <tr><td><strong>R²</strong></td><td>1 - SS_res/SS_tot</td><td>-∞ to 1 (higher=better)</td><td>% variance explained; >0.02 is good in finance!</td></tr>
+        <tr><td><strong>IC (Info Coef)</strong></td><td>corr(predicted rank, actual rank)</td><td>-1 to 1</td><td>Industry standard for alpha signal quality</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body"><strong>Finance reality check:</strong> An R² of 0.02 (explaining 2% of variance) can be a profitable trading signal! Unlike physical sciences where R² > 0.9 is expected, financial markets are near-random — any predictability at all is valuable. Focus on the <strong>Information Coefficient (IC)</strong> instead.</div>
+  </div>
+
+  <h2>Regularisation — Preventing Overfitting in Regression</h2>
+  <div class="card card-green">
+    <h3>The Problem: Too Many Features</h3>
+    <p>With 100 technical indicators as features and only 200 data points, linear regression can overfit dramatically — finding spurious patterns. Regularisation adds a <strong>penalty for complexity</strong> to the loss function.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Ridge Regression (L2)</h3>
+      <p>Adds the sum of <em>squared</em> coefficients as a penalty. Shrinks all coefficients toward zero but keeps all features. Good when you believe all features contribute a little.</p>
+      <div class="formula">Loss = MSE + λ × Σβᵢ²<br><br>λ controls strength (hyperparameter)<br>Higher λ = more shrinkage</div>
+    </div>
+    <div class="card">
+      <h3>Lasso Regression (L1)</h3>
+      <p>Adds the sum of <em>absolute</em> coefficients as penalty. Can shrink some coefficients to exactly zero — automatic feature selection! Great in finance to identify the most important signals.</p>
+      <div class="formula">Loss = MSE + λ × Σ|βᵢ|<br><br>When λ is large enough,<br>weak features → coefficient = 0</div>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <text x="350" y="20" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="11">EFFECT OF REGULARISATION ON COEFFICIENTS</text>
+      <!-- Features -->
+      <text x="30" y="55"  fill="#64748b" font-family="Space Mono" font-size="9">momentum</text>
+      <text x="30" y="80"  fill="#64748b" font-family="Space Mono" font-size="9">volume</text>
+      <text x="30" y="105" fill="#64748b" font-family="Space Mono" font-size="9">noise1</text>
+      <text x="30" y="130" fill="#64748b" font-family="Space Mono" font-size="9">noise2</text>
+
+      <!-- OLS bars -->
+      <text x="200" y="38" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="9">OLS (no regularisation)</text>
+      <rect x="130" y="45" width="140" height="14" rx="3" fill="rgba(0,212,255,0.5)"/>
+      <rect x="130" y="70" width="80"  height="14" rx="3" fill="rgba(0,212,255,0.5)"/>
+      <rect x="130" y="95" width="110" height="14" rx="3" fill="rgba(255,107,53,0.5)"/>
+      <rect x="130" y="120" width="95" height="14" rx="3" fill="rgba(255,107,53,0.5)"/>
+      <text x="275" y="56" fill="#00d4ff" font-size="10" font-family="Space Mono">0.14</text>
+      <text x="215" y="81" fill="#00d4ff" font-size="10" font-family="Space Mono">0.08</text>
+      <text x="245" y="106" fill="#ff6b35" font-size="10" font-family="Space Mono">0.11 ← noise!</text>
+      <text x="230" y="131" fill="#ff6b35" font-size="10" font-family="Space Mono">0.09 ← noise!</text>
+
+      <!-- Lasso bars -->
+      <text x="530" y="38" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="9">Lasso (L1 regularised)</text>
+      <rect x="460" y="45" width="130" height="14" rx="3" fill="rgba(16,185,129,0.5)"/>
+      <rect x="460" y="70" width="60"  height="14" rx="3" fill="rgba(16,185,129,0.5)"/>
+      <rect x="460" y="95" width="2"   height="14" rx="3" fill="rgba(100,116,139,0.3)"/>
+      <rect x="460" y="120" width="2"  height="14" rx="3" fill="rgba(100,116,139,0.3)"/>
+      <text x="596" y="56" fill="#10b981" font-size="10" font-family="Space Mono">0.13</text>
+      <text x="526" y="81" fill="#10b981" font-size="10" font-family="Space Mono">0.06</text>
+      <text x="470" y="106" fill="#4b5563" font-size="10" font-family="Space Mono">0.00 ✓ zeroed out</text>
+      <text x="470" y="131" fill="#4b5563" font-size="10" font-family="Space Mono">0.00 ✓ zeroed out</text>
+    </svg>
+  </div>
+
+  <h2>Beyond Linear: Tree-Based Models for Return Prediction</h2>
+  <div class="card card-gold">
+    <h3>Random Forest Regressor</h3>
+    <p>An ensemble of decision trees. Each tree learns a different "view" of the data. The final prediction is the average of all trees. Handles non-linear relationships automatically — crucial in finance where patterns aren't linear.</p>
+    <div class="grid-2">
+      <div>
+        <h4>Why it's good for finance</h4>
+        <ul>
+          <li>Captures non-linear interactions (e.g., momentum only works in high-volume regimes)</li>
+          <li>Robust to outliers in returns</li>
+          <li>Gives feature importance scores</li>
+          <li>Resistant to overfitting (due to averaging)</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Key hyperparameters</h4>
+        <ul>
+          <li><code>n_estimators</code>: number of trees (more = better, slower)</li>
+          <li><code>max_depth</code>: how deep each tree can grow</li>
+          <li><code>max_features</code>: features tried at each split</li>
+          <li><code>min_samples_leaf</code>: minimum samples per leaf</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>🧪 Colab Experiment: Return Forecasting</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Experiment #2 — Predict Stock Returns</div>
+    <pre><span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, Ridge, Lasso
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestRegressor
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> pearsonr
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="comment"># ── 1. Get data ──────────────────────────────────────────────────────</span>
+df = yf.download(<span class="str">'SPY'</span>, start=<span class="str">'2018-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+df.columns = [c.lower() <span class="kw">for</span> c <span class="kw">in</span> df.columns]
+
+<span class="comment"># ── 2. Create features ───────────────────────────────────────────────</span>
+df[<span class="str">'ret'</span>]   = df[<span class="str">'close'</span>].pct_change()
+df[<span class="str">'mom5'</span>]  = df[<span class="str">'ret'</span>].rolling(<span class="num">5</span>).mean()
+df[<span class="str">'mom20'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">20</span>).mean()
+df[<span class="str">'vol20'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">20</span>).std()
+df[<span class="str">'vol_ratio'</span>] = df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].rolling(<span class="num">20</span>).mean()
+
+<span class="comment"># Target: next day return</span>
+df[<span class="str">'target'</span>] = df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>)
+df.dropna(inplace=<span class="kw">True</span>)
+
+features = [<span class="str">'mom5'</span>, <span class="str">'mom20'</span>, <span class="str">'vol20'</span>, <span class="str">'vol_ratio'</span>]
+X = df[features].values
+y = df[<span class="str">'target'</span>].values
+
+<span class="comment"># ── 3. Time-based split ──────────────────────────────────────────────</span>
+split = <span class="kw">int</span>(<span class="num">0.8</span> * <span class="kw">len</span>(X))
+X_train, X_test = X[:split], X[split:]
+y_train, y_test = y[:split], y[split:]
+
+<span class="comment"># ── 4. Train models ──────────────────────────────────────────────────</span>
+models = {
+    <span class="str">'Linear'</span>: LinearRegression(),
+    <span class="str">'Ridge'</span>:  Ridge(alpha=<span class="num">0.01</span>),
+    <span class="str">'Lasso'</span>:  Lasso(alpha=<span class="num">0.0001</span>),
+    <span class="str">'RandomForest'</span>: RandomForestRegressor(n_estimators=<span class="num">100</span>, max_depth=<span class="num">5</span>, random_state=<span class="num">42</span>)
+}
+
+print(<span class="str">f"{'Model':<16} {'Test IC':>10} {'Test RMSE':>12}"</span>)
+print(<span class="str">"-"</span> * <span class="num">42</span>)
+
+<span class="kw">for</span> name, m <span class="kw">in</span> models.items():
+    m.fit(X_train, y_train)
+    preds = m.predict(X_test)
+    ic = pearsonr(y_test, preds)[<span class="num">0</span>]      <span class="comment"># Information Coefficient</span>
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    print(<span class="str">f"{name:<16} {ic:>10.4f} {rmse:>12.6f}"</span>)
+
+<span class="comment"># ── 5. Feature importance (Random Forest) ────────────────────────────</span>
+rf = models[<span class="str">'RandomForest'</span>]
+importance = pd.Series(rf.feature_importances_, index=features).sort_values()
+importance.plot(kind=<span class="str">'barh'</span>, color=<span class="str">'#00d4ff'</span>, title=<span class="str">'Feature Importance'</span>)
+plt.tight_layout(); plt.show()</pre>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E2.1 — Fit and Interpret OLS</span></div>
+    <p>Using SPY data: create a single feature (5-day momentum). Fit a linear regression to predict next-day return. Print the coefficient. Interpret it: "For every 1% increase in 5-day momentum, we expect next-day return to change by ___." Is this positive or negative? Does it make economic sense?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E2.2 — Ridge vs Lasso</span></div>
+    <p>Create 20 features: momentum at lags 1, 3, 5, 10, 20 days; volatility at 5, 10, 20 days; volume ratios; RSI; plus 8 random noise columns. Fit both Ridge and Lasso with alpha=0.001. Compare: (a) which features does Lasso zero out? (b) plot Ridge vs Lasso coefficients side by side. (c) which has better test set IC?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E2.3 — Hyperparameter Tuning with Walk-Forward Validation</span></div>
+    <p>Using a Random Forest regressor on 5 years of SPY data: implement a walk-forward loop with 12-month training window and 1-month test window. For each fold, test max_depth ∈ {2, 5, 10} and n_estimators ∈ {50, 100, 200}. Report the average IC across all folds for each hyperparameter combination. Build a simple strategy (go long/short based on predicted sign), compute annualised Sharpe ratio, and compare models.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 3: CLASSIFICATION
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-classification">
+<div class="page">
+
+  <p class="section-title">Classification</p>
+  <p class="section-subtitle">Predicting discrete outcomes — buy/sell/hold, default/no-default, regime detection.</p>
+
+  <h2>What Is Classification in Finance?</h2>
+  <div class="highlight-box">
+    <p>Instead of asking "how much will this stock return?", classification asks <strong>"which category does this observation belong to?"</strong> In finance, this maps naturally to trading signals: should we be long or short? Will this loan default? Are we in a bull or bear regime?</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <h4>Binary Classification</h4>
+      <p>Two outcomes: Up/Down, Default/No-Default, Buy/No-Buy. The most common in trading signals.</p>
+    </div>
+    <div class="card">
+      <h4>Multi-Class</h4>
+      <p>Three+ outcomes: Buy/Hold/Sell, Regime (Bull/Bear/Sideways), Credit Rating (A/B/C/D).</p>
+    </div>
+    <div class="card">
+      <h4>Multi-Label</h4>
+      <p>Each sample can belong to multiple classes simultaneously — e.g., a stock can be both "momentum" and "value."</p>
+    </div>
+  </div>
+
+  <h2>Logistic Regression — The Gateway Classifier</h2>
+  <div class="card card-accent">
+    <h3>From Regression to Classification</h3>
+    <p>Despite the name, logistic regression is a <strong>classifier</strong>. It takes the linear regression output and squashes it through a sigmoid function to produce a probability between 0 and 1.</p>
+    <div class="diagram">
+      <svg viewBox="0 0 650 120" xmlns="http://www.w3.org/2000/svg" style="max-width:650px;width:100%">
+        <defs><marker id="arr3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#64748b"/></marker></defs>
+        <rect x="10" y="35" width="140" height="50" rx="8" fill="rgba(0,212,255,.1)" stroke="rgba(0,212,255,.3)" stroke-width="1.5"/>
+        <text x="80" y="57" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="10">Linear combo</text>
+        <text x="80" y="72" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">z = β₀ + β₁x₁ + ...</text>
+        <text x="80" y="84" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Space Mono">z ∈ (-∞, +∞)</text>
+        <line x1="150" y1="60" x2="195" y2="60" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+        <rect x="198" y="35" width="150" height="50" rx="8" fill="rgba(124,58,237,.1)" stroke="rgba(124,58,237,.3)" stroke-width="1.5"/>
+        <text x="273" y="57" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="10">Sigmoid Function</text>
+        <text x="273" y="72" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="11">σ(z) = 1 / (1 + e⁻ᶻ)</text>
+        <text x="273" y="84" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Space Mono">output ∈ (0, 1)</text>
+        <line x1="348" y1="60" x2="393" y2="60" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+        <rect x="396" y="35" width="150" height="50" rx="8" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.3)" stroke-width="1.5"/>
+        <text x="471" y="52" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="10">Probability + Class</text>
+        <text x="471" y="67" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">P(up) = 0.73</text>
+        <text x="471" y="80" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">→ Predict: UP (class=1)</text>
+        <text x="471" y="100" text-anchor="middle" fill="#64748b" font-size="9" font-family="Space Mono">threshold typically 0.5</text>
+      </svg>
+    </div>
+  </div>
+
+  <h2>Evaluation Metrics — Beyond Accuracy</h2>
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body"><strong>Accuracy is misleading in finance!</strong> If stocks go up 55% of days, a model that always predicts "up" gets 55% accuracy — but it's useless. We need better metrics.</div>
+  </div>
+
+  <div class="card card-accent">
+    <h3>The Confusion Matrix</h3>
+    <div class="diagram" style="padding:16px">
+      <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:100%">
+        <!-- Headers -->
+        <text x="280" y="25" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="10">PREDICTED</text>
+        <text x="230" y="55" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="11">Predicted UP</text>
+        <text x="370" y="55" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="11">Predicted DOWN</text>
+        <text x="60" y="105" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="11" transform="rotate(-90, 60, 105)">ACTUAL UP</text>
+        <text x="60" y="175" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="11" transform="rotate(-90, 60, 175)">ACTUAL DOWN</text>
+        <!-- Cells -->
+        <rect x="160" y="65" width="140" height="60" rx="6" fill="rgba(16,185,129,.15)" stroke="rgba(16,185,129,.3)" stroke-width="1.5"/>
+        <text x="230" y="92" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="14" font-weight="700">TP</text>
+        <text x="230" y="110" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">True Positives</text>
+        <text x="230" y="122" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Predicted UP, was UP ✓</text>
+
+        <rect x="305" y="65" width="140" height="60" rx="6" fill="rgba(255,107,53,.1)" stroke="rgba(255,107,53,.25)" stroke-width="1.5"/>
+        <text x="375" y="92" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="14" font-weight="700">FN</text>
+        <text x="375" y="110" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">False Negatives</text>
+        <text x="375" y="122" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Predicted DOWN, was UP</text>
+
+        <rect x="160" y="135" width="140" height="60" rx="6" fill="rgba(255,107,53,.1)" stroke="rgba(255,107,53,.25)" stroke-width="1.5"/>
+        <text x="230" y="162" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="14" font-weight="700">FP</text>
+        <text x="230" y="180" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">False Positives</text>
+        <text x="230" y="192" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Predicted UP, was DOWN</text>
+
+        <rect x="305" y="135" width="140" height="60" rx="6" fill="rgba(16,185,129,.15)" stroke="rgba(16,185,129,.3)" stroke-width="1.5"/>
+        <text x="375" y="162" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="14" font-weight="700">TN</text>
+        <text x="375" y="180" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">True Negatives</text>
+        <text x="375" y="192" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="9">Predicted DOWN, was DOWN ✓</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>Formula</th><th>Finance Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Accuracy</strong></td><td>(TP+TN)/(TP+FP+FN+TN)</td><td>Baseline — use carefully with imbalanced data</td></tr>
+        <tr><td><strong>Precision</strong></td><td>TP/(TP+FP)</td><td>"When we say buy, how often are we right?" — controls false signals</td></tr>
+        <tr><td><strong>Recall</strong></td><td>TP/(TP+FN)</td><td>"Did we catch all the up days?" — important for not missing moves</td></tr>
+        <tr><td><strong>F1 Score</strong></td><td>2×(P×R)/(P+R)</td><td>Balance of precision and recall</td></tr>
+        <tr><td><strong>ROC-AUC</strong></td><td>Area under ROC curve</td><td>Overall discrimination power; >0.55 is useful in finance</td></tr>
+        <tr><td><strong>Log Loss</strong></td><td>-mean(y·log(p))</td><td>Rewards confident correct predictions; training objective</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Key Classifiers for Quant Finance</h2>
+
+  <div class="card card-purple">
+    <h3>Decision Tree</h3>
+    <p>Creates a tree of if-then-else rules. Extremely interpretable — you can read the rules. A decision tree might learn: "If 5-day momentum > 1.5% AND volatility < 15%, predict UP." Great for understanding the model's reasoning.</p>
+    <div class="diagram" style="padding:12px">
+      <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" style="max-width:500px;width:100%">
+        <defs><marker id="arr4" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="#4b5563"/></marker></defs>
+        <!-- Root -->
+        <rect x="180" y="10" width="140" height="40" rx="6" fill="rgba(0,212,255,.12)" stroke="rgba(0,212,255,.35)" stroke-width="1.5"/>
+        <text x="250" y="28" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="9">5d_momentum</text>
+        <text x="250" y="43" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">&gt; 1.5%?</text>
+        <!-- Left branch -->
+        <line x1="215" y1="50" x2="130" y2="90" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <text x="155" y="80" fill="#64748b" font-size="9" font-family="Space Mono">YES</text>
+        <rect x="70" y="90" width="120" height="40" rx="6" fill="rgba(124,58,237,.12)" stroke="rgba(124,58,237,.35)" stroke-width="1.5"/>
+        <text x="130" y="108" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="9">volatility_20d</text>
+        <text x="130" y="122" text-anchor="middle" fill="#94a3b8" font-family="DM Sans" font-size="10">&lt; 15%?</text>
+        <!-- Right branch -->
+        <line x1="285" y1="50" x2="370" y2="90" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <text x="350" y="80" fill="#64748b" font-size="9" font-family="Space Mono">NO</text>
+        <rect x="310" y="90" width="120" height="40" rx="6" fill="rgba(255,107,53,.12)" stroke="rgba(255,107,53,.35)" stroke-width="1.5"/>
+        <text x="370" y="115" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="10">SELL / Short</text>
+        <!-- Left-left -->
+        <line x1="110" y1="130" x2="80" y2="155" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <text x="75" y="150" fill="#64748b" font-size="8" font-family="Space Mono">YES</text>
+        <rect x="30" y="155" width="90" height="22" rx="5" fill="rgba(16,185,129,.15)" stroke="rgba(16,185,129,.3)" stroke-width="1.5"/>
+        <text x="75" y="170" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="9">BUY / Long ✓</text>
+        <!-- Left-right -->
+        <line x1="150" y1="130" x2="185" y2="155" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr4)"/>
+        <text x="177" y="150" fill="#64748b" font-size="8" font-family="Space Mono">NO</text>
+        <rect x="140" y="155" width="90" height="22" rx="5" fill="rgba(245,158,11,.12)" stroke="rgba(245,158,11,.3)" stroke-width="1.5"/>
+        <text x="185" y="170" text-anchor="middle" fill="#f59e0b" font-family="Space Mono" font-size="9">HOLD</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card card-green">
+      <h3>Random Forest Classifier</h3>
+      <p>Builds many decision trees with randomness (different subsets of data + features). Final prediction by majority vote. Key benefits:</p>
+      <ul>
+        <li>Automatically handles non-linear relationships</li>
+        <li>Feature importance tells you which signals matter</li>
+        <li>Robust to overfitting via bagging</li>
+        <li>Handles missing data and mixed feature types</li>
+      </ul>
+    </div>
+    <div class="card card-gold">
+      <h3>Gradient Boosting (XGBoost/LightGBM)</h3>
+      <p>Builds trees sequentially, each one correcting the previous one's mistakes. Often best-in-class for tabular financial data:</p>
+      <ul>
+        <li>Very high predictive accuracy</li>
+        <li>Built-in regularisation (L1/L2)</li>
+        <li>Handles missing values natively</li>
+        <li>Industry standard in quant competitions</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Handling Class Imbalance in Finance</h2>
+  <div class="callout callout-info">
+    <div class="callout-icon">📊</div>
+    <div class="callout-body"><strong>Real problem:</strong> In credit default prediction, maybe only 2% of loans default. A model that predicts "no default" for everything gets 98% accuracy but is completely useless. Solutions include: <strong>SMOTE</strong> (synthetic oversampling), <strong>class_weight='balanced'</strong>, adjusting prediction threshold, and using AUC-ROC instead of accuracy.</div>
+  </div>
+
+  <h2>🧪 Colab Experiment: Trading Signal Classifier</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Experiment #3 — Build a Long/Short Signal</div>
+    <pre>!pip install xgboost -q
+
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> xgboost <span class="kw">import</span> XGBClassifier
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, roc_auc_score
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="comment"># ── Data & Features ──────────────────────────────────────────────────</span>
+df = yf.download(<span class="str">'SPY'</span>, start=<span class="str">'2015-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+df.columns = [c.lower() <span class="kw">for</span> c <span class="kw">in</span> df.columns]
+df[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].pct_change()
+
+<span class="comment"># Momentum features</span>
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="num">5</span>, <span class="num">10</span>, <span class="num">20</span>]:
+    df[<span class="str">f'mom{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).mean()
+    df[<span class="str">f'vol{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).std()
+
+df[<span class="str">'vol_ratio'</span>] = df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].rolling(<span class="num">20</span>).mean()
+
+<span class="comment"># Target: 1 if next day UP, 0 if DOWN</span>
+df[<span class="str">'target'</span>] = (df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>) > <span class="num">0</span>).astype(<span class="kw">int</span>)
+df.dropna(inplace=<span class="kw">True</span>)
+
+features = [<span class="str">'mom5'</span>,<span class="str">'mom10'</span>,<span class="str">'mom20'</span>,<span class="str">'vol5'</span>,<span class="str">'vol10'</span>,<span class="str">'vol20'</span>,<span class="str">'vol_ratio'</span>]
+X, y = df[features].values, df[<span class="str">'target'</span>].values
+
+split = <span class="kw">int</span>(<span class="num">0.8</span> * <span class="kw">len</span>(X))
+X_tr, X_te = X[:split], X[split:]
+y_tr, y_te = y[:split], y[split:]
+
+<span class="comment"># ── Train classifiers ────────────────────────────────────────────────</span>
+rf = RandomForestClassifier(n_estimators=<span class="num">200</span>, max_depth=<span class="num">5</span>, random_state=<span class="num">42</span>)
+xgb = XGBClassifier(n_estimators=<span class="num">200</span>, max_depth=<span class="num">4</span>, learning_rate=<span class="num">0.05</span>,
+                    use_label_encoder=<span class="kw">False</span>, eval_metric=<span class="str">'logloss'</span>, random_state=<span class="num">42</span>)
+
+rf.fit(X_tr, y_tr)
+xgb.fit(X_tr, y_tr)
+
+<span class="kw">for</span> name, m <span class="kw">in</span> [(<span class="str">'RandomForest'</span>, rf), (<span class="str">'XGBoost'</span>, xgb)]:
+    preds = m.predict(X_te)
+    probs = m.predict_proba(X_te)[:,<span class="num">1</span>]
+    print(<span class="str">f"\n── {name} ──"</span>)
+    print(classification_report(y_te, preds, target_names=[<span class="str">'DOWN'</span>,<span class="str">'UP'</span>]))
+    print(<span class="str">f"ROC-AUC: {roc_auc_score(y_te, probs):.4f}"</span>)
+
+<span class="comment"># ── Simple long/short backtest ────────────────────────────────────────</span>
+test_dates = df.index[split:]
+test_ret   = df[<span class="str">'ret'</span>].iloc[split:].values
+
+rf_signal  = np.where(rf.predict(X_te) == <span class="num">1</span>, <span class="num">1</span>, -<span class="num">1</span>)  <span class="comment"># +1 = long, -1 = short</span>
+strat_ret  = rf_signal * test_ret
+
+cumulative = (pd.Series(strat_ret, index=test_dates) + <span class="num">1</span>).cumprod()
+benchmark  = (pd.Series(test_ret, index=test_dates) + <span class="num">1</span>).cumprod()
+
+plt.figure(figsize=(<span class="num">12</span>, <span class="num">4</span>))
+cumulative.plot(label=<span class="str">'ML Strategy'</span>, color=<span class="str">'#00d4ff'</span>)
+benchmark.plot(label=<span class="str">'Buy & Hold'</span>, color=<span class="str">'#f59e0b'</span>)
+plt.title(<span class="str">'ML Signal vs Buy & Hold'</span>); plt.legend(); plt.show()</pre>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E3.1 — Confusion Matrix Deep Dive</span></div>
+    <p>Train a logistic regression on any stock to predict up/down next day. Plot the confusion matrix using sklearn. For each of TP, FP, TN, FN: write what that means in financial terms. Which type of error is more costly for a long-only fund? For a long-short fund?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E3.2 — ROC Curve Comparison</span></div>
+    <p>Train Logistic Regression, Random Forest, and XGBoost on the same dataset. Plot all three ROC curves on the same chart. Compute AUC for each. Which performs best? Run a simple backtest (go long when probability > 0.55) and compute Sharpe ratio for each model. Does higher AUC always mean better Sharpe?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E3.3 — Regime Classification</span></div>
+    <p>Using S&P 500 data (2000–2024): Define three market regimes: Bull (12-month rolling return > 10%), Bear (< -10%), Neutral (in between). Build a multi-class Random Forest classifier using features like VIX level, yield curve slope, credit spreads (download from FRED), and momentum. Evaluate with per-class precision/recall. Build a regime-conditional strategy: only go long in Bull, flat in Neutral, short in Bear. Compare vs buy-and-hold over full period including 2008 and 2020 drawdowns.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 4: FEATURE ENGINEERING
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-features">
+<div class="page">
+
+  <p class="section-title">Feature Engineering</p>
+  <p class="section-subtitle">Turning raw market data into meaningful signals — where domain expertise and ML intersect.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body"><strong>"In God we trust, all others bring data — and better features."</strong> Feature engineering is the most impactful thing you can do for a quant ML model. A simple logistic regression with great features will beat a deep neural network with raw data every time in finance.</div>
+  </div>
+
+  <h2>What Is a Feature?</h2>
+  <p>A <strong>feature</strong> (also called a factor or signal in finance) is any measurable quantity that might help predict your target. Good features are:</p>
+  <div class="grid-3">
+    <div class="card card-accent">
+      <h4>Predictive</h4>
+      <p>Actually correlates with future returns (not just past returns). Has an economic reason to work.</p>
+    </div>
+    <div class="card card-green">
+      <h4>Non-redundant</h4>
+      <p>Adds information not already captured by other features. Avoid using both "5-day return" and "5-day cumulative return" — they're the same thing.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>Stable</h4>
+      <p>Works across different market regimes and time periods, not just during a specific historical window.</p>
+    </div>
+  </div>
+
+  <h2>The Feature Engineering Pipeline</h2>
+  <div class="flow">
+    <div class="flow-step" data-n="1">
+      <div class="flow-step-body">
+        <h4>Raw Data Collection</h4>
+        <p>OHLCV (Open, High, Low, Close, Volume), fundamental data (earnings, PE ratios), alternative data (sentiment, satellite), macroeconomic data (rates, GDP).</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="2">
+      <div class="flow-step-body">
+        <h4>Stationarity Transformation</h4>
+        <p>Raw prices are non-stationary (they trend). Convert to returns, log-returns, or z-scores. Stationary features are required for most ML models to work correctly.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="3">
+      <div class="flow-step-body">
+        <h4>Signal Construction</h4>
+        <p>Build momentum, mean-reversion, volatility, volume, and fundamental features from the transformed data.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="4">
+      <div class="flow-step-body">
+        <h4>Normalisation / Scaling</h4>
+        <p>Scale features to a common range. Critical for linear models and gradient-based algorithms. Use <strong>rolling z-score</strong> for time series to prevent look-ahead bias.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="5">
+      <div class="flow-step-body">
+        <h4>Feature Selection</h4>
+        <p>Remove noisy, redundant, or irrelevant features. Use correlation analysis, Lasso, or tree-based importance scores.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>The Major Feature Categories in Finance</h2>
+
+  <div class="card card-accent">
+    <h3>📈 Momentum Features</h3>
+    <p>Momentum is the tendency for recent winners to keep winning. One of the most robust factors in finance.</p>
+    <pre><span class="comment"># Return-based momentum</span>
+df[<span class="str">'mom_1m'</span>]  = df[<span class="str">'close'</span>].pct_change(<span class="num">21</span>)    <span class="comment"># 1-month return</span>
+df[<span class="str">'mom_3m'</span>]  = df[<span class="str">'close'</span>].pct_change(<span class="num">63</span>)    <span class="comment"># 3-month return</span>
+df[<span class="str">'mom_12m'</span>] = df[<span class="str">'close'</span>].pct_change(<span class="num">252</span>)   <span class="comment"># 12-month return</span>
+
+<span class="comment"># Fama-French style: skip-1-month (avoids short-term reversal)</span>
+df[<span class="str">'mom_ff'</span>]  = df[<span class="str">'close'</span>].pct_change(<span class="num">252</span>) / df[<span class="str">'close'</span>].pct_change(<span class="num">21</span>)
+
+<span class="comment"># Moving average crossover signal</span>
+df[<span class="str">'ma_cross'</span>] = df[<span class="str">'close'</span>].rolling(<span class="num">20</span>).mean() / df[<span class="str">'close'</span>].rolling(<span class="num">50</span>).mean() - <span class="num">1</span>
+
+<span class="comment"># RSI (Relative Strength Index)</span>
+delta = df[<span class="str">'close'</span>].diff()
+gain  = delta.clip(lower=<span class="num">0</span>).rolling(<span class="num">14</span>).mean()
+loss  = (-delta).clip(lower=<span class="num">0</span>).rolling(<span class="num">14</span>).mean()
+df[<span class="str">'rsi'</span>] = <span class="num">100</span> - (<span class="num">100</span> / (<span class="num">1</span> + gain / loss))</pre>
+  </div>
+
+  <div class="card card-purple">
+    <h3>🌊 Volatility Features</h3>
+    <p>Volatility predicts future volatility (GARCH effects). It also interacts with other signals — momentum works differently in high vs low vol regimes.</p>
+    <pre><span class="comment"># Historical volatility (annualised)</span>
+df[<span class="str">'hvol_20'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">20</span>).std() * np.sqrt(<span class="num">252</span>)
+df[<span class="str">'hvol_60'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">60</span>).std() * np.sqrt(<span class="num">252</span>)
+
+<span class="comment"># Volatility ratio (vol regime signal)</span>
+df[<span class="str">'vol_ratio'</span>] = df[<span class="str">'hvol_20'</span>] / df[<span class="str">'hvol_60'</span>]
+
+<span class="comment"># Realised variance</span>
+df[<span class="str">'rv_5'</span>] = (df[<span class="str">'ret'</span>]**<span class="num">2</span>).rolling(<span class="num">5</span>).sum()
+
+<span class="comment"># Garman-Klass volatility (uses OHLC)</span>
+df[<span class="str">'gk_vol'</span>] = np.sqrt(
+    <span class="num">0.5</span> * np.log(df[<span class="str">'high'</span>]/df[<span class="str">'low'</span>])**<span class="num">2</span> -
+    (<span class="num">2</span>*np.log(<span class="num">2</span>)-<span class="num">1</span>) * np.log(df[<span class="str">'close'</span>]/df[<span class="str">'open'</span>])**<span class="num">2</span>
+)</pre>
+  </div>
+
+  <div class="card card-green">
+    <h3>📊 Volume Features</h3>
+    <p>Volume confirms price moves. Unusual volume often precedes significant price action (informed trading, news, earnings).</p>
+    <pre><span class="comment"># Volume relative to moving average</span>
+df[<span class="str">'vol_ma20'</span>] = df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].rolling(<span class="num">20</span>).mean()
+
+<span class="comment"># Price-volume trend</span>
+df[<span class="str">'pvt'</span>] = (df[<span class="str">'ret'</span>] * df[<span class="str">'volume'</span>]).cumsum()
+
+<span class="comment"># On-Balance Volume (OBV)</span>
+obv = <span class="num">0</span>
+df[<span class="str">'obv'</span>] = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, <span class="kw">len</span>(df)):
+    <span class="kw">if</span> df[<span class="str">'close'</span>].iloc[i] > df[<span class="str">'close'</span>].iloc[i-<span class="num">1</span>]:
+        obv += df[<span class="str">'volume'</span>].iloc[i]
+    <span class="kw">elif</span> df[<span class="str">'close'</span>].iloc[i] < df[<span class="str">'close'</span>].iloc[i-<span class="num">1</span>]:
+        obv -= df[<span class="str">'volume'</span>].iloc[i]
+    df[<span class="str">'obv'</span>].iloc[i] = obv</pre>
+  </div>
+
+  <div class="card card-gold">
+    <h3>📐 Statistical / Mean-Reversion Features</h3>
+    <p>Captures how far a stock has deviated from its historical "normal" — useful for mean-reversion strategies.</p>
+    <pre><span class="comment"># Z-score of price (distance from rolling mean)</span>
+def <span class="fn">rolling_zscore</span>(series, window):
+    mean = series.rolling(window).mean()
+    std  = series.rolling(window).std()
+    <span class="kw">return</span> (series - mean) / std
+
+df[<span class="str">'price_z20'</span>] = rolling_zscore(df[<span class="str">'close'</span>], <span class="num">20</span>)
+df[<span class="str">'price_z60'</span>] = rolling_zscore(df[<span class="str">'close'</span>], <span class="num">60</span>)
+
+<span class="comment"># Bollinger Band position</span>
+ma = df[<span class="str">'close'</span>].rolling(<span class="num">20</span>).mean()
+std = df[<span class="str">'close'</span>].rolling(<span class="num">20</span>).std()
+df[<span class="str">'bb_pos'</span>] = (df[<span class="str">'close'</span>] - ma) / (<span class="num">2</span> * std)
+
+<span class="comment"># Autocorrelation of returns (mean-reversion indicator)</span>
+df[<span class="str">'autocorr_5'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">60</span>).apply(
+    <span class="kw">lambda</span> x: x.autocorr(lag=<span class="num">5</span>), raw=<span class="kw">False</span>
+)</pre>
+  </div>
+
+  <h2>Critical: The Look-Ahead Bias Trap</h2>
+  <div class="card card-warn">
+    <h3>The #1 Mistake in Quant Feature Engineering</h3>
+    <p>Using information that wouldn't have been available at the time of prediction is called <strong>look-ahead bias</strong>. It's subtle and destroys live performance.</p>
+    <div class="grid-2">
+      <div>
+        <h4>❌ Bad — Look-ahead bias</h4>
+        <pre><span class="comment"># Using today's close to compute "today's" feature
+# — but today's close isn't known until EOD</span>
+df[<span class="str">'mom'</span>] = df[<span class="str">'close'</span>].pct_change(<span class="num">5</span>)
+df[<span class="str">'target'</span>] = df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>)
+<span class="comment"># If you use same-day close for feature AND
+# shift(-1) for target, you're using the
+# closing price in two conflicting ways!</span></pre>
+      </div>
+      <div>
+        <h4>✅ Good — Proper alignment</h4>
+        <pre><span class="comment"># Features computed from data up to time t
+# Target is return from t to t+1
+# Predict at market open using prev day data</span>
+df[<span class="str">'mom'</span>] = df[<span class="str">'close'</span>].pct_change(<span class="num">5</span>).shift(<span class="num">1</span>)
+df[<span class="str">'vol'</span>] = df[<span class="str">'ret'</span>].rolling(<span class="num">20</span>).std().shift(<span class="num">1</span>)
+df[<span class="str">'target'</span>] = df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>)
+<span class="comment"># shift(1) delays features by 1 day — safe!</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <h2>Feature Normalisation — Making Features Comparable</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Standard Scaling</h3>
+      <p>Subtract mean, divide by std. Good for normally distributed features. Use rolling version for time series!</p>
+      <div class="formula">z = (x - μ) / σ</div>
+      <pre><span class="comment"># BAD for time series (uses future data)</span>
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler().fit(X_train)
+
+<span class="comment"># GOOD for time series (rolling)</span>
+df[<span class="str">'feat_scaled'</span>] = rolling_zscore(df[<span class="str">'feat'</span>], <span class="num">252</span>)</pre>
+    </div>
+    <div class="card">
+      <h3>Cross-Sectional Ranking</h3>
+      <p>For a universe of stocks, rank each feature within each day. This makes features comparable across stocks and time, and is robust to outliers. Industry standard in quant factor investing.</p>
+      <pre><span class="comment"># For a cross-section of stocks</span>
+<span class="comment"># df has Date + Ticker index</span>
+df[<span class="str">'mom_rank'</span>] = df.groupby(<span class="str">'date'</span>)[<span class="str">'mom_12m'</span>]\
+    .rank(pct=<span class="kw">True</span>)  <span class="comment"># 0 to 1 percentile rank</span>
+
+<span class="comment"># Winsorise outliers before ranking</span>
+df[<span class="str">'mom_w'</span>] = df[<span class="str">'mom_12m'</span>].clip(
+    lower=df[<span class="str">'mom_12m'</span>].quantile(<span class="num">0.01</span>),
+    upper=df[<span class="str">'mom_12m'</span>].quantile(<span class="num">0.99</span>)
+)</pre>
+    </div>
+  </div>
+
+  <h2>Feature Selection — Quality over Quantity</h2>
+  <div class="card card-accent">
+    <h3>Information Coefficient (IC) Based Selection</h3>
+    <p>The IC is the correlation between your predicted feature values and the actual next-period returns. It's the primary metric quant researchers use to assess signal quality before including it in a model.</p>
+    <pre><span class="kw">from</span> scipy.stats <span class="kw">import</span> spearmanr
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+def <span class="fn">compute_ic</span>(feature_series, forward_return, window=<span class="num">252</span>):
+    <span class="str">"""Rolling Information Coefficient"""</span>
+    combined = pd.DataFrame({
+        <span class="str">'feature'</span>: feature_series,
+        <span class="str">'return'</span>: forward_return
+    }).dropna()
+    
+    def <span class="fn">rolling_ic</span>(x):
+        <span class="kw">return</span> spearmanr(x[<span class="str">'feature'</span>], x[<span class="str">'return'</span>])[<span class="num">0</span>]
+    
+    <span class="kw">return</span> combined.rolling(window).apply(rolling_ic, raw=<span class="kw">False</span>)
+
+<span class="comment"># Keep features with |IC| > 0.02 and t-stat > 2</span>
+<span class="comment"># IC > 0.05 is excellent in practice</span></pre>
+    <div class="table-wrap" style="margin-top:12px">
+      <table>
+        <thead><tr><th>IC Range</th><th>Signal Quality</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>|IC| < 0.02</td><td>Weak / noise</td><td>Discard</td></tr>
+          <tr><td>0.02 – 0.05</td><td>Marginal</td><td>Use with caution, combine with others</td></tr>
+          <tr><td>0.05 – 0.10</td><td>Good</td><td>Include in model</td></tr>
+          <tr><td>> 0.10</td><td>Excellent (rare)</td><td>Prioritise — check for errors first!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2>🧪 Colab Experiment: Feature IC Analysis</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Experiment #4 — Build and Score Features</div>
+    <pre><span class="kw">import</span> yfinance <span class="kw">as</span> yf, pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> spearmanr
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+df = yf.download(<span class="str">'SPY'</span>, start=<span class="str">'2010-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+df.columns = [c.lower() <span class="kw">for</span> c <span class="kw">in</span> df.columns]
+df[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].pct_change()
+
+<span class="comment"># Build feature library</span>
+features = {}
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="num">5</span>, <span class="num">10</span>, <span class="num">21</span>, <span class="num">63</span>, <span class="num">126</span>, <span class="num">252</span>]:
+    features[<span class="str">f'mom_{n}d'</span>] = df[<span class="str">'ret'</span>].rolling(n).mean().shift(<span class="num">1</span>)
+    features[<span class="str">f'vol_{n}d'</span>] = df[<span class="str">'ret'</span>].rolling(n).std().shift(<span class="num">1</span>)
+
+features[<span class="str">'vol_ratio'</span>] = (features[<span class="str">'vol_5d'</span>] / features[<span class="str">'vol_63d'</span>])
+features[<span class="str">'vol_surge'</span>] = (df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].rolling(<span class="num">20</span>).mean()).shift(<span class="num">1</span>)
+
+<span class="comment"># Forward return (target)</span>
+fwd_ret = df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>)
+
+<span class="comment"># Compute IC for each feature</span>
+ic_results = {}
+<span class="kw">for</span> name, feat <span class="kw">in</span> features.items():
+    data = pd.concat([feat, fwd_ret], axis=<span class="num">1</span>).dropna()
+    data.columns = [<span class="str">'feat'</span>, <span class="str">'fwd'</span>]
+    ic, pval = spearmanr(data[<span class="str">'feat'</span>], data[<span class="str">'fwd'</span>])
+    ic_results[name] = {<span class="str">'IC'</span>: ic, <span class="str">'p_val'</span>: pval,
+                        <span class="str">'significant'</span>: pval < <span class="num">0.05</span>}
+
+ic_df = pd.DataFrame(ic_results).T.sort_values(<span class="str">'IC'</span>)
+print(ic_df.to_string())
+
+<span class="comment"># Plot IC bar chart</span>
+colors = [<span class="str">'#10b981'</span> <span class="kw">if</span> v[<span class="str">'significant'</span>] <span class="kw">else</span> <span class="str">'#374151'</span> 
+          <span class="kw">for</span> v <span class="kw">in</span> ic_results.values() <span class="kw">if</span> <span class="kw">True</span>]
+ic_df[<span class="str">'IC'</span>].plot(kind=<span class="str">'barh'</span>, figsize=(<span class="num">10</span>,<span class="num">6</span>),
+                 color=[<span class="str">'#10b981'</span> <span class="kw">if</span> x else <span class="str">'#374151'</span> <span class="kw">for</span> x <span class="kw">in</span> ic_df[<span class="str">'significant'</span>]])
+plt.axvline(<span class="num">0</span>, color=<span class="str">'white'</span>, lw=<span class="num">0.5</span>)
+plt.title(<span class="str">'Feature IC (green = statistically significant)'</span>)
+plt.tight_layout(); plt.show()</pre>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E4.1 — Build 5 Features</span></div>
+    <p>Using any stock: implement (a) 5-day momentum, (b) 20-day volatility, (c) RSI-14, (d) volume ratio vs 20-day MA, (e) Bollinger Band position. Plot all 5 features on subplots alongside price for the last 2 years. Make sure all features are properly shifted to avoid look-ahead bias.</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E4.2 — IC Decay Analysis</span></div>
+    <p>Pick the single best-IC feature from your analysis. Compute IC not just for 1-day forward returns but for 1, 3, 5, 10, 21-day forward returns. Plot IC vs horizon. Does the feature's predictive power decay? At what horizon does it become insignificant? What does this tell you about optimal holding period for a strategy using this signal?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E4.3 — Factor Portfolio Construction</span></div>
+    <p>Download daily returns for S&P 500 constituent stocks (use a pre-built list or download from a provider). Compute 12-month momentum (skip 1 month) for each stock on each date. Each month, sort stocks into quintiles (Q1=lowest momentum, Q5=highest). Build equal-weighted portfolios for each quintile. Compute monthly returns for each quintile portfolio from 2010–2023. Plot cumulative returns and compute Sharpe ratios. This is a real Fama-French style factor analysis!</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 5: PURGED CROSS-VALIDATION
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-purgecv">
+<div class="page">
+
+  <p class="section-title">Purged Cross-Validation</p>
+  <p class="section-subtitle">The right way to validate models on financial time series — avoiding the serial correlation trap.</p>
+
+  <h2>Why Standard Cross-Validation Fails in Finance</h2>
+
+  <div class="card card-warn">
+    <h3>The Serial Correlation Problem</h3>
+    <p>Standard k-fold cross-validation randomly shuffles data and splits it into folds. This works for IID (independent and identically distributed) data like image classification. <strong>Financial time series data is NOT IID.</strong></p>
+    <div class="grid-2">
+      <div>
+        <h4>Why this is dangerous</h4>
+        <ul>
+          <li>Adjacent data points are correlated (Monday's return affects Tuesday's)</li>
+          <li>Features like "20-day momentum" overlap across time — today's feature shares 19 days with yesterday's</li>
+          <li>If fold 3 (e.g., March 2020) is adjacent to fold 2 (Feb 2020), the model has "seen" the volatility regime in advance</li>
+          <li>Results in massively optimistic out-of-sample metrics</li>
+        </ul>
+      </div>
+      <div>
+        <div class="diagram" style="padding:12px">
+          <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" style="max-width:300px;width:100%">
+            <text x="150" y="18" text-anchor="middle" fill="#ff6b35" font-family="Space Mono" font-size="9">❌ STANDARD K-FOLD</text>
+            <text x="150" y="30" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="8">(Wrong for finance)</text>
+            <!-- Blocks randomly mixed -->
+            <rect x="10" y="40" width="40" height="25" rx="3" fill="rgba(0,212,255,.3)"/><text x="30" y="57" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">Fold 2</text>
+            <rect x="55" y="40" width="40" height="25" rx="3" fill="rgba(255,107,53,.3)"/><text x="75" y="57" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+            <rect x="100" y="40" width="40" height="25" rx="3" fill="rgba(0,212,255,.3)"/><text x="120" y="57" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">Fold 4</text>
+            <rect x="145" y="40" width="40" height="25" rx="3" fill="rgba(0,212,255,.3)"/><text x="165" y="57" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">Fold 1</text>
+            <rect x="190" y="40" width="40" height="25" rx="3" fill="rgba(0,212,255,.3)"/><text x="210" y="57" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">Fold 3</text>
+            <text x="150" y="82" text-anchor="middle" fill="#ff6b35" font-family="DM Sans" font-size="9">↑ Future leaks into past!</text>
+            <text x="150" y="95" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="8">Training fold 4 (future) adjacent</text>
+            <text x="150" y="107" text-anchor="middle" fill="#64748b" font-family="DM Sans" font-size="8">to TEST — contaminates validation</text>
+
+            <text x="150" y="130" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="9">✓ WALK-FORWARD (correct)</text>
+            <!-- Proper time order -->
+            <rect x="10" y="140" width="50" height="25" rx="3" fill="rgba(0,212,255,.25)"/><text x="35" y="157" text-anchor="middle" fill="#00d4ff" font-size="7" font-family="Space Mono">TRAIN 1</text>
+            <rect x="65" y="140" width="25" height="25" rx="3" fill="rgba(255,107,53,.35)"/><text x="77" y="157" text-anchor="middle" fill="#ff6b35" font-size="7" font-family="Space Mono">T1</text>
+            <rect x="95" y="140" width="60" height="25" rx="3" fill="rgba(0,212,255,.25)"/><text x="125" y="157" text-anchor="middle" fill="#00d4ff" font-size="7" font-family="Space Mono">TRAIN 2</text>
+            <rect x="160" y="140" width="25" height="25" rx="3" fill="rgba(255,107,53,.35)"/><text x="172" y="157" text-anchor="middle" fill="#ff6b35" font-size="7" font-family="Space Mono">T2</text>
+            <rect x="190" y="140" width="70" height="25" rx="3" fill="rgba(0,212,255,.25)"/><text x="225" y="157" text-anchor="middle" fill="#00d4ff" font-size="7" font-family="Space Mono">TRAIN 3</text>
+            <text x="150" y="178" text-anchor="middle" fill="#10b981" font-family="DM Sans" font-size="8">Always train on past, test on future</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Walk-Forward Cross-Validation</h2>
+  <div class="highlight-box">
+    <p>The simplest fix: always train on the past and test on the future. Split the timeline into rolling windows. This mirrors how a strategy would actually be deployed.</p>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <text x="350" y="20" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="10">WALK-FORWARD (EXPANDING WINDOW)</text>
+      <!-- Fold 1 -->
+      <text x="12" y="45" fill="#64748b" font-family="Space Mono" font-size="9">Fold 1</text>
+      <rect x="60" y="35" width="200" height="18" rx="3" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="160" y="48" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">TRAIN</text>
+      <rect x="265" y="35" width="60" height="18" rx="3" fill="rgba(255,107,53,.3)" stroke="rgba(255,107,53,.4)" stroke-width="1"/>
+      <text x="295" y="48" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+
+      <!-- Fold 2 -->
+      <text x="12" y="75" fill="#64748b" font-family="Space Mono" font-size="9">Fold 2</text>
+      <rect x="60" y="65" width="265" height="18" rx="3" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="192" y="78" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">TRAIN (expanded)</text>
+      <rect x="330" y="65" width="60" height="18" rx="3" fill="rgba(255,107,53,.3)" stroke="rgba(255,107,53,.4)" stroke-width="1"/>
+      <text x="360" y="78" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+
+      <!-- Fold 3 -->
+      <text x="12" y="105" fill="#64748b" font-family="Space Mono" font-size="9">Fold 3</text>
+      <rect x="60" y="95" width="330" height="18" rx="3" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="225" y="108" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">TRAIN (expanded)</text>
+      <rect x="395" y="95" width="60" height="18" rx="3" fill="rgba(255,107,53,.3)" stroke="rgba(255,107,53,.4)" stroke-width="1"/>
+      <text x="425" y="108" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+
+      <!-- Fold 4 -->
+      <text x="12" y="135" fill="#64748b" font-family="Space Mono" font-size="9">Fold 4</text>
+      <rect x="60" y="125" width="395" height="18" rx="3" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="257" y="138" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">TRAIN (expanded)</text>
+      <rect x="460" y="125" width="60" height="18" rx="3" fill="rgba(255,107,53,.3)" stroke="rgba(255,107,53,.4)" stroke-width="1"/>
+      <text x="490" y="138" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+
+      <!-- Fold 5 -->
+      <text x="12" y="165" fill="#64748b" font-family="Space Mono" font-size="9">Fold 5</text>
+      <rect x="60" y="155" width="460" height="18" rx="3" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+      <text x="290" y="168" text-anchor="middle" fill="#00d4ff" font-size="8" font-family="Space Mono">TRAIN (full history)</text>
+      <rect x="525" y="155" width="60" height="18" rx="3" fill="rgba(255,107,53,.3)" stroke="rgba(255,107,53,.4)" stroke-width="1"/>
+      <text x="555" y="168" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Space Mono">TEST</text>
+      <!-- Time arrow -->
+      <line x1="60" y1="185" x2="640" y2="185" stroke="#1e2d45" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="60" y="198" fill="#4b5563" font-size="9" font-family="Space Mono">2015</text>
+      <text x="600" y="198" fill="#4b5563" font-size="9" font-family="Space Mono">2024 →</text>
+    </svg>
+  </div>
+
+  <h2>The Purged Cross-Validation Framework</h2>
+  <div class="card card-accent">
+    <h3>The Problem Walk-Forward Doesn't Fully Solve: Label Leakage</h3>
+    <p>Even with walk-forward validation, there's a subtle issue: if your labels (forward returns) overlap with training data, information leaks. Example:</p>
+    <ul>
+      <li>You're predicting 5-day forward return</li>
+      <li>Training ends on Day 100</li>
+      <li>Test starts on Day 101</li>
+      <li><strong>But the label for Day 98 uses price on Day 103!</strong> Day 103 is in the test set but was used to create a training label.</li>
+    </ul>
+    <p>This is called <strong>label overlap</strong> and causes information leakage across the train/test boundary.</p>
+  </div>
+
+  <div class="highlight-box">
+    <h3>Purged K-Fold: The Solution (López de Prado)</h3>
+    <p>Developed by Marcos López de Prado in "Advances in Financial Machine Learning," purged cross-validation removes (<strong>purges</strong>) any training observations whose labels overlap with the test set's time range. An optional <strong>embargo</strong> period is also added after each test fold to prevent leakage from serial correlations in features.</p>
+  </div>
+
+  <div class="diagram">
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%">
+      <text x="350" y="18" text-anchor="middle" fill="#94a3b8" font-family="Space Mono" font-size="10">PURGED K-FOLD WITH EMBARGO</text>
+      <!-- Timeline bar -->
+      <rect x="30" y="35" width="640" height="30" rx="4" fill="rgba(30,45,69,0.5)" stroke="var(--border)" stroke-width="1"/>
+
+      <!-- Train fold A -->
+      <rect x="30"  y="35" width="180" height="30" rx="4" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1.5"/>
+      <text x="120" y="54" text-anchor="middle" fill="#00d4ff" font-size="9" font-family="Space Mono">TRAIN A</text>
+
+      <!-- Purge zone -->
+      <rect x="210" y="35" width="30" height="30" rx="0" fill="rgba(245,158,11,.3)" stroke="rgba(245,158,11,.4)" stroke-width="1.5"/>
+      <text x="225" y="54" text-anchor="middle" fill="#f59e0b" font-size="7" font-family="Space Mono">PURGE</text>
+
+      <!-- Test fold -->
+      <rect x="240" y="35" width="160" height="30" rx="0" fill="rgba(255,107,53,.25)" stroke="rgba(255,107,53,.4)" stroke-width="1.5"/>
+      <text x="320" y="54" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="Space Mono">TEST FOLD</text>
+
+      <!-- Embargo -->
+      <rect x="400" y="35" width="30" height="30" rx="0" fill="rgba(124,58,237,.3)" stroke="rgba(124,58,237,.4)" stroke-width="1.5"/>
+      <text x="415" y="54" text-anchor="middle" fill="#a78bfa" font-size="7" font-family="Space Mono">EMBARGO</text>
+
+      <!-- Train fold B -->
+      <rect x="430" y="35" width="240" height="30" rx="4" fill="rgba(0,212,255,.2)" stroke="rgba(0,212,255,.3)" stroke-width="1.5"/>
+      <text x="550" y="54" text-anchor="middle" fill="#00d4ff" font-size="9" font-family="Space Mono">TRAIN B</text>
+
+      <!-- Legend -->
+      <rect x="30"  y="85" width="14" height="10" rx="2" fill="rgba(245,158,11,.5)"/>
+      <text x="50" y="95" fill="#94a3b8" font-size="10" font-family="DM Sans">Purge: removes training samples whose forward return overlaps with test period</text>
+      <rect x="30"  y="105" width="14" height="10" rx="2" fill="rgba(124,58,237,.5)"/>
+      <text x="50" y="115" fill="#94a3b8" font-size="10" font-family="DM Sans">Embargo: gap after test set — no training on too-recent data (accounts for autocorrelation)</text>
+
+      <!-- Process steps -->
+      <text x="30" y="145" fill="#64748b" font-family="Space Mono" font-size="9">STEP-BY-STEP:</text>
+      <text x="30" y="160" fill="#94a3b8" font-family="DM Sans" font-size="10">1. Divide timeline into k folds (without shuffling)</text>
+      <text x="30" y="175" fill="#94a3b8" font-family="DM Sans" font-size="10">2. For each test fold: remove from TRAINING any sample whose label end-time falls inside the test period</text>
+      <text x="30" y="190" fill="#94a3b8" font-family="DM Sans" font-size="10">3. Remove the embargo period (e.g., 5-10 days) immediately after the test fold from training too</text>
+    </svg>
+  </div>
+
+  <h2>Implementing Purged CV from Scratch</h2>
+  <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> KFold
+
+<span class="kw">class</span> <span class="fn">PurgedKFold</span>:
+    <span class="str">"""
+    Purged K-Fold Cross-Validation for financial time series.
+    Based on López de Prado (2018) Advances in Financial ML.
+    
+    Removes training samples whose labels overlap with test fold.
+    """</span>
+    
+    def <span class="fn">__init__</span>(self, n_splits=<span class="num">5</span>, purge_gap=<span class="num">0</span>, embargo_pct=<span class="num">0.01</span>):
+        self.n_splits   = n_splits
+        self.purge_gap  = purge_gap    <span class="comment"># days to purge before test fold</span>
+        self.embargo_pct = embargo_pct <span class="comment"># % of total data as embargo</span>
+    
+    def <span class="fn">split</span>(self, X, y=<span class="kw">None</span>, groups=<span class="kw">None</span>):
+        <span class="str">"""
+        X must be a DataFrame with DatetimeIndex.
+        Returns (train_idx, test_idx) for each fold.
+        """</span>
+        n = <span class="kw">len</span>(X)
+        embargo_size = <span class="kw">int</span>(n * self.embargo_pct)
+        
+        <span class="comment"># Create k evenly-spaced folds along timeline</span>
+        fold_boundaries = np.array_split(np.arange(n), self.n_splits)
+        
+        <span class="kw">for</span> fold_idx <span class="kw">in</span> range(self.n_splits):
+            test_idx   = fold_boundaries[fold_idx]
+            test_start = test_idx[<span class="num">0</span>]
+            test_end   = test_idx[-<span class="num">1</span>]
+            
+            <span class="comment"># Embargo: exclude data immediately after test fold</span>
+            embargo_end = min(n - <span class="num">1</span>, test_end + embargo_size)
+            
+            <span class="comment"># Train: everything outside [test_start - purge_gap, embargo_end]</span>
+            train_idx = np.concatenate([
+                np.arange(<span class="num">0</span>, max(<span class="num">0</span>, test_start - self.purge_gap)),
+                np.arange(embargo_end + <span class="num">1</span>, n)
+            ])
+            
+            <span class="kw">if</span> <span class="kw">len</span>(train_idx) > <span class="num">0</span> <span class="kw">and</span> <span class="kw">len</span>(test_idx) > <span class="num">0</span>:
+                <span class="kw">yield</span> train_idx.astype(<span class="kw">int</span>), test_idx.astype(<span class="kw">int</span>)
+
+<span class="comment"># ── Usage ─────────────────────────────────────────────────────────────</span>
+cv = PurgedKFold(n_splits=<span class="num">5</span>, purge_gap=<span class="num">5</span>, embargo_pct=<span class="num">0.01</span>)
+
+scores = []
+<span class="kw">for</span> train_idx, test_idx <span class="kw">in</span> cv.split(X_df):
+    X_tr, X_te = X_df.iloc[train_idx], X_df.iloc[test_idx]
+    y_tr, y_te = y_series.iloc[train_idx], y_series.iloc[test_idx]
+    
+    model.fit(X_tr, y_tr)
+    score = model.score(X_te, y_te)
+    scores.append(score)
+
+print(<span class="str">f"Purged CV Score: {np.mean(scores):.4f} ± {np.std(scores):.4f}"</span>)</pre>
+
+  <h2>Using mlfinlab for Production-Grade Purged CV</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Experiment #5 — Purged CV vs Standard CV</div>
+    <pre>!pip install mlfinlab -q  <span class="comment"># López de Prado's library</span>
+
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf, pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score, KFold
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score
+
+<span class="comment"># ── Build dataset ────────────────────────────────────────────────────</span>
+df = yf.download(<span class="str">'SPY'</span>, start=<span class="str">'2015-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+df.columns = [c.lower() <span class="kw">for</span> c <span class="kw">in</span> df.columns]
+df[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].pct_change()
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="num">5</span>,<span class="num">10</span>,<span class="num">20</span>]:
+    df[<span class="str">f'mom{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).mean().shift(<span class="num">1</span>)
+    df[<span class="str">f'vol{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).std().shift(<span class="num">1</span>)
+df[<span class="str">'target'</span>] = (df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>) > <span class="num">0</span>).astype(<span class="kw">int</span>)
+df.dropna(inplace=<span class="kw">True</span>)
+
+features = [<span class="str">'mom5'</span>,<span class="str">'mom10'</span>,<span class="str">'mom20'</span>,<span class="str">'vol5'</span>,<span class="str">'vol10'</span>,<span class="str">'vol20'</span>]
+X = df[features]
+y = df[<span class="str">'target'</span>]
+
+model = RandomForestClassifier(n_estimators=<span class="num">100</span>, max_depth=<span class="num">5</span>, random_state=<span class="num">42</span>)
+
+<span class="comment"># ── Method 1: Standard (WRONG) K-Fold ────────────────────────────────</span>
+std_cv = KFold(n_splits=<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">42</span>)
+std_scores = cross_val_score(model, X, y, cv=std_cv, scoring=<span class="str">'accuracy'</span>)
+print(<span class="str">f"Standard K-Fold CV: {std_scores.mean():.4f} ± {std_scores.std():.4f}"</span>)
+
+<span class="comment"># ── Method 2: Purged K-Fold (CORRECT) ────────────────────────────────</span>
+purged_cv = PurgedKFold(n_splits=<span class="num">5</span>, purge_gap=<span class="num">5</span>, embargo_pct=<span class="num">0.01</span>)
+purged_scores = []
+<span class="kw">for</span> tr_idx, te_idx <span class="kw">in</span> purged_cv.split(X):
+    model.fit(X.iloc[tr_idx], y.iloc[tr_idx])
+    preds = model.predict(X.iloc[te_idx])
+    purged_scores.append(accuracy_score(y.iloc[te_idx], preds))
+
+purged_arr = np.array(purged_scores)
+print(<span class="str">f"Purged K-Fold CV:   {purged_arr.mean():.4f} ± {purged_arr.std():.4f}"</span>)
+print(<span class="str">f"\nOverfit gap: {std_scores.mean() - purged_arr.mean():.4f}"</span>)
+print(<span class="str">"Note: Standard CV usually shows inflated accuracy!"</span>)</pre>
+  </div>
+
+  <h2>Combinatorial Purged Cross-Validation (CPCV)</h2>
+  <div class="card card-purple">
+    <h3>Going Further: When You Have Limited Data</h3>
+    <p>Regular purged CV can only test on each time period once — wasting backtesting information. CPCV, also from López de Prado, generates multiple train/test splits from all possible combinations of folds, providing a more robust estimate of performance distribution. It allows estimation of strategy performance path (not just point estimate), enabling Sharpe ratio confidence intervals.</p>
+    <div class="formula">
+      CPCV(N, k): N = total folds, k = number of test folds<br>
+      Number of paths = C(N, k) = N! / (k! × (N-k)!)<br><br>
+      Example: N=6, k=2 → C(6,2) = 15 paths
+    </div>
+  </div>
+
+  <h2>Exercises</h2>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-easy">Easy</span><span class="exercise-title">E5.1 — Walk-Forward Implementation</span></div>
+    <p>Using SPY data (2015–2023): implement a walk-forward validation loop manually. Use 12-month training window, 3-month test window. For each fold, print: fold dates, number of training samples, test accuracy of a logistic regression. Report the mean and std of accuracy across all folds.</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-medium">Medium</span><span class="exercise-title">E5.2 — Standard vs Purged CV Comparison</span></div>
+    <p>Using the PurgedKFold class above: compare the CV accuracy reported by (a) standard K-fold with shuffle=True, (b) standard K-fold with shuffle=False, (c) purged K-fold with purge_gap=5 days. Run this experiment for 3 different stocks. Does standard CV consistently overestimate performance? By how much on average?</p>
+  </div>
+  <div class="exercise">
+    <div class="exercise-header"><span class="badge badge-hard">Hard</span><span class="exercise-title">E5.3 — Hyperparameter Tuning with Purged CV</span></div>
+    <p>Implement a grid search using purged CV (not standard CV). Search over: max_depth ∈ {2,4,6,8}, n_estimators ∈ {50,100,200}, min_samples_leaf ∈ {10,20,50} for a Random Forest on SPY data. Select the best hyperparameters using purged CV, then retrain on all available data and run a final out-of-sample test on the last year. Compare the selected hyperparameters to those selected by standard CV. Write a short report explaining any differences and what they imply about the models' actual predictive power.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 6: PUTTING IT TOGETHER
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-integration">
+<div class="page">
+
+  <p class="section-title">Putting It All Together</p>
+  <p class="section-subtitle">Build a complete ML-powered trading strategy from raw data to backtest — the full quant pipeline.</p>
+
+  <h2>The Complete Quant ML Pipeline</h2>
+  <div class="flow">
+    <div class="flow-step" data-n="1">
+      <div class="flow-step-body">
+        <h4>Data Collection & Quality Check</h4>
+        <p>Download price/volume data. Check for: gaps, splits, dividend adjustments, survivorship bias. Use adjusted close prices. For cross-section strategies, collect a consistent universe (e.g., S&P 500 constituents over time, not just current members).</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="2">
+      <div class="flow-step-body">
+        <h4>Label Construction</h4>
+        <p>Define your prediction target carefully. In finance, instead of just "next-day return", consider: (a) <strong>triple barrier method</strong> (label +1 if upper barrier hit first, -1 if lower hit first, 0 if time expires), (b) <strong>meta-labeling</strong> (label 1 if a side-bet on an existing strategy would have been profitable).</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="3">
+      <div class="flow-step-body">
+        <h4>Feature Engineering (from Tab 4)</h4>
+        <p>Build momentum, volatility, volume, and cross-sectional features. Always shift by at least 1 to avoid look-ahead. Winsorise outliers. Use rolling z-scores for normalisation.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="4">
+      <div class="flow-step-body">
+        <h4>Feature Selection via IC Analysis</h4>
+        <p>Compute IC for every feature. Keep only features with |IC| > 0.02 and p-value < 0.05 (over training period). Cluster correlated features and keep one per cluster to avoid redundancy.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="5">
+      <div class="flow-step-body">
+        <h4>Model Training with Purged CV</h4>
+        <p>Use purged k-fold CV for hyperparameter tuning. Sample weights proportional to label uniqueness (avoid giving equal weight to overlapping samples). Use class_weight='balanced' for imbalanced labels.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="6">
+      <div class="flow-step-body">
+        <h4>Position Sizing</h4>
+        <p>Convert model output (probability or regression score) to position size. Scale position proportionally to signal strength AND inversely to volatility (Kelly criterion, volatility targeting). Never go all-in on a signal.</p>
+      </div>
+    </div>
+    <div class="flow-step" data-n="7">
+      <div class="flow-step-body">
+        <h4>Backtest & Performance Attribution</h4>
+        <p>Run walk-forward backtest. Compute: Sharpe ratio, Maximum Drawdown, Calmar ratio (return/MaxDD), Hit Rate, Profit Factor. Decompose performance by year, market regime, and feature contribution.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Full Pipeline Code</h2>
+  <div class="colab-box">
+    <div class="colab-box-header">🧪 Final Experiment — Complete ML Trading Strategy</div>
+    <pre>!pip install yfinance xgboost -q
+
+<span class="kw">import</span> yfinance <span class="kw">as</span> yf, pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> spearmanr
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> warnings; warnings.filterwarnings(<span class="str">'ignore'</span>)
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 1: Data
+# ═══════════════════════════════════════════════════════</span>
+df = yf.download(<span class="str">'SPY'</span>, start=<span class="str">'2012-01-01'</span>, end=<span class="str">'2024-01-01'</span>)
+df.columns = [c.lower() <span class="kw">for</span> c <span class="kw">in</span> df.columns]
+df[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].pct_change()
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 2: Feature Engineering (with look-ahead protection)
+# ═══════════════════════════════════════════════════════</span>
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="num">5</span>, <span class="num">10</span>, <span class="num">21</span>, <span class="num">63</span>]:
+    df[<span class="str">f'mom_{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).mean().shift(<span class="num">1</span>)
+    df[<span class="str">f'vol_{n}'</span>] = df[<span class="str">'ret'</span>].rolling(n).std().shift(<span class="num">1</span>)
+df[<span class="str">'vol_ratio'</span>] = (df[<span class="str">'vol_5'</span>] / df[<span class="str">'vol_63'</span>]).shift(<span class="num">1</span>)
+df[<span class="str">'vol_surge'</span>] = (df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].rolling(<span class="num">20</span>).mean()).shift(<span class="num">1</span>)
+
+<span class="comment"># Z-score normalisation (rolling, no look-ahead)</span>
+<span class="kw">for</span> col <span class="kw">in</span> [<span class="str">'mom_5'</span>,<span class="str">'mom_21'</span>,<span class="str">'vol_21'</span>,<span class="str">'vol_ratio'</span>,<span class="str">'vol_surge'</span>]:
+    mu  = df[col].rolling(<span class="num">252</span>).mean()
+    std = df[col].rolling(<span class="num">252</span>).std()
+    df[col+<span class="str">'_z'</span>] = (df[col] - mu) / std.replace(<span class="num">0</span>, np.nan)
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 3: Labels
+# ═══════════════════════════════════════════════════════</span>
+df[<span class="str">'fwd_ret'</span>] = df[<span class="str">'ret'</span>].shift(-<span class="num">1</span>)
+df[<span class="str">'label'</span>] = (df[<span class="str">'fwd_ret'</span>] > <span class="num">0</span>).astype(<span class="kw">int</span>)
+df.dropna(inplace=<span class="kw">True</span>)
+
+features = [<span class="str">'mom_5_z'</span>,<span class="str">'mom_21_z'</span>,<span class="str">'vol_21_z'</span>,<span class="str">'vol_ratio_z'</span>,<span class="str">'vol_surge_z'</span>]
+X, y = df[features], df[<span class="str">'label'</span>]
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 4: Purged Walk-Forward Backtest
+# ═══════════════════════════════════════════════════════</span>
+TRAIN_YEARS = <span class="num">3</span>
+TEST_MONTHS = <span class="num">6</span>
+EMBARGO_DAYS = <span class="num">5</span>
+
+results = []
+unique_years = sorted(df.index.year.unique())
+
+<span class="kw">for</span> start_y <span class="kw">in</span> unique_years[TRAIN_YEARS:-<span class="num">1</span>]:
+    train_end   = pd.Timestamp(<span class="str">f'{start_y}-01-01'</span>)
+    train_start = train_end - pd.DateOffset(years=TRAIN_YEARS)
+    test_start  = train_end + pd.DateOffset(days=EMBARGO_DAYS)
+    test_end    = test_start + pd.DateOffset(months=TEST_MONTHS)
+    
+    train_mask = (df.index >= train_start) & (df.index < train_end)
+    test_mask  = (df.index >= test_start)  & (df.index < test_end)
+    
+    <span class="kw">if</span> train_mask.sum() < <span class="num">100</span> <span class="kw">or</span> test_mask.sum() < <span class="num">20</span>:
+        <span class="kw">continue</span>
+    
+    model = RandomForestClassifier(n_estimators=<span class="num">200</span>, max_depth=<span class="num">4</span>,
+                                   min_samples_leaf=<span class="num">20</span>, random_state=<span class="num">42</span>)
+    model.fit(X[train_mask], y[train_mask])
+    
+    probs = model.predict_proba(X[test_mask])[:,<span class="num">1</span>]
+    
+    <span class="comment"># Position: long if prob > 0.55, short if < 0.45, flat otherwise</span>
+    positions = np.where(probs > <span class="num">0.55</span>, <span class="num">1</span>, np.where(probs < <span class="num">0.45</span>, -<span class="num">1</span>, <span class="num">0</span>))
+    
+    fold_df = pd.DataFrame({
+        <span class="str">'date'</span>:     df.index[test_mask],
+        <span class="str">'ret'</span>:      df[<span class="str">'fwd_ret'</span>][test_mask].values,
+        <span class="str">'position'</span>: positions,
+        <span class="str">'prob'</span>:     probs,
+        <span class="str">'label'</span>:    y[test_mask].values,
+    })
+    fold_df[<span class="str">'strat_ret'</span>] = fold_df[<span class="str">'position'</span>] * fold_df[<span class="str">'ret'</span>]
+    results.append(fold_df)
+
+all_results = pd.concat(results).set_index(<span class="str">'date'</span>)
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 5: Performance Metrics
+# ═══════════════════════════════════════════════════════</span>
+strat  = all_results[<span class="str">'strat_ret'</span>]
+bh     = all_results[<span class="str">'ret'</span>]
+
+ann_ret_strat = strat.mean() * <span class="num">252</span>
+ann_vol_strat = strat.std()  * np.sqrt(<span class="num">252</span>)
+sharpe_strat  = ann_ret_strat / ann_vol_strat
+maxdd_strat   = ((<span class="num">1</span>+strat).cumprod() / (<span class="num">1</span>+strat).cumprod().cummax() - <span class="num">1</span>).min()
+
+print(<span class="str">"═"</span>*<span class="num">45</span>)
+print(<span class="str">f"  ML Strategy Annualised Return: {ann_ret_strat:.2%}"</span>)
+print(<span class="str">f"  ML Strategy Sharpe Ratio:      {sharpe_strat:.3f}"</span>)
+print(<span class="str">f"  ML Strategy Max Drawdown:      {maxdd_strat:.2%}"</span>)
+print(<span class="str">f"  Buy-and-Hold Sharpe:           {bh.mean()*252/(bh.std()*np.sqrt(252)):.3f}"</span>)
+print(<span class="str">"═"</span>*<span class="num">45</span>)
+
+<span class="comment"># ═══════════════════════════════════════════════════════
+# STEP 6: Plot Results
+# ═══════════════════════════════════════════════════════</span>
+fig, axes = plt.subplots(<span class="num">2</span>, <span class="num">2</span>, figsize=(<span class="num">14</span>, <span class="num">8</span>))
+
+<span class="comment"># Cumulative returns</span>
+((<span class="num">1</span>+strat).cumprod()).plot(ax=axes[<span class="num">0</span>,<span class="num">0</span>], label=<span class="str">'ML Strategy'</span>, color=<span class="str">'#00d4ff'</span>)
+((<span class="num">1</span>+bh).cumprod()).plot(ax=axes[<span class="num">0</span>,<span class="num">0</span>],   label=<span class="str">'Buy & Hold'</span>,  color=<span class="str">'#f59e0b'</span>)
+axes[<span class="num">0</span>,<span class="num">0</span>].set_title(<span class="str">'Cumulative Returns'</span>); axes[<span class="num">0</span>,<span class="num">0</span>].legend()
+
+<span class="comment"># Annual returns</span>
+strat.resample(<span class="str">'Y'</span>).sum().plot(kind=<span class="str">'bar'</span>, ax=axes[<span class="num">0</span>,<span class="num">1</span>], color=<span class="str">'#7c3aed'</span>)
+axes[<span class="num">0</span>,<span class="num">1</span>].set_title(<span class="str">'Annual Returns'</span>)
+
+<span class="comment"># Drawdown</span>
+dd = ((<span class="num">1</span>+strat).cumprod() / (<span class="num">1</span>+strat).cumprod().cummax() - <span class="num">1</span>)
+dd.plot(ax=axes[<span class="num">1</span>,<span class="num">0</span>], color=<span class="str">'#ff6b35'</span>); axes[<span class="num">1</span>,<span class="num">0</span>].set_title(<span class="str">'Drawdown'</span>)
+
+<span class="comment"># Probability distribution of signals</span>
+all_results[<span class="str">'prob'</span>].hist(ax=axes[<span class="num">1</span>,<span class="num">1</span>], bins=<span class="num">30</span>, color=<span class="str">'#10b981'</span>)
+axes[<span class="num">1</span>,<span class="num">1</span>].set_title(<span class="str">'Signal Probability Distribution'</span>)
+
+plt.tight_layout(); plt.show()</pre>
+  </div>
+
+  <h2>Common Pitfalls & How to Avoid Them</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pitfall</th><th>What Happens</th><th>Prevention</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Look-ahead bias</strong></td><td>Unrealistically high backtest returns; strategy fails live</td><td>Always shift features, use only lagged data</td></tr>
+        <tr><td><strong>Survivorship bias</strong></td><td>Overestimate performance — you only test on stocks that survived</td><td>Use point-in-time universe (companies that existed then, not now)</td></tr>
+        <tr><td><strong>Overfitting</strong></td><td>Great backtest, terrible live performance</td><td>Purged CV, regularisation, fewer features, out-of-sample test</td></tr>
+        <tr><td><strong>Transaction costs</strong></td><td>Strategy looks profitable before costs, unprofitable after</td><td>Always include estimated bid-ask spread + market impact</td></tr>
+        <tr><td><strong>Regime change</strong></td><td>Model trained on bull market fails in bear market</td><td>Walk-forward with frequent retraining, regime-aware features</td></tr>
+        <tr><td><strong>Multiple testing</strong></td><td>Test 100 strategies, 5 appear significant by chance</td><td>Bonferroni/BHY correction, combinatorial purged CV</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Your Quant ML Reading Roadmap</h2>
+  <div class="grid-2">
+    <div class="card card-accent">
+      <h3>Month 1–2: Foundations</h3>
+      <ul>
+        <li>Python for Data Analysis (Wes McKinney)</li>
+        <li>Hands-On ML with Scikit-Learn (Aurélien Géron)</li>
+        <li>Quantitative Finance for Beginners (Robert Carver)</li>
+        <li>Practice: replicate all Colab experiments here</li>
+      </ul>
+    </div>
+    <div class="card card-purple">
+      <h3>Month 3–4: Quant Specific</h3>
+      <ul>
+        <li><strong>Advances in Financial ML</strong> (López de Prado) ← read this!</li>
+        <li>Machine Learning for Asset Managers (López de Prado)</li>
+        <li>Systematic Trading (Robert Carver)</li>
+        <li>Practice: build a cross-sectional factor model</li>
+      </ul>
+    </div>
+    <div class="card card-green">
+      <h3>Month 5–6: Advanced</h3>
+      <ul>
+        <li>Active Portfolio Management (Grinold & Kahn)</li>
+        <li>Algorithmic Trading (Ernest Chan)</li>
+        <li>Research papers on QuantLib, SSRN finance section</li>
+        <li>Practice: participate in Kaggle/Numerai competitions</li>
+      </ul>
+    </div>
+    <div class="card card-gold">
+      <h3>Ongoing: Stay Current</h3>
+      <ul>
+        <li>Papers on arXiv (quant-fin section)</li>
+        <li>Journal of Financial Data Science</li>
+        <li>Risk.net quantitative finance articles</li>
+        <li>Numerai forum and data science competitions</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TAB 7: RESOURCES
+══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-resources">
+<div class="page">
+
+  <p class="section-title">Resources & References</p>
+  <p class="section-subtitle">Curated external resources — all linkable, all useful, all organised by topic.</p>
+
+  <h2>📚 Core Books</h2>
+  <div class="grid-2">
+    <a href="https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📗</span>
+      <div><strong>Advances in Financial ML</strong> — López de Prado<div class="resource-link-meta">The definitive book for quant ML · Covers purged CV, feature importance, bars</div></div>
+    </a>
+    <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📘</span>
+      <div><strong>Hands-On Machine Learning</strong> — Aurélien Géron<div class="resource-link-meta">Best ML foundations book · Excellent scikit-learn coverage</div></div>
+    </a>
+    <a href="https://www.amazon.com/Machine-Learning-Asset-Managers-Elements/dp/1108792898" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📙</span>
+      <div><strong>ML for Asset Managers</strong> — López de Prado<div class="resource-link-meta">More focused than AFML · Great for portfolio applications</div></div>
+    </a>
+    <a href="https://www.amazon.com/Systematic-Trading-designing-trading-investing/dp/0857194453" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📕</span>
+      <div><strong>Systematic Trading</strong> — Robert Carver<div class="resource-link-meta">Practical guide to building systematic strategies</div></div>
+    </a>
+  </div>
+
+  <h2>🎓 Free Courses & Interactive Learning</h2>
+  <a href="https://www.coursera.org/learn/machine-learning" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🎓</span>
+    <div><strong>Machine Learning Specialization</strong> — Andrew Ng (Coursera)<div class="resource-link-meta">Free to audit · Best foundational ML course available</div></div>
+  </a>
+  <a href="https://www.kaggle.com/learn/intro-to-machine-learning" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🏆</span>
+    <div><strong>Kaggle ML Micro-Courses</strong> — Kaggle Learn<div class="resource-link-meta">Free · Hands-on · Intro ML through Feature Engineering, all interactive</div></div>
+  </a>
+  <a href="https://mlcourse.ai" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🤖</span>
+    <div><strong>Open Machine Learning Course</strong> — mlcourse.ai<div class="resource-link-meta">Free · 10 weeks · Covers classification, regression, feature engineering deeply</div></div>
+  </a>
+  <a href="https://www.coursera.org/learn/python-for-applied-data-science-ai" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🐍</span>
+    <div><strong>Python for Data Science, AI & Development</strong> — IBM/Coursera<div class="resource-link-meta">Free to audit · Strong Python + pandas + sklearn foundations</div></div>
+  </a>
+  <a href="https://numer.ai/tournament" target="_blank" class="resource-link">
+    <span class="resource-link-icon">💰</span>
+    <div><strong>Numerai Tournament</strong> — Real quant ML competition with prize money<div class="resource-link-meta">Free · Build and submit ML models on obfuscated financial data · Real money</div></div>
+  </a>
+
+  <h2>🛠️ Python Libraries</h2>
+  <div class="grid-2">
+    <a href="https://scikit-learn.org/stable/user_guide.html" target="_blank" class="resource-link">
+      <span class="resource-link-icon">⚙️</span>
+      <div><strong>scikit-learn docs</strong><div class="resource-link-meta">Complete ML algorithms, preprocessing, model selection</div></div>
+    </a>
+    <a href="https://xgboost.readthedocs.io" target="_blank" class="resource-link">
+      <span class="resource-link-icon">🌲</span>
+      <div><strong>XGBoost docs</strong><div class="resource-link-meta">Gradient boosting — often best-in-class for tabular finance data</div></div>
+    </a>
+    <a href="https://pandas.pydata.org/docs/user_guide/index.html" target="_blank" class="resource-link">
+      <span class="resource-link-icon">🐼</span>
+      <div><strong>Pandas documentation</strong><div class="resource-link-meta">Time series handling, groupby, rolling, resample</div></div>
+    </a>
+    <a href="https://github.com/hudson-and-thames/mlfinlab" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📊</span>
+      <div><strong>mlfinlab (Hudson & Thames)</strong><div class="resource-link-meta">Implements López de Prado's algorithms: purged CV, fractional differentiation, bars</div></div>
+    </a>
+    <a href="https://github.com/ranaroussi/yfinance" target="_blank" class="resource-link">
+      <span class="resource-link-icon">💹</span>
+      <div><strong>yfinance</strong><div class="resource-link-meta">Free Yahoo Finance data download in Python</div></div>
+    </a>
+    <a href="https://pypi.org/project/pandas-ta/" target="_blank" class="resource-link">
+      <span class="resource-link-icon">📈</span>
+      <div><strong>pandas-ta</strong><div class="resource-link-meta">200+ technical analysis indicators as pandas functions</div></div>
+    </a>
+  </div>
+
+  <h2>🧪 Interactive Visualisations & Demos</h2>
+  <a href="https://playground.tensorflow.org" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🕹️</span>
+    <div><strong>TensorFlow Playground</strong> — Visual Neural Network<div class="resource-link-meta">Interactively see how models learn classification and regression patterns</div></div>
+  </a>
+  <a href="https://distill.pub/2020/grand-tour/" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🔬</span>
+    <div><strong>Distill.pub</strong> — Interactive ML Visualisations<div class="resource-link-meta">Research-grade interactive explanations of ML concepts</div></div>
+  </a>
+  <a href="https://rps.cs.tufts.edu/doc/scikit-examples.html" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🎨</span>
+    <div><strong>Sklearn Visual Examples</strong><div class="resource-link-meta">All sklearn classifiers/regressors visualised side by side</div></div>
+  </a>
+  <a href="https://explained.ai/decision-tree-viz/" target="_blank" class="resource-link">
+    <span class="resource-link-icon">🌳</span>
+    <div><strong>Explained.ai — Decision Tree Visualiser</strong><div class="resource-link-meta">Deep visual explanation of how decision trees split data</div></div>
+  </a>
+  <a href="https://www.youtube.com/c/QuantProgram" target="_blank" class="resource-link">
+    <span class="resource-link-icon">▶️</span>
+    <div><strong>QuantProgram YouTube</strong><div class="resource-link-meta">Applied quant ML tutorials in Python</div></div>
+  </a>
+
+  <h2>📰 Papers & Research</h2>
+  <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2701346" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📄</span>
+    <div><strong>The Cross-Section of Expected Stock Returns</strong> — Fama & French<div class="resource-link-meta">Foundation paper for factor investing · Free on SSRN</div></div>
+  </a>
+  <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2834387" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📄</span>
+    <div><strong>Can Machine Learning "Solve" Finance?</strong> — SSRN<div class="resource-link-meta">Overview of ML applications and limitations in finance</div></div>
+  </a>
+  <a href="https://arxiv.org/abs/1904.11582" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📄</span>
+    <div><strong>Deep Learning for Financial Data</strong> — arXiv<div class="resource-link-meta">Survey of DL applications in finance</div></div>
+  </a>
+
+  <h2>🧪 Google Colab Starter Notebooks</h2>
+  <a href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📓</span>
+    <div><strong>End-to-End ML Project</strong> — Aurélien Géron<div class="resource-link-meta">Complete ML pipeline from scratch · Official notebook for Hands-On ML book</div></div>
+  </a>
+  <a href="https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/05.02-Introducing-Scikit-Learn.ipynb" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📓</span>
+    <div><strong>Introducing Scikit-Learn</strong> — Jake VanderPlas<div class="resource-link-meta">Python Data Science Handbook · Free on Colab</div></div>
+  </a>
+  <a href="https://colab.research.google.com/github/twopirllc/pandas-ta/blob/main/examples/PandasTA_Strategy_Examples.ipynb" target="_blank" class="resource-link">
+    <span class="resource-link-icon">📓</span>
+    <div><strong>Technical Analysis with pandas-ta</strong><div class="resource-link-meta">Build 100+ technical indicators for feature engineering</div></div>
+  </a>
+
+  <hr>
+
+  <div class="highlight-box" style="text-align:center">
+    <p style="font-family:var(--font-display);font-size:24px;font-weight:900;color:#fff;margin-bottom:8px">You've Got Everything You Need</p>
+    <p style="color:var(--text-dim)">This guide covers the complete foundation for ML-powered quant finance. Work through each tab sequentially, run every Colab experiment, and complete the tiered exercises. The path from here to quant engineer is practice, practice, practice.</p>
+    <p style="margin-top:16px;font-family:var(--font-mono);font-size:12px;color:var(--accent)">Prerequisites → Supervised Learning → Regression → Classification → Feature Engineering → Purged CV → Full Pipeline</p>
+  </div>
+
+</div>
+</div>
+
+<script>
+  // Tab switching
+  function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    const pct   = (window.scrollY / total) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+</script>
+
+</body>
+</html>
