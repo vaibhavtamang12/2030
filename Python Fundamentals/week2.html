@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Mastery for Quant Engineers</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --bg2: #0f1520;
+    --bg3: #141c2e;
+    --card: #192035;
+    --border: #1e2d4a;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --code-bg: #0d1117;
+    --easy: #10b981;
+    --medium: #f59e0b;
+    --hard: #ef4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0a0e17 0%, #0f1a2e 50%, #0a0e17 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -10%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .header-badge {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: white;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    letter-spacing: 0.15em;
+    white-space: nowrap;
+    margin-top: 0.5rem;
+  }
+  .header-title h1 {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-title p {
+    color: var(--text2);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* TABS */
+  .tabs-container {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: relative;
+    z-index: 1;
+  }
+  .tabs-container::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.8rem 1.1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab-num {
+    background: var(--border);
+    color: var(--text3);
+    font-size: 0.6rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    margin-right: 0.4rem;
+  }
+  .tab-btn.active .tab-num {
+    background: rgba(0,212,255,0.15);
+    color: var(--accent);
+  }
+
+  /* CONTENT */
+  .content-wrap { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION STYLES */
+  .section-hero {
+    background: linear-gradient(135deg, var(--card) 0%, var(--bg3) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-hero::before {
+    content: attr(data-icon);
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 5rem;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  .section-hero h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+  .section-hero .tagline {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+  .section-hero p { color: var(--text2); line-height: 1.7; font-size: 0.95rem; }
+
+  /* CONCEPT CARDS */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .concept-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .concept-card h3 { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .concept-card p { color: var(--text2); font-size: 0.88rem; line-height: 1.6; }
+  .card-icon { font-size: 1.3rem; }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 1.2rem 0;
+    overflow: hidden;
+  }
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+  .code-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+  }
+  .code-block pre {
+    padding: 1.2rem;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.83rem;
+    line-height: 1.65;
+    color: #e2e8f0;
+  }
+  .code-block pre .kw { color: #c792ea; }
+  .code-block pre .fn { color: #82aaff; }
+  .code-block pre .str { color: #c3e88d; }
+  .code-block pre .cm { color: #546e7a; font-style: italic; }
+  .code-block pre .nb { color: #ffcb6b; }
+  .code-block pre .num { color: #f78c6c; }
+  .code-block pre .dec { color: #00d4ff; }
+  .code-block pre .cls { color: #ffcb6b; }
+  .code-block pre .op { color: #89ddff; }
+  .code-block pre .out { color: #546e7a; }
+
+  /* VISUAL DIAGRAMS */
+  .diagram-box {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.2rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text2);
+    overflow-x: auto;
+  }
+  .diagram-box .d-title {
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* EXERCISES */
+  .exercises-section { margin-top: 2.5rem; }
+  .exercises-section h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .exercise-tier { margin-bottom: 2rem; }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+  .tier-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .tier-easy { background: rgba(16,185,129,0.15); color: var(--easy); border: 1px solid rgba(16,185,129,0.3); }
+  .tier-medium { background: rgba(245,158,11,0.15); color: var(--medium); border: 1px solid rgba(245,158,11,0.3); }
+  .tier-hard { background: rgba(239,68,68,0.15); color: var(--hard); border: 1px solid rgba(239,68,68,0.3); }
+  .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .exercise-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .ex-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+    min-width: 24px;
+    margin-top: 2px;
+  }
+  .ex-content { flex: 1; }
+  .ex-title { font-weight: 700; color: white; font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .ex-desc { color: var(--text2); font-size: 0.85rem; line-height: 1.5; }
+  .ex-hint {
+    color: var(--text3);
+    font-size: 0.8rem;
+    font-family: 'Space Mono', monospace;
+    margin-top: 0.4rem;
+  }
+
+  /* COLAB EXPERIMENTS */
+  .colab-section {
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(0,212,255,0.05));
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .colab-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: var(--accent3);
+    font-size: 0.9rem;
+  }
+  .colab-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .colab-item {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    color: var(--text2);
+    font-size: 0.87rem;
+    line-height: 1.5;
+  }
+  .colab-item::before {
+    content: '▶';
+    color: var(--accent3);
+    font-size: 0.7rem;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 8px;
+    padding: 1.1rem 1.3rem;
+    margin: 1.2rem 0;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    font-size: 0.87rem;
+    line-height: 1.6;
+  }
+  .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .callout.info { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); color: var(--text2); }
+  .callout.warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--text2); }
+  .callout.quant { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); color: var(--text2); }
+  .callout.tip { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--text2); }
+
+  /* SECTION HEADERS */
+  .section-h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: white;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-h2::before { content: '//'; color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.9rem; }
+  .section-h3 { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 1.5rem 0 0.7rem; font-family: 'Space Mono', monospace; }
+
+  /* RESOURCES */
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+  .resource-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem;
+    text-decoration: none;
+    transition: border-color 0.2s;
+    display: block;
+  }
+  .resource-card:hover { border-color: var(--accent2); }
+  .resource-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+  .resource-title { color: white; font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .resource-desc { color: var(--text3); font-size: 0.8rem; }
+
+  /* ANALOGY BOX */
+  .analogy {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,212,255,0.05));
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    margin: 1.2rem 0;
+  }
+  .analogy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.6rem;
+  }
+  .analogy p { color: var(--text2); font-size: 0.9rem; line-height: 1.65; }
+
+  /* TABLE */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.2rem 0;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .styled-table th {
+    background: var(--bg3);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .styled-table td {
+    padding: 0.75rem 1rem;
+    color: var(--text2);
+    border-bottom: 1px solid rgba(30,45,74,0.5);
+    vertical-align: top;
+  }
+  .styled-table tr:last-child td { border-bottom: none; }
+  .styled-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .styled-table td code {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent3);
+    background: rgba(16,185,129,0.1);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+
+  /* PILL TAGS */
+  .tag { display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 3px; letter-spacing: 0.05em; margin: 0.1rem; }
+  .tag-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .tag-purple { background: rgba(124,58,237,0.12); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2); }
+  .tag-green { background: rgba(16,185,129,0.12); color: var(--accent3); border: 1px solid rgba(16,185,129,0.2); }
+
+  /* PREREQ SECTION */
+  .prereq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+  .prereq-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent4);
+    border-radius: 8px;
+    padding: 1.2rem;
+  }
+  .prereq-card h4 { color: var(--accent4); font-size: 0.9rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+  .prereq-card p { color: var(--text2); font-size: 0.84rem; line-height: 1.6; }
+
+  /* PROGRESS INDICATOR */
+  .topic-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 1.5rem 0;
+    padding: 1rem 1.2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .flow-item {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text3);
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .flow-item.done { color: var(--accent); background: rgba(0,212,255,0.08); }
+  .flow-arrow { color: var(--border); font-size: 0.8rem; margin: 0 0.3rem; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* INLINE CODE */
+  code { font-family: 'JetBrains Mono', monospace; color: var(--accent3); background: rgba(16,185,129,0.1); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.85em; }
+
+  p { line-height: 1.7; color: var(--text2); margin-bottom: 0.8rem; }
+  ul, ol { padding-left: 1.5rem; color: var(--text2); font-size: 0.9rem; line-height: 1.7; }
+  li { margin-bottom: 0.3rem; }
+
+  /* SVG DIAGRAMS */
+  .svg-diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 1.2rem 0; overflow-x: auto; }
+  .svg-diagram svg { display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-badge">QUANT ENGINEERING SERIES • VOL. I</div>
+    </div>
+    <div class="header-title">
+      <h1>Python Mastery<br>for Quant Engineers</h1>
+      <p>// OOP · Dunders · Decorators · Generators · Context Managers · Logging · PDB</p>
+    </div>
+  </div>
+  <div class="tabs-container">
+    <button class="tab-btn active" onclick="showTab('prereqs')"><span class="tab-num">00</span>Prerequisites</button>
+    <button class="tab-btn" onclick="showTab('oop')"><span class="tab-num">01</span>OOP & Classes</button>
+    <button class="tab-btn" onclick="showTab('inheritance')"><span class="tab-num">02</span>Inheritance</button>
+    <button class="tab-btn" onclick="showTab('dunders')"><span class="tab-num">03</span>Dunder Methods</button>
+    <button class="tab-btn" onclick="showTab('decorators')"><span class="tab-num">04</span>Decorators</button>
+    <button class="tab-btn" onclick="showTab('generators')"><span class="tab-num">05</span>Generators</button>
+    <button class="tab-btn" onclick="showTab('context')"><span class="tab-num">06</span>Context Managers</button>
+    <button class="tab-btn" onclick="showTab('logging')"><span class="tab-num">07</span>Logging</button>
+    <button class="tab-btn" onclick="showTab('pdb')"><span class="tab-num">08</span>PDB Debugging</button>
+  </div>
+</div>
+
+<div class="content-wrap">
+
+<!-- ============================= TAB 00: PREREQUISITES ============================= -->
+<div id="tab-prereqs" class="tab-content active">
+  <div class="section-hero" data-icon="🧱">
+    <div class="tagline">// BEFORE YOU BEGIN</div>
+    <h2>Prerequisites & Foundations</h2>
+    <p>These are the building blocks you need before diving into OOP and advanced Python. If you already know these, skim through. If not, study each one carefully — they are the vocabulary we'll use throughout this guide.</p>
+  </div>
+
+  <div class="topic-flow">
+    <span class="flow-item done">Variables & Types</span><span class="flow-arrow">→</span>
+    <span class="flow-item done">Functions</span><span class="flow-arrow">→</span>
+    <span class="flow-item done">Loops & Conditionals</span><span class="flow-arrow">→</span>
+    <span class="flow-item done">Lists/Dicts/Sets</span><span class="flow-arrow">→</span>
+    <span class="flow-item done">Modules & Imports</span><span class="flow-arrow">→</span>
+    <span class="flow-item">OOP & Beyond ✓</span>
+  </div>
+
+  <div class="section-h2">Core Concepts You Must Know</div>
+
+  <div class="prereq-grid">
+    <div class="prereq-card">
+      <h4>📦 Variables & Data Types</h4>
+      <p>Python variables are names that point to values. Types: <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>list</code>, <code>dict</code>, <code>tuple</code>, <code>set</code>. Python is <em>dynamically typed</em> — the type is figured out at runtime, not declaration time.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>⚙️ Functions</h4>
+      <p>Functions are reusable blocks of code defined with <code>def</code>. They can take arguments (inputs) and return values. Functions are <em>first-class objects</em> in Python — you can pass them around like variables. This is critical for decorators.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>🔁 Loops & Conditionals</h4>
+      <p><code>for</code> loops iterate over sequences. <code>while</code> loops run until a condition is False. <code>if/elif/else</code> handles branching. The <code>in</code> keyword checks membership. <code>break</code> exits a loop; <code>continue</code> skips to next iteration.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>📚 Lists, Dicts, Sets, Tuples</h4>
+      <p>The 4 main built-in containers. <code>list</code>: ordered, mutable. <code>dict</code>: key-value pairs. <code>set</code>: unordered unique values. <code>tuple</code>: ordered, immutable. List comprehensions: <code>[x*2 for x in lst]</code> — very common in Python.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>📂 Modules & Imports</h4>
+      <p>Code is organized in files called <em>modules</em>. Use <code>import math</code>, <code>from math import sqrt</code>, or <code>import numpy as np</code>. Python's standard library has hundreds of built-in modules. Third-party ones are installed via <code>pip</code>.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>⚠️ Exception Handling</h4>
+      <p><code>try/except/finally</code> blocks let you handle errors gracefully. <code>raise</code> lets you throw your own errors. This is the foundation for context managers and professional code. Always handle exceptions in production quant code.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>🔍 Scope (LEGB Rule)</h4>
+      <p>Python looks up variables in this order: <strong>L</strong>ocal → <strong>E</strong>nclosing → <strong>G</strong>lobal → <strong>B</strong>uilt-in. This is crucial for understanding closures and decorators. <code>global</code> and <code>nonlocal</code> keywords modify scope rules.</p>
+    </div>
+    <div class="prereq-card">
+      <h4>🎯 First-Class Functions</h4>
+      <p>In Python, functions are objects. You can store them in variables: <code>f = print</code>. Pass them as arguments: <code>map(str, [1,2,3])</code>. Return them from other functions. This is the foundation of <em>decorators</em> and <em>higher-order functions</em>.</p>
+    </div>
+  </div>
+
+  <div class="section-h2">Quick Python Refresher Code</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">prereq_refresher.py</span></div>
+    <pre><span class="cm"># ── VARIABLES & TYPES ──────────────────────────────────────────</span>
+price = <span class="num">100.5</span>       <span class="cm"># float</span>
+symbol = <span class="str">"AAPL"</span>   <span class="cm"># str</span>
+is_long = <span class="nb">True</span>     <span class="cm"># bool</span>
+trades = [<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>]  <span class="cm"># list</span>
+
+<span class="cm"># ── FUNCTION (first-class object) ──────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">calculate_pnl</span>(buy_price, sell_price, qty):
+    <span class="kw">return</span> (sell_price - buy_price) * qty
+
+pnl = calculate_pnl(<span class="num">100</span>, <span class="num">110</span>, <span class="num">50</span>)
+<span class="fn">print</span>(pnl)  <span class="out"># Output: 500</span>
+
+<span class="cm"># ── STORING A FUNCTION IN A VARIABLE ───────────────────────────</span>
+my_func = calculate_pnl
+<span class="fn">print</span>(my_func(<span class="num">90</span>, <span class="num">100</span>, <span class="num">10</span>))  <span class="out"># 100 — same function, different name</span>
+
+<span class="cm"># ── LIST COMPREHENSION ──────────────────────────────────────────</span>
+prices = [<span class="num">100</span>, <span class="num">101</span>, <span class="num">99</span>, <span class="num">102</span>, <span class="num">98</span>]
+returns = [(prices[i] - prices[i-<span class="num">1</span>]) / prices[i-<span class="num">1</span>]
+           <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(prices))]
+
+<span class="cm"># ── EXCEPTION HANDLING ──────────────────────────────────────────</span>
+<span class="kw">try</span>:
+    result = <span class="num">100</span> / <span class="num">0</span>
+<span class="kw">except</span> ZeroDivisionError:
+    <span class="fn">print</span>(<span class="str">"Cannot divide by zero!"</span>)
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="str">"This always runs"</span>)
+
+<span class="cm"># ── SCOPE EXAMPLE ───────────────────────────────────────────────</span>
+threshold = <span class="num">0.05</span>  <span class="cm"># Global</span>
+
+<span class="kw">def</span> <span class="fn">check_drawdown</span>(loss):
+    <span class="cm"># 'threshold' found in Global scope (LEGB)</span>
+    <span class="kw">return</span> loss > threshold  </pre>
+  </div>
+
+  <div class="section-h2">Key Mental Models for Quant Engineers</div>
+
+  <div class="callout quant">
+    <span class="callout-icon">📊</span>
+    <div>
+      <strong style="color: #a78bfa;">Why Does This Matter for Quant Work?</strong><br>
+      In quant engineering, you'll model financial instruments as <em>objects</em> (Portfolio, Trade, Strategy, RiskModel). You'll decorate trading functions with retry logic. You'll use generators to stream live market data efficiently. You'll use context managers to safely open database connections. Every concept in this guide maps directly to real production code at hedge funds and banks.
+    </div>
+  </div>
+
+  <div class="section-h2">Visualization Resources</div>
+  <div class="resources-grid">
+    <a class="resource-card" href="https://pythontutor.com/visualize.html" target="_blank">
+      <div class="resource-tag">🔭 INTERACTIVE VISUALIZER</div>
+      <div class="resource-title">Python Tutor</div>
+      <div class="resource-desc">Step through code execution visually. See how variables and memory work in real time.</div>
+    </a>
+    <a class="resource-card" href="https://docs.python.org/3/tutorial/" target="_blank">
+      <div class="resource-tag">📖 OFFICIAL DOCS</div>
+      <div class="resource-title">Python Official Tutorial</div>
+      <div class="resource-desc">The definitive source for Python fundamentals from python.org</div>
+    </a>
+    <a class="resource-card" href="https://colab.research.google.com/" target="_blank">
+      <div class="resource-tag">🧪 PRACTICE ENVIRONMENT</div>
+      <div class="resource-title">Google Colab</div>
+      <div class="resource-desc">Free Jupyter notebooks in the cloud. Run every experiment from this guide here.</div>
+    </a>
+    <a class="resource-card" href="https://realpython.com/python-basics/" target="_blank">
+      <div class="resource-tag">📚 TUTORIALS</div>
+      <div class="resource-title">Real Python Basics</div>
+      <div class="resource-desc">High-quality, beginner-friendly Python tutorials with examples</div>
+    </a>
+  </div>
+</div>
+
+<!-- ============================= TAB 01: OOP & CLASSES ============================= -->
+<div id="tab-oop" class="tab-content">
+  <div class="section-hero" data-icon="🏗️">
+    <div class="tagline">// TOPIC 01 — OBJECT ORIENTED PROGRAMMING</div>
+    <h2>OOP & Classes</h2>
+    <p>OOP is a way to organize your code around <em>things</em> (objects) rather than just <em>actions</em> (functions). A class is a blueprint. An object is something built from that blueprint. Think: a <code>Trade</code> class is the blueprint; a specific Apple stock purchase is an object (instance) of that class.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — FINANCIAL INSTRUMENT</div>
+    <p>Imagine you work at a trading desk. Every trade has the same <em>structure</em>: a symbol, price, quantity, direction. Instead of writing separate variables for each trade, you create a <strong>Trade class</strong> — a template. Every time you execute a trade, you create a new <em>instance</em> (object) of that template. The class is the <strong>blueprint</strong>; each trade execution is an <strong>object</strong>. Like a factory that stamps out Trade objects, each with their own data but following the same structure.</p>
+  </div>
+
+  <div class="section-h2">The 4 Pillars of OOP</div>
+  <div class="cards-grid">
+    <div class="concept-card">
+      <h3><span class="card-icon">📦</span> Encapsulation</h3>
+      <p>Bundle data (attributes) and behavior (methods) together inside a class. Hide internal implementation details. Other code interacts through a clean interface. Like a black box: you use a <code>Portfolio</code> without knowing how it calculates NAV internally.</p>
+    </div>
+    <div class="concept-card">
+      <h3><span class="card-icon">🧬</span> Inheritance</h3>
+      <p>A child class can <em>inherit</em> all properties and methods of a parent class, then add or override behavior. <code>EquityTrade</code> inherits from <code>Trade</code> and adds equity-specific logic. Avoids repeating code.</p>
+    </div>
+    <div class="concept-card">
+      <h3><span class="card-icon">🎭</span> Polymorphism</h3>
+      <p>Different classes can respond to the same method call differently. <code>trade.execute()</code> works whether <code>trade</code> is an <code>EquityTrade</code> or <code>OptionTrade</code> — each implements it differently but the interface is the same.</p>
+    </div>
+    <div class="concept-card">
+      <h3><span class="card-icon">🔒</span> Abstraction</h3>
+      <p>Expose only what's necessary. Hide complexity. A <code>RiskEngine</code> class exposes <code>.calculate_var()</code>. Users don't need to know it runs 10,000 Monte Carlo simulations internally.</p>
+    </div>
+  </div>
+
+  <div class="section-h2">Anatomy of a Class</div>
+
+  <div class="svg-diagram">
+    <svg width="680" height="300" viewBox="0 0 680 300">
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#00d4ff"/>
+        </marker>
+      </defs>
+      <!-- Class box -->
+      <rect x="50" y="30" width="580" height="250" rx="8" fill="#0d1117" stroke="#1e2d4a" stroke-width="1.5"/>
+      <!-- Header -->
+      <rect x="50" y="30" width="580" height="40" rx="8" fill="#192035"/>
+      <rect x="50" y="58" width="580" height="12" fill="#192035"/>
+      <text x="340" y="55" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="13" font-weight="bold">class Trade:</text>
+      <!-- Divider -->
+      <line x1="50" y1="70" x2="630" y2="70" stroke="#1e2d4a" stroke-width="1"/>
+      <!-- Attributes section -->
+      <text x="70" y="95" fill="#546e7a" font-family="JetBrains Mono" font-size="11">ATTRIBUTES (data)</text>
+      <text x="70" y="115" fill="#c3e88d" font-family="JetBrains Mono" font-size="11">    self.symbol = symbol</text>
+      <text x="70" y="132" fill="#c3e88d" font-family="JetBrains Mono" font-size="11">    self.price  = price</text>
+      <text x="70" y="149" fill="#c3e88d" font-family="JetBrains Mono" font-size="11">    self.qty    = qty</text>
+      <!-- Divider -->
+      <line x1="50" y1="162" x2="630" y2="162" stroke="#1e2d4a" stroke-width="1" stroke-dasharray="4,3"/>
+      <!-- Methods section -->
+      <text x="70" y="182" fill="#546e7a" font-family="JetBrains Mono" font-size="11">METHODS (behavior)</text>
+      <text x="70" y="202" fill="#82aaff" font-family="JetBrains Mono" font-size="11">    def __init__(self, symbol, price, qty):  ← constructor</text>
+      <text x="70" y="222" fill="#82aaff" font-family="JetBrains Mono" font-size="11">    def calculate_pnl(self, current_price):  ← instance method</text>
+      <text x="70" y="242" fill="#82aaff" font-family="JetBrains Mono" font-size="11">    def __repr__(self):                      ← dunder method</text>
+      <!-- Arrow labels -->
+      <rect x="420" y="92" width="90" height="20" rx="4" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.3)"/>
+      <text x="465" y="105" text-anchor="middle" fill="#00d4ff" font-family="Space Mono" font-size="9">INSTANCE DATA</text>
+      <line x1="415" y1="102" x2="380" y2="128" stroke="#00d4ff" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="3,2"/>
+    </svg>
+  </div>
+
+  <div class="section-h2">Building a Trade Class Step-by-Step</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step1_basic_class.py — Start simple</span></div>
+    <pre><span class="cm"># STEP 1: The most basic class possible</span>
+<span class="kw">class</span> <span class="cls">Trade</span>:
+    <span class="kw">pass</span>  <span class="cm"># empty class — valid Python!</span>
+
+t = <span class="cls">Trade</span>()          <span class="cm"># create an instance (object)</span>
+t.symbol = <span class="str">"AAPL"</span>   <span class="cm"># attach data to it ad-hoc</span>
+t.price = <span class="num">150.0</span>
+<span class="fn">print</span>(t.symbol)      <span class="out"># AAPL</span>
+<span class="fn">print</span>(<span class="fn">type</span>(t))        <span class="out"># &lt;class '__main__.Trade'&gt;</span>
+<span class="fn">print</span>(<span class="fn">isinstance</span>(t, <span class="cls">Trade</span>))  <span class="out"># True</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step2_init_method.py — Adding __init__</span></div>
+    <pre><span class="cm"># STEP 2: Use __init__ to initialize attributes properly
+# __init__ is called automatically when you do Trade(...)
+# 'self' refers to the NEW OBJECT being created</span>
+
+<span class="kw">class</span> <span class="cls">Trade</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, price, qty, direction=<span class="str">"BUY"</span>):
+        <span class="cm"># 'self.something' creates an INSTANCE ATTRIBUTE</span>
+        self.symbol    = symbol     <span class="cm"># each Trade has its own symbol</span>
+        self.price     = price      <span class="cm"># each Trade has its own price</span>
+        self.qty       = qty
+        self.direction = direction
+        self.is_open   = <span class="nb">True</span>      <span class="cm"># default state</span>
+
+<span class="cm"># Creating instances — __init__ is called here</span>
+trade1 = <span class="cls">Trade</span>(<span class="str">"AAPL"</span>, <span class="num">150.0</span>, <span class="num">100</span>)
+trade2 = <span class="cls">Trade</span>(<span class="str">"MSFT"</span>, <span class="num">320.0</span>, <span class="num">50</span>, <span class="str">"SELL"</span>)
+
+<span class="cm"># Each object has its OWN copy of the attributes</span>
+<span class="fn">print</span>(trade1.symbol)   <span class="out"># AAPL</span>
+<span class="fn">print</span>(trade2.symbol)   <span class="out"># MSFT</span>
+<span class="fn">print</span>(trade1 <span class="kw">is</span> trade2)  <span class="out"># False — different objects!</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step3_methods.py — Adding behavior</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Trade</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, price, qty, direction=<span class="str">"BUY"</span>):
+        self.symbol    = symbol
+        self.price     = price
+        self.qty       = qty
+        self.direction = direction
+        self.is_open   = <span class="nb">True</span>
+
+    <span class="cm"># INSTANCE METHOD — operates on one specific trade object</span>
+    <span class="kw">def</span> <span class="fn">calculate_pnl</span>(self, current_price):
+        <span class="str">"""Calculate P&L of this trade."""</span>
+        raw_pnl = (current_price - self.price) * self.qty
+        <span class="kw">if</span> self.direction == <span class="str">"SELL"</span>:
+            raw_pnl = -raw_pnl   <span class="cm"># reverse for short trades</span>
+        <span class="kw">return</span> raw_pnl
+
+    <span class="kw">def</span> <span class="fn">close_trade</span>(self, close_price):
+        <span class="str">"""Close the position and report P&L."""</span>
+        pnl = self.calculate_pnl(close_price)
+        self.is_open = <span class="nb">False</span>
+        <span class="kw">return</span> {<span class="str">"symbol"</span>: self.symbol, <span class="str">"pnl"</span>: pnl}
+
+    <span class="cm"># CLASS METHOD — works on the class itself, not an instance</span>
+    <span class="dec">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">from_order_dict</span>(cls, order):
+        <span class="str">"""Alternative constructor — create Trade from a dict."""</span>
+        <span class="kw">return</span> cls(order[<span class="str">"symbol"</span>], order[<span class="str">"price"</span>], order[<span class="str">"qty"</span>])
+
+    <span class="cm"># STATIC METHOD — utility, no access to self or cls</span>
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">validate_symbol</span>(symbol):
+        <span class="str">"""Check if symbol is valid ticker format."""</span>
+        <span class="kw">return</span> symbol.isalpha() <span class="kw">and</span> symbol.isupper()
+
+
+<span class="cm"># ── Usage ─────────────────────────────────────────────────────</span>
+t = <span class="cls">Trade</span>(<span class="str">"AAPL"</span>, <span class="num">150.0</span>, <span class="num">100</span>)
+<span class="fn">print</span>(t.calculate_pnl(<span class="num">160.0</span>))   <span class="out"># 1000.0</span>
+<span class="fn">print</span>(t.close_trade(<span class="num">155.0</span>))     <span class="out"># {'symbol': 'AAPL', 'pnl': 500.0}</span>
+
+order = {<span class="str">"symbol"</span>: <span class="str">"GOOGL"</span>, <span class="str">"price"</span>: <span class="num">2800</span>, <span class="str">"qty"</span>: <span class="num">10</span>}
+t2 = <span class="cls">Trade</span>.from_order_dict(order)   <span class="cm"># classmethod usage</span>
+<span class="fn">print</span>(<span class="cls">Trade</span>.validate_symbol(<span class="str">"AAPL"</span>))  <span class="out"># True</span></pre>
+  </div>
+
+  <div class="section-h2">Class vs Instance Attributes</div>
+  <div class="callout info">
+    <span class="callout-icon">ℹ️</span>
+    <div><strong>Critical Distinction:</strong> Class attributes are shared by ALL instances. Instance attributes are unique to each object. Confusing these causes nasty bugs in production code.</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">class_vs_instance_attrs.py</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Portfolio</span>:
+    <span class="cm"># CLASS ATTRIBUTE — shared by ALL Portfolio instances</span>
+    exchange = <span class="str">"NYSE"</span>
+    trade_count = <span class="num">0</span>       <span class="cm"># danger: mutable class attribute!</span>
+    positions = []         <span class="cm"># ⚠️ DANGER: shared list between instances!</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        <span class="cm"># INSTANCE ATTRIBUTE — unique to each Portfolio</span>
+        self.name = name
+        self.positions = []    <span class="cm"># ✅ SAFE: each instance gets its own list</span>
+        <span class="cls">Portfolio</span>.trade_count += <span class="num">1</span>
+
+p1 = <span class="cls">Portfolio</span>(<span class="str">"Alpha Fund"</span>)
+p2 = <span class="cls">Portfolio</span>(<span class="str">"Beta Fund"</span>)
+
+<span class="cm"># Class attribute — same for all</span>
+<span class="fn">print</span>(p1.exchange)     <span class="out"># NYSE</span>
+<span class="fn">print</span>(p2.exchange)     <span class="out"># NYSE</span>
+<span class="fn">print</span>(<span class="cls">Portfolio</span>.trade_count)  <span class="out"># 2</span>
+
+<span class="cm"># Instance attribute — different for each</span>
+<span class="fn">print</span>(p1.name)  <span class="out"># Alpha Fund</span>
+<span class="fn">print</span>(p2.name)  <span class="out"># Beta Fund</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Create a <code>Bond</code> class with face_value, coupon_rate, maturity attributes and a <code>price(yield_rate)</code> method using PV formula</li>
+      <li>Build a <code>Position</code> class. Add a class attribute <code>max_positions = 100</code>. Track how many positions exist. Enforce the limit in <code>__init__</code></li>
+      <li>Use Python Tutor (pythontutor.com) to step through <code>Trade.__init__</code> and visually see <code>self</code> pointing to the new object</li>
+      <li>Create a <code>Stock</code> class, create 5 instances, store them in a list, call <code>.calculate_pnl()</code> on each — see how each object holds independent state</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">BankAccount Class</div><div class="ex-desc">Create a <code>BankAccount</code> class with attributes: <code>owner</code>, <code>balance</code>. Add methods: <code>deposit(amount)</code>, <code>withdraw(amount)</code> (prevent overdraft), <code>get_balance()</code>.</div><div class="ex-hint">hint: raise ValueError if withdrawal > balance</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">Stock Class</div><div class="ex-desc">Create a <code>Stock</code> class. Store: ticker, current_price, previous_close. Add a <code>daily_return()</code> method that returns (current - prev) / prev as a percentage.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E3</span><div class="ex-content"><div class="ex-title">Class Attribute Counter</div><div class="ex-desc">Build a <code>Trade</code> class that counts how many trade objects have been created using a class attribute <code>trade_count</code>. Increment it in <code>__init__</code>.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Portfolio Manager</div><div class="ex-desc">Build a <code>Portfolio</code> class. Methods: <code>add_position(stock, qty, price)</code>, <code>remove_position(stock)</code>, <code>total_value()</code>, <code>top_performer()</code>. Store positions as a dict mapping stock → {qty, entry_price}.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Moving Average Calculator</div><div class="ex-desc">Create a <code>MovingAverage</code> class. Constructor takes <code>window</code> size. Method <code>update(price)</code> adds a price and returns the current moving average. Use a list internally. Add <code>@classmethod</code> that creates from a list of prices in one shot.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M3</span><div class="ex-content"><div class="ex-title">Option Pricer</div><div class="ex-desc">Create an <code>Option</code> class with: underlying, strike, expiry, option_type (call/put). Add a <code>intrinsic_value(spot_price)</code> method. For calls: max(spot - strike, 0). For puts: max(strike - spot, 0).</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Order Book Simulation</div><div class="ex-desc">Build <code>OrderBook</code> class. Maintain separate bid and ask sorted lists. Methods: <code>add_order(price, qty, side)</code>, <code>best_bid()</code>, <code>best_ask()</code>, <code>spread()</code>, <code>execute_market_order(qty, side)</code> that matches against the book.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">H2</span><div class="ex-content"><div class="ex-title">Risk Engine</div><div class="ex-desc">Create a <code>RiskEngine</code> class. Takes a list of <code>Position</code> objects. Implements: <code>var_historical(confidence=0.95)</code> — uses numpy's percentile on returns. <code>max_drawdown()</code> — peak-to-trough. <code>sharpe_ratio(risk_free=0.02)</code>.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 02: INHERITANCE ============================= -->
+<div id="tab-inheritance" class="tab-content">
+  <div class="section-hero" data-icon="🧬">
+    <div class="tagline">// TOPIC 02 — INHERITANCE & POLYMORPHISM</div>
+    <h2>Inheritance</h2>
+    <p>Inheritance lets you build new classes that <em>extend</em> existing ones. A child class gets everything the parent has, and can add new stuff or change existing behavior. This is how you build a hierarchy of financial instruments without repeating yourself.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — INSTRUMENT HIERARCHY</div>
+    <p>In finance, all instruments share common properties: symbol, price, currency. But an <strong>Equity</strong> adds dividends and market cap. An <strong>Bond</strong> adds coupon rate and maturity. An <strong>Option</strong> adds strike, expiry, and Greeks. Inheritance lets you model this exactly: a base <code>Instrument</code> class, with specialized subclasses. You write common logic once. Subclasses inherit it for free, and only add what makes them special.</p>
+  </div>
+
+  <div class="svg-diagram">
+    <svg width="680" height="320" viewBox="0 0 680 320">
+      <defs>
+        <marker id="inh" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+          <path d="M0,0 L0,10 L10,5 z" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+        </marker>
+      </defs>
+      <!-- Parent -->
+      <rect x="240" y="20" width="200" height="80" rx="8" fill="#192035" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="340" y="45" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="13" font-weight="bold">Instrument</text>
+      <text x="340" y="65" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="10">symbol, price, currency</text>
+      <text x="340" y="82" text-anchor="middle" fill="#82aaff" font-family="JetBrains Mono" font-size="10">get_price(), to_dict()</text>
+      <!-- Lines -->
+      <line x1="200" y1="160" x2="290" y2="100" stroke="#1e2d4a" stroke-width="1.5" marker-end="url(#inh)"/>
+      <line x1="340" y1="160" x2="340" y2="100" stroke="#1e2d4a" stroke-width="1.5" marker-end="url(#inh)"/>
+      <line x1="480" y1="160" x2="390" y2="100" stroke="#1e2d4a" stroke-width="1.5" marker-end="url(#inh)"/>
+      <!-- Children -->
+      <rect x="60" y="160" width="180" height="90" rx="8" fill="#192035" stroke="#10b981" stroke-width="1.5"/>
+      <text x="150" y="185" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="12" font-weight="bold">Equity</text>
+      <text x="150" y="203" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ dividend_yield</text>
+      <text x="150" y="218" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ market_cap</text>
+      <text x="150" y="234" text-anchor="middle" fill="#82aaff" font-family="JetBrains Mono" font-size="9">+ ex_dividend_date()</text>
+      <rect x="250" y="160" width="180" height="90" rx="8" fill="#192035" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="340" y="185" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="12" font-weight="bold">Bond</text>
+      <text x="340" y="203" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ coupon_rate</text>
+      <text x="340" y="218" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ maturity_date</text>
+      <text x="340" y="234" text-anchor="middle" fill="#82aaff" font-family="JetBrains Mono" font-size="9">+ yield_to_maturity()</text>
+      <rect x="440" y="160" width="180" height="90" rx="8" fill="#192035" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="530" y="185" text-anchor="middle" fill="#ffcb6b" font-family="JetBrains Mono" font-size="12" font-weight="bold">Option</text>
+      <text x="530" y="203" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ strike, expiry</text>
+      <text x="530" y="218" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">+ option_type</text>
+      <text x="530" y="234" text-anchor="middle" fill="#82aaff" font-family="JetBrains Mono" font-size="9">+ delta(), gamma()</text>
+      <!-- Labels -->
+      <text x="340" y="295" text-anchor="middle" fill="#546e7a" font-family="Space Mono" font-size="10">▲ = inherits from (IS-A relationship)</text>
+    </svg>
+  </div>
+
+  <div class="section-h2">Basic Inheritance Syntax</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">inheritance_basics.py</span></div>
+    <pre><span class="cm"># ── PARENT CLASS ────────────────────────────────────────────────</span>
+<span class="kw">class</span> <span class="cls">Instrument</span>:
+    <span class="str">"""Base class for all financial instruments."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, price, currency=<span class="str">"USD"</span>):
+        self.symbol   = symbol
+        self.price    = price
+        self.currency = currency
+
+    <span class="kw">def</span> <span class="fn">get_price</span>(self):
+        <span class="kw">return</span> <span class="fn">f</span><span class="str">"{self.symbol}: {self.price} {self.currency}"</span>
+
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        <span class="kw">return</span> {<span class="str">"symbol"</span>: self.symbol, <span class="str">"price"</span>: self.price}
+
+
+<span class="cm"># ── CHILD CLASS ──────────────────────────────────────────────────
+# Equity IS-A Instrument — it gets everything Instrument has</span>
+<span class="kw">class</span> <span class="cls">Equity</span>(<span class="cls">Instrument</span>):    <span class="cm"># ← parentheses declare inheritance</span>
+    <span class="str">"""Stock/equity instrument."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, price, dividend_yield=<span class="num">0.0</span>):
+        <span class="cm"># super() calls parent's __init__ — DON'T repeat parent's init code!</span>
+        <span class="fn">super</span>().__init__(symbol, price)
+        self.dividend_yield = dividend_yield   <span class="cm"># equity-specific attribute</span>
+
+    <span class="cm"># NEW method — only on Equity, not on Instrument</span>
+    <span class="kw">def</span> <span class="fn">annual_dividend</span>(self):
+        <span class="kw">return</span> self.price * self.dividend_yield
+
+    <span class="cm"># OVERRIDE parent method — polymorphism in action</span>
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        d = <span class="fn">super</span>().to_dict()          <span class="cm"># get parent's dict</span>
+        d[<span class="str">"dividend_yield"</span>] = self.dividend_yield  <span class="cm"># extend it</span>
+        <span class="kw">return</span> d
+
+
+<span class="kw">class</span> <span class="cls">Bond</span>(<span class="cls">Instrument</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, price, coupon_rate, maturity_years):
+        <span class="fn">super</span>().__init__(symbol, price)
+        self.coupon_rate    = coupon_rate
+        self.maturity_years = maturity_years
+
+    <span class="kw">def</span> <span class="fn">annual_coupon</span>(self):
+        <span class="kw">return</span> self.price * self.coupon_rate
+
+    <span class="kw">def</span> <span class="fn">to_dict</span>(self):
+        d = <span class="fn">super</span>().to_dict()
+        d[<span class="str">"coupon_rate"</span>] = self.coupon_rate
+        <span class="kw">return</span> d
+
+
+<span class="cm"># ── USAGE ────────────────────────────────────────────────────────</span>
+aapl  = <span class="cls">Equity</span>(<span class="str">"AAPL"</span>, <span class="num">175.0</span>, <span class="num">0.005</span>)
+tbill = <span class="cls">Bond</span>(<span class="str">"US10Y"</span>, <span class="num">98.5</span>, <span class="num">0.045</span>, <span class="num">10</span>)
+
+<span class="fn">print</span>(aapl.get_price())     <span class="out"># AAPL: 175.0 USD  ← inherited method</span>
+<span class="fn">print</span>(aapl.annual_dividend())  <span class="out"># 0.875  ← child method</span>
+
+<span class="fn">print</span>(tbill.get_price())   <span class="out"># US10Y: 98.5 USD  ← inherited</span>
+<span class="fn">print</span>(tbill.annual_coupon()) <span class="out"># 4.4325  ← child method</span>
+
+<span class="cm"># isinstance checks — true up the hierarchy</span>
+<span class="fn">print</span>(<span class="fn">isinstance</span>(aapl, <span class="cls">Equity</span>))      <span class="out"># True</span>
+<span class="fn">print</span>(<span class="fn">isinstance</span>(aapl, <span class="cls">Instrument</span>))   <span class="out"># True  ← inheritance!</span>
+<span class="fn">print</span>(<span class="fn">isinstance</span>(aapl, <span class="cls">Bond</span>))         <span class="out"># False</span></pre>
+  </div>
+
+  <div class="section-h2">Polymorphism — Same Interface, Different Behavior</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">polymorphism.py — The power of a unified interface</span></div>
+    <pre><span class="cm"># Polymorphism: treat different objects through the same interface
+# The 'print_report' function doesn't care WHAT type of instrument it gets
+# It just calls .to_dict() and .get_price() — works on ALL of them!</span>
+
+<span class="kw">def</span> <span class="fn">print_report</span>(instruments):
+    <span class="str">"""Works with ANY Instrument subclass — polymorphism!"""</span>
+    <span class="fn">print</span>(<span class="str">"="</span> * <span class="num">40</span>)
+    <span class="kw">for</span> instr <span class="kw">in</span> instruments:
+        <span class="fn">print</span>(instr.get_price())        <span class="cm"># calls each class's version</span>
+        <span class="fn">print</span>(instr.to_dict(), <span class="str">"\n"</span>)   <span class="cm"># each class overrides to_dict()</span>
+
+portfolio = [
+    <span class="cls">Equity</span>(<span class="str">"AAPL"</span>, <span class="num">175.0</span>, <span class="num">0.005</span>),
+    <span class="cls">Bond</span>(<span class="str">"US10Y"</span>, <span class="num">98.5</span>, <span class="num">0.045</span>, <span class="num">10</span>),
+    <span class="cls">Equity</span>(<span class="str">"MSFT"</span>, <span class="num">380.0</span>, <span class="num">0.008</span>),
+]
+
+print_report(portfolio)   <span class="cm"># works seamlessly on mixed list!</span>
+
+<span class="cm"># DUCK TYPING: Python doesn't check types strictly.
+# "If it has a get_price() method, I can call it"
+# This is Python's built-in polymorphism support.</span></pre>
+  </div>
+
+  <div class="section-h2">Abstract Base Classes (ABCs)</div>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div><strong>Abstract Classes:</strong> Sometimes you want to force every subclass to implement certain methods. Use <code>abc.ABC</code> and <code>@abstractmethod</code>. Any class that inherits but doesn't implement the abstract methods will raise a <code>TypeError</code> when instantiated.</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">abstract_classes.py — Enforcing a contract</span></div>
+    <pre><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> <span class="cls">TradingStrategy</span>(ABC):
+    <span class="str">"""Abstract base: every strategy MUST implement these methods."""</span>
+
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">generate_signal</span>(self, market_data) <span class="op">-></span> <span class="fn">str</span>:
+        <span class="str">"""Must return 'BUY', 'SELL', or 'HOLD'."""</span>
+        ...   <span class="cm"># body doesn't matter — it's abstract</span>
+
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">calculate_position_size</span>(self, signal, portfolio_value) <span class="op">-></span> <span class="fn">float</span>:
+        ...
+
+    <span class="cm"># Concrete method — inherited as-is by all subclasses</span>
+    <span class="kw">def</span> <span class="fn">describe</span>(self):
+        <span class="kw">return</span> <span class="fn">f</span><span class="str">"Strategy: {type(self).__name__}"</span>
+
+
+<span class="kw">class</span> <span class="cls">MomentumStrategy</span>(<span class="cls">TradingStrategy</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, lookback=<span class="num">20</span>):
+        self.lookback = lookback
+
+    <span class="kw">def</span> <span class="fn">generate_signal</span>(self, market_data):
+        prices = market_data[<span class="str">"close"</span>][-self.lookback:]
+        <span class="kw">if</span> prices[-<span class="num">1</span>] > prices[<span class="num">0</span>]:
+            <span class="kw">return</span> <span class="str">"BUY"</span>
+        <span class="kw">elif</span> prices[-<span class="num">1</span>] < prices[<span class="num">0</span>]:
+            <span class="kw">return</span> <span class="str">"SELL"</span>
+        <span class="kw">return</span> <span class="str">"HOLD"</span>
+
+    <span class="kw">def</span> <span class="fn">calculate_position_size</span>(self, signal, portfolio_value):
+        <span class="kw">return</span> portfolio_value * <span class="num">0.1</span> <span class="kw">if</span> signal != <span class="str">"HOLD"</span> <span class="kw">else</span> <span class="num">0</span>
+
+
+<span class="cm"># TradingStrategy()        ← TypeError: Can't instantiate abstract class</span>
+strat = <span class="cls">MomentumStrategy</span>() <span class="cm"># ✅ OK — all abstract methods are implemented</span>
+<span class="fn">print</span>(strat.describe())    <span class="out"># Strategy: MomentumStrategy</span></pre>
+  </div>
+
+  <div class="section-h2">Method Resolution Order (MRO)</div>
+  <p>When Python looks up a method, it follows a specific order through the inheritance tree. You can inspect it:</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">mro.py</span></div>
+    <pre><span class="kw">class</span> <span class="cls">A</span>:
+    <span class="kw">def</span> <span class="fn">hello</span>(self): <span class="fn">print</span>(<span class="str">"A"</span>)
+
+<span class="kw">class</span> <span class="cls">B</span>(<span class="cls">A</span>):
+    <span class="kw">def</span> <span class="fn">hello</span>(self): <span class="fn">print</span>(<span class="str">"B"</span>)
+
+<span class="kw">class</span> <span class="cls">C</span>(<span class="cls">A</span>):
+    <span class="kw">def</span> <span class="fn">hello</span>(self): <span class="fn">print</span>(<span class="str">"C"</span>)
+
+<span class="kw">class</span> <span class="cls">D</span>(<span class="cls">B</span>, <span class="cls">C</span>):  <span class="cm"># Multiple inheritance</span>
+    <span class="kw">pass</span>
+
+d = <span class="cls">D</span>()
+d.hello()          <span class="out"># B — Python uses C3 linearization</span>
+<span class="fn">print</span>(<span class="cls">D</span>.__mro__)    <span class="out"># (D, B, C, A, object)</span>
+<span class="cm"># Left to right, depth first, but each class appears only once</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Build the full Instrument → Equity/Bond/Option hierarchy. Create a mixed list of all 3 types and call <code>to_dict()</code> on each in a loop</li>
+      <li>Create an abstract <code>Indicator</code> class with abstract method <code>calculate(prices)</code>. Implement <code>SMA</code> and <code>EMA</code> subclasses</li>
+      <li>Print <code>.__mro__</code> for your classes. Observe the resolution order</li>
+      <li>Try to instantiate an abstract class and observe the <code>TypeError</code></li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">Vehicle Hierarchy</div><div class="ex-desc">Create <code>Vehicle</code> (base) → <code>Car</code> and <code>Truck</code> (children). Base has <code>speed</code>, <code>fuel</code>. Car adds <code>num_doors</code>. Truck adds <code>payload_kg</code>. Both override a <code>describe()</code> method.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">super() practice</div><div class="ex-desc">Create a 3-level hierarchy: <code>Animal → Mammal → Dog</code>. Each adds an attribute in <code>__init__</code> using <code>super()</code>. Call <code>Dog(...)</code> and verify all 3 levels' attributes are present.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Technical Indicators</div><div class="ex-desc">Abstract <code>Indicator</code> class with abstract method <code>calculate(prices: list) -> float</code>. Implement: <code>SMA(window)</code>, <code>EMA(window, smoothing=2)</code>, <code>RSI(period=14)</code>. Test all 3 with same price list.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Instrument Pricing</div><div class="ex-desc">Extend the Instrument hierarchy. Add <code>FX</code> class for currency pairs. Override <code>get_price()</code> to show both base and quote currency. Add <code>convert(amount, to_currency)</code> method.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Strategy Backtester</div><div class="ex-desc">Build abstract <code>Strategy</code> class. Implement <code>MeanReversion</code> and <code>Momentum</code> subclasses. Create a <code>Backtester</code> class that accepts any <code>Strategy</code> instance and runs it on historical price data, reporting Sharpe ratio, max drawdown, and total return.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 03: DUNDER METHODS ============================= -->
+<div id="tab-dunders" class="tab-content">
+  <div class="section-hero" data-icon="✨">
+    <div class="tagline">// TOPIC 03 — DUNDER / MAGIC METHODS</div>
+    <h2>__dunder__ Methods</h2>
+    <p>Dunder methods (double underscore methods, aka "magic methods") are special methods Python calls automatically in certain situations. When you write <code>a + b</code>, Python calls <code>a.__add__(b)</code>. When you do <code>len(x)</code>, Python calls <code>x.__len__()</code>. They let your custom classes integrate seamlessly with Python's syntax.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — THE PROTOCOL SYSTEM</div>
+    <p>Think of dunder methods as <strong>contracts with Python</strong>. Python says: "If you implement <code>__len__</code>, I'll let you use <code>len()</code> on your object. If you implement <code>__add__</code>, I'll let people write <code>obj1 + obj2</code>." By implementing these contracts, your <code>Portfolio</code> class can behave just like a built-in Python type — you can iterate it, add them together, compare them, print them nicely. It's the difference between a class that <em>works</em> and one that <em>feels native</em>.</p>
+  </div>
+
+  <div class="section-h2">Complete Dunder Method Reference</div>
+
+  <table class="styled-table">
+    <thead><tr><th>Category</th><th>Method</th><th>Triggered By</th><th>Quant Use Case</th></tr></thead>
+    <tbody>
+      <tr><td>Object Lifecycle</td><td><code>__init__</code></td><td><code>Trade()</code></td><td>Initialize position with symbol, price, qty</td></tr>
+      <tr><td>Object Lifecycle</td><td><code>__new__</code></td><td>Before init</td><td>Singleton pattern for market data feed</td></tr>
+      <tr><td>Object Lifecycle</td><td><code>__del__</code></td><td>Garbage collected</td><td>Close DB connection when position deleted</td></tr>
+      <tr><td>Representation</td><td><code>__repr__</code></td><td><code>repr(obj)</code>, in REPL</td><td>Unambiguous debug output of a Trade</td></tr>
+      <tr><td>Representation</td><td><code>__str__</code></td><td><code>print(obj)</code>, <code>str(obj)</code></td><td>Human-readable portfolio summary</td></tr>
+      <tr><td>Arithmetic</td><td><code>__add__</code></td><td><code>a + b</code></td><td>Combine portfolios: <code>port1 + port2</code></td></tr>
+      <tr><td>Arithmetic</td><td><code>__sub__</code></td><td><code>a - b</code></td><td>Subtract positions</td></tr>
+      <tr><td>Arithmetic</td><td><code>__mul__</code></td><td><code>a * b</code></td><td>Scale position size</td></tr>
+      <tr><td>Arithmetic</td><td><code>__truediv__</code></td><td><code>a / b</code></td><td>Normalize weights</td></tr>
+      <tr><td>Comparison</td><td><code>__eq__</code></td><td><code>a == b</code></td><td>Are two trades identical?</td></tr>
+      <tr><td>Comparison</td><td><code>__lt__</code></td><td><code>a &lt; b</code></td><td>Sort trades by price</td></tr>
+      <tr><td>Comparison</td><td><code>__gt__</code>, <code>__le__</code>, <code>__ge__</code></td><td>>, ≤, ≥</td><td>Risk comparisons</td></tr>
+      <tr><td>Container</td><td><code>__len__</code></td><td><code>len(obj)</code></td><td>Number of positions in portfolio</td></tr>
+      <tr><td>Container</td><td><code>__getitem__</code></td><td><code>obj[key]</code></td><td><code>portfolio["AAPL"]</code></td></tr>
+      <tr><td>Container</td><td><code>__setitem__</code></td><td><code>obj[key] = val</code></td><td><code>portfolio["AAPL"] = position</code></td></tr>
+      <tr><td>Container</td><td><code>__contains__</code></td><td><code>x in obj</code></td><td><code>"AAPL" in portfolio</code></td></tr>
+      <tr><td>Iterator</td><td><code>__iter__</code></td><td><code>for x in obj</code></td><td>Iterate all positions in portfolio</td></tr>
+      <tr><td>Iterator</td><td><code>__next__</code></td><td><code>next(obj)</code></td><td>Custom iteration logic</td></tr>
+      <tr><td>Context</td><td><code>__enter__</code></td><td><code>with obj:</code></td><td>Open DB connection on entry</td></tr>
+      <tr><td>Context</td><td><code>__exit__</code></td><td>End of <code>with</code> block</td><td>Close DB connection on exit</td></tr>
+      <tr><td>Callable</td><td><code>__call__</code></td><td><code>obj()</code></td><td>Strategy object used as a function</td></tr>
+      <tr><td>Attribute</td><td><code>__getattr__</code></td><td>Attribute not found</td><td>Dynamic metric access on data frame</td></tr>
+      <tr><td>Hashing</td><td><code>__hash__</code></td><td><code>hash(obj)</code>, use in set/dict</td><td>Use Trade as dict key</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-h2">Building a Full-Featured Portfolio Class</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">portfolio_dunders.py — All major dunders demonstrated</span></div>
+    <pre><span class="kw">from</span> functools <span class="kw">import</span> total_ordering
+
+<span class="dec">@total_ordering</span>   <span class="cm"># fills in all comparison methods from __eq__ + __lt__</span>
+<span class="kw">class</span> <span class="cls">Portfolio</span>:
+    <span class="str">"""A portfolio that behaves like a native Python container."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name, positions=<span class="nb">None</span>):
+        self.name      = name
+        self._positions = positions <span class="kw">or</span> {}   <span class="cm"># {symbol: (qty, avg_price)}</span>
+
+    <span class="cm"># ── REPRESENTATION ──────────────────────────────────────────────</span>
+    <span class="kw">def</span> <span class="fn">__repr__</span>(self):
+        <span class="str">"""Unambiguous — useful in debugger/REPL."""</span>
+        <span class="kw">return</span> <span class="fn">f</span><span class="str">"Portfolio(name={self.name!r}, positions={len(self._positions)})"</span>
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="str">"""Human-readable — used by print()."""</span>
+        lines = [<span class="fn">f</span><span class="str">"Portfolio: {self.name}"</span>]
+        <span class="kw">for</span> sym, (qty, price) <span class="kw">in</span> self._positions.items():
+            lines.append(<span class="fn">f</span><span class="str">"  {sym}: {qty} @ {price:.2f}"</span>)
+        <span class="kw">return</span> <span class="str">"\n"</span>.join(lines)
+
+    <span class="cm"># ── CONTAINER PROTOCOL ──────────────────────────────────────────</span>
+    <span class="kw">def</span> <span class="fn">__len__</span>(self):
+        <span class="str">"""len(portfolio) → number of positions."""</span>
+        <span class="kw">return</span> <span class="fn">len</span>(self._positions)
+
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(self, symbol):
+        <span class="str">"""portfolio['AAPL'] → returns position data."""</span>
+        <span class="kw">if</span> symbol <span class="kw">not in</span> self._positions:
+            <span class="kw">raise</span> KeyError(<span class="fn">f</span><span class="str">"No position for {symbol}"</span>)
+        <span class="kw">return</span> self._positions[symbol]
+
+    <span class="kw">def</span> <span class="fn">__setitem__</span>(self, symbol, value):
+        <span class="str">"""portfolio['AAPL'] = (100, 150.0)"""</span>
+        self._positions[symbol] = value
+
+    <span class="kw">def</span> <span class="fn">__contains__</span>(self, symbol):
+        <span class="str">"""'AAPL' in portfolio → True/False."""</span>
+        <span class="kw">return</span> symbol <span class="kw">in</span> self._positions
+
+    <span class="kw">def</span> <span class="fn">__iter__</span>(self):
+        <span class="str">"""for symbol in portfolio → iterate symbols."""</span>
+        <span class="kw">return</span> <span class="fn">iter</span>(self._positions)
+
+    <span class="cm"># ── ARITHMETIC ──────────────────────────────────────────────────</span>
+    <span class="kw">def</span> <span class="fn">__add__</span>(self, other):
+        <span class="str">"""portfolio1 + portfolio2 → combined portfolio."""</span>
+        combined = <span class="fn">dict</span>(self._positions)
+        <span class="kw">for</span> sym, (qty, price) <span class="kw">in</span> other._positions.items():
+            <span class="kw">if</span> sym <span class="kw">in</span> combined:
+                <span class="cm"># Merge positions with weighted average price</span>
+                old_qty, old_price = combined[sym]
+                new_qty = old_qty + qty
+                new_price = (old_qty * old_price + qty * price) / new_qty
+                combined[sym] = (new_qty, new_price)
+            <span class="kw">else</span>:
+                combined[sym] = (qty, price)
+        <span class="kw">return</span> <span class="cls">Portfolio</span>(<span class="fn">f</span><span class="str">"{self.name}+{other.name}"</span>, combined)
+
+    <span class="kw">def</span> <span class="fn">__mul__</span>(self, scalar):
+        <span class="str">"""portfolio * 2 → scale all quantities."""</span>
+        scaled = {sym: (<span class="fn">int</span>(qty * scalar), price)
+                  <span class="kw">for</span> sym, (qty, price) <span class="kw">in</span> self._positions.items()}
+        <span class="kw">return</span> <span class="cls">Portfolio</span>(<span class="fn">f</span><span class="str">"{self.name}×{scalar}"</span>, scaled)
+
+    <span class="cm"># ── COMPARISON ──────────────────────────────────────────────────</span>
+    <span class="kw">def</span> <span class="fn">total_value</span>(self):
+        <span class="kw">return</span> <span class="fn">sum</span>(qty * price <span class="kw">for</span> qty, price <span class="kw">in</span> self._positions.values())
+
+    <span class="kw">def</span> <span class="fn">__eq__</span>(self, other):
+        <span class="str">"""Two portfolios are equal if they have same value."""</span>
+        <span class="kw">return</span> self.total_value() == other.total_value()
+
+    <span class="kw">def</span> <span class="fn">__lt__</span>(self, other):
+        <span class="kw">return</span> self.total_value() < other.total_value()
+
+    <span class="cm"># ── CALLABLE ────────────────────────────────────────────────────</span>
+    <span class="kw">def</span> <span class="fn">__call__</span>(self, symbol):
+        <span class="str">"""portfolio('AAPL') — same as portfolio['AAPL']."""</span>
+        <span class="kw">return</span> self[symbol]
+
+
+<span class="cm"># ── USAGE ────────────────────────────────────────────────────────</span>
+p1 = <span class="cls">Portfolio</span>(<span class="str">"Alpha"</span>, {<span class="str">"AAPL"</span>: (<span class="num">100</span>, <span class="num">175.0</span>), <span class="str">"MSFT"</span>: (<span class="num">50</span>, <span class="num">380.0</span>)})
+p2 = <span class="cls">Portfolio</span>(<span class="str">"Beta"</span>,  {<span class="str">"GOOGL"</span>: (<span class="num">20</span>, <span class="num">2800.0</span>)})
+
+<span class="fn">print</span>(p1)              <span class="cm"># calls __str__</span>
+<span class="fn">print</span>(<span class="fn">repr</span>(p1))        <span class="cm"># calls __repr__</span>
+<span class="fn">print</span>(<span class="fn">len</span>(p1))         <span class="cm"># 2 — calls __len__</span>
+<span class="fn">print</span>(<span class="str">"AAPL"</span> <span class="kw">in</span> p1)   <span class="cm"># True — calls __contains__</span>
+<span class="fn">print</span>(p1[<span class="str">"AAPL"</span>])     <span class="cm"># (100, 175.0) — calls __getitem__</span>
+<span class="fn">print</span>(p1(<span class="str">"AAPL"</span>))     <span class="cm"># (100, 175.0) — calls __call__</span>
+
+<span class="kw">for</span> sym <span class="kw">in</span> p1:         <span class="cm"># calls __iter__</span>
+    <span class="fn">print</span>(sym)
+
+p3 = p1 + p2           <span class="cm"># calls __add__</span>
+p4 = p1 * <span class="num">2</span>            <span class="cm"># calls __mul__</span>
+<span class="fn">print</span>(p1 > p2)         <span class="cm"># calls __gt__ (from @total_ordering + __lt__)</span></pre>
+  </div>
+
+  <div class="section-h2">__repr__ vs __str__ — Know The Difference</div>
+  <div class="callout tip">
+    <span class="callout-icon">✅</span>
+    <div><strong>Rule of thumb:</strong> <code>__repr__</code> should be unambiguous and ideally let you recreate the object: <code>Trade('AAPL', 150.0, 100)</code>. <code>__str__</code> should be readable by a human: <code>"AAPL: 100 shares at $150.00"</code>. If only <code>__repr__</code> is defined, Python uses it for both. In the debugger and REPL, <code>__repr__</code> is what you see.</div>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Build a <code>Vector</code> class with <code>__add__</code>, <code>__mul__</code>, <code>__abs__</code> (magnitude), <code>__repr__</code>. Use it to do portfolio weight calculations</li>
+      <li>Add <code>__iter__</code> and <code>__next__</code> to a custom class. Implement a trade history iterator</li>
+      <li>Make a <code>Strategy</code> class callable via <code>__call__</code>. Pass market data as argument</li>
+      <li>Use <code>@total_ordering</code> decorator to add comparison support. Sort a list of portfolios by NAV</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">Trade Representation</div><div class="ex-desc">Add <code>__repr__</code> and <code>__str__</code> to a <code>Trade</code> class. <code>repr</code> should return something like <code>Trade('AAPL', 150.0, 100, 'BUY')</code>. <code>str</code> should return a readable sentence.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">Equality Check</div><div class="ex-desc">Implement <code>__eq__</code> on a <code>Price</code> class. Two prices are equal if they have the same currency and amount. Test with <code>==</code> and <code>!=</code>.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">TimeSeries Container</div><div class="ex-desc">Build a <code>TimeSeries</code> class wrapping a list of (date, value) pairs. Implement: <code>__len__</code>, <code>__getitem__</code> (by index AND date), <code>__iter__</code>, <code>__contains__</code> (check if date exists), <code>__repr__</code>.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Matrix Operations</div><div class="ex-desc">Create a <code>Matrix</code> class (2D list). Implement <code>__add__</code>, <code>__mul__</code> (matrix multiply), <code>__getitem__</code> for row access and <code>[row][col]</code> access, <code>__repr__</code> showing matrix nicely.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Pandas-like DataFrame Lite</div><div class="ex-desc">Build a <code>DataFrame</code> class. Constructor: takes dict of column→list. Implement: <code>__getitem__</code> (column access by name), <code>__len__</code> (row count), <code>__iter__</code> (iterate column names), <code>__repr__</code> (tabular view), <code>__add__</code> (concatenate rows). Add a <code>describe()</code> method showing min/max/mean per column.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 04: DECORATORS ============================= -->
+<div id="tab-decorators" class="tab-content">
+  <div class="section-hero" data-icon="🎀">
+    <div class="tagline">// TOPIC 04 — DECORATORS</div>
+    <h2>Decorators</h2>
+    <p>A decorator is a function that <em>wraps</em> another function to add behavior before, after, or around it — without modifying the original function's code. They are built on the principle that functions are first-class objects (from our prerequisites). The <code>@decorator</code> syntax is just beautiful shorthand for <code>func = decorator(func)</code>.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — THE TRADING DESK STAMP</div>
+    <p>Imagine every trade that goes through your desk needs to be: <strong>logged</strong>, <strong>risk-checked</strong>, and <strong>timed</strong>. Instead of adding this boilerplate to every single trade function, you write it once as a decorator and <em>stamp</em> it on any function you want. The function itself stays clean and focused. The decorator handles the cross-cutting concerns. This is exactly what production quant systems do — <code>@log_trade</code>, <code>@risk_check</code>, <code>@timer</code> decorators on every execution function.</p>
+  </div>
+
+  <div class="svg-diagram">
+    <svg width="680" height="220" viewBox="0 0 680 220">
+      <defs>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#00d4ff"/>
+        </marker>
+      </defs>
+      <!-- Input -->
+      <rect x="20" y="85" width="120" height="50" rx="6" fill="#192035" stroke="#1e2d4a"/>
+      <text x="80" y="107" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">call: execute()</text>
+      <text x="80" y="123" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">with args</text>
+      <!-- Arrow -->
+      <line x1="140" y1="110" x2="175" y2="110" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Outer wrapper (decorator) -->
+      <rect x="175" y="20" width="330" height="180" rx="8" fill="rgba(124,58,237,0.06)" stroke="rgba(124,58,237,0.4)" stroke-dasharray="5,3"/>
+      <text x="340" y="42" text-anchor="middle" fill="#a78bfa" font-family="Space Mono" font-size="9" letter-spacing="0.1em">DECORATOR WRAPPER</text>
+      <!-- Before -->
+      <rect x="190" y="55" width="140" height="40" rx="6" fill="#192035" stroke="#f59e0b" stroke-width="1"/>
+      <text x="260" y="72" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="10">BEFORE: log call,</text>
+      <text x="260" y="87" text-anchor="middle" fill="#f59e0b" font-family="JetBrains Mono" font-size="10">start timer</text>
+      <!-- Down arrow -->
+      <line x1="260" y1="95" x2="260" y2="115" stroke="#546e7a" stroke-width="1" marker-end="url(#arr2)"/>
+      <!-- Original -->
+      <rect x="190" y="115" width="140" height="40" rx="6" fill="#192035" stroke="#10b981" stroke-width="1.5"/>
+      <text x="260" y="132" text-anchor="middle" fill="#10b981" font-family="JetBrains Mono" font-size="10" font-weight="bold">ORIGINAL FUNCTION</text>
+      <text x="260" y="147" text-anchor="middle" fill="#82aaff" font-family="JetBrains Mono" font-size="10">execute_trade()</text>
+      <!-- Down arrow -->
+      <line x1="260" y1="155" x2="260" y2="172" stroke="#546e7a" stroke-width="1" marker-end="url(#arr2)"/>
+      <!-- After -->
+      <rect x="190" y="170" width="140" height="20" rx="6" fill="#192035" stroke="#ef4444" stroke-width="1"/>
+      <text x="260" y="184" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="10">AFTER: log result</text>
+      <!-- Arrow out -->
+      <line x1="505" y1="110" x2="540" y2="110" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <!-- Output -->
+      <rect x="540" y="85" width="120" height="50" rx="6" fill="#192035" stroke="#1e2d4a"/>
+      <text x="600" y="107" text-anchor="middle" fill="#c3e88d" font-family="JetBrains Mono" font-size="10">return value</text>
+      <text x="600" y="123" text-anchor="middle" fill="#546e7a" font-family="JetBrains Mono" font-size="9">unchanged</text>
+    </svg>
+  </div>
+
+  <div class="section-h2">Building Decorators from Scratch</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step1_closure.py — The foundation: closures</span></div>
+    <pre><span class="cm"># STEP 1: Understand closures first — a function that remembers its enclosing scope</span>
+<span class="kw">def</span> <span class="fn">make_multiplier</span>(factor):
+    <span class="str">"""Returns a new function that multiplies by factor."""</span>
+    <span class="kw">def</span> <span class="fn">multiplier</span>(x):
+        <span class="kw">return</span> x * factor    <span class="cm"># 'factor' is remembered from outer scope</span>
+    <span class="kw">return</span> multiplier        <span class="cm"># return the FUNCTION, not its result</span>
+
+double = make_multiplier(<span class="num">2</span>)   <span class="cm"># double is a function</span>
+triple = make_multiplier(<span class="num">3</span>)
+
+<span class="fn">print</span>(double(<span class="num">5</span>))   <span class="out"># 10</span>
+<span class="fn">print</span>(triple(<span class="num">5</span>))   <span class="out"># 15</span>
+<span class="fn">print</span>(double)      <span class="out"># &lt;function make_multiplier.&lt;locals&gt;.multiplier at 0x...&gt;</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step2_basic_decorator.py — First decorator</span></div>
+    <pre><span class="kw">from</span> functools <span class="kw">import</span> wraps
+<span class="kw">import</span> time
+
+<span class="cm"># A decorator is a function that takes a function and returns a function</span>
+<span class="kw">def</span> <span class="fn">timer</span>(func):
+    <span class="str">"""Times how long a function takes to execute."""</span>
+    <span class="dec">@wraps</span>(func)   <span class="cm"># preserves original function's name & docstring</span>
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):   <span class="cm"># *args, **kwargs: accept any arguments</span>
+        start  = time.perf_counter()
+        result = func(*args, **kwargs)   <span class="cm"># call the ORIGINAL function</span>
+        end    = time.perf_counter()
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"{func.__name__} took {end-start:.4f}s"</span>)
+        <span class="kw">return</span> result   <span class="cm"># return original result unchanged</span>
+    <span class="kw">return</span> wrapper
+
+
+<span class="cm"># METHOD 1: Explicit decoration</span>
+<span class="kw">def</span> <span class="fn">run_backtest</span>():
+    time.sleep(<span class="num">0.1</span>)
+    <span class="kw">return</span> <span class="num">0.15</span>
+
+run_backtest = timer(run_backtest)   <span class="cm"># wrap it manually</span>
+
+
+<span class="cm"># METHOD 2: @ syntax — EXACTLY the same as above, just prettier</span>
+<span class="dec">@timer</span>
+<span class="kw">def</span> <span class="fn">run_backtest_v2</span>():
+    time.sleep(<span class="num">0.1</span>)
+    <span class="kw">return</span> <span class="num">0.15</span>
+
+result = run_backtest_v2()   <span class="out"># run_backtest_v2 took 0.1002s</span>
+<span class="fn">print</span>(result)               <span class="out"># 0.15  ← original return value preserved</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">step3_decorator_with_args.py — Parametrized decorators</span></div>
+    <pre><span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="cm"># Decorator WITH arguments needs an extra layer of nesting</span>
+<span class="kw">def</span> <span class="fn">retry</span>(max_attempts=<span class="num">3</span>, delay=<span class="num">1.0</span>, exceptions=(Exception,)):
+    <span class="str">"""Retry a function up to max_attempts times on failure."""</span>
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="dec">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_attempts):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> func(*args, **kwargs)
+                <span class="kw">except</span> exceptions <span class="kw">as</span> e:
+                    <span class="kw">if</span> attempt == max_attempts - <span class="num">1</span>:
+                        <span class="kw">raise</span>   <span class="cm"># re-raise on final attempt</span>
+                    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Attempt {attempt+1} failed: {e}. Retrying..."</span>)
+                    time.sleep(delay)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+
+<span class="dec">@retry</span>(max_attempts=<span class="num">3</span>, delay=<span class="num">0.5</span>, exceptions=(ConnectionError,))
+<span class="kw">def</span> <span class="fn">fetch_market_data</span>(symbol):
+    <span class="str">"""Fetch live data — might fail due to network issues."""</span>
+    <span class="kw">import</span> random
+    <span class="kw">if</span> random.random() < <span class="num">0.6</span>:
+        <span class="kw">raise</span> ConnectionError(<span class="str">"API timeout"</span>)
+    <span class="kw">return</span> {<span class="str">"symbol"</span>: symbol, <span class="str">"price"</span>: <span class="num">175.0</span>}
+
+
+<span class="cm"># ── Quant use cases for decorators ─────────────────────────────</span>
+<span class="kw">import</span> functools
+
+<span class="dec">@functools.lru_cache</span>(maxsize=<span class="num">128</span>)   <span class="cm"># Built-in memoization decorator!</span>
+<span class="kw">def</span> <span class="fn">expensive_calculation</span>(n):
+    <span class="str">"""Fibonacci — cached automatically."""</span>
+    <span class="kw">if</span> n < <span class="num">2</span>: <span class="kw">return</span> n
+    <span class="kw">return</span> expensive_calculation(n-<span class="num">1</span>) + expensive_calculation(n-<span class="num">2</span>)</pre>
+  </div>
+
+  <div class="section-h2">Real Quant Engineering Decorators</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">quant_decorators.py — Production patterns</span></div>
+    <pre><span class="kw">import</span> logging, time, functools
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="cm"># 1. LOGGING DECORATOR ───────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">log_trade</span>(func):
+    <span class="dec">@wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        logging.info(<span class="fn">f</span><span class="str">"TRADE: {func.__name__} called with args={args} kwargs={kwargs}"</span>)
+        result = func(*args, **kwargs)
+        logging.info(<span class="fn">f</span><span class="str">"TRADE: {func.__name__} returned {result}"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">return</span> wrapper
+
+<span class="cm"># 2. RISK CHECK DECORATOR ────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">risk_check</span>(max_position_size=<span class="num">1_000_000</span>):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="dec">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(symbol, qty, price, *args, **kwargs):
+            notional = qty * price
+            <span class="kw">if</span> notional > max_position_size:
+                <span class="kw">raise</span> ValueError(
+                    <span class="fn">f</span><span class="str">"Position {symbol}: notional {notional:,.0f} exceeds limit {max_position_size:,.0f}"</span>
+                )
+            <span class="kw">return</span> func(symbol, qty, price, *args, **kwargs)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="cm"># 3. MEMOIZE (manual cache) ──────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">memoize</span>(func):
+    cache = {}
+    <span class="dec">@wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args):
+        <span class="kw">if</span> args <span class="kw">not in</span> cache:
+            cache[args] = func(*args)
+        <span class="kw">return</span> cache[args]
+    wrapper.cache = cache    <span class="cm"># expose cache for inspection</span>
+    <span class="kw">return</span> wrapper
+
+<span class="cm"># 4. STACKING DECORATORS ─────────────────────────────────────────
+# Applied bottom-up: risk_check runs first, then log_trade, then the function</span>
+
+<span class="dec">@log_trade</span>
+<span class="dec">@risk_check</span>(max_position_size=<span class="num">500_000</span>)
+<span class="kw">def</span> <span class="fn">execute_trade</span>(symbol, qty, price):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Executing: {qty} {symbol} @ {price}"</span>)
+    <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"filled"</span>, <span class="str">"symbol"</span>: symbol}
+
+<span class="cm"># execute_trade("AAPL", 100, 175.0)   ← triggers both decorators</span>
+<span class="cm"># execute_trade("AAPL", 5000, 175.0)  ← raises ValueError from risk_check</span></pre>
+  </div>
+
+  <div class="section-h2">Class Decorators & Property</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">property_decorator.py — Built-in @property</span></div>
+    <pre><span class="kw">class</span> <span class="cls">Position</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, qty, price):
+        self.symbol = symbol
+        self.qty    = qty
+        self._price = price   <span class="cm"># underscore = "private by convention"</span>
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">price</span>(self):
+        <span class="str">"""Getter — called when you access position.price"""</span>
+        <span class="kw">return</span> self._price
+
+    <span class="dec">@price.setter</span>
+    <span class="kw">def</span> <span class="fn">price</span>(self, value):
+        <span class="str">"""Setter — called when you do position.price = x"""</span>
+        <span class="kw">if</span> value <= <span class="num">0</span>:
+            <span class="kw">raise</span> ValueError(<span class="str">"Price must be positive"</span>)
+        self._price = value
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">market_value</span>(self):
+        <span class="str">"""Computed property — calculated on access, no setter."""</span>
+        <span class="kw">return</span> self.qty * self._price
+
+<span class="cm"># Usage — feels like attribute access, but has logic</span>
+p = <span class="cls">Position</span>(<span class="str">"AAPL"</span>, <span class="num">100</span>, <span class="num">175.0</span>)
+<span class="fn">print</span>(p.price)          <span class="out"># 175.0</span>
+<span class="fn">print</span>(p.market_value)   <span class="out"># 17500.0</span>
+p.price = <span class="num">180.0</span>         <span class="cm"># setter validates</span>
+<span class="cm"># p.price = -5          ← raises ValueError</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Write a <code>@validate_inputs</code> decorator that checks all numeric args are positive. Apply it to a Black-Scholes function</li>
+      <li>Stack 3 decorators on a function: <code>@timer</code>, <code>@log_trade</code>, <code>@retry(3)</code>. Observe order of execution</li>
+      <li>Remove <code>@wraps</code> from a decorator. Notice how <code>func.__name__</code> changes. Add it back and see it fix</li>
+      <li>Build a <code>@cache_result(ttl=60)</code> decorator that caches results for 60 seconds using a dict with timestamps</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">Timer Decorator</div><div class="ex-desc">Write a <code>@timer</code> decorator that prints execution time. Apply it to a function that calculates the sum of squares of first 1 million numbers.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">@property Practice</div><div class="ex-desc">Create a <code>Circle</code> class with radius. Add <code>@property</code> for area and circumference. Add a radius setter that validates radius > 0.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Memoize Decorator</div><div class="ex-desc">Build a <code>@memoize</code> decorator. Apply it to recursive fibonacci. Benchmark with and without it for n=35. Print cache hit count.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Rate Limiter</div><div class="ex-desc">Build <code>@rate_limit(calls_per_second=2)</code> decorator. It should enforce a minimum interval between calls. Use it on a simulated API call function.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Circuit Breaker Pattern</div><div class="ex-desc">Implement a <code>@circuit_breaker(failure_threshold=3, recovery_timeout=30)</code> decorator. After 3 failures, it "opens" and raises immediately for 30 seconds without calling the function. After 30s, it "half-opens" and tries again. This is a real pattern used in HFT systems.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 05: GENERATORS ============================= -->
+<div id="tab-generators" class="tab-content">
+  <div class="section-hero" data-icon="⚡">
+    <div class="tagline">// TOPIC 05 — GENERATORS</div>
+    <h2>Generators</h2>
+    <p>A generator is a special function that <em>lazily</em> produces values one at a time, instead of building an entire list in memory. It uses <code>yield</code> instead of <code>return</code>. The magic: execution <em>pauses</em> at each <code>yield</code> and resumes where it left off when you ask for the next value. Perfect for streaming huge amounts of market data.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — TICK DATA STREAM</div>
+    <p>Imagine you have 10 years of tick-by-tick market data — billions of rows. If you load it all into a list, you'll crash your computer (it won't fit in RAM). A generator is like a <strong>fire hose that you control</strong>: it produces one tick at a time, you process it, then ask for the next one. The data is never all in memory at once. In live trading, your price feed IS a generator — it produces the next price only when available. Generators are also the foundation of Python's <code>async/await</code> concurrency model.</p>
+  </div>
+
+  <div class="section-h2">yield vs return — The Core Difference</div>
+
+  <div class="svg-diagram">
+    <svg width="680" height="200" viewBox="0 0 680 200">
+      <!-- Normal function -->
+      <rect x="20" y="20" width="300" height="160" rx="8" fill="#0d1117" stroke="#1e2d4a"/>
+      <text x="170" y="45" text-anchor="middle" fill="#ef4444" font-family="Space Mono" font-size="10" letter-spacing="0.1em">NORMAL FUNCTION (return)</text>
+      <text x="40" y="70" fill="#546e7a" font-family="JetBrains Mono" font-size="9">def get_prices():        </text>
+      <text x="40" y="87" fill="#546e7a" font-family="JetBrains Mono" font-size="9">    result = []           </text>
+      <text x="40" y="104" fill="#546e7a" font-family="JetBrains Mono" font-size="9">    for i in range(1000000):</text>
+      <text x="40" y="121" fill="#546e7a" font-family="JetBrains Mono" font-size="9">        result.append(i) </text>
+      <text x="40" y="138" fill="#c792ea" font-family="JetBrains Mono" font-size="9">    return result         </text>
+      <text x="40" y="160" fill="#ef4444" font-family="JetBrains Mono" font-size="9">← ALL IN MEMORY AT ONCE → RAM!</text>
+      <!-- Generator function -->
+      <rect x="360" y="20" width="300" height="160" rx="8" fill="#0d1117" stroke="#10b981"/>
+      <text x="510" y="45" text-anchor="middle" fill="#10b981" font-family="Space Mono" font-size="10" letter-spacing="0.1em">GENERATOR (yield)</text>
+      <text x="380" y="70" fill="#546e7a" font-family="JetBrains Mono" font-size="9">def price_stream():      </text>
+      <text x="380" y="87" fill="#546e7a" font-family="JetBrains Mono" font-size="9">    for i in range(1000000):</text>
+      <text x="380" y="104" fill="#c3e88d" font-family="JetBrains Mono" font-size="9">        yield i   # PAUSE HERE</text>
+      <text x="380" y="121" fill="#546e7a" font-family="JetBrains Mono" font-size="9">    # resumes when next()   </text>
+      <text x="380" y="160" fill="#10b981" font-family="JetBrains Mono" font-size="9">← ONE VALUE AT A TIME → ✅</text>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">generators_basics.py</span></div>
+    <pre><span class="cm"># STEP 1: Your first generator</span>
+<span class="kw">def</span> <span class="fn">countdown</span>(n):
+    <span class="fn">print</span>(<span class="str">"Starting countdown..."</span>)
+    <span class="kw">while</span> n > <span class="num">0</span>:
+        <span class="kw">yield</span> n       <span class="cm"># pause here, give n to caller</span>
+        n -= <span class="num">1</span>        <span class="cm"># resumes here when next() is called</    </span>
+    <span class="fn">print</span>(<span class="str">"Done!"</span>)
+
+gen = countdown(<span class="num">3</span>)    <span class="cm"># NOTHING RUNS YET — just creates generator object</span>
+<span class="fn">print</span>(gen)            <span class="out"># &lt;generator object countdown at 0x...&gt;</span>
+
+<span class="fn">print</span>(<span class="fn">next</span>(gen))   <span class="out"># Starting countdown...</span>
+                   <span class="out"># 3</span>
+<span class="fn">print</span>(<span class="fn">next</span>(gen))   <span class="out"># 2    ← resumes from where it left off</span>
+<span class="fn">print</span>(<span class="fn">next</span>(gen))   <span class="out"># 1</span>
+<span class="cm"># print(next(gen))   ← raises StopIteration: generator exhausted</span>
+
+<span class="cm"># Generators work in for loops naturally (for calls next() automatically)</span>
+<span class="kw">for</span> n <span class="kw">in</span> countdown(<span class="num">5</span>):
+    <span class="fn">print</span>(n, end=<span class="str">" "</span>)   <span class="out"># 5 4 3 2 1</span></pre>
+  </div>
+
+  <div class="section-h2">Generator Expressions — Lazy List Comprehensions</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">generator_expressions.py</span></div>
+    <pre><span class="cm"># List comprehension — EAGER: creates full list in memory immediately</span>
+prices_list = [x * <span class="num">1.001</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1_000_000</span>)]  <span class="cm"># 8MB in RAM</span>
+
+<span class="cm"># Generator expression — LAZY: same syntax but () not []</span>
+prices_gen  = (x * <span class="num">1.001</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1_000_000</span>))   <span class="cm"># ~120 bytes!</span>
+
+<span class="kw">import</span> sys
+<span class="fn">print</span>(sys.getsizeof(prices_list))  <span class="out"># ~8MB</span>
+<span class="fn">print</span>(sys.getsizeof(prices_gen))   <span class="out"># 112 bytes</span>
+
+<span class="cm"># Generators work with ALL built-in functions that accept iterables</span>
+total = <span class="fn">sum</span>(x * <span class="num">1.001</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1_000_000</span>))
+<span class="fn">max</span>(x ** <span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> [<span class="num">-3</span>, <span class="num">1</span>, <span class="num">-5</span>, <span class="num">2</span>])   <span class="out"># 25</span>
+<span class="fn">list</span>(x*<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>))   <span class="out"># [0, 2, 4, 6, 8] — force evaluate</span></pre>
+  </div>
+
+  <div class="section-h2">Real Quant Use Cases for Generators</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">quant_generators.py — Market data streaming</span></div>
+    <pre><span class="kw">import</span> random, itertools
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime, timedelta
+
+<span class="cm"># ── 1. PRICE FEED SIMULATOR ──────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">price_feed</span>(symbol, start_price, volatility=<span class="num">0.01</span>):
+    <span class="str">"""Infinite generator simulating a live price stream."""</span>
+    price = start_price
+    <span class="kw">while</span> <span class="nb">True</span>:
+        change = random.gauss(<span class="num">0</span>, volatility)
+        price *= (<span class="num">1</span> + change)
+        <span class="kw">yield</span> {<span class="str">"symbol"</span>: symbol, <span class="str">"price"</span>: <span class="fn">round</span>(price, <span class="num">4</span>),
+               <span class="str">"timestamp"</span>: datetime.now().isoformat()}
+
+<span class="cm"># Take only the first 5 ticks (itertools.islice stops the infinite generator)</span>
+feed = price_feed(<span class="str">"AAPL"</span>, <span class="num">175.0</span>)
+<span class="kw">for</span> tick <span class="kw">in</span> itertools.islice(feed, <span class="num">5</span>):
+    <span class="fn">print</span>(tick)
+
+
+<span class="cm"># ── 2. HISTORICAL CANDLES ────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">candlestick_generator</span>(csv_path, chunk_size=<span class="num">1000</span>):
+    <span class="str">"""Read massive OHLCV file in chunks — never loads all at once."""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(csv_path) <span class="kw">as</span> f:
+        headers = f.readline().strip().split(<span class="str">","</span>)
+        chunk = []
+        <span class="kw">for</span> line <span class="kw">in</span> f:
+            row = <span class="fn">dict</span>(<span class="fn">zip</span>(headers, line.strip().split(<span class="str">","</span>)))
+            chunk.append(row)
+            <span class="kw">if</span> <span class="fn">len</span>(chunk) == chunk_size:
+                <span class="kw">yield</span> chunk
+                chunk = []
+        <span class="kw">if</span> chunk:   <span class="cm"># yield remaining</span>
+            <span class="kw">yield</span> chunk
+
+
+<span class="cm"># ── 3. ROLLING WINDOW GENERATOR ─────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">rolling_window</span>(data, window):
+    <span class="str">"""Generate sliding windows of 'window' size."""</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(data) - window + <span class="num">1</span>):
+        <span class="kw">yield</span> data[i:i + window]
+
+prices = [<span class="num">100</span>, <span class="num">102</span>, <span class="num">101</span>, <span class="num">103</span>, <span class="num">105</span>, <span class="num">104</span>]
+<span class="kw">for</span> window <span class="kw">in</span> rolling_window(prices, <span class="num">3</span>):
+    sma = <span class="fn">sum</span>(window) / <span class="fn">len</span>(window)
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"SMA: {sma:.2f}"</span>)   <span class="out"># 101.0, 102.0, 103.0, 104.0</span>
+
+
+<span class="cm"># ── 4. PIPELINE WITH GENERATORS ─────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">generate_prices</span>(n): <span class="kw">yield from</span> (<span class="num">100</span> + random.gauss(<span class="num">0</span>, <span class="num">2</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n))
+<span class="kw">def</span> <span class="fn">filter_outliers</span>(prices, threshold=<span class="num">3</span>):
+    <span class="kw">for</span> p <span class="kw">in</span> prices:
+        <span class="kw">if</span> <span class="fn">abs</span>(p - <span class="num">100</span>) < threshold: <span class="kw">yield</span> p
+<span class="kw">def</span> <span class="fn">scale_prices</span>(prices, factor):
+    <span class="kw">yield from</span> (p * factor <span class="kw">for</span> p <span class="kw">in</span> prices)
+
+<span class="cm"># Compose a pipeline — all lazy!</span>
+raw     = generate_prices(<span class="num">1000</span>)
+cleaned = filter_outliers(raw, <span class="num">2</span>)
+scaled  = scale_prices(cleaned, <span class="num">1.1</span>)
+result  = <span class="fn">list</span>(scaled)  <span class="cm"># only materializes here</span></pre>
+  </div>
+
+  <div class="section-h2">yield from — Delegating to Sub-generators</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">yield_from.py</span></div>
+    <pre><span class="cm"># yield from delegates to another iterable/generator</span>
+<span class="kw">def</span> <span class="fn">all_symbols</span>():
+    <span class="kw">yield from</span> [<span class="str">"AAPL"</span>, <span class="str">"MSFT"</span>, <span class="str">"GOOGL"</span>]   <span class="cm"># iterate list</span>
+    <span class="kw">yield from</span> (<span class="str">"AMZN"</span>, <span class="str">"META"</span>)              <span class="cm"># iterate tuple</span>
+    <span class="kw">yield</span> <span class="str">"NVDA"</span>                              <span class="cm"># single value</span>
+
+<span class="kw">for</span> s <span class="kw">in</span> all_symbols():
+    <span class="fn">print</span>(s)  <span class="out"># AAPL MSFT GOOGL AMZN META NVDA</span>
+
+<span class="cm"># Flattening a nested list with a generator</span>
+<span class="kw">def</span> <span class="fn">flatten</span>(nested):
+    <span class="kw">for</span> item <span class="kw">in</span> nested:
+        <span class="kw">if</span> <span class="fn">isinstance</span>(item, <span class="fn">list</span>):
+            <span class="kw">yield from</span> flatten(item)   <span class="cm"># recursive!</span>
+        <span class="kw">else</span>:
+            <span class="kw">yield</span> item
+
+sectors = [[<span class="str">"AAPL"</span>, <span class="str">"MSFT"</span>], [<span class="str">"JPM"</span>, [<span class="str">"GS"</span>, <span class="str">"MS"</span>]]]
+<span class="fn">print</span>(<span class="fn">list</span>(flatten(sectors)))  <span class="out"># ['AAPL', 'MSFT', 'JPM', 'GS', 'MS']</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Compare memory usage: <code>sys.getsizeof([x for x in range(1_000_000)])</code> vs the same generator expression</li>
+      <li>Build a Brownian motion price path generator. Feed it into a rolling SMA generator. Plot the results with matplotlib</li>
+      <li>Use <code>itertools.islice</code>, <code>itertools.chain</code>, <code>itertools.takewhile</code> with generators to process data</li>
+      <li>Create an infinite Fibonacci generator. Use <code>islice</code> to get first 20 numbers</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">Number Generator</div><div class="ex-desc">Write generators for: even numbers up to N, squares of first N integers, and prime numbers (infinite). Test each with a for loop and <code>itertools.islice</code>.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">File Line Generator</div><div class="ex-desc">Write a generator that reads a CSV file line by line, parses each line into a dict, and yields it. Never loads the whole file into memory.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Technical Indicator Pipeline</div><div class="ex-desc">Create a pipeline: <code>price_generator()</code> → <code>compute_returns(prices)</code> → <code>rolling_stddev(returns, 20)</code> → <code>bollinger_bands()</code>. Each stage is a generator. Consume with a for loop.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Event Replay</div><div class="ex-desc">Write a <code>replay_trades(filename)</code> generator that reads historical trade data and yields events. Add a parameter <code>speed_multiplier</code> that controls how fast simulated time passes.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Streaming Backtester</div><div class="ex-desc">Build a backtest engine that is entirely generator-based. <code>data_source</code> yields candles. <code>signal_generator</code> consumes them and yields signals. <code>position_tracker</code> consumes signals and yields portfolio states. <code>metrics_calculator</code> yields running Sharpe and drawdown. No lists — everything flows through the pipeline.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 06: CONTEXT MANAGERS ============================= -->
+<div id="tab-context" class="tab-content">
+  <div class="section-hero" data-icon="🔐">
+    <div class="tagline">// TOPIC 06 — CONTEXT MANAGERS</div>
+    <h2>Context Managers</h2>
+    <p>A context manager is an object that defines what happens when you enter and exit a <code>with</code> block. They guarantee cleanup code always runs — even if an exception occurs. Perfect for managing resources: database connections, file handles, locks, and trading sessions that must be properly opened and closed.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — TRADING SESSION</div>
+    <p>Imagine opening a trading session at market open: you authenticate, set up connections, initialize risk parameters. At market close, you must flatten all positions, disconnect, save state — <em>no matter what</em> happened during the day (errors, crashes, exceptions). A context manager is like a <strong>guaranteed cleanup contract</strong>. <code>with trading_session() as session:</code> — the session always opens and always closes properly, even if your strategy crashes halfway through.</p>
+  </div>
+
+  <div class="section-h2">The Problem Context Managers Solve</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">the_problem.py — Without context managers</span></div>
+    <pre><span class="cm"># ❌ WITHOUT context manager — resource leak if exception occurs</span>
+<span class="kw">def</span> <span class="fn">bad_approach</span>():
+    conn = database.connect()
+    data = conn.query(<span class="str">"SELECT * FROM trades"</span>)  <span class="cm"># what if THIS throws?</span>
+    conn.close()   <span class="cm"># NEVER REACHED if query fails!</span>
+    <span class="kw">return</span> data   <span class="cm"># leaked connection!</span>
+
+<span class="cm"># ❌ Manual try/finally — correct but ugly and repetitive</span>
+<span class="kw">def</span> <span class="fn">manual_approach</span>():
+    conn = <span class="nb">None</span>
+    <span class="kw">try</span>:
+        conn = database.connect()
+        data = conn.query(<span class="str">"SELECT * FROM trades"</span>)
+        <span class="kw">return</span> data
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Error: {e}"</span>)
+    <span class="kw">finally</span>:
+        <span class="kw">if</span> conn:
+            conn.close()  <span class="cm"># always runs — correct but boilerplate</span>
+
+<span class="cm"># ✅ WITH context manager — clean, guaranteed, Pythonic</span>
+<span class="kw">def</span> <span class="fn">good_approach</span>():
+    <span class="kw">with</span> database.connect() <span class="kw">as</span> conn:  <span class="cm"># opens on entry, closes on exit</span>
+        data = conn.query(<span class="str">"SELECT * FROM trades"</span>)
+        <span class="kw">return</span> data
+    <span class="cm"># conn.close() called automatically — ALWAYS — even if exception thrown</span></pre>
+  </div>
+
+  <div class="section-h2">Building Context Managers — 2 Ways</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">method1_class.py — Class-based context manager</span></div>
+    <pre><span class="kw">import</span> time
+
+<span class="kw">class</span> <span class="cls">TradingSession</span>:
+    <span class="str">"""Context manager for a trading session."""</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, session_name, risk_limit=<span class="num">1_000_000</span>):
+        self.session_name = session_name
+        self.risk_limit   = risk_limit
+        self.start_time   = <span class="nb">None</span>
+        self.trades       = []
+
+    <span class="kw">def</span> <span class="fn">__enter__</span>(self):
+        <span class="str">"""Called at start of 'with' block. Return value is bound to 'as' variable."""</span>
+        self.start_time = time.time()
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[SESSION] Opening: {self.session_name}"</span>)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[SESSION] Risk limit: ${self.risk_limit:,}"</span>)
+        <span class="kw">return</span> self    <span class="cm"># this is what 'as session' refers to</span>
+
+    <span class="kw">def</span> <span class="fn">__exit__</span>(self, exc_type, exc_val, exc_tb):
+        <span class="str">"""Called at end of 'with' block. 3 args: exception info (None if no error)."""</span>
+        elapsed = time.time() - self.start_time
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[SESSION] Closing: {self.session_name}"</span>)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[SESSION] Duration: {elapsed:.2f}s, Trades: {len(self.trades)}"</span>)
+
+        <span class="kw">if</span> exc_type <span class="kw">is not</span> <span class="nb">None</span>:
+            <span class="cm"># An exception occurred in the 'with' block</span>
+            <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[SESSION] ⚠️ Error: {exc_val} — rolling back trades!"</span>)
+            self.trades.clear()
+
+        <span class="cm"># return True to suppress exception, False/None to re-raise it</span>
+        <span class="kw">return</span> <span class="nb">False</span>   <span class="cm"># don't suppress — let error propagate</span>
+
+    <span class="kw">def</span> <span class="fn">execute_trade</span>(self, symbol, qty, price):
+        self.trades.append({<span class="str">"symbol"</span>: symbol, <span class="str">"qty"</span>: qty, <span class="str">"price"</span>: price})
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"  Trade: {qty} {symbol} @ {price}"</span>)
+
+
+<span class="cm"># ── USAGE ──────────────────────────────────────────────────────</span>
+<span class="kw">with</span> <span class="cls">TradingSession</span>(<span class="str">"Morning Session"</span>) <span class="kw">as</span> session:
+    session.execute_trade(<span class="str">"AAPL"</span>, <span class="num">100</span>, <span class="num">175.0</span>)
+    session.execute_trade(<span class="str">"MSFT"</span>, <span class="num">50</span>, <span class="num">380.0</span>)
+    <span class="cm"># session closes automatically here, prints summary</span>
+
+<span class="out"># [SESSION] Opening: Morning Session
+# [SESSION] Risk limit: $1,000,000
+#   Trade: 100 AAPL @ 175.0
+#   Trade: 50 MSFT @ 380.0
+# [SESSION] Closing: Morning Session
+# [SESSION] Duration: 0.00s, Trades: 2</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">method2_contextlib.py — Generator-based with @contextmanager</span></div>
+    <pre><span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+<span class="kw">import</span> time
+
+<span class="cm"># The @contextmanager decorator turns a generator function into a context manager
+# Code BEFORE yield = __enter__
+# The yield value = what 'as' binds to
+# Code AFTER yield = __exit__</span>
+
+<span class="dec">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">timer_context</span>(label):
+    <span class="str">"""Context manager that times a block of code."""</span>
+    start = time.perf_counter()
+    <span class="fn">print</span>(<span class="fn">f</span><span class="str">"⏱  Starting: {label}"</span>)
+    <span class="kw">try</span>:
+        <span class="kw">yield</span>           <span class="cm"># body of 'with' block runs here</span>
+    <span class="kw">finally</span>:            <span class="cm"># always runs, even on exception</span>
+        elapsed = time.perf_counter() - start
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"⏱  {label} done in {elapsed:.4f}s"</span>)
+
+
+<span class="dec">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">managed_position</span>(symbol, risk_system):
+    <span class="str">"""Open a position, ensure it's always tracked/closed."""</span>
+    risk_system.register(symbol)
+    <span class="kw">try</span>:
+        position = {<span class="str">"symbol"</span>: symbol, <span class="str">"qty"</span>: <span class="num">0</span>, <span class="str">"open"</span>: <span class="nb">True</span>}
+        <span class="kw">yield</span> position
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Error in position {symbol}: {e}"</span>)
+        <span class="kw">raise</span>
+    <span class="kw">finally</span>:
+        position[<span class="str">"open"</span>] = <span class="nb">False</span>
+        risk_system.unregister(symbol)
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"Position {symbol} closed and unregistered from risk"</span>)
+
+
+<span class="cm"># ── USAGE ──────────────────────────────────────────────────────</span>
+<span class="kw">with</span> timer_context(<span class="str">"Monte Carlo simulation"</span>):
+    total = <span class="fn">sum</span>(i**<span class="num">2</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10_000_000</span>))
+
+<span class="cm"># ── NESTING CONTEXT MANAGERS ───────────────────────────────────</span>
+<span class="kw">with</span> timer_context(<span class="str">"outer"</span>):
+    <span class="kw">with</span> timer_context(<span class="str">"inner"</span>):
+        time.sleep(<span class="num">0.1</span>)
+
+<span class="cm"># Python 3 shorthand — same thing</span>
+<span class="kw">with</span> timer_context(<span class="str">"A"</span>), timer_context(<span class="str">"B"</span>):
+    time.sleep(<span class="num">0.05</span>)</pre>
+  </div>
+
+  <div class="section-h2">Real Quant Patterns</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">quant_context_managers.py</span></div>
+    <pre><span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager, suppress
+<span class="kw">import</span> threading
+
+<span class="cm"># ── 1. DATABASE CONNECTION POOL ──────────────────────────────────</span>
+<span class="dec">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">db_transaction</span>(connection_string):
+    <span class="str">"""Manages DB connection and transaction — auto commit/rollback."""</span>
+    conn = cursor = <span class="nb">None</span>
+    <span class="kw">try</span>:
+        <span class="cm"># import sqlite3  # example with real DB</span>
+        <span class="cm"># conn = sqlite3.connect(connection_string)</span>
+        <span class="cm"># cursor = conn.cursor()</span>
+        <span class="fn">print</span>(<span class="str">"[DB] Connection opened"</span>)
+        <span class="kw">yield</span> <span class="str">"cursor_placeholder"</span>    <span class="cm"># yield cursor in real code</span>
+        <span class="fn">print</span>(<span class="str">"[DB] Committing transaction"</span>)
+        <span class="cm"># conn.commit()</span>
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="str">"[DB] Error! Rolling back: {e}"</span>)
+        <span class="cm"># conn.rollback()</span>
+        <span class="kw">raise</span>
+    <span class="kw">finally</span>:
+        <span class="fn">print</span>(<span class="str">"[DB] Connection closed"</span>)
+        <span class="cm"># if conn: conn.close()</span>
+
+<span class="cm"># ── 2. MUTEX LOCK ────────────────────────────────────────────────</span>
+order_lock = threading.Lock()
+
+<span class="dec">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">exclusive_order_access</span>():
+    <span class="str">"""Ensure only one thread executes orders at a time."""</span>
+    <span class="fn">print</span>(<span class="str">"[LOCK] Acquiring order lock"</span>)
+    <span class="kw">with</span> order_lock:      <span class="cm"># Lock is itself a context manager!</span>
+        <span class="kw">yield</span>
+    <span class="fn">print</span>(<span class="str">"[LOCK] Released order lock"</span>)
+
+<span class="cm"># ── 3. SUPPRESS SPECIFIC EXCEPTIONS ─────────────────────────────</span>
+<span class="kw">with</span> suppress(FileNotFoundError):
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"trades_cache.pkl"</span>) <span class="kw">as</span> f:
+        cache = pickle.load(f)
+<span class="cm"># If file doesn't exist, just continue — no error</span>
+
+<span class="cm"># ── 4. USAGE ─────────────────────────────────────────────────────</span>
+<span class="kw">with</span> db_transaction(<span class="str">"trades.db"</span>) <span class="kw">as</span> cursor:
+    <span class="fn">print</span>(<span class="str">"Executing trades..."</span>)
+    <span class="cm"># cursor.execute("INSERT INTO trades VALUES (?, ?, ?)", ...)</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Write a <code>@contextmanager</code> that redirects stdout to a string buffer. Capture the output of <code>print()</code> calls inside a <code>with</code> block</li>
+      <li>Build a context manager that sets and restores numpy random seed — ensuring reproducible results inside the block</li>
+      <li>Create a context manager that tracks all positions opened inside the block. On exit, print a summary of all open positions</li>
+      <li>Test what happens when an exception is raised inside a <code>with</code> block — verify cleanup code still runs</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">File Manager</div><div class="ex-desc">Create a context manager class <code>SafeFileWriter</code>. On enter: open a temp file. On exit without error: rename temp to target file. On exit with error: delete temp file (atomic write pattern).</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">Temp Directory</div><div class="ex-desc">Using <code>@contextmanager</code>, create <code>temp_directory()</code> that creates a temp dir, yields its path, then deletes it and all contents when done.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Risk Limit Context</div><div class="ex-desc">Build <code>risk_limit(max_drawdown)</code> context manager. Track portfolio value inside the block. If it drops below max_drawdown, raise <code>RiskLimitBreached</code>. On exit, print final P&L.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">API Session Manager</div><div class="ex-desc">Create <code>api_session(base_url, auth_token)</code> context manager that manages an HTTP session. On enter: create session with auth headers. On exit: close session and log total requests made.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">ExitStack-based Pipeline</div><div class="ex-desc">Use <code>contextlib.ExitStack</code> to build a dynamic resource manager that opens N data streams, N DB connections, and acquires N locks — all in a single <code>with</code> block. The number N is determined at runtime. All resources must be cleaned up in LIFO order.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 07: LOGGING ============================= -->
+<div id="tab-logging" class="tab-content">
+  <div class="section-hero" data-icon="📋">
+    <div class="tagline">// TOPIC 07 — LOGGING</div>
+    <h2>Logging</h2>
+    <p>Python's <code>logging</code> module is the standard way to emit structured diagnostic messages from your code. Unlike <code>print()</code>, logs have <em>levels</em> (severity), can be routed to multiple destinations (files, databases, monitoring systems), filtered, formatted, and turned off without changing your code. In production quant systems, comprehensive logging is not optional — it's how you reconstruct what happened during a trading incident.</p>
+  </div>
+
+  <div class="section-h2">The Logging Hierarchy</div>
+
+  <div class="svg-diagram">
+    <svg width="680" height="200" viewBox="0 0 680 200">
+      <!-- Severity bar -->
+      <defs>
+        <linearGradient id="sev" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#10b981"/>
+          <stop offset="25%" style="stop-color:#3b82f6"/>
+          <stop offset="50%" style="stop-color:#f59e0b"/>
+          <stop offset="75%" style="stop-color:#ef4444"/>
+          <stop offset="100%" style="stop-color:#7c3aed"/>
+        </linearGradient>
+      </defs>
+      <rect x="40" y="100" width="600" height="12" rx="6" fill="url(#sev)" opacity="0.7"/>
+      <!-- Labels -->
+      <text x="40" y="90" fill="#10b981" font-family="Space Mono" font-size="11" font-weight="bold">DEBUG</text>
+      <text x="40" y="130" fill="#10b981" font-family="JetBrains Mono" font-size="9">Level 10</text>
+      <text x="155" y="90" fill="#3b82f6" font-family="Space Mono" font-size="11" font-weight="bold">INFO</text>
+      <text x="155" y="130" fill="#3b82f6" font-family="JetBrains Mono" font-size="9">Level 20</text>
+      <text x="270" y="90" fill="#f59e0b" font-family="Space Mono" font-size="11" font-weight="bold">WARNING</text>
+      <text x="270" y="130" fill="#f59e0b" font-family="JetBrains Mono" font-size="9">Level 30</text>
+      <text x="415" y="90" fill="#ef4444" font-family="Space Mono" font-size="11" font-weight="bold">ERROR</text>
+      <text x="415" y="130" fill="#ef4444" font-family="JetBrains Mono" font-size="9">Level 40</text>
+      <text x="530" y="90" fill="#a78bfa" font-family="Space Mono" font-size="11" font-weight="bold">CRITICAL</text>
+      <text x="530" y="130" fill="#a78bfa" font-family="JetBrains Mono" font-size="9">Level 50</text>
+      <!-- Arrow -->
+      <text x="300" y="175" text-anchor="middle" fill="#546e7a" font-family="Space Mono" font-size="10">─────── INCREASING SEVERITY ───────▶</text>
+    </svg>
+  </div>
+
+  <div class="section-h2">Basic Logging Setup</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">logging_basics.py</span></div>
+    <pre><span class="kw">import</span> logging
+
+<span class="cm"># ── BASIC SETUP ─────────────────────────────────────────────────</span>
+logging.basicConfig(
+    level=logging.DEBUG,                 <span class="cm"># minimum level to display</span>
+    format=<span class="str">"%(asctime)s [%(levelname)s] %(name)s: %(message)s"</span>,
+    datefmt=<span class="str">"%Y-%m-%d %H:%M:%S"</span>
+)
+
+<span class="cm"># ── THE 5 LEVELS ───────────────────────────────────────────────</span>
+logging.debug(<span class="str">"Detailed info for debugging: price=175.23, qty=100"</span>)
+logging.info(<span class="str">"Trade executed: AAPL BUY 100 @ 175.23"</span>)
+logging.warning(<span class="str">"Drawdown approaching limit: -4.8% of -5% max"</span>)
+logging.error(<span class="str">"Order rejected by broker: insufficient margin"</span>)
+logging.critical(<span class="str">"RISK LIMIT BREACHED: shutting down trading"</span>)
+
+<span class="out"># 2024-01-15 09:31:05 [DEBUG] root: Detailed info for debugging...
+# 2024-01-15 09:31:05 [INFO] root: Trade executed: AAPL BUY 100 @ 175.23
+# 2024-01-15 09:31:05 [WARNING] root: Drawdown approaching limit...
+# 2024-01-15 09:31:05 [ERROR] root: Order rejected by broker...
+# 2024-01-15 09:31:05 [CRITICAL] root: RISK LIMIT BREACHED...</span></pre>
+  </div>
+
+  <div class="section-h2">Professional Logging Pattern for Quant Systems</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">professional_logging.py — Production setup</span></div>
+    <pre><span class="kw">import</span> logging
+<span class="kw">import</span> logging.handlers
+<span class="kw">import</span> sys
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">def</span> <span class="fn">setup_quant_logger</span>(name, log_file=<span class="nb">None</span>, level=logging.DEBUG):
+    <span class="str">"""Create a production-grade logger for quant systems."""</span>
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+
+    <span class="cm"># Prevent duplicate handlers if called multiple times</span>
+    <span class="kw">if</span> logger.handlers:
+        <span class="kw">return</span> logger
+
+    <span class="cm"># ── FORMAT ─────────────────────────────────────────────────────</span>
+    fmt = logging.Formatter(
+        <span class="str">"%(asctime)s.%(msecs)03d | %(levelname)-8s | %(name)s | %(message)s"</span>,
+        datefmt=<span class="str">"%Y-%m-%dT%H:%M:%S"</span>
+    )
+
+    <span class="cm"># ── HANDLER 1: Console (WARNING and above) ─────────────────────</span>
+    console = logging.StreamHandler(sys.stdout)
+    console.setLevel(logging.WARNING)
+    console.setFormatter(fmt)
+    logger.addHandler(console)
+
+    <span class="cm"># ── HANDLER 2: Rotating file (all levels) ──────────────────────</span>
+    <span class="kw">if</span> log_file:
+        Path(log_file).parent.mkdir(parents=<span class="nb">True</span>, exist_ok=<span class="nb">True</span>)
+        rotating = logging.handlers.RotatingFileHandler(
+            log_file,
+            maxBytes=<span class="num">10</span> * <span class="num">1024</span> * <span class="num">1024</span>,   <span class="cm"># 10 MB per file</span>
+            backupCount=<span class="num">5</span>               <span class="cm"># keep 5 old files</span>
+        )
+        rotating.setLevel(logging.DEBUG)
+        rotating.setFormatter(fmt)
+        logger.addHandler(rotating)
+
+    <span class="kw">return</span> logger
+
+
+<span class="cm"># ── PER-MODULE LOGGER PATTERN ───────────────────────────────────
+# Each module gets its own logger — standard Python practice</span>
+<span class="kw">class</span> <span class="cls">TradingEngine</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="cm"># Logger named after class — creates hierarchy: root → TradingEngine</span>
+        self.logger = logging.getLogger(<span class="fn">f</span><span class="str">"{__name__}.TradingEngine"</span>)
+
+    <span class="kw">def</span> <span class="fn">execute_trade</span>(self, symbol, qty, price):
+        self.logger.info(<span class="fn">f</span><span class="str">"Executing trade: {symbol} qty={qty} price={price}"</span>)
+        <span class="kw">try</span>:
+            <span class="cm"># ... trade logic ...</span>
+            self.logger.debug(<span class="fn">f</span><span class="str">"Trade order sent to broker for {symbol}"</span>)
+            <span class="kw">return</span> <span class="nb">True</span>
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            <span class="cm"># exc_info=True includes the full stack trace</span>
+            self.logger.error(<span class="fn">f</span><span class="str">"Trade failed for {symbol}: {e}"</span>, exc_info=<span class="nb">True</span>)
+            <span class="kw">return</span> <span class="nb">False</span>
+
+    <span class="kw">def</span> <span class="fn">check_risk</span>(self, portfolio_value, drawdown):
+        <span class="kw">if</span> drawdown > <span class="num">0.04</span>:
+            self.logger.warning(<span class="fn">f</span><span class="str">"Drawdown {drawdown:.1%} approaching 5% limit"</span>)
+        <span class="kw">if</span> drawdown > <span class="num">0.05</span>:
+            self.logger.critical(<span class="fn">f</span><span class="str">"RISK BREACH: drawdown={drawdown:.1%}"</span>)
+            self.logger.critical(<span class="str">"Initiating emergency position liquidation!"</span>)
+
+
+<span class="cm"># ── SETUP & USE ─────────────────────────────────────────────────</span>
+logger = setup_quant_logger(<span class="str">"quant_system"</span>, <span class="str">"logs/trading.log"</span>)
+
+engine = <span class="cls">TradingEngine</span>()
+engine.execute_trade(<span class="str">"AAPL"</span>, <span class="num">100</span>, <span class="num">175.0</span>)
+engine.check_risk(<span class="num">1_000_000</span>, <span class="num">0.045</span>)  <span class="cm"># triggers WARNING</span></pre>
+  </div>
+
+  <div class="section-h2">Logging Best Practices</div>
+
+  <table class="styled-table">
+    <thead><tr><th>Practice</th><th>Good</th><th>Bad</th></tr></thead>
+    <tbody>
+      <tr><td>Use module logger</td><td><code>logging.getLogger(__name__)</code></td><td><code>logging.warning("...")</code> (root logger)</td></tr>
+      <tr><td>Include context</td><td><code>logger.info(f"Trade {id}: {symbol}")</code></td><td><code>logger.info("Trade executed")</code></td></tr>
+      <tr><td>Stack traces</td><td><code>logger.error("...", exc_info=True)</code></td><td><code>logger.error(str(e))</code> (loses trace)</td></tr>
+      <tr><td>Level usage</td><td>DEBUG: dev only; INFO: normal ops; WARNING: unexpected but handled; ERROR: recoverable failure; CRITICAL: system-stopping</td><td>Using print() instead</td></tr>
+      <tr><td>Production level</td><td>Set to INFO or WARNING in prod</td><td>DEBUG in production (too verbose, slow)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Set up a logger that writes DEBUG to a file and WARNING to console. Confirm different output in each destination</li>
+      <li>Decorate a trading function with a logging decorator that records inputs, outputs, and execution time</li>
+      <li>Use <code>logging.exception()</code> inside an except block. Compare output to <code>logging.error(str(e))</code></li>
+      <li>Create a logger hierarchy: root → strategy → momentum. Set different levels at each. Observe how levels propagate</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">Logging Levels</div><div class="ex-desc">Set up basicConfig. Call all 5 logging levels. Change the minimum level to WARNING and observe which ones disappear. Change to DEBUG to see all.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">Format Customization</div><div class="ex-desc">Create a custom format showing: timestamp with milliseconds, level, logger name, thread name, and message. Apply it to a FileHandler.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Trade Audit Logger</div><div class="ex-desc">Build a system where every trade (buy/sell/cancel) is logged to a dedicated <code>audit.log</code> file with a structured JSON format. Each entry must have: timestamp, action, symbol, qty, price, user_id.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Logging Decorator</div><div class="ex-desc">Build a <code>@logged</code> decorator that logs function entry (DEBUG), function exit (DEBUG), arguments (DEBUG), and any exceptions (ERROR with stack trace). Apply it to 3 different functions.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Multi-destination Alert System</div><div class="ex-desc">Build a logging system with: RotatingFileHandler for all levels, StreamHandler for WARNING+, custom Handler subclass that sends a simulated "Slack alert" (print to stdout in slack format) for CRITICAL only. Add a Filter that only logs trades above $100,000 notional.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= TAB 08: PDB ============================= -->
+<div id="tab-pdb" class="tab-content">
+  <div class="section-hero" data-icon="🔍">
+    <div class="tagline">// TOPIC 08 — PDB DEBUGGING</div>
+    <h2>Python Debugger (pdb)</h2>
+    <p>PDB is Python's built-in interactive debugger. Instead of adding 50 <code>print()</code> statements and re-running, you drop a breakpoint in your code and <em>pause execution</em> at that exact line. You then inspect all variables, step through code one line at a time, and understand exactly what's happening. An essential skill for finding bugs in complex trading algorithms.</p>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 ANALOGY — SLOW MOTION REPLAY</div>
+    <p>Imagine your trading algorithm produced a wrong PnL calculation. With <code>print()</code> debugging, you're guessing and re-running. With PDB, it's like having a <strong>slow-motion replay</strong> of your code's execution. You pause at any line, look at every variable's exact value at that exact moment, step forward one instruction at a time, and run Python expressions to test hypotheses — all while the program is paused mid-execution. It's the difference between watching a blurry video and pausing on every frame.</p>
+  </div>
+
+  <div class="section-h2">PDB Command Reference</div>
+
+  <table class="styled-table">
+    <thead><tr><th>Command</th><th>Full Form</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>n</code></td><td>next</td><td>Execute next line (don't step into function calls)</td></tr>
+      <tr><td><code>s</code></td><td>step</td><td>Step into function call</td></tr>
+      <tr><td><code>c</code></td><td>continue</td><td>Continue execution until next breakpoint</td></tr>
+      <tr><td><code>r</code></td><td>return</td><td>Continue until current function returns</td></tr>
+      <tr><td><code>q</code></td><td>quit</td><td>Quit debugger (raises BdbQuit)</td></tr>
+      <tr><td><code>l</code></td><td>list</td><td>Show current code (11 lines around current)</td></tr>
+      <tr><td><code>ll</code></td><td>longlist</td><td>Show entire current function</td></tr>
+      <tr><td><code>p expr</code></td><td>print</td><td>Print value of expression</td></tr>
+      <tr><td><code>pp expr</code></td><td>pretty-print</td><td>Pretty-print complex objects</td></tr>
+      <tr><td><code>a</code></td><td>args</td><td>Print all arguments of current function</td></tr>
+      <tr><td><code>w</code></td><td>where</td><td>Show call stack (where am I?)</td></tr>
+      <tr><td><code>u/d</code></td><td>up/down</td><td>Move up/down the call stack</td></tr>
+      <tr><td><code>b N</code></td><td>break N</td><td>Set breakpoint at line N</td></tr>
+      <tr><td><code>b func</code></td><td>break func</td><td>Set breakpoint at start of function</td></tr>
+      <tr><td><code>cl</code></td><td>clear</td><td>Clear all breakpoints</td></tr>
+      <tr><td><code>h</code></td><td>help</td><td>List all commands</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-h2">3 Ways to Enter PDB</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">entering_pdb.py — All 3 methods</span></div>
+    <pre><span class="cm"># ── METHOD 1: breakpoint() — Python 3.7+ preferred way ─────────</span>
+<span class="kw">def</span> <span class="fn">calculate_sharpe</span>(returns, risk_free_rate=<span class="num">0.02</span>):
+    excess = [r - risk_free_rate/<span class="num">252</span> <span class="kw">for</span> r <span class="kw">in</span> returns]
+    <span class="fn">breakpoint</span>()   <span class="cm"># ← execution pauses HERE, drops into PDB</span>
+    mean  = <span class="fn">sum</span>(excess) / <span class="fn">len</span>(excess)
+    std   = ((<span class="fn">sum</span>((x - mean)**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> excess) / <span class="fn">len</span>(excess))**<span class="num">0.5</span>)
+    <span class="kw">return</span> (mean / std) * (<span class="num">252</span>**<span class="num">0.5</span>)
+
+<span class="cm"># ── METHOD 2: import pdb; pdb.set_trace() — older style ────────</span>
+<span class="kw">import</span> pdb
+
+<span class="kw">def</span> <span class="fn">risky_function</span>(data):
+    pdb.set_trace()    <span class="cm"># same as breakpoint() but explicit</span>
+    <span class="kw">return</span> process(data)
+
+<span class="cm"># ── METHOD 3: Post-mortem on crash ──────────────────────────────</span>
+<span class="kw">import</span> pdb
+
+<span class="kw">try</span>:
+    result = calculate_sharpe([])   <span class="cm"># ZeroDivisionError!</span>
+<span class="kw">except</span>:
+    pdb.post_mortem()  <span class="cm"># drops into PDB at the point of failure</span>
+
+<span class="cm"># ── METHOD 4: Command line — debug entire script ────────────────
+# Run from terminal: python -m pdb my_strategy.py
+# Pauses at first line. Use 'c' to continue to first breakpoint</span></pre>
+  </div>
+
+  <div class="section-h2">A Real Debugging Session — Step by Step</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">debug_session.py — The buggy code</span></div>
+    <pre><span class="cm"># BUGGY CODE — Sharpe ratio is coming out wrong. Let's debug it.</span>
+
+<span class="kw">def</span> <span class="fn">compute_returns</span>(prices):
+    <span class="str">"""Compute daily returns from price series."""</span>
+    <span class="kw">return</span> [(prices[i] - prices[i-<span class="num">1</span>]) / prices[i-<span class="num">1</span>]
+            <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(prices))]
+
+<span class="kw">def</span> <span class="fn">sharpe_ratio</span>(prices, risk_free=<span class="num">0.02</span>):
+    <span class="str">"""Annualized Sharpe ratio — BUGGY!"""</span>
+    returns = compute_returns(prices)
+    <span class="fn">breakpoint</span>()    <span class="cm"># ← Let's investigate here</span>
+    daily_rf = risk_free / <span class="num">252</span>
+    excess_returns = [r - daily_rf <span class="kw">for</span> r <span class="kw">in</span> returns]
+    mean  = <span class="fn">sum</span>(excess_returns) / <span class="fn">len</span>(excess_returns)
+    <span class="cm"># BUG: forgot to divide by N before taking sqrt → wrong std!</span>
+    variance = <span class="fn">sum</span>((x - mean)**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> excess_returns)
+    std  = variance ** <span class="num">0.5</span>   <span class="cm"># ← BUG IS HERE (should be / N)</span>
+    <span class="kw">return</span> (mean / std) * (<span class="num">252</span> ** <span class="num">0.5</span>)
+
+prices = [<span class="num">100</span>, <span class="num">101</span>, <span class="num">100.5</span>, <span class="num">102</span>, <span class="num">101.5</span>, <span class="num">103</span>]
+<span class="fn">print</span>(sharpe_ratio(prices))</pre>
+  </div>
+
+  <div class="diagram-box">
+    <div class="d-title">// SIMULATED PDB SESSION</div>
+    <pre style="color: #e2e8f0; font-size: 0.82rem; line-height: 1.7;">&gt; debug_session.py(13)sharpe_ratio()
+-&gt; daily_rf = risk_free / 252
+
+(Pdb) <span style="color:#00d4ff">l</span>                       ← list code around current line
+  9         returns = compute_returns(prices)
+  10        breakpoint()
+  11
+  12 -&gt;     daily_rf = risk_free / 252
+  13        excess_returns = [r - daily_rf for r in returns]
+
+(Pdb) <span style="color:#00d4ff">p returns</span>               ← print returns variable
+[0.01, -0.00495, 0.01493, -0.00490, 0.01478]
+
+(Pdb) <span style="color:#00d4ff">p len(returns)</span>          ← print expression
+5
+
+(Pdb) <span style="color:#00d4ff">n</span>                       ← next line
+&gt; debug_session.py(14)sharpe_ratio()
+-&gt; excess_returns = [r - daily_rf for r in returns]
+
+(Pdb) <span style="color:#00d4ff">n</span>
+&gt; debug_session.py(15)sharpe_ratio()
+-&gt; mean = sum(excess_returns) / len(excess_returns)
+
+(Pdb) <span style="color:#00d4ff">n</span>
+&gt; debug_session.py(16)sharpe_ratio()
+-&gt; variance = sum((x - mean)**2 for x in excess_returns)
+
+(Pdb) <span style="color:#00d4ff">n</span>
+&gt; debug_session.py(17)sharpe_ratio()
+-&gt; std = variance ** 0.5
+
+(Pdb) <span style="color:#00d4ff">p variance</span>              ← AHA! variance is not divided by N
+0.00023145                                  should be 0.0000463
+
+(Pdb) <span style="color:#00d4ff">p variance / len(excess_returns)</span>   ← test the fix
+4.629e-05
+
+(Pdb) <span style="color:#00d4ff">!std = (variance / len(excess_returns)) ** 0.5</span>   ← fix in session
+(Pdb) <span style="color:#00d4ff">c</span>                       ← continue with fix applied</pre>
+  </div>
+
+  <div class="section-h2">Advanced PDB Features</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">advanced_pdb.py</span></div>
+    <pre><span class="kw">import</span> pdb
+
+<span class="cm"># ── CONDITIONAL BREAKPOINT ──────────────────────────────────────
+# Only pause when a specific condition is true</span>
+<span class="kw">def</span> <span class="fn">process_trades</span>(trades):
+    <span class="kw">for</span> i, trade <span class="kw">in</span> <span class="fn">enumerate</span>(trades):
+        <span class="kw">if</span> trade[<span class="str">"qty"</span>] > <span class="num">1000</span>:
+            <span class="fn">breakpoint</span>()   <span class="cm"># only pauses for large trades</span>
+        process(trade)
+
+<span class="cm"># ── PDB COMMAND LINE BREAKPOINTS ────────────────────────────────
+# Inside pdb:
+# b 25                  ← break at line 25
+# b process_trades      ← break at function start
+# b 25, qty > 1000      ← CONDITIONAL break at line 25
+# commands 1            ← run commands when breakpoint 1 hits
+# p trade               ← print trade each time
+# end</span>
+
+<span class="cm"># ── WATCHDOG DEBUGGING ──────────────────────────────────────────
+# Watch an expression change</span>
+<span class="kw">class</span> <span class="cls">Watchdog</span>:
+    <span class="str">"""Drop into debugger when a value changes unexpectedly."""</span>
+    <span class="kw">def</span> <span class="fn">__setattr__</span>(self, name, value):
+        <span class="kw">if</span> name == <span class="str">"pnl"</span> <span class="kw">and</span> <span class="fn">hasattr</span>(self, <span class="str">"pnl"</span>):
+            <span class="kw">if</span> value < self.pnl - <span class="num">10000</span>:  <span class="cm"># sudden large loss!</span>
+                <span class="fn">breakpoint</span>()
+        <span class="fn">super</span>().__setattr__(name, value)
+
+<span class="cm"># ── USING IPDB (IMPROVED PDB) ────────────────────────────────────
+# Install: pip install ipdb
+# import ipdb; ipdb.set_trace()
+# Features: syntax highlighting, tab completion, better traceback</span>
+
+<span class="cm"># ── DISABLE ALL BREAKPOINTS WITHOUT CODE CHANGES ─────────────────
+# Set env variable before running:
+# PYTHONBREAKPOINT=0 python my_script.py
+# This disables ALL breakpoint() calls — useful for production!</span></pre>
+  </div>
+
+  <div class="section-h2">PDB in Jupyter/Colab</div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">PYTHON</span><span class="code-label">jupyter_debugging.py — Colab-specific patterns</span></div>
+    <pre><span class="cm"># In Jupyter/Colab, use %debug magic after an exception</span>
+
+<span class="cm"># METHOD 1: %%debug — debug entire cell</span>
+<span class="cm"># %%debug</span>
+<span class="cm"># result = my_buggy_function()</span>
+
+<span class="cm"># METHOD 2: %debug — post-mortem on last exception</span>
+<span class="cm"># try running this in a cell:</span>
+<span class="cm"># 1/0  ← causes ZeroDivisionError</span>
+<span class="cm"># then in next cell:</span>
+<span class="cm"># %debug  ← drops into pdb at the point of failure</span>
+
+<span class="cm"># METHOD 3: set_trace() still works in Colab</span>
+<span class="kw">import</span> pdb
+
+<span class="kw">def</span> <span class="fn">debug_me</span>(x):
+    pdb.set_trace()
+    <span class="kw">return</span> x * <span class="num">2</span>
+
+debug_me(<span class="num">5</span>)   <span class="cm"># drops into debugger in Colab output</span>
+
+<span class="cm"># COLAB TIP: Use print() liberally for quick inspection
+# but switch to pdb when things get complex</span></pre>
+  </div>
+
+  <div class="colab-section">
+    <div class="colab-header">🧪 Google Colab Experiments</div>
+    <ul class="colab-list">
+      <li>Write a buggy Black-Scholes implementation. Use <code>breakpoint()</code> to pause inside it, inspect all variables with <code>p</code>, and identify the bug</li>
+      <li>Use <code>%debug</code> magic in Colab after triggering a ZeroDivisionError. Navigate the call stack with <code>u</code> and <code>d</code></li>
+      <li>Set a conditional breakpoint that only triggers when a simulated stock price drops below a threshold</li>
+      <li>Practice the full workflow: <code>n</code> (next), <code>s</code> (step into), <code>r</code> (return from function), <code>c</code> (continue), <code>q</code> (quit)</li>
+    </ul>
+  </div>
+
+  <div class="exercises-section">
+    <h2>🎯 Practice Exercises</h2>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-easy">EASY</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">E1</span><div class="ex-content"><div class="ex-title">First Debug Session</div><div class="ex-desc">Write a function that calculates portfolio volatility (std dev of returns). Introduce a bug (e.g., wrong formula). Use <code>breakpoint()</code> and PDB commands to find and fix the bug.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">E2</span><div class="ex-content"><div class="ex-title">Post-Mortem</div><div class="ex-desc">Write code that crashes with IndexError. Wrap it in try/except, call <code>pdb.post_mortem()</code>. Navigate the crash site and inspect variables.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-medium">MEDIUM</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">M1</span><div class="ex-content"><div class="ex-title">Walk the Call Stack</div><div class="ex-desc">Create 3 nested functions: <code>strategy() → signal() → indicator()</code>. Set a breakpoint in <code>indicator()</code>. Use <code>w</code> to see the call stack. Use <code>u</code> to move up and inspect variables in each frame.</div></div></li>
+        <li class="exercise-item"><span class="ex-num">M2</span><div class="ex-content"><div class="ex-title">Live Fix</div><div class="ex-desc">Write a loop that processes 100 trades. Plant a bug that affects only trades where qty > 500. Use a conditional <code>if</code> guard around <code>breakpoint()</code> to pause only on those trades. Fix the bug interactively with <code>!</code> assignment.</div></div></li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge tier-hard">HARD</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="ex-num">H1</span><div class="ex-content"><div class="ex-title">Custom PDB Subclass</div><div class="ex-desc">Subclass <code>pdb.Pdb</code> to create a <code>TradingDebugger</code> that: auto-prints portfolio state on every <code>n</code> command, highlights WARNING when drawdown crosses thresholds, and logs every debugger command to a file for audit purposes.</div></div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-h2">External Resources</div>
+  <div class="resources-grid">
+    <a class="resource-card" href="https://docs.python.org/3/library/pdb.html" target="_blank">
+      <div class="resource-tag">📖 OFFICIAL DOCS</div>
+      <div class="resource-title">Python PDB Documentation</div>
+      <div class="resource-desc">Complete official reference for all PDB commands and features</div>
+    </a>
+    <a class="resource-card" href="https://realpython.com/python-debugging-pdb/" target="_blank">
+      <div class="resource-tag">📚 TUTORIAL</div>
+      <div class="resource-title">Real Python: PDB Guide</div>
+      <div class="resource-desc">Comprehensive walkthrough with examples and interactive sessions</div>
+    </a>
+    <a class="resource-card" href="https://github.com/gotcha/ipdb" target="_blank">
+      <div class="resource-tag">🔧 TOOL</div>
+      <div class="resource-title">ipdb — IPython PDB</div>
+      <div class="resource-desc">Enhanced PDB with syntax highlighting and tab completion</div>
+    </a>
+  </div>
+</div>
+
+</div><!-- end content-wrap -->
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

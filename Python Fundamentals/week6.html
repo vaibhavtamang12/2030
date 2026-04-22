@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Visualization — Quant Engineer Study Guide</title>
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #161920;
+            --surface-2: #1e2129;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+            --accent: #38bdf8;
+            --accent-2: #818cf8;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --border: #2d3748;
+            --code-bg: #0d1117;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+            padding: 3rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        header p { color: var(--text-dim); font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 140px;
+            z-index: 99;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: var(--text); background: var(--surface-2); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--surface-2); }
+        
+        .tab-content { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h2 { color: var(--accent); font-size: 2rem; margin: 2rem 0 1rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+        h3 { color: var(--accent-2); font-size: 1.4rem; margin: 2rem 0 0.8rem; }
+        h4 { color: var(--text); font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        p { margin-bottom: 1rem; color: var(--text-dim); }
+        p strong { color: var(--text); }
+        
+        .prereq-box {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .prereq-box h4 { color: var(--accent); margin-top: 0; }
+        
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        @media (max-width: 900px) { .concept-grid { grid-template-columns: 1fr; } }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .card h4 { color: var(--accent); margin-bottom: 0.5rem; }
+        
+        .diagram-container {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 1rem 0;
+        }
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #e2e8f0;
+        }
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .function { color: #d2a8ff; }
+        .comment { color: #8b949e; font-style: italic; }
+        .number { color: #79c0ff; }
+        
+        .exercise-tier {
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .tier-header {
+            padding: 1rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tier-easy .tier-header { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+        .tier-medium .tier-header { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+        .tier-hard .tier-header { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+        .tier-body { padding: 1.5rem; background: var(--surface); display: none; }
+        .tier-body.open { display: block; }
+        .tier-body ol { margin-left: 1.5rem; }
+        .tier-body li { margin-bottom: 0.8rem; color: var(--text-dim); }
+        
+        .resource-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        .resource-list li {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.2s;
+        }
+        .resource-list li:hover { border-color: var(--accent-2); }
+        .resource-list a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .resource-list a:hover { text-decoration: underline; }
+        .resource-list span { display: block; color: var(--text-dim); font-size: 0.9rem; margin-top: 0.3rem; }
+        
+        .highlight-box {
+            background: var(--surface-2);
+            border-left: 4px solid var(--accent-2);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+        }
+        
+        .formula {
+            background: var(--code-bg);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            display: inline-block;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th { background: var(--surface-2); color: var(--accent); font-weight: 600; }
+        tr:hover { background: rgba(56, 189, 248, 0.05); }
+        
+        .progress-tracker {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            z-index: 98;
+            display: none;
+        }
+        @media (min-width: 1400px) { .progress-tracker { display: block; } }
+        .progress-tracker h4 { font-size: 0.9rem; margin-bottom: 0.8rem; color: var(--accent); }
+        .progress-item {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            padding: 0.3rem 0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .progress-item:hover, .progress-item.active { color: var(--accent); }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+        .badge-prereq { background: rgba(129, 140, 248, 0.2); color: var(--accent-2); }
+        .badge-core { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+        
+        canvas { max-width: 100%; }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--accent);
+            cursor: help;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background: var(--surface-2);
+            color: var(--text);
+            text-align: center;
+            border-radius: 8px;
+            padding: 0.8rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Financial Visualization</h1>
+    <p>A comprehensive, self-contained study guide for aspiring Quant Engineers. From Python prerequisites to advanced portfolio visualizations — entirely offline-ready with interactive diagrams, Colab experiments, and tiered exercises.</p>
+</header>
+
+<nav class="tabs" id="tabNav">
+    <button class="tab-btn active" onclick="showTab('prereq')">Prerequisites</button>
+    <button class="tab-btn" onclick="showTab('ts')">1. Time Series</button>
+    <button class="tab-btn" onclick="showTab('dist')">2. Distributions</button>
+    <button class="tab-btn" onclick="showTab('corr')">3. Correlation</button>
+    <button class="tab-btn" onclick="showTab('risk')">4. Risk Metrics</button>
+    <button class="tab-btn" onclick="showTab('port')">5. Portfolio Theory</button>
+    <button class="tab-btn" onclick="showTab('advanced')">6. Advanced Quant Viz</button>
+    <button class="tab-btn" onclick="showTab('dashboard')">7. Dashboards</button>
+</nav>
+
+<!-- ==================== PREREQUISITES ==================== -->
+<section id="prereq" class="tab-content active">
+    <h2>Prerequisites <span class="badge badge-prereq">Foundation</span></h2>
+    <p>Before visualizing financial data, you need to understand what the data represents and how to manipulate it. This section covers the absolute essentials. <strong>Do not skip this.</strong></p>
+    
+    <div class="prereq-box">
+        <h4>📚 What You Need First</h4>
+        <p>We assume zero prior knowledge of finance or advanced math, but you should be comfortable with basic Python syntax (variables, loops, functions). Everything else is taught here.</p>
+    </div>
+
+    <h3>Topic 0.1: Python for Data — NumPy & Pandas</h3>
+    <div class="concept-grid">
+        <div class="card">
+            <h4>NumPy — The Engine</h4>
+            <p>Finance is numerical. NumPy provides <strong>arrays</strong> — fast, memory-efficient grids of numbers. Think of an array as an Excel column that can do math on every cell instantly.</p>
+            <p><strong>Key concept:</strong> Vectorization. Instead of looping through prices to calculate returns, you do: <code>returns = prices[1:] / prices[:-1] - 1</code></p>
+        </div>
+        <div class="card">
+            <h4>Pandas — The Organizer</h4>
+            <p>Pandas adds <strong>DataFrames</strong> (labeled tables) and <strong>Series</strong> (labeled columns). It connects raw numbers to meaning — dates, stock tickers, prices.</p>
+            <p><strong>Key concept:</strong> Indexing by time. Financial data is a <em>time series</em>, and Pandas makes <code>df['2020':'2023']</code> slice effortlessly.</p>
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <h4>Diagram: Array vs DataFrame Mental Model</h4>
+        <svg width="700" height="280" viewBox="0 0 700 280">
+            <!-- NumPy Array -->
+            <rect x="50" y="40" width="200" height="180" fill="#1e2129" stroke="#38bdf8" stroke-width="2" rx="8"/>
+            <text x="150" y="30" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="bold">NumPy Array</text>
+            <text x="150" y="65" text-anchor="middle" fill="#94a3b8" font-size="12">[100.2, 101.5, 99.8, ...]</text>
+            <text x="150" y="95" text-anchor="middle" fill="#94a3b8" font-size="12">Fast math, no labels</text>
+            <text x="150" y="125" text-anchor="middle" fill="#94a3b8" font-size="12">Homogeneous data</text>
+            <text x="150" y="170" text-anchor="middle" fill="#e2e8f0" font-size="13">prices[5] → 102.3</text>
+            
+            <!-- Arrow -->
+            <path d="M 280 130 L 340 130" stroke="#818cf8" stroke-width="3" marker-end="url(#arrowhead)"/>
+            <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#818cf8"/></marker></defs>
+            <text x="310" y="120" text-anchor="middle" fill="#818cf8" font-size="11">Wrap with</text>
+            
+            <!-- Pandas DataFrame -->
+            <rect x="380" y="40" width="280" height="180" fill="#1e2129" stroke="#818cf8" stroke-width="2" rx="8"/>
+            <text x="520" y="30" text-anchor="middle" fill="#818cf8" font-size="14" font-weight="bold">Pandas DataFrame</text>
+            <rect x="400" y="55" width="60" height="25" fill="#0f1115" stroke="#38bdf8" rx="4"/><text x="430" y="72" text-anchor="middle" fill="#38bdf8" font-size="11">Date</text>
+            <rect x="465" y="55" width="80" height="25" fill="#0f1115" stroke="#38bdf8" rx="4"/><text x="505" y="72" text-anchor="middle" fill="#38bdf8" font-size="11">Open</text>
+            <rect x="550" y="55" width="80" height="25" fill="#0f1115" stroke="#38bdf8" rx="4"/><text x="590" y="72" text-anchor="middle" fill="#38bdf8" font-size="11">Close</text>
+            
+            <rect x="400" y="85" width="60" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="430" y="102" text-anchor="middle" fill="#94a3b8" font-size="10">Jan 1</text>
+            <rect x="465" y="85" width="80" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="505" y="102" text-anchor="middle" fill="#94a3b8" font-size="10">100.2</text>
+            <rect x="550" y="85" width="80" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="590" y="102" text-anchor="middle" fill="#94a3b8" font-size="10">101.5</text>
+            
+            <rect x="400" y="115" width="60" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="430" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">Jan 2</text>
+            <rect x="465" y="115" width="80" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="505" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">101.5</text>
+            <rect x="550" y="115" width="80" height="25" fill="#0f1115" stroke="#2d3748" rx="4"/><text x="590" y="132" text-anchor="middle" fill="#94a3b8" font-size="10">99.8</text>
+            
+            <text x="520" y="180" text-anchor="middle" fill="#e2e8f0" font-size="13">df.loc['Jan 2', 'Close'] → 99.8</text>
+        </svg>
+    </div>
+
+    <h3>Topic 0.2: Financial Data Structure — OHLCV</h3>
+    <p>Financial time series isn't just one price per day. It's five numbers:</p>
+    <table>
+        <tr><th>Field</th><th>Meaning</th><th>Why It Matters</th></tr>
+        <tr><td><strong>Open</strong></td><td>First traded price of the period</td><td>Reflects overnight sentiment</td></tr>
+        <tr><td><strong>High</strong></td><td>Maximum price during the period</td><td>Shows resistance levels</td></tr>
+        <tr><td><strong>Low</strong></td><td>Minimum price during the period</td><td>Shows support levels</td></tr>
+        <tr><td><strong>Close</strong></td><td>Last traded price of the period</td><td>Most analyzed price point</td></tr>
+        <tr><td><strong>Volume</strong></td><td>Number of shares/contracts traded</td><td>Confirms trend strength</td></tr>
+    </table>
+
+    <div class="diagram-container">
+        <h4>Diagram: One Day of Trading Visualized</h4>
+        <svg width="600" height="220" viewBox="0 0 600 220">
+            <!-- Price axis -->
+            <text x="30" y="40" text-anchor="end" fill="#94a3b8" font-size="11">$105</text>
+            <text x="30" y="110" text-anchor="end" fill="#94a3b8" font-size="11">$100</text>
+            <text x="30" y="180" text-anchor="end" fill="#94a3b8" font-size="11">$95</text>
+            <line x1="40" y1="40" x2="560" y2="40" stroke="#2d3748" stroke-dasharray="4"/>
+            <line x1="40" y1="110" x2="560" y2="110" stroke="#2d3748" stroke-dasharray="4"/>
+            <line x1="40" y1="180" x2="560" y2="180" stroke="#2d3748" stroke-dasharray="4"/>
+            
+            <!-- High-Low line -->
+            <line x1="200" y1="40" x2="200" y2="180" stroke="#94a3b8" stroke-width="2"/>
+            <!-- Open tick -->
+            <line x1="190" y1="140" x2="200" y2="140" stroke="#f87171" stroke-width="3"/>
+            <text x="170" y="145" text-anchor="end" fill="#f87171" font-size="12">Open $98</text>
+            <!-- Close tick -->
+            <line x1="200" y1="80" x2="210" y2="80" stroke="#34d399" stroke-width="3"/>
+            <text x="230" y="85" text-anchor="start" fill="#34d399" font-size="12">Close $102</text>
+            <!-- High label -->
+            <text x="200" y="30" text-anchor="middle" fill="#e2e8f0" font-size="12">High $105</text>
+            <!-- Low label -->
+            <text x="200" y="195" text-anchor="middle" fill="#e2e8f0" font-size="12">Low $95</text>
+            
+            <!-- Volume bars -->
+            <rect x="350" y="120" width="30" height="60" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" rx="2"/>
+            <rect x="390" y="100" width="30" height="80" fill="rgba(56,189,248,0.5)" stroke="#38bdf8" rx="2"/>
+            <rect x="430" y="140" width="30" height="40" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" rx="2"/>
+            <text x="405" y="95" text-anchor="middle" fill="#38bdf8" font-size="12">Volume</text>
+            
+            <!-- Time axis -->
+            <text x="200" y="215" text-anchor="middle" fill="#94a3b8" font-size="11">9:30 AM</text>
+            <text x="405" y="215" text-anchor="middle" fill="#94a3b8" font-size="11">Time →</text>
+        </svg>
+    </div>
+
+    <h3>Topic 0.3: Returns — The Universal Language</h3>
+    <p>Prices vary across stocks ($5 vs $5000). <strong>Returns</strong> normalize everything. A 2% gain is a 2% gain whether the stock is $10 or $1000.</p>
+    <div class="formula">
+        Simple Return: R<sub>t</sub> = (P<sub>t</sub> - P<sub>t-1</sub>) / P<sub>t-1</sub> = P<sub>t</sub>/P<sub>t-1</sub> - 1
+    </div>
+    <div class="formula">
+        Log Return: r<sub>t</sub> = ln(P<sub>t</sub> / P<sub>t-1</sub>)
+    </div>
+    <p><strong>Why log returns?</strong> They are <span class="tooltip">time-additive<span class="tooltip-text">Log returns over multiple periods simply sum up: r_total = r_1 + r_2 + r_3</span></span> and mathematically cleaner for modeling. For small daily moves, simple and log returns are nearly identical.</p>
+
+    <h3>Topic 0.4: Basic Statistics for Finance</h3>
+    <div class="concept-grid">
+        <div class="card">
+            <h4>Mean (Average Return)</h4>
+            <p>The center of gravity. Tells you the expected drift of an asset. In Python: <code>returns.mean()</code></p>
+        </div>
+        <div class="card">
+            <h4>Standard Deviation (Volatility)</h4>
+            <p>The "wobble." How far returns typically deviate from the mean. This is the most common risk measure. In Python: <code>returns.std()</code></p>
+        </div>
+        <div class="card">
+            <h4>Variance</h4>
+            <p>Standard deviation squared. Used in portfolio math because variances add (if uncorrelated), but standard deviations don't.</p>
+        </div>
+        <div class="card">
+            <h4>Percentiles / Quantiles</h4>
+            <p>The 5th percentile of returns tells you: "5% of the time, I lost more than X." Critical for risk management.</p>
+        </div>
+    </div>
+
+    <h3>🧪 Colab Experiment: Prerequisites</h3>
+    <pre><code><span class="comment"># Run this in Google Colab to build your foundation</span>
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># 1. Create synthetic OHLCV data</span>
+np.random.seed(42)
+dates = pd.date_range(<span class="string">'2023-01-01'</span>, periods=252, freq=<span class="string">'B'</span>)
+trend = np.linspace(100, 150, 252)
+noise = np.cumsum(np.random.randn(252) * 0.5)
+prices = trend + noise
+
+df = pd.DataFrame({
+    <span class="string">'Open'</span>: prices + np.random.randn(252) * 0.3,
+    <span class="string">'High'</span>: prices + abs(np.random.randn(252)) * 0.8,
+    <span class="string">'Low'</span>: prices - abs(np.random.randn(252)) * 0.8,
+    <span class="string">'Close'</span>: prices + np.random.randn(252) * 0.2,
+    <span class="string">'Volume'</span>: np.random.randint(1e6, 5e6, 252)
+}, index=dates)
+
+<span class="comment"># 2. Calculate returns</span>
+df[<span class="string">'Simple_Return'</span>] = df[<span class="string">'Close'</span>].pct_change()
+df[<span class="string">'Log_Return'</span>] = np.log(df[<span class="string">'Close'</span>] / df[<span class="string">'Close'</span>].shift(1))
+
+<span class="comment"># 3. Basic stats</span>
+<span class="function">print</span>(<span class="string">"Mean daily return:"</span>, df[<span class="string">'Simple_Return'</span>].mean())
+<span class="function">print</span>(<span class="string">"Volatility:"</span>, df[<span class="string">'Simple_Return'</span>].std())
+<span class="function">print</span>(<span class="string">"5th percentile (VaR proxy):"</span>, df[<span class="string">'Simple_Return'</span>].quantile(0.05))
+
+<span class="comment"># 4. Visualize price path</span>
+plt.figure(figsize=(10, 4))
+plt.plot(df.index, df[<span class="string">'Close'</span>], color=<span class="string">'#38bdf8'</span>, linewidth=1.5)
+plt.title(<span class="string">'Synthetic Stock Price Path'</span>, color=<span class="string">'white'</span>)
+plt.gca().set_facecolor(<span class="string">'#0f1115'</span>)
+plt.gcf().patch.set_facecolor(<span class="string">'#0f1115'</span>)
+plt.tick_params(colors=<span class="string">'white'</span>)
+plt.show()</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy Quickstart Guide</a><span>Official documentation for array computing</span></li>
+        <li><a href="https://pandas.pydata.org/docs/getting_started/index.html" target="_blank">Pandas Getting Started</a><span>Learn DataFrames and time series handling</span></li>
+        <li><a href="https://www.investopedia.com/terms/o/ohlcchart.asp" target="_blank">Investopedia: OHLC Chart</a><span>Visual explanation of price bars</span></li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics & Probability</a><span>Free course on mean, variance, percentiles</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Create a NumPy array of 100 random numbers. Calculate its mean and standard deviation without using built-in functions (use manual loops), then verify with <code>np.mean()</code> and <code>np.std()</code>.</li>
+                <li>Download AAPL stock data using <code>yfinance</code> for the last 3 months. Print the first 5 rows and identify the Open, High, Low, Close, Volume columns.</li>
+                <li>Calculate daily simple returns for the AAPL data. Plot a line chart of the closing prices using Matplotlib with a green color.</li>
+                <li>What is the difference between simple returns and log returns? Calculate both for the same series and show that for small values (daily data), they are nearly identical.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Create a function that takes a DataFrame of OHLC data and returns a DataFrame of returns (Open-to-Open, High-to-High, etc.). Which return series has the highest volatility and why?</li>
+                <li>Implement a rolling 20-day mean and rolling 20-day standard deviation on AAPL returns. Plot three subplots: (1) price, (2) rolling mean, (3) rolling volatility.</li>
+                <li>Generate 10,000 random returns from a normal distribution with the same mean and std as AAPL returns. Plot a histogram of real returns overlaid with the theoretical normal distribution. What differences do you notice?</li>
+                <li>Calculate the correlation between AAPL's volume and the absolute value of its daily returns. Is there a relationship? Visualize it with a scatter plot.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement an <strong>efficient cache for pandas DataFrames</strong> that stores OHLC data to disk in Parquet format. Write functions to update the cache incrementally (only download missing dates) using yfinance.</li>
+                <li>Create a <strong>bootstrap resampling</strong> experiment: draw 252 returns (with replacement) from AAPL's historical returns 10,000 times. For each sample, calculate the annualized return and volatility. Plot the joint distribution. What does this tell you about estimation uncertainty?</li>
+                <li>Build a <strong>statistical arbitrage signal</strong>: calculate the z-score of the spread between two correlated stocks (e.g., PEP and KO). Visualize the spread, its rolling z-score, and mark entry/exit points where |z| > 2.</li>
+                <li>Prove mathematically (and verify with code) that the variance of a portfolio of two assets is: σ²ₚ = w₁²σ₁² + w₂²σ₂² + 2w₁w₂σ₁σ₂ρ₁₂. Visualize how portfolio variance changes as correlation ρ moves from -1 to +1.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TIME SERIES ==================== -->
+<section id="ts" class="tab-content">
+    <h2>1. Time Series Visualization <span class="badge badge-core">Core</span></h2>
+    <p>Time series is the DNA of quantitative finance. Every price, every return, every signal exists in time. Visualizing it well separates amateur charts from professional analytics.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>OHLCV data structure, Pandas time-indexing, basic Matplotlib/Seaborn, simple returns calculation.</p>
+    </div>
+
+    <h3>1.1 The Line Chart — Foundation of Everything</h3>
+    <p>A line chart connects closing prices over time. It's simple, but dangerous — it hides intraday volatility. Always ask: "What time granularity am I looking at?"</p>
+    
+    <div class="diagram-container">
+        <h4>Interactive Concept: Time Granularity Changes Meaning</h4>
+        <canvas id="tsCanvas" width="700" height="300"></canvas>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.5rem;">The same data looks calm on a monthly chart but chaotic on an hourly chart. <strong>Zoom level changes narrative.</strong></p>
+    </div>
+
+    <h3>1.2 Candlestick Charts — Seeing the Battle</h3>
+    <p>Candlesticks encode 4 prices in one shape. The <strong>body</strong> (open-close) shows who won the period. The <strong>wicks</strong> (high-low) show how far the battle extended.</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Green/White candle:</strong> Close > Open (bulls won)</li>
+        <li><strong>Red/Black candle:</strong> Close < Open (bears won)</li>
+        <li><strong>Long wick + small body:</strong> Indecision (reversal potential)</li>
+        <li><strong>No wick + long body:</strong> Strong conviction</li>
+    </ul>
+
+    <div class="diagram-container">
+        <h4>Diagram: Candlestick Anatomy</h4>
+        <svg width="600" height="250" viewBox="0 0 600 250">
+            <!-- Bullish candle -->
+            <line x1="150" y1="50" x2="150" y2="200" stroke="#34d399" stroke-width="2"/>
+            <rect x="130" y="100" width="40" height="80" fill="#34d399" rx="2"/>
+            <text x="150" y="40" text-anchor="middle" fill="#34d399" font-size="12">High</text>
+            <text x="150" y="215" text-anchor="middle" fill="#34d399" font-size="12">Low</text>
+            <text x="110" y="145" text-anchor="end" fill="#e2e8f0" font-size="12">Open</text>
+            <text x="180" y="145" text-anchor="start" fill="#e2e8f0" font-size="12">Close</text>
+            <text x="150" y="240" text-anchor="middle" fill="#34d399" font-size="14" font-weight="bold">BULLISH (Close > Open)</text>
+            
+            <!-- Bearish candle -->
+            <line x1="450" y1="50" x2="450" y2="200" stroke="#f87171" stroke-width="2"/>
+            <rect x="430" y="100" width="40" height="80" fill="#f87171" rx="2"/>
+            <text x="450" y="40" text-anchor="middle" fill="#f87171" font-size="12">High</text>
+            <text x="450" y="215" text-anchor="middle" fill="#f87171" font-size="12">Low</text>
+            <text x="410" y="145" text-anchor="end" fill="#e2e8f0" font-size="12">Close</text>
+            <text x="480" y="145" text-anchor="start" fill="#e2e8f0" font-size="12">Open</text>
+            <text x="450" y="240" text-anchor="middle" fill="#f87171" font-size="14" font-weight="bold">BEARISH (Close < Open)</text>
+            
+            <!-- Wick labels -->
+            <line x1="150" y1="50" x2="170" y2="50" stroke="#94a3b8" stroke-dasharray="3"/>
+            <line x1="150" y1="200" x2="170" y2="200" stroke="#94a3b8" stroke-dasharray="3"/>
+            <text x="175" y="55" fill="#94a3b8" font-size="11">Upper Wick</text>
+            <text x="175" y="205" fill="#94a3b8" font-size="11">Lower Wick</text>
+        </svg>
+    </div>
+
+    <h3>1.3 Volume — The Lie Detector</h3>
+    <p>Price moves backed by <strong>high volume</strong> are more trustworthy. A price breakout on low volume is like a party with no music — suspicious.</p>
+    <p>Common visualizations:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Volume bars below price:</strong> Classic, simple, effective</li>
+        <li><strong>Volume Profile:</strong> Histogram rotated sideways — shows where most trading happened (Value Area)</li>
+        <li><strong>On-Balance Volume (OBV):</strong> Cumulative volume flow to predict price</li>
+    </ul>
+
+    <h3>1.4 Moving Averages — Smoothing the Noise</h3>
+    <p>A <span class="tooltip">Moving Average<span class="tooltip-text">The average price over the last N periods. As time moves forward, the window "moves" with it.</span></span> filters noise and reveals trend. Two main types:</p>
+    <div class="concept-grid">
+        <div class="card">
+            <h4>SMA (Simple Moving Average)</h4>
+            <p>Equal weight to all N periods. Slower to react. Formula: SMA<sub>t</sub> = (P<sub>t</sub> + P<sub>t-1</sub> + ... + P<sub>t-N+1</sub>) / N</p>
+        </div>
+        <div class="card">
+            <h4>EMA (Exponential Moving Average)</h4>
+            <p>More weight to recent prices. Faster, more jittery. Preferred for signals. Formula involves a smoothing factor α = 2/(N+1).</p>
+        </div>
+    </div>
+
+    <h3>🧪 Colab Experiment: Time Series Mastery</h3>
+    <pre><code><span class="comment"># Financial Time Series Visualization Lab</span>
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> matplotlib.patches <span class="keyword">import</span> Rectangle
+
+<span class="comment"># Download data</span>
+ticker = yf.Ticker(<span class="string">"SPY"</span>)
+df = ticker.history(period=<span class="string">"6mo"</span>)
+
+<span class="comment"># 1. Line chart with dual EMAs</span>
+plt.figure(figsize=(12, 5))
+plt.plot(df.index, df[<span class="string">'Close'</span>], label=<span class="string">'Close'</span>, color=<span class="string">'white'</span>, linewidth=1)
+plt.plot(df.index, df[<span class="string">'Close'</span>].ewm(span=20).mean(), label=<span class="string">'EMA 20'</span>, color=<span class="string">'#38bdf8'</span>)
+plt.plot(df.index, df[<span class="string">'Close'</span>].ewm(span=50).mean(), label=<span class="string">'EMA 50'</span>, color=<span class="string">'#fbbf24'</span>)
+plt.fill_between(df.index, df[<span class="string">'Close'</span>], alpha=0.1, color=<span class="string">'white'</span>)
+plt.legend(); plt.title(<span class="string">'SPY Price with EMA Cloud'</span>)
+plt.show()
+
+<span class="comment"># 2. Matplotlib candlestick (simplified)</span>
+<span class="keyword">def</span> <span class="function">plot_candles</span>(df, n=30):
+    df = df.tail(n)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    width = 0.6
+    <span class="keyword">for</span> i, (idx, row) <span class="keyword">in</span> <span class="function">enumerate</span>(df.iterrows()):
+        color = <span class="string">'#34d399'</span> <span class="keyword">if</span> row[<span class="string">'Close'</span>] >= row[<span class="string">'Open'</span>] <span class="keyword">else</span> <span class="string">'#f87171'</span>
+        ax.plot([i, i], [row[<span class="string">'Low'</span>], row[<span class="string">'High'</span>]], color=<span class="string">'white'</span>, linewidth=1)
+        ax.add_patch(Rectangle((i-width/2, <span class="function">min</span>(row[<span class="string">'Open'</span>], row[<span class="string">'Close'</span>])), 
+                               width, abs(row[<span class="string">'Close'</span>]-row[<span class="string">'Open'</span>]), 
+                               facecolor=color, edgecolor=color))
+    ax.set_xticks(<span class="function">range</span>(0, n, 5))
+    ax.set_xticklabels([d.strftime(<span class="string">'%m-%d'</span>) <span class="keyword">for</span> d <span class="keyword">in</span> df.index[::5]])
+    ax.set_title(<span class="string">'Candlestick Chart (Last 30 Days)'</span>)
+    plt.show()
+
+plot_candles(df)
+
+<span class="comment"># 3. Volume profile (price-level histogram)</span>
+plt.figure(figsize=(8, 5))
+plt.hist2d(df[<span class="string">'Close'</span>], df[<span class="string">'Volume'</span>], bins=30, cmap=<span class="string">'Blues'</span>)
+plt.colorbar(label=<span class="string">'Density'</span>)
+plt.xlabel(<span class="string">'Price'</span>); plt.ylabel(<span class="string">'Volume'</span>)
+plt.title(<span class="string">'Volume Profile Heatmap'</span>)
+plt.show()</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.investopedia.com/trading/candlestick-charting-what-is-it/" target="_blank">Investopedia: Candlestick Charting</a><span>Deep dive into candlestick patterns and psychology</span></li>
+        <li><a href="https://matplotlib.org/stable/gallery/index.html" target="_blank">Matplotlib Gallery</a><span>Copy-paste examples for financial plots</span></li>
+        <li><a href="https://plotly.com/python/candlestick-charts/" target="_blank">Plotly Candlestick Charts</a><span>Interactive web-based candlesticks with zoom/pan</span></li>
+        <li><a href="https://school.stockcharts.com/doku.php?id=chart_analysis:volume" target="_blank">StockCharts: Volume Analysis</a><span>How professionals read volume</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Download TSLA data for the last year. Plot a simple line chart of closing prices with the chart title "TSLA Price Journey".</li>
+                <li>Add a 30-day SMA to the TSLA chart. Color it red. Add a legend. What happens to the price when it crosses above the SMA?</li>
+                <li>Create a volume bar chart below the price chart using <code>plt.subplots(2, 1, sharex=True)</code>. Color volume bars green when Close > Open, red otherwise.</li>
+                <li>Explain in your own words: Why do candlesticks provide more information than a simple line chart?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a <strong>Bollinger Bands</strong> visualization: 20-day SMA plus 2 standard deviation bands. Highlight (with color) periods where price touches the upper or lower band.</li>
+                <li>Create a function that detects <strong>"Doji"</strong> candlesticks (where Open ≈ Close). Mark them on a candlestick chart with yellow stars.</li>
+                <li>Implement a <strong>volume-weighted average price (VWAP)</strong> line intraday. Download 1-minute data for one day and plot price vs VWAP. When does price deviate most from VWAP?</li>
+                <li>Compare SMA vs EMA responsiveness: Plot both on the same chart during a sharp market reversal (March 2020). Quantify which reacts faster by measuring the lag in days.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build an <strong>interactive candlestick chart with Plotly</strong> that includes: range slider, volume subplot, 20 EMA toggle button, and annotations for gaps (days where Low > previous High or High < previous Low).</li>
+                <li>Create a <strong>market regime detector</strong> visual: Use a 2-state Hidden Markov Model (via <code>hmmlearn</code>) on SPY returns. Plot the price colored by regime (bull/bear) in the background.</li>
+                <li>Implement a <strong>seasonality decomposition</strong> visual: Decompose 10 years of SPY data into trend, seasonal (monthly), and residual. Plot all four components as subplots.</li>
+                <li>Build a <strong>real-time streaming visualization simulator</strong>: Create a Python script that generates fake tick data every 0.1 seconds and updates a Matplotlib window with a 1-minute candlestick forming in real-time.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DISTRIBUTIONS ==================== -->
+<section id="dist" class="tab-content">
+    <h2>2. Statistical Distributions <span class="badge badge-core">Core</span></h2>
+    <p>Returns are random variables. To model them, we must see their <strong>distribution</strong> — the shape of uncertainty. This is where quant finance meets statistics.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>Returns calculation, mean, standard deviation, percentiles. Basic Matplotlib histograms.</p>
+    </div>
+
+    <h3>2.1 Histograms — The First Look</h3>
+    <p>A histogram bins returns and counts frequency. It answers: "How often do I get a return of roughly X%?"</p>
+    <p><strong>Key parameters:</strong> Number of bins (too few hides detail, too many adds noise). Use rules like Sturges or Freedman-Diaconis.</p>
+
+    <div class="diagram-container">
+        <h4>Diagram: Histogram Construction</h4>
+        <svg width="650" height="280" viewBox="0 0 650 280">
+            <!-- Raw data points -->
+            <text x="80" y="30" fill="#94a3b8" font-size="12">Raw Returns: [-2.1%, 1.3%, -0.5%, 2.2%, -1.8%, 0.4%, ...]</text>
+            
+            <!-- Bins -->
+            <rect x="100" y="200" width="60" height="40" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" rx="2"/>
+            <text x="130" y="255" text-anchor="middle" fill="#94a3b8" font-size="10">-3% to -1%</text>
+            <text x="130" y="190" text-anchor="middle" fill="#38bdf8" font-size="12">3</text>
+            
+            <rect x="180" y="160" width="60" height="80" fill="rgba(56,189,248,0.4)" stroke="#38bdf8" rx="2"/>
+            <text x="210" y="255" text-anchor="middle" fill="#94a3b8" font-size="10">-1% to +1%</text>
+            <text x="210" y="150" text-anchor="middle" fill="#38bdf8" font-size="12">7</text>
+            
+            <rect x="260" y="120" width="60" height="120" fill="rgba(56,189,248,0.6)" stroke="#38bdf8" rx="2"/>
+            <text x="290" y="255" text-anchor="middle" fill="#94a3b8" font-size="10">+1% to +3%</text>
+            <text x="290" y="110" text-anchor="middle" fill="#38bdf8" font-size="12">12</text>
+            
+            <rect x="340" y="180" width="60" height="60" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" rx="2"/>
+            <text x="370" y="255" text-anchor="middle" fill="#94a3b8" font-size="10">+3% to +5%</text>
+            <text x="370" y="170" text-anchor="middle" fill="#38bdf8" font-size="12">5</text>
+            
+            <!-- Arrow -->
+            <path d="M 450 140 L 500 140" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+            <text x="475" y="130" text-anchor="middle" fill="#818cf8" font-size="11">Count</text>
+            
+            <!-- KDE smooth -->
+            <path d="M 90 220 Q 150 180, 210 100 T 330 80 T 450 140 T 530 200" fill="none" stroke="#fbbf24" stroke-width="3"/>
+            <text x="530" y="190" fill="#fbbf24" font-size="12">KDE (smoothed)</text>
+        </svg>
+    </div>
+
+    <h3>2.2 KDE — Smoothing the Histogram</h3>
+    <p>Kernel Density Estimation draws a smooth curve through the histogram. It's a probability density function (PDF) estimate. The area under the curve between two points gives the probability of returns falling in that range.</p>
+
+    <h3>2.3 The Normal Distribution Myth</h3>
+    <p>Finance textbooks love the <strong>Normal (Gaussian) distribution</strong> because it's mathematically convenient. Reality is different:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Fat tails (Leptokurtosis):</strong> Extreme moves happen more often than normal predicts</li>
+        <li><strong>Skewness:</strong> Crashes are sudden (negative skew); rallies are gradual</li>
+        <li><strong>Volatility clustering:</strong> Big moves cluster together; normal assumes independence</li>
+    </ul>
+
+    <div class="diagram-container">
+        <h4>Diagram: Normal vs. Real Returns</h4>
+        <svg width="600" height="250" viewBox="0 0 600 250">
+            <!-- Axis -->
+            <line x1="50" y1="200" x2="550" y2="200" stroke="#94a3b8"/>
+            <line x1="300" y1="200" x2="300" y2="30" stroke="#94a3b8"/>
+            <text x="300" y="220" text-anchor="middle" fill="#94a3b8" font-size="12">0%</text>
+            <text x="550" y="220" text-anchor="end" fill="#94a3b8" font-size="12">Return →</text>
+            
+            <!-- Normal curve -->
+            <path d="M 50 180 Q 175 180, 300 50 T 550 180" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,5"/>
+            <text x="450" y="100" fill="#38bdf8" font-size="12">Normal (theoretical)</text>
+            
+            <!-- Real returns (fat tails) -->
+            <path d="M 50 160 Q 120 170, 180 120 Q 240 60, 300 55 Q 360 60, 420 120 Q 480 170, 550 160" fill="none" stroke="#f87171" stroke-width="3"/>
+            <text x="100" y="80" fill="#f87171" font-size="12">Real returns (fat tails)</text>
+            
+            <!-- Tail highlight -->
+            <circle cx="80" cy="155" r="4" fill="#fbbf24"/>
+            <circle cx="520" cy="155" r="4" fill="#fbbf24"/>
+            <text x="300" y="245" text-anchor="middle" fill="#fbbf24" font-size="13">Black Swans live here — Normal says "impossible," Reality says "inevitable"</text>
+        </svg>
+    </div>
+
+    <h3>2.4 Box Plots & Violin Plots — Summary Statistics Visualized</h3>
+    <p>A box plot shows: median (line), interquartile range (box), and whiskers (typically 1.5×IQR). Points beyond are outliers.</p>
+    <p>Violin plots combine box plots with KDE — showing both summary and full distribution shape.</p>
+
+    <h3>2.5 Q-Q Plots — Testing Normality</h3>
+    <p>A Quantile-Quantile plot compares your data's quantiles against a theoretical normal distribution. If points fall on the diagonal line, your data is normal. <strong>Curved ends</strong> = fat tails. <strong>S-shaped</strong> = skewness.</p>
+
+    <h3>🧪 Colab Experiment: Distribution Analysis</h3>
+    <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+
+<span class="comment"># Get real data</span>
+returns = yf.download(<span class="string">"SPY"</span>, start=<span class="string">"2010-01-01"</span>)[<span class="string">'Adj Close'</span>].pct_change().dropna()
+
+<span class="comment"># 1. Histogram + KDE + Normal overlay</span>
+plt.figure(figsize=(10, 6))
+sns.histplot(returns, bins=60, kde=<span class="keyword">True</span>, stat=<span class="string">'density'</span>, color=<span class="string">'#38bdf8'</span>, alpha=0.6)
+xmin, xmax = plt.xlim()
+x = np.linspace(xmin, xmax, 100)
+p = stats.norm.pdf(x, returns.mean(), returns.std())
+plt.plot(x, p, <span class="string">'#f87171'</span>, linewidth=2, label=<span class="string">'Normal Fit'</span>)
+plt.title(<span class="string">'SPY Returns: Real vs Normal'</span>)
+plt.legend()
+plt.show()
+
+<span class="comment"># 2. Box plot by year</span>
+returns_df = returns.to_frame(name=<span class="string">'Returns'</span>)
+returns_df[<span class="string">'Year'</span>] = returns_df.index.year
+plt.figure(figsize=(12, 5))
+sns.boxplot(data=returns_df, x=<span class="string">'Year'</span>, y=<span class="string">'Returns'</span>, palette=<span class="string">'viridis'</span>)
+plt.xticks(rotation=45)
+plt.title(<span class="string">'Annual Return Distributions (Box Plots)'</span>)
+plt.show()
+
+<span class="comment"># 3. Q-Q Plot</span>
+fig, ax = plt.subplots(figsize=(8, 8))
+stats.probplot(returns, dist=<span class="string">"norm"</span>, plot=ax)
+ax.get_lines()[0].set_markerfacecolor(<span class="string">'#38bdf8'</span>)
+ax.get_lines()[0].set_markersize(4)
+ax.get_lines()[1].set_color(<span class="string">'#f87171'</span>)
+ax.set_title(<span class="string">'Q-Q Plot: Are SPY Returns Normal?'</span>)
+plt.show()
+
+<span class="comment"># 4. Print moments</span>
+<span class="function">print</span>(<span class="string">f"Skewness: {returns.skew():.3f} (0 = symmetric)"</span>)
+<span class="function">print</span>(<span class="string">f"Kurtosis: {returns.kurtosis():.3f} (0 = normal tails)"</span>)</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.investopedia.com/terms/d/distribution.asp" target="_blank">Investopedia: Distribution</a><span>Overview of statistical distributions in finance</span></li>
+        <li><a href="https://seaborn.pydata.org/tutorial/distributions.html" target="_blank">Seaborn: Visualizing Distributions</a><span>Modern Python statistical visualization</span></li>
+        <li><a href="https://www.khanacademy.org/math/statistics-probability/modeling-distributions-article" target="_blank">Khan Academy: Modeling Distributions</a><span>Understanding shape, center, and spread</span></li>
+        <li><a href="https://towardsdatascience.com/understanding-qq-plots-6f9c60e8f3c7" target="_blank">Towards Data Science: Understanding Q-Q Plots</a><span>Visual guide to normality testing</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Plot a histogram of daily returns for AAPL, MSFT, and GOOGL on the same chart with transparency (alpha=0.5). Which stock has the widest distribution?</li>
+                <li>Calculate skewness and kurtosis for TSLA returns. Is the distribution symmetric? Does it have fat tails compared to a normal distribution?</li>
+                <li>Create a violin plot comparing monthly returns of SPY vs QQQ. What does the shape tell you about the consistency of returns?</li>
+                <li>Explain: If a distribution has a kurtosis of 5, what does that practically mean for an investor?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Fit a <strong>t-distribution</strong> to SPY returns using <code>scipy.stats.t.fit()</code>. Overlay the PDF on a histogram. Does the t-distribution capture fat tails better than normal?</li>
+                <li>Create a <strong>rolling 252-day skewness and kurtosis</strong> plot for SPY. Do these moments change over time? What does this imply for risk models?</li>
+                <li>Build a <strong>Jarque-Bera test</strong> visual: For each year from 2000-2023, test if SPY returns are normal. Plot the p-values. At what significance level would you reject normality?</li>
+                <li>Compare empirical vs theoretical VaR: Calculate the 5% historical VaR (actual 5th percentile) and the 5% parametric VaR (assuming normality). Plot both on the histogram. How much does normality underestimate tail risk?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement a <strong>kernel density estimator from scratch</strong> using only NumPy (Gaussian kernel). Compare your result to Seaborn's KDE. Visualize the bandwidth sensitivity.</li>
+                <li>Model SPY returns with a <strong>mixture of two normals</strong> (regime-switching) using EM algorithm or <code>sklearn.mixture.GaussianMixture</strong>. Plot the combined PDF and the two component PDFs. Does this capture fat tails?</li>
+                <li>Create an <strong>animated visualization</strong> showing how the distribution of 1-month SPY returns evolves from 1993 to 2023. Use a sliding 5-year window. Save as GIF.</li>
+                <li>Build a <strong>Copula visualization</strong>: Generate 1000 samples from a Clayton copula and a Gaussian copula with the same correlation. Transform to SPY-like marginals. Plot scatter and compare tail dependence visually.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CORRELATION ==================== -->
+<section id="corr" class="tab-content">
+    <h2>3. Correlation & Relationships <span class="badge badge-core">Core</span></h2>
+    <p>No asset trades in isolation. Correlation tells us how assets move together — the foundation of diversification, pairs trading, and risk aggregation.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>Returns calculation, basic statistics (mean, std), scatter plots, time series visualization.</p>
+    </div>
+
+    <h3>3.1 Correlation Coefficient — The Magic Number</h3>
+    <p>Pearson's r ranges from -1 to +1:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>+1:</strong> Perfect positive (A goes up, B goes up proportionally)</li>
+        <li><strong>0:</strong> No linear relationship</li>
+        <li><strong>-1:</strong> Perfect negative (A goes up, B goes down proportionally)</li>
+    </ul>
+    <div class="formula">
+        r = Cov(X,Y) / (σ<sub>X</sub> × σ<sub>Y</sub>)
+    </div>
+    <p><strong>Warning:</strong> Correlation measures <em>linear</em> relationships only. Two assets can be perfectly related in a non-linear way (e.g., circular) and have r ≈ 0.</p>
+
+    <div class="diagram-container">
+        <h4>Diagram: Correlation Visual Spectrum</h4>
+        <svg width="700" height="200" viewBox="0 0 700 200">
+            <!-- r = -1 -->
+            <text x="80" y="20" text-anchor="middle" fill="#f87171" font-size="14" font-weight="bold">r = -1.0</text>
+            <line x1="40" y1="160" x2="120" y2="40" stroke="#f87171" stroke-width="3"/>
+            <circle cx="50" cy="145" r="3" fill="#e2e8f0"/><circle cx="70" cy="115" r="3" fill="#e2e8f0"/>
+            <circle cx="90" cy="85" r="3" fill="#e2e8f0"/><circle cx="110" cy="55" r="3" fill="#e2e8f0"/>
+            
+            <!-- r = -0.5 -->
+            <text x="230" y="20" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="bold">r = -0.5</text>
+            <circle cx="190" cy="140" r="3" fill="#e2e8f0"/><circle cx="210" cy="160" r="3" fill="#e2e8f0"/>
+            <circle cx="230" cy="100" r="3" fill="#e2e8f0"/><circle cx="250" cy="120" r="3" fill="#e2e8f0"/>
+            <circle cx="270" cy="60" r="3" fill="#e2e8f0"/>
+            <line x1="190" y1="160" x2="270" y2="60" stroke="#fbbf24" stroke-width="1" stroke-dasharray="3"/>
+            
+            <!-- r = 0 -->
+            <text x="380" y="20" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold">r = 0.0</text>
+            <circle cx="340" cy="100" r="3" fill="#e2e8f0"/><circle cx="360" cy="140" r="3" fill="#e2e8f0"/>
+            <circle cx="380" cy="80" r="3" fill="#e2e8f0"/><circle cx="400" cy="120" r="3" fill="#e2e8f0"/>
+            <circle cx="420" cy="90" r="3" fill="#e2e8f0"/>
+            
+            <!-- r = +0.5 -->
+            <text x="530" y="20" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="bold">r = +0.5</text>
+            <circle cx="490" cy="140" r="3" fill="#e2e8f0"/><circle cx="510" cy="100" r="3" fill="#e2e8f0"/>
+            <circle cx="530" cy="120" r="3" fill="#e2e8f0"/><circle cx="550" cy="60" r="3" fill="#e2e8f0"/>
+            <circle cx="570" cy="80" r="3" fill="#e2e8f0"/>
+            <line x1="490" y1="140" x2="570" y2="60" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3"/>
+            
+            <!-- r = +1 -->
+            <text x="650" y="20" text-anchor="middle" fill="#34d399" font-size="14" font-weight="bold">r = +1.0</text>
+            <line x1="610" y1="160" x2="690" y2="40" stroke="#34d399" stroke-width="3"/>
+            <circle cx="620" cy="145" r="3" fill="#e2e8f0"/><circle cx="640" cy="115" r="3" fill="#e2e8f0"/>
+            <circle cx="660" cy="85" r="3" fill="#e2e8f0"/><circle cx="680" cy="55" r="3" fill="#e2e8f0"/>
+        </svg>
+    </div>
+
+    <h3>3.2 Scatter Plots — Seeing the Relationship</h3>
+    <p>Every point is one day. X-axis = Asset A return, Y-axis = Asset B return. The cloud's tilt reveals correlation. The spread reveals noise.</p>
+    <p><strong>Pro tip:</strong> Color points by time to see if correlation is stable. Early years blue, recent years red. If colors separate, correlation is changing.</p>
+
+    <h3>3.3 Correlation Matrix & Heatmaps</h3>
+    <p>With many assets, pairwise scatter plots become overwhelming. A correlation matrix compresses everything into a grid. Heatmaps color-code the numbers for instant pattern recognition.</p>
+
+    <div class="diagram-container">
+        <h4>Diagram: Heatmap Structure</h4>
+        <svg width="400" height="320" viewBox="0 0 400 320">
+            <!-- Grid -->
+            <rect x="80" y="40" width="60" height="60" fill="#34d399" rx="4"/><text x="110" y="75" text-anchor="middle" fill="#0f1115" font-size="14" font-weight="bold">1.0</text>
+            <rect x="145" y="40" width="60" height="60" fill="rgba(52,211,153,0.6)" rx="4"/><text x="175" y="75" text-anchor="middle" fill="white" font-size="14">0.8</text>
+            <rect x="210" y="40" width="60" height="60" fill="rgba(248,113,113,0.4)" rx="4"/><text x="240" y="75" text-anchor="middle" fill="white" font-size="14">-0.2</text>
+            
+            <rect x="80" y="105" width="60" height="60" fill="rgba(52,211,153,0.6)" rx="4"/><text x="110" y="140" text-anchor="middle" fill="white" font-size="14">0.8</text>
+            <rect x="145" y="105" width="60" height="60" fill="#34d399" rx="4"/><text x="175" y="140" text-anchor="middle" fill="#0f1115" font-size="14" font-weight="bold">1.0</text>
+            <rect x="210" y="105" width="60" height="60" fill="rgba(251,191,36,0.3)" rx="4"/><text x="240" y="140" text-anchor="middle" fill="white" font-size="14">0.1</text>
+            
+            <rect x="80" y="170" width="60" height="60" fill="rgba(248,113,113,0.4)" rx="4"/><text x="110" y="205" text-anchor="middle" fill="white" font-size="14">-0.2</text>
+            <rect x="145" y="170" width="60" height="60" fill="rgba(251,191,36,0.3)" rx="4"/><text x="175" y="205" text-anchor="middle" fill="white" font-size="14">0.1</text>
+            <rect x="210" y="170" width="60" height="60" fill="#34d399" rx="4"/><text x="240" y="205" text-anchor="middle" fill="#0f1115" font-size="14" font-weight="bold">1.0</text>
+            
+            <!-- Labels -->
+            <text x="110" y="30" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold">AAPL</text>
+            <text x="175" y="30" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold">MSFT</text>
+            <text x="240" y="30" text-anchor="middle" fill="#38bdf8" font-size="13" font-weight="bold">GLD</text>
+            
+            <text x="70" y="75" text-anchor="end" fill="#38bdf8" font-size="13" font-weight="bold">AAPL</text>
+            <text x="70" y="140" text-anchor="end" fill="#38bdf8" font-size="13" font-weight="bold">MSFT</text>
+            <text x="70" y="205" text-anchor="end" fill="#38bdf8" font-size="13" font-weight="bold">GLD</text>
+            
+            <text x="170" y="280" text-anchor="middle" fill="#94a3b8" font-size="12">Green = Positive correlation | Red = Negative | Yellow = Neutral</text>
+        </svg>
+    </div>
+
+    <h3>3.4 Rolling Correlation — Nothing Lasts Forever</h3>
+    <p>Correlation is not static. During crises, correlations tend toward +1 (everything falls together). A rolling 60-day correlation plot reveals this instability.</p>
+
+    <h3>3.5 Cointegration vs. Correlation</h3>
+    <p>Correlation measures <em>directional</em> movement. <strong>Cointegration</strong> measures a <em>long-term equilibrium</em> relationship. Two assets can be uncorrelated in returns but cointegrated in price (they don't drift apart forever). This is the statistical basis for pairs trading.</p>
+
+    <h3>🧪 Colab Experiment: Correlation Deep Dive</h3>
+    <pre><code><span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="comment"># Download multiple assets</span>
+tickers = [<span class="string">'SPY'</span>, <span class="string">'QQQ'</span>, <span class="string">'IWM'</span>, <span class="string">'GLD'</span>, <span class="string">'TLT'</span>, <span class="string">'VIXY'</span>]
+data = yf.download(tickers, start=<span class="string">'2020-01-01'</span>)[<span class="string">'Adj Close'</span>]
+returns = data.pct_change().dropna()
+
+<span class="comment"># 1. Correlation matrix heatmap</span>
+plt.figure(figsize=(10, 8))
+mask = np.triu(np.ones_like(returns.corr(), dtype=<span class="keyword">bool</span>))
+sns.heatmap(returns.corr(), mask=mask, annot=<span class="keyword">True</span>, cmap=<span class="string">'RdYlGn'</span>, 
+            center=0, vmin=-1, vmax=1, square=<span class="keyword">True</span>, linewidths=1,
+            cbar_kws={<span class="string">"shrink"</span>: .8})
+plt.title(<span class="string">'Cross-Asset Correlation Matrix'</span>, fontsize=16)
+plt.show()
+
+<span class="comment"># 2. Scatter with regression</span>
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+axes = axes.flatten()
+<span class="keyword">for</span> i, t <span class="keyword">in</span> <span class="function">enumerate</span>(tickers[1:]):
+    sns.regplot(x=returns[<span class="string">'SPY'</span>], y=returns[t], ax=axes[i], 
+                scatter_kws={<span class="string">'alpha'</span>:0.3, <span class="string">'s'</span>:10}, line_kws={<span class="string">'color'</span>:<span class="string">'red'</span>})
+    axes[i].set_title(<span class="string">f'SPY vs {t} (r={returns.corr().loc["SPY", t]:.2f})'</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="comment"># 3. Rolling correlation (crisis detector)</span>
+plt.figure(figsize=(12, 5))
+rolling_corr = returns[<span class="string">'SPY'</span>].rolling(60).corr(returns[<span class="string">'QQQ'</span>])
+plt.plot(rolling_corr.index, rolling_corr, color=<span class="string">'#38bdf8'</span>, linewidth=2)
+plt.axhline(y=returns.corr().loc[<span class="string">'SPY'</span>, <span class="string">'QQQ'</span>], color=<span class="string">'#f87171'</span>, linestyle=<span class="string">'--'</span>, label=<span class="string">'Full-period correlation'</span>)
+plt.fill_between(rolling_corr.index, rolling_corr, alpha=0.3, color=<span class="string">'#38bdf8'</span>)
+plt.title(<span class="string">'60-Day Rolling Correlation: SPY vs QQQ'</span>)
+plt.legend()
+plt.show()</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.investopedia.com/terms/c/correlation.asp" target="_blank">Investopedia: Correlation</a><span>Foundation of portfolio diversification theory</span></li>
+        <li><a href="https://seaborn.pydata.org/examples/many_pairwise_correlations.html" target="_blank">Seaborn: Pairwise Correlations</a><span>Beautiful correlation heatmaps with annotations</span></li>
+        <li><a href="https://www.quantstart.com/articles/Cointegration-Trading-With-Spreads/" target="_blank">QuantStart: Cointegration Trading</a><span>Advanced pairs trading with statistical tests</span></li>
+        <li><a href="https://www.portfoliovisualizer.com/asset-correlations" target="_blank">Portfolio Visualizer: Asset Correlations</a><span>Interactive tool to explore real-world correlations</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Calculate the correlation matrix for FAANG stocks (META, AAPL, AMZN, NFLX, GOOGL) using 2 years of daily returns. Which pair is most correlated? Which is least?</li>
+                <li>Create a scatter plot of SPY returns vs VIX returns. What correlation do you expect? Does the plot confirm it? Why is the relationship negative?</li>
+                <li>Build a heatmap of monthly returns (not daily) for 5 ETFs. Does correlation change when you use monthly vs daily data?</li>
+                <li>Explain the difference between correlation and causation using a financial example. Why might two stocks be correlated without one causing the other's movement?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement a <strong>rolling correlation matrix animation</strong>: For each year from 2015-2023, plot the correlation heatmap of SPY, QQQ, GLD, TLT. Save as a GIF showing how correlations evolve.</li>
+                <li>Test for <strong>cointegration</strong> between PEP and KO using the Engle-Granger two-step method. Plot the residual spread and its rolling z-score. Mark trading signals.</li>
+                <li>Build a <strong>minimum spanning tree</strong> from a correlation matrix of 50 stocks. Visualize the network where edges connect the most correlated pairs. What clusters emerge?</li>
+                <li>Analyze <strong>correlation breakdown during stress</strong>: Compare the correlation of SPY-QQQ during normal times (VIX < 20) vs crisis (VIX > 30). Is diversification a myth when you need it most?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement a <strong>Dynamic Conditional Correlation (DCC-GARCH)</strong> model for SPY and QQQ. Plot the time-varying correlation and compare it to the naive 60-day rolling correlation.</li>
+                <li>Create a <strong>copula heatmap</strong>: Estimate the tail dependence coefficient between all pairs of 10 sector ETFs. Visualize in a matrix. Which sectors have the highest tail dependence?</li>
+                <li>Build a <strong>graphical LASSO</strong> to estimate a sparse precision matrix (inverse covariance) for 100 stocks. Visualize the resulting conditional independence graph. What does the sparse structure reveal?</li>
+                <li>Design a <strong>correlation regime-switching model</strong>: Use a 2-state HMM where each state has its own correlation matrix. Plot the probability of being in the "high correlation" state over time alongside SPY price.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== RISK METRICS ==================== -->
+<section id="risk" class="tab-content">
+    <h2>4. Risk Metrics Visualization <span class="badge badge-core">Core</span></h2>
+    <p>Returns get the glory, but risk pays the bills. Quants visualize risk to answer: "How much can I lose, and when?"</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>Returns, distributions (percentiles, fat tails), time series, correlation basics.</p>
+    </div>
+
+    <h3>4.1 Drawdown — The Investor's Nightmare</h3>
+    <p>A <strong>drawdown</strong> measures the decline from a peak to a trough. Even if your strategy makes 10% annually, a 50% drawdown can ruin you (psychologically or via margin calls).</p>
+    <div class="formula">
+        DD<sub>t</sub> = (Peak<sub>t</sub> - Current<sub>t</sub>) / Peak<sub>t</sub>
+    </div>
+    <p>The <strong>underwater curve</strong> plots drawdown over time. Every quant stares at this before deploying capital.</p>
+
+    <div class="diagram-container">
+        <h4>Diagram: Drawdown Mechanics</h4>
+        <svg width="650" height="260" viewBox="0 0 650 260">
+            <!-- Price path -->
+            <path d="M 50 80 Q 100 60, 150 90 T 250 70 T 350 120 T 450 100 T 550 140" fill="none" stroke="#34d399" stroke-width="2"/>
+            <text x="570" y="145" fill="#34d399" font-size="12">Price</text>
+            
+            <!-- Peak line -->
+            <line x1="50" y1="60" x2="250" y2="60" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+            <text x="150" y="55" text-anchor="middle" fill="#fbbf24" font-size="12">Running Peak</text>
+            
+            <!-- Drawdown fill -->
+            <path d="M 250 60 L 250 70 Q 300 100, 350 120 L 350 120 L 350 60 Z" fill="rgba(248,113,113,0.3)" stroke="none"/>
+            <text x="300" y="105" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">Drawdown</text>
+            <text x="300" y="120" text-anchor="middle" fill="#f87171" font-size="11">(Peak - Trough) / Peak</text>
+            
+            <!-- Underwater curve -->
+            <path d="M 50 220 L 250 220 Q 300 200, 350 180 T 450 190 T 550 170" fill="none" stroke="#f87171" stroke-width="2"/>
+            <text x="570" y="175" fill="#f87171" font-size="12">Underwater</text>
+            <line x1="50" y1="220" x2="550" y2="220" stroke="#94a3b8" stroke-dasharray="2"/>
+            <text x="30" y="225" text-anchor="end" fill="#94a3b8" font-size="11">0%</text>
+            
+            <!-- Arrows -->
+            <line x1="300" y1="130" x2="300" y2="170" stroke="#f87171" stroke-width="1" marker-end="url(#arrowhead)"/>
+        </svg>
+    </div>
+
+    <h3>4.2 Value at Risk (VaR) — The Industry Standard</h3>
+    <p>VaR asks: "What is my worst loss over the next N days, with X% confidence?"</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Parametric VaR:</strong> Assumes normal distribution. Fast, flawed.</li>
+        <li><strong>Historical VaR:</strong> Uses actual past returns. No distribution assumption.</li>
+        <li><strong>Monte Carlo VaR:</strong> Simulates thousands of future paths. Computationally intensive.</li>
+    </ul>
+    <div class="formula">
+        VaR<sub>α</sub> = μ - z<sub>α</sub> × σ  (parametric, 1-day)
+    </div>
+
+    <h3>4.3 Conditional VaR (CVaR) / Expected Shortfall</h3>
+    <p>VaR tells you the threshold. CVaR tells you the <em>average</em> loss <strong>given</strong> you exceed that threshold. It's the "what happens in the tail" metric. Regulators prefer CVaR because it's <span class="tooltip">coherent<span class="tooltip-text">Satisfies mathematical properties like subadditivity: the risk of a portfolio should be less than or equal to the sum of individual risks.</span></span>.</p>
+
+    <h3>4.4 Volatility Clustering</h3>
+    <p>Markets have memory in variance. High-volatility days cluster together (ARCH/GARCH effects). Visualizing squared returns or rolling volatility reveals this clustering.</p>
+
+    <h3>🧪 Colab Experiment: Risk Dashboard</h3>
+    <pre><code><span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+
+<span class="comment"># Data</span>
+prices = yf.download(<span class="string">"SPY"</span>, start=<span class="string">"2018-01-01"</span>)[<span class="string">'Adj Close'</span>]
+returns = prices.pct_change().dropna()
+
+<span class="comment"># 1. Underwater curve (Drawdown)</span>
+running_max = prices.cummax()
+drawdown = (prices - running_max) / running_max
+
+fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=<span class="keyword">True</span>)
+axes[0].plot(prices.index, prices, color=<span class="string">'#34d399'</span>, linewidth=1.5)
+axes[0].set_title(<span class="string">'Price & Drawdown Analysis'</span>, fontsize=14)
+axes[0].set_ylabel(<span class="string">'Price'</span>)
+
+axes[1].fill_between(drawdown.index, drawdown, 0, color=<span class="string">'#f87171'</span>, alpha=0.7)
+axes[1].set_ylabel(<span class="string">'Drawdown %'</span>)
+axes[1].axhline(y=-0.2, color=<span class="string">'#fbbf24'</span>, linestyle=<span class="string">'--'</span>, label=<span class="string">'-20% line'</span>)
+axes[1].legend()
+
+<span class="comment"># 2. Rolling volatility (30-day)</span>
+rolling_vol = returns.rolling(30).std() * np.sqrt(252)  <span class="comment"># Annualized</span>
+axes[2].plot(rolling_vol.index, rolling_vol, color=<span class="string">'#38bdf8'</span>, linewidth=1.5)
+axes[2].fill_between(rolling_vol.index, rolling_vol, alpha=0.3, color=<span class="string">'#38bdf8'</span>)
+axes[2].set_ylabel(<span class="string">'Annualized Volatility'</span>)
+axes[2].set_xlabel(<span class="string">'Date'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="comment"># 3. VaR visualization</span>
+mean = returns.mean()
+std = returns.std()
+var_95_param = mean - 1.645 * std
+var_99_param = mean - 2.33 * std
+var_95_hist = returns.quantile(0.05)
+var_99_hist = returns.quantile(0.01)
+
+plt.figure(figsize=(10, 6))
+sns.histplot(returns, bins=80, stat=<span class="string">'density'</span>, color=<span class="string">'#1e2129'</span>, edgecolor=<span class="string">'#38bdf8'</span>)
+plt.axvline(var_95_param, color=<span class="string">'#fbbf24'</span>, linestyle=<span class="string">'--'</span>, linewidth=2, label=<span class="string">f'Parametric VaR 95%: {var_95_param:.4f}'</span>)
+plt.axvline(var_95_hist, color=<span class="string">'#f87171'</span>, linestyle=<span class="string">'-'</span>, linewidth=2, label=<span class="string">f'Historical VaR 95%: {var_95_hist:.4f}'</span>)
+plt.axvline(var_99_hist, color=<span class="string">'#f87171'</span>, linestyle=<span class="string">':'</span>, linewidth=2, label=<span class="string">f'Historical VaR 99%: {var_99_hist:.4f}'</span>)
+plt.legend()
+plt.title(<span class="string">'Value at Risk Visualization'</span>)
+plt.show()
+
+<span class="comment"># 4. CVaR / Expected Shortfall</span>
+cvar_95 = returns[returns <= var_95_hist].mean()
+<span class="function">print</span>(<span class="string">f"CVaR 95% (Expected Shortfall): {cvar_95:.4f}"</span>)
+<span class="function">print</span>(<span class="string">f"Meaning: When SPY has a bad day (worst 5%), the average loss is {abs(cvar_95)*100:.2f}%"</span>)</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.investopedia.com/terms/d/drawdown.asp" target="_blank">Investopedia: Drawdown</a><span>Understanding peak-to-trough declines</span></li>
+        <li><a href="https://www.investopedia.com/terms/v/var.asp" target="_blank">Investopedia: Value at Risk</a><span>The standard risk measure explained simply</span></li>
+        <li><a href="https://pyfolio.ml4trading.io/" target="_blank">PyFolio Documentation</a><span>Tear sheets with drawdown and risk analysis</span></li>
+        <li><a href="https://www.quantstart.com/articles/Value-at-Risk-VaR-for-Algorithmic-Trading-Risk-Management/" target="_blank">QuantStart: VaR for Algo Trading</a><span>Implementation details for quants</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Calculate the maximum drawdown for TSLA over the last 5 years. Plot the underwater curve. How long did it take to recover (make a new high)?</li>
+                <li>Calculate 1-day 95% Historical VaR for SPY, QQQ, and IWM. Which is riskiest? Does this match your intuition?</li>
+                <li>Plot a 30-day rolling volatility for Bitcoin (BTC-USD) and SPY on the same chart. How many times more volatile is Bitcoin?</li>
+                <li>Explain the difference between VaR and CVaR in plain English. Why might a risk manager prefer CVaR?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a <strong>drawdown table</strong>: For SPY since 1993, identify every drawdown > 10%. Report: start date, trough date, recovery date, max drawdown %, duration. Visualize as a timeline.</li>
+                <li>Implement <strong>Monte Carlo VaR</strong>: Simulate 10,000 paths of 10-day returns using bootstrapped historical returns. Plot the distribution of 10-day cumulative returns and mark the 5th percentile.</li>
+                <li>Create a <strong>risk contribution</strong> pie chart: For an equal-weighted portfolio of 5 assets, calculate each asset's contribution to total portfolio volatility. Is equal weight equal risk?</li>
+                <li>Visualize <strong>volatility clustering</strong>: Plot squared daily returns for SPY. Fit a GARCH(1,1) model using <code>arch</code> library. Overlay the conditional volatility. Does it capture clustering?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build an <strong>entire risk report tear sheet</strong> (inspired by PyFolio) from scratch: rolling Sharpe, rolling volatility, top 5 drawdown periods, underwater plot, monthly returns heatmap, return quantile box plot.</li>
+                <li>Implement <strong>filtered historical simulation</strong>: Combine GARCH volatility forecasts with historical return residuals. Calculate 1-day ahead VaR for 252 days and backtest (count exceptions). Plot actual vs predicted VaR.</li>
+                <li>Create a <strong>stress testing visualization</strong>: Apply historical stress scenarios (2008 crash, 2020 COVID, 2022 rate hikes) to a portfolio. Show the P&L distribution under each scenario as a separate violin plot.</li>
+                <li>Design a <strong>tail risk hedging simulator</strong>: Compare buying OTM puts vs VIX calls vs reducing equity exposure. For each, plot the portfolio return distribution and calculate CVaR. Which is most cost-effective?</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== PORTFOLIO THEORY ==================== -->
+<section id="port" class="tab-content">
+    <h2>5. Portfolio Theory Visualization <span class="badge badge-core">Core</span></h2>
+    <p>This is where quant engineering shines. You don't just analyze one asset — you construct, optimize, and visualize entire portfolios.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>Returns, correlation, risk metrics (volatility, VaR), basic linear algebra (vectors, matrices), Matplotlib scatter plots.</p>
+    </div>
+
+    <h3>5.1 The Risk-Return Plane</h3>
+    <p>Every asset is a point: X-axis = risk (volatility), Y-axis = expected return. Investors want to be <strong>up and to the left</strong> (high return, low risk).</p>
+
+    <div class="diagram-container">
+        <h4>Diagram: The Efficient Frontier</h4>
+        <svg width="600" height="350" viewBox="0 0 600 350">
+            <!-- Axes -->
+            <line x1="80" y1="300" x2="550" y2="300" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="80" y1="300" x2="80" y2="50" stroke="#94a3b8" stroke-width="2"/>
+            <text x="550" y="320" text-anchor="end" fill="#94a3b8" font-size="13">Risk (σ) →</text>
+            <text x="60" y="40" text-anchor="middle" fill="#94a3b8" font-size="13" transform="rotate(-90, 60, 40)">Expected Return →</text>
+            
+            <!-- Random portfolios -->
+            <g opacity="0.4">
+                <circle cx="150" cy="250" r="3" fill="#38bdf8"/><circle cx="180" cy="220" r="3" fill="#38bdf8"/>
+                <circle cx="200" cy="200" r="3" fill="#38bdf8"/><circle cx="220" cy="230" r="3" fill="#38bdf8"/>
+                <circle cx="250" cy="180" r="3" fill="#38bdf8"/><circle cx="280" cy="160" r="3" fill="#38bdf8"/>
+                <circle cx="300" cy="190" r="3" fill="#38bdf8"/><circle cx="320" cy="140" r="3" fill="#38bdf8"/>
+                <circle cx="350" cy="170" r="3" fill="#38bdf8"/><circle cx="380" cy="130" r="3" fill="#38bdf8"/>
+                <circle cx="400" cy="150" r="3" fill="#38bdf8"/><circle cx="420" cy="120" r="3" fill="#38bdf8"/>
+                <circle cx="450" cy="140" r="3" fill="#38bdf8"/><circle cx="480" cy="110" r="3" fill="#38bdf8"/>
+            </g>
+            
+            <!-- Efficient frontier curve -->
+            <path d="M 150 250 Q 250 180, 350 140 T 480 110" fill="none" stroke="#34d399" stroke-width="3"/>
+            <text x="400" y="100" fill="#34d399" font-size="14" font-weight="bold">Efficient Frontier</text>
+            <text x="400" y="115" fill="#34d399" font-size="11">Best return for given risk</text>
+            
+            <!-- Capital Market Line -->
+            <line x1="80" y1="300" x2="480" y2="110" stroke="#fbbf24" stroke-width="2" stroke-dasharray="5,3"/>
+            <text x="250" y="200" fill="#fbbf24" font-size="12" transform="rotate(-35, 250, 200)">Capital Market Line</text>
+            
+            <!-- Risk-free rate -->
+            <circle cx="80" cy="300" r="5" fill="#fbbf24"/>
+            <text x="80" y="325" text-anchor="middle" fill="#fbbf24" font-size="12">Risk-Free (Rf)</text>
+            
+            <!-- Tangency portfolio -->
+            <circle cx="320" cy="140" r="6" fill="#f87171" stroke="white" stroke-width="2"/>
+            <text x="320" y="125" text-anchor="middle" fill="#f87171" font-size="12" font-weight="bold">Tangency Portfolio</text>
+            
+            <!-- Inefficient region -->
+            <text x="200" y="280" fill="#94a3b8" font-size="13">Inefficient Region</text>
+            <text x="200" y="295" fill="#94a3b8" font-size="11">(No rational investor chooses here)</text>
+        </svg>
+    </div>
+
+    <h3>5.2 Modern Portfolio Theory (Markowitz)</h3>
+    <p>Given expected returns (μ) and covariance matrix (Σ), we solve:</p>
+    <div class="formula">
+        Minimize: w<sup>T</sup>Σw  subject to: w<sup>T</sup>μ = target_return, Σw<sub>i</sub> = 1
+    </div>
+    <p>Where <strong>w</strong> is the weight vector. The solution traces the efficient frontier.</p>
+
+    <h3>5.3 The Tangency Portfolio & Sharpe Ratio</h3>
+    <p>The <strong>Sharpe Ratio</strong> measures excess return per unit of risk:</p>
+    <div class="formula">
+        Sharpe = (R<sub>p</sub> - R<sub>f</sub>) / σ<sub>p</sub>
+    </div>
+    <p>The portfolio with the highest Sharpe ratio is the <strong>tangency portfolio</strong> — where the Capital Market Line touches the efficient frontier. This is the optimal risky portfolio.</p>
+
+    <h3>5.4 Asset Allocation Visuals</h3>
+    <p>Beyond scatter plots, we visualize weights:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Pie charts:</strong> Simple, but misleading (correlation matters more than weights)</li>
+        <li><strong>Treemaps:</strong> Show hierarchy (asset class → sector → stock)</li>
+        <li><strong>Stacked area charts:</strong> Show how weights drift over time</li>
+        <li><strong>Risk parity waterfal:</strong> Equal risk contribution, not equal capital</li>
+    </ul>
+
+    <h3>5.5 Cumulative Returns — The Bottom Line</h3>
+    <p>While the efficient frontier is theoretical, the <strong>cumulative return chart</strong> shows what actually matters: growth of $1 over time. Plot multiple strategies together to compare wealth generation.</p>
+
+    <h3>🧪 Colab Experiment: Portfolio Optimization</h3>
+    <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> minimize
+
+<span class="comment"># Download data</span>
+tickers = [<span class="string">'SPY'</span>, <span class="string">'QQQ'</span>, <span class="string">'IWM'</span>, <span class="string">'GLD'</span>, <span class="string">'TLT'</span>]
+data = yf.download(tickers, start=<span class="string">'2018-01-01'</span>)[<span class="string">'Adj Close'</span>]
+returns = data.pct_change().dropna()
+
+<span class="comment"># Expected returns and covariance</span>
+mu = returns.mean() * 252  <span class="comment"># Annualized</span>
+Sigma = returns.cov() * 252
+
+<span class="comment"># Generate random portfolios</span>
+n_portfolios = 5000
+n_assets = len(tickers)
+results = np.zeros((3, n_portfolios))
+weights_record = []
+
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n_portfolios):
+    w = np.random.random(n_assets)
+    w /= np.sum(w)
+    weights_record.append(w)
+    port_return = np.dot(w, mu)
+    port_vol = np.sqrt(np.dot(w.T, np.dot(Sigma, w)))
+    sharpe = (port_return - 0.02) / port_vol  <span class="comment"># Assuming 2% risk-free</span>
+    results[0,i] = port_vol
+    results[1,i] = port_return
+    results[2,i] = sharpe
+
+<span class="comment"># Plot efficient frontier</span>
+plt.figure(figsize=(10, 7))
+scatter = plt.scatter(results[0,:], results[1,:], c=results[2,:], cmap=<span class="string">'viridis'</span>, alpha=0.6, s=20)
+plt.colorbar(scatter, label=<span class="string">'Sharpe Ratio'</span>)
+
+<span class="comment"># Mark max Sharpe</span>
+max_sharpe_idx = np.argmax(results[2,:])
+plt.scatter(results[0,max_sharpe_idx], results[1,max_sharpe_idx], c=<span class="string">'red'</span>, s=200, marker=<span class="string">'*'</span>, label=<span class="string">'Max Sharpe'</span>)
+
+<span class="comment"># Mark min volatility</span>
+min_vol_idx = np.argmin(results[0,:])
+plt.scatter(results[0,min_vol_idx], results[1,min_vol_idx], c=<span class="string">'blue'</span>, s=200, marker=<span class="string">'*'</span>, label=<span class="string">'Min Volatility'</span>)
+
+plt.xlabel(<span class="string">'Volatility (Risk)'</span>)
+plt.ylabel(<span class="string">'Expected Return'</span>)
+plt.title(<span class="string">'Monte Carlo Simulation: Efficient Frontier'</span>)
+plt.legend()
+plt.show()
+
+<span class="comment"># Print optimal weights</span>
+<span class="function">print</span>(<span class="string">"Max Sharpe Portfolio Weights:"</span>)
+<span class="keyword">for</span> t, w <span class="keyword">in</span> <span class="function">zip</span>(tickers, weights_record[max_sharpe_idx]):
+    <span class="function">print</span>(<span class="string">f"  {t}: {w:.2%}"</span>)</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.investopedia.com/terms/m/modernportfoliotheory.asp" target="_blank">Investopedia: Modern Portfolio Theory</a><span>The foundation of quantitative portfolio construction</span></li>
+        <li><a href="https://pyportfolioopt.readthedocs.io/en/latest/" target="_blank">PyPortfolioOpt Documentation</a><span>Production-ready Python portfolio optimization</span></li>
+        <li><a href="https://www.quantstart.com/articles/Mean-Variance-Optimisation-Python/" target="_blank">QuantStart: Mean-Variance Optimization</a><span>Step-by-step efficient frontier coding</span></li>
+        <li><a href="https://portfoliocharts.com/" target="_blank">Portfolio Charts</a><span>Visual exploration of real-world portfolio performance</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Create an equal-weighted portfolio of 5 ETFs. Calculate its daily returns. Plot the cumulative return of this portfolio alongside SPY alone. Did diversification help?</li>
+                <li>Calculate the correlation matrix of your 5 ETFs. Based on correlations alone, which pair would provide the most diversification benefit?</li>
+                <li>Plot a pie chart of the maximum Sharpe portfolio weights from the Colab experiment. Which asset dominates and why?</li>
+                <li>Explain: Why does the efficient frontier curve backward (concave) rather than being a straight line?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement the <strong>analytical efficient frontier</strong> using quadratic programming (not random portfolios). Plot the exact curve. Mark the minimum variance portfolio and tangency portfolio precisely.</li>
+                <li>Build a <strong>Black-Litterman model</strong> visualization: Start with market equilibrium weights (implied returns), then overlay your views (e.g., "Tech will outperform by 3%"). Show how the optimal weights shift.</li>
+                <li>Create a <strong>rebalancing drift visualization</strong>: Start with 60/40 SPY/TLT. Plot how the allocation drifts over 2 years without rebalancing. Mark rebalancing bands at 55% and 65%.</li>
+                <li>Compare <strong>mean-variance optimization</strong> vs <strong>minimum correlation algorithm</strong> vs <strong>inverse volatility weighting</strong>. Plot all three on the risk-return plane with 10 assets.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement <strong>CVaR optimization</strong> (not mean-variance) using linear programming. Compare the CVaR-optimal portfolio weights to the Markowitz-optimal weights for the same 10 assets. Visualize both frontiers.</li>
+                <li>Build a <strong>factor exposure visualization</strong>: Regress a portfolio against Fama-French 5 factors. Create a bar chart of factor betas and a rolling 1-year beta plot for each factor.</li>
+                <li>Create an <strong>interactive efficient frontier app</strong> using Plotly Dash: Slider for risk-free rate updates the CML in real-time. Dropdown to exclude assets reshapes the frontier instantly.</li>
+                <li>Design a <strong>robust optimization</strong> experiment: Add estimation error to expected returns (bootstrapped). Plot 100 "noisy" frontiers to show the <strong>estimation error in the "optimal" portfolio</strong>. What does this teach us?</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ADVANCED QUANT VIZ ==================== -->
+<section id="advanced" class="tab-content">
+    <h2>6. Advanced Quant Visualizations <span class="badge badge-core">Advanced</span></h2>
+    <p>Professional quant platforms visualize data that retail charts never show: microstructure, regime changes, factor exposures, and backtest diagnostics.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>All previous topics: time series, distributions, correlation, risk metrics, portfolio theory. Some machine learning basics helpful but not required.</p>
+    </div>
+
+    <h3>6.1 Order Book Depth — Market Microstructure</h3>
+    <p>The order book is a real-time list of buy (bid) and sell (ask) orders. Visualizing depth shows <strong>liquidity</strong> and <strong>support/resistance</strong> levels.</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Depth chart:</strong> Cumulative volume at each price level. Steep walls = strong support/resistance.</li>
+        <li><strong>Spread:</strong> Gap between best bid and best ask. Tight spread = liquid market.</li>
+        <li><strong>Imbalance:</strong> More bid volume than ask = bullish pressure.</li>
+    </ul>
+
+    <div class="diagram-container">
+        <h4>Diagram: Order Book Depth</h4>
+        <svg width="600" height="280" viewBox="0 0 600 280">
+            <!-- Price axis -->
+            <text x="30" y="60" text-anchor="end" fill="#94a3b8" font-size="11">$101.00</text>
+            <text x="30" y="140" text-anchor="end" fill="#fbbf24" font-size="12" font-weight="bold">$100.50</text>
+            <text x="30" y="220" text-anchor="end" fill="#94a3b8" font-size="11">$100.00</text>
+            <line x1="40" y1="140" x2="560" y2="140" stroke="#fbbf24" stroke-dasharray="4"/>
+            
+            <!-- Ask side (red, right) -->
+            <rect x="300" y="50" width="40" height="20" fill="rgba(248,113,113,0.7)" rx="2"/>
+            <rect x="300" y="75" width="80" height="20" fill="rgba(248,113,113,0.7)" rx="2"/>
+            <rect x="300" y="100" width="120" height="20" fill="rgba(248,113,113,0.7)" rx="2"/>
+            <text x="440" y="115" fill="#f87171" font-size="12">Asks (Sell)</text>
+            
+            <!-- Bid side (green, left) -->
+            <rect x="180" y="160" width="120" height="20" fill="rgba(52,211,153,0.7)" rx="2"/>
+            <rect x="220" y="185" width="80" height="20" fill="rgba(52,211,153,0.7)" rx="2"/>
+            <rect x="260" y="210" width="40" height="20" fill="rgba(52,211,153,0.7)" rx="2"/>
+            <text x="140" y="175" fill="#34d399" font-size="12">Bids (Buy)</text>
+            
+            <!-- Mid price -->
+            <text x="300" y="145" text-anchor="middle" fill="#fbbf24" font-size="11">Mid</text>
+            
+            <!-- Cumulative depth curves -->
+            <path d="M 300 140 L 300 40 Q 350 50, 420 55" fill="none" stroke="#f87171" stroke-width="2"/>
+            <path d="M 300 140 L 300 240 Q 250 230, 180 225" fill="none" stroke="#34d399" stroke-width="2"/>
+            
+            <text x="500" y="50" fill="#f87171" font-size="11">Cumulative</text>
+            <text x="100" y="235" fill="#34d399" font-size="11">Cumulative</text>
+        </svg>
+    </div>
+
+    <h3>6.2 Regime Detection — When the Rules Change</h3>
+    <p>Markets switch between "calm" and "crisis" regimes. A Hidden Markov Model (HMM) can infer the current regime from price action. Visualizing regimes as background colors on price charts is powerful.</p>
+
+    <h3>6.3 Factor Exposure — What's Really Driving Returns?</h3>
+    <p>Is your portfolio up because you're smart, or because the market is up? Factor models decompose returns into:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Market (Beta):</strong> Sensitivity to overall market</li>
+        <li><strong>Value (HML):</strong> Cheap vs expensive stocks</li>
+        <li><strong>Size (SMB):</strong> Small vs large cap</li>
+        <li><strong>Momentum (MOM):</strong> Trend-following effect</li>
+        <li><strong>Quality:</strong> Profitable, stable companies</li>
+    </ul>
+
+    <h3>6.4 Backtest Visualization — Don't Fool Yourself</h3>
+    <p>Every quant strategy must be backtested. Essential visualizations:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>Equity curve:</strong> Cumulative P&L over time</li>
+        <li><strong>Underwater curve:</strong> Drawdowns of the strategy</li>
+        <li><strong>Monthly returns heatmap:</strong> Spot consistency</li>
+        <li><strong>Trade P&L distribution:</strong> Win rate, skew, outliers</li>
+        <li><strong>Rolling Sharpe:</strong> Is the edge decaying?</li>
+    </ul>
+
+    <h3>🧪 Colab Experiment: Advanced Quant</h3>
+    <pre><code><span class="comment"># Advanced Quant Visualization Lab</span>
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.mixture <span class="keyword">import</span> GaussianMixture
+
+<span class="comment"># 1. Regime Detection with Gaussian Mixture</span>
+spy = yf.download(<span class="string">'SPY'</span>, start=<span class="string">'2000-01-01'</span>)[<span class="string">'Adj Close'</span>]
+returns = spy.pct_change().dropna()
+
+<span class="comment"># Fit 2-regime model on volatility features</span>
+vol_features = returns.rolling(20).std().dropna().values.reshape(-1, 1)
+gmm = GaussianMixture(n_components=2, random_state=42)
+regimes = gmm.fit_predict(vol_features)
+
+<span class="comment"># Align indices</span>
+aligned_returns = returns.iloc[19:]
+aligned_spy = spy.iloc[19:]
+
+<span class="comment"># Plot regimes</span>
+fig, ax = plt.subplots(figsize=(14, 6))
+colors = [<span class="string">'#34d399'</span>, <span class="string">'#f87171'</span>]  <span class="comment"># low vol, high vol</span>
+<span class="keyword">for</span> regime <span class="keyword">in</span> [0, 1]:
+    mask = regimes == regime
+    ax.scatter(aligned_spy.index[mask], aligned_spy.values[mask], 
+               c=colors[regime], s=1, alpha=0.6, label=<span class="string">f'Regime {regime}'</span>)
+ax.plot(spy.index, spy.values, color=<span class="string">'white'</span>, alpha=0.3, linewidth=0.5)
+ax.set_title(<span class="string">'SPY Price Colored by Volatility Regime'</span>)
+ax.legend()
+plt.show()
+
+<span class="comment"># 2. Simple Backtest Visualization Framework</span>
+<span class="keyword">def</span> <span class="function">visualize_backtest</span>(returns, title=<span class="string">'Strategy'</span>):
+    cum_returns = (1 + returns).cumprod()
+    running_max = cum_returns.cummax()
+    drawdown = (cum_returns - running_max) / running_max
+    
+    fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=<span class="keyword">True</span>)
+    
+    <span class="comment"># Equity curve</span>
+    axes[0].plot(cum_returns.index, cum_returns, color=<span class="string">'#34d399'</span>, linewidth=1.5)
+    axes[0].set_title(<span class="string">f'{title} - Equity Curve'</span>)
+    axes[0].set_ylabel(<span class="string">'Growth of $1'</span>)
+    
+    <span class="comment"># Drawdown</span>
+    axes[1].fill_between(drawdown.index, drawdown, 0, color=<span class="string">'#f87171'</span>, alpha=0.7)
+    axes[1].set_ylabel(<span class="string">'Drawdown'</span>)
+    
+    <span class="comment"># Rolling Sharpe (252-day)</span>
+    rolling_sharpe = returns.rolling(252).mean() / returns.rolling(252).std() * np.sqrt(252)
+    axes[2].plot(rolling_sharpe.index, rolling_sharpe, color=<span class="string">'#38bdf8'</span>)
+    axes[2].axhline(y=1, color=<span class="string">'#fbbf24'</span>, linestyle=<span class="string">'--'</span>)
+    axes[2].set_ylabel(<span class="string">'Rolling Sharpe'</span>)
+    axes[2].set_xlabel(<span class="string">'Date'</span>)
+    
+    plt.tight_layout()
+    plt.show()
+
+<span class="comment"># Example: Simple momentum strategy</span>
+position = np.where(returns.rolling(60).mean() > returns.rolling(120).mean(), 1, -1)
+strategy_returns = position[1:] * returns[1:]
+visualize_backtest(strategy_returns, <span class="string">'60/120 Momentum Strategy'</span>)</code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://www.quantstart.com/articles/Backtesting-Systematic-Trading-Strategies/" target="_blank">QuantStart: Backtesting Strategies</a><span>How to properly test trading ideas</span></li>
+        <li><a href="https://hmmlearn.readthedocs.io/en/latest/" target="_blank">hmmlearn Documentation</a><span>Hidden Markov Models for regime detection</span></li>
+        <li><a href="https://www.kaggle.com/code/currie32/predicting-stock-market-crashes" target="_blank">Kaggle: Predicting Market Crashes</a><span>Practical regime detection examples</span></li>
+        <li><a href="https://www.quantopian.com/lectures/introduction-to-pairs-trading" target="_blank">Quantopian Archive: Pairs Trading</a><span>Classic quant finance lecture series</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Download Level 2 order book data (or use a simulated one). Plot a depth chart showing cumulative bid and ask volume. Identify the price level with the largest bid wall.</li>
+                <li>Run a 2-state Gaussian Mixture on VIX levels (not returns). Plot VIX with background colors indicating regime. Do high-VIX regimes align with SPY drawdowns?</li>
+                <li>Create a simple moving average crossover strategy (50/200). Plot the equity curve and drawdown. How many trades does it generate?</li>
+                <li>Explain: Why is it dangerous to optimize strategy parameters on the entire dataset before visualizing backtest results?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a <strong>walk-forward backtest visualizer</strong>: Train a model on 2 years, test on 6 months, roll forward. Plot cumulative out-of-sample returns vs in-sample. Is there decay?</li>
+                <li>Implement a <strong>trade-level analysis</strong>: Extract every trade from a strategy backtest. Plot the distribution of trade returns, win rate by month, and consecutive win/loss streaks.</li>
+                <li>Create a <strong>factor exposure waterfall chart</strong>: Decompose a portfolio's 1-year return into market, sector, style, and stock-specific contributions. Visualize as a waterfall.</li>
+                <li>Build a <strong>market impact simulator</strong>: Given an order book snapshot, model how a 10,000 share market order would walk the book. Visualize the before/after depth chart.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Implement a <strong>Kalman Filter pairs trading strategy</strong> on GLD/GDX. Plot the filtered spread, dynamic hedge ratio, and entry/exit signals. Show the equity curve with transaction costs.</li>
+                <li>Build a <strong>full backtest tear sheet</strong> from scratch including: gross vs net of fees, alpha/beta decomposition, information ratio, Sortino ratio, Calmar ratio, max consecutive losses, and monthly return table.</li>
+                <li>Create a <strong>limit order book heatmap animation</strong>: Generate 1 hour of synthetic LOB data. Create an animation showing price levels (y-axis) vs time (x-axis) with color intensity = order size.</li>
+                <li>Design a <strong>meta-labeling visualization</strong>: Use a primary model to generate trade signals, then a secondary model to predict which signals will work. Plot the ROC curve of the secondary model and the improved equity curve.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== DASHBOARDS ==================== -->
+<section id="dashboard" class="tab-content">
+    <h2>7. Interactive Dashboards <span class="badge badge-core">Applied</span></h2>
+    <p>Static plots are for research. Interactive dashboards are for trading desks. Learn to build tools that update, filter, and respond.</p>
+    
+    <div class="prereq-box">
+        <h4>Prerequisites Needed</h4>
+        <p>All visualization topics above. Basic HTML/JS understanding helpful but not required (we use Python abstractions).</p>
+    </div>
+
+    <h3>7.1 Plotly — Interactive Python Charts</h3>
+    <p>Plotly renders web-based visualizations with zoom, pan, hover tooltips, and toggles. It's the bridge between Python analysis and web interactivity.</p>
+    <p><strong>Key features:</strong> Range sliders, dropdown menus, buttons, linked subplots, and 3D charts.</p>
+
+    <h3>7.2 Dash — Full Applications</h3>
+    <p>Dash (by Plotly) lets you build full analytical web apps in pure Python. Layouts are declarative, callbacks handle interactivity.</p>
+    <div class="concept-grid">
+        <div class="card">
+            <h4>Components</h4>
+            <p><strong>dcc.Graph:</strong> Renders Plotly figures.<br><strong>dcc.Dropdown:</strong> User selections.<br><strong>dcc.Slider:</strong> Numeric inputs.<br><strong>html.Div:</strong> Containers and layout.</p>
+        </div>
+        <div class="card">
+            <h4>Callbacks</h4>
+            <p>Python functions that run automatically when inputs change. <code>@app.callback(Output, Input)</code> connects user actions to data updates.</p>
+        </div>
+    </div>
+
+    <h3>7.3 Streamlit — Rapid Prototyping</h3>
+    <p>Streamlit is even simpler than Dash. One script becomes a web app. Perfect for internal quant tools and quick prototypes.</p>
+
+    <h3>7.4 Real-Time Considerations</h3>
+    <p>Financial dashboards often need live data:</p>
+    <ul style="margin-left: 2rem; color: var(--text-dim);">
+        <li><strong>WebSockets:</strong> Push data from server to client (e.g., Webull, Binance streams)</li>
+        <li><strong>Interval polling:</strong> Client asks for updates every N seconds</li>
+        <li><strong>Redis/Queue:</strong> Buffer incoming tick data before visualization</li>
+    </ul>
+
+    <h3>🧪 Colab Experiment: Building Dashboards</h3>
+    <pre><code><span class="comment"># Run locally or in Colab (some features limited in Colab)</span>
+<span class="keyword">import</span> plotly.graph_objects <span class="keyword">as</span> go
+<span class="keyword">from</span> plotly.subplots <span class="keyword">import</span> make_subplots
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="comment"># Data</span>
+df = yf.download(<span class="string">"AAPL"</span>, period=<span class="string">"1y"</span>)
+
+<span class="comment"># 1. Interactive candlestick with range slider</span>
+fig = make_subplots(rows=2, cols=1, shared_xaxes=<span class="keyword">True</span>, 
+                    vertical_spacing=0.03, row_heights=[0.7, 0.3])
+
+fig.add_trace(go.Candlestick(
+    x=df.index, open=df[<span class="string">'Open'</span>], high=df[<span class="string">'High'</span>],
+    low=df[<span class="string">'Low'</span>], close=df[<span class="string">'Close'</span>], name=<span class="string">'Price'</span>), row=1, col=1)
+
+fig.add_trace(go.Bar(x=df.index, y=df[<span class="string">'Volume'</span>], name=<span class="string">'Volume'</span>, 
+                     marker_color=<span class="string">'#38bdf8'</span>), row=2, col=1)
+
+fig.update_layout(
+    title=<span class="string">'AAPL Interactive Chart'</span>,
+    xaxis_rangeslider_visible=<span class="keyword">False</span>,
+    template=<span class="string">'plotly_dark'</span>,
+    height=700
+)
+fig.show()
+
+<span class="comment"># 2. Dash App Skeleton (save as app.py and run)</span>
+<span class="comment">"""
+import dash
+from dash import dcc, html, Input, Output
+import plotly.express as px
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.H1('Quant Dashboard'),
+    dcc.Dropdown(id='ticker-dropdown', 
+                 options=[{'label': i, 'value': i} for i in ['SPY', 'QQQ', 'IWM']],
+                 value='SPY'),
+    dcc.Graph(id='price-chart'),
+    dcc.Slider(id='ma-slider', min=5, max=100, step=5, value=20,
+               marks={i: str(i) for i in range(5, 101, 10)})
+])
+
+@app.callback(
+    Output('price-chart', 'figure'),
+    Input('ticker-dropdown', 'value'),
+    Input('ma-slider', 'value')
+)
+def update_chart(ticker, ma):
+    df = yf.download(ticker, period='1y')
+    df['MA'] = df['Close'].rolling(ma).mean()
+    fig = px.line(df, x=df.index, y=['Close', 'MA'], 
+                  title=f'{ticker} with {ma}-day MA')
+    return fig
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+"""</span>
+
+<span class="comment"># 3. Streamlit Skeleton</span>
+<span class="comment">"""
+import streamlit as st
+
+st.title('Financial Visualization Dashboard')
+ticker = st.sidebar.selectbox('Select Asset', ['SPY', 'QQQ', 'GLD'])
+ma_period = st.sidebar.slider('Moving Average', 5, 200, 20)
+
+data = yf.download(ticker, period='2y')
+data['MA'] = data['Close'].rolling(ma_period).mean()
+
+st.line_chart(data[['Close', 'MA']])
+st.bar_chart(data['Volume'])
+"""</span></code></pre>
+
+    <h3>📚 External Resources</h3>
+    <ul class="resource-list">
+        <li><a href="https://plotly.com/python/" target="_blank">Plotly Python Documentation</a><span>The bible of interactive Python visualization</span></li>
+        <li><a href="https://dash.plotly.com/" target="_blank">Dash Documentation</a><span>Build full analytical web applications</span></li>
+        <li><a href="https://docs.streamlit.io/" target="_blank">Streamlit Documentation</a><span>Fastest way to build data apps in Python</span></li>
+        <li><a href="https://github.com/quantopian/pyfolio" target="_blank">PyFolio GitHub</a><span>Example of production quant tear sheets</span></li>
+    </ul>
+
+    <h3>💪 Practice Exercises</h3>
+    <div class="exercise-tier tier-easy">
+        <div class="tier-header" onclick="toggleTier(this)">EASY <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a Plotly figure with a dropdown menu that switches between SPY, QQQ, and IWM candlestick charts. Use <code>updatemenus</code> in Plotly.</li>
+                <li>Create a Streamlit app that takes a user-input ticker and displays: current price, 52-week range, P/E ratio, and a simple line chart.</li>
+                <li>Add a <code>dcc.Slider</code> to a Dash app that controls the lookback period for a Bollinger Band chart. The chart should update instantly when dragged.</li>
+                <li>Explain: What is the difference between a static Matplotlib chart and an interactive Plotly chart? When would you choose one over the other?</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-medium">
+        <div class="tier-header" onclick="toggleTier(this)">MEDIUM <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a <strong>multi-asset correlation dashboard</strong> in Dash: Dropdown to select 5 tickers, auto-download data, display correlation heatmap and scatter matrix. Add a "Refresh Data" button.</li>
+                <li>Create a <strong>real-time simulation</strong> in Streamlit: Generate fake price ticks every 0.5 seconds. Display a live-updating line chart and a live order book table using <code>st.empty()</code> and loops.</li>
+                <li>Implement <strong>cross-filtering</strong> in Plotly Dash: Clicking a bar in a sector-performance chart updates a secondary chart showing stocks within that sector.</li>
+                <li>Build a <strong>portfolio tracker dashboard</strong>: Input weights for 5 assets. Display: pie chart of weights, risk-return scatter on efficient frontier, rolling correlation matrix, and cumulative return comparison.</li>
+            </ol>
+        </div>
+    </div>
+    <div class="exercise-tier tier-hard">
+        <div class="tier-header" onclick="toggleTier(this)">HARD <span>▶</span></div>
+        <div class="tier-body">
+            <ol>
+                <li>Build a <strong>full trading blotter dashboard</strong> in Dash: Table of simulated trades with filters (date range, symbol, P&L > X). Click a trade to show its lifecycle on a candlestick chart with entry/exit markers.</li>
+                <li>Create a <strong>WebSocket-powered real-time crypto dashboard</strong>: Connect to Binance WebSocket stream for BTC-USD. Use Dash/Flask-SocketIO to push trades to the client. Display live depth chart and recent trades table.</li>
+                <li>Implement a <strong>drag-and-drop portfolio builder</strong>: Use Dash <code>dash-draggable</code> or similar to let users drag stocks into a basket, then instantly see the portfolio's efficient frontier position update.</li>
+                <li>Design a <strong>collaborative quant research platform</strong>: Multiple users can annotate charts (draw trendlines, add comments). Store annotations in a SQLite database. Display all annotations as a layer on top of Plotly charts.</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Tab switching
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+    
+    // Tier toggle
+    function toggleTier(header) {
+        const body = header.nextElementSibling;
+        const arrow = header.querySelector('span');
+        body.classList.toggle('open');
+        arrow.textContent = body.classList.contains('open') ? '▼' : '▶';
+    }
+    
+    // Open all tiers by default for better UX
+    document.querySelectorAll('.tier-body').forEach(el => {
+        el.classList.add('open');
+        el.previousElementSibling.querySelector('span').textContent = '▼';
+    });
+    
+    // Simple canvas animation for time series granularity
+    const canvas = document.getElementById('tsCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let offset = 0;
+        function draw() {
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, 700, 300);
+            
+            // Grid
+            ctx.strokeStyle = '#2d3748';
+            ctx.lineWidth = 1;
+            for(let i=0; i<700; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,300); ctx.stroke(); }
+            for(let i=0; i<300; i+=50) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(700,i); ctx.stroke(); }
+            
+            // Generate smooth random walk
+            ctx.beginPath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            let y = 150;
+            ctx.moveTo(0, y);
+            for(let x=0; x<700; x+=3) {
+                y += (Math.random()-0.5) * 10 + Math.sin((x+offset)*0.01)*2;
+                y = Math.max(20, Math.min(280, y));
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('Daily Granularity: High Noise, High Detail', 20, 30);
+            
+            offset += 1;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+</script>
+
+</body>
+</html>

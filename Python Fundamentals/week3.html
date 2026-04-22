@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumPy & Vectorization: Quant Engineer Study Guide</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #d29922;
+            --accent-red: #f85149;
+            --border: #30363d;
+            --code-bg: #1e2530;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+
+        h1 { font-size: 2.5em; color: var(--accent); margin-bottom: 10px; }
+        h2 { font-size: 1.8em; color: var(--accent-green); margin: 30px 0 15px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        h3 { font-size: 1.3em; color: var(--accent-orange); margin: 25px 0 12px; }
+        h4 { font-size: 1.1em; color: var(--text-primary); margin: 20px 0 10px; }
+
+        .subtitle { color: var(--text-secondary); font-size: 1.1em; }
+
+        /* Tabs */
+        .tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+        .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .warning { border-left: 4px solid var(--accent-orange); background: rgba(210, 153, 34, 0.1); }
+        .tip { border-left: 4px solid var(--accent-green); background: rgba(63, 185, 80, 0.1); }
+        .danger { border-left: 4px solid var(--accent-red); background: rgba(248, 81, 73, 0.1); }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 0.9em; }
+        .code-inline { background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+        /* Syntax highlighting */
+        .kw { color: #ff7b72; } /* keyword */
+        .fn { color: #d2a8ff; } /* function */
+        .str { color: #a5d6ff; } /* string */
+        .num { color: #79c0ff; } /* number */
+        .cmt { color: #8b949e; font-style: italic; } /* comment */
+        .var { color: #ffa657; } /* variable/class */
+
+        /* Diagrams */
+        .diagram-container { text-align: center; margin: 25px 0; padding: 20px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border); }
+        svg { max-width: 100%; height: auto; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        th { background: var(--bg-tertiary); color: var(--accent); font-weight: 600; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+        /* Exercise tiers */
+        .tier { margin: 20px 0; padding: 20px; border-radius: 8px; }
+        .tier-easy { background: rgba(63, 185, 80, 0.08); border: 1px solid rgba(63, 185, 80, 0.3); }
+        .tier-medium { background: rgba(210, 153, 34, 0.08); border: 1px solid rgba(210, 153, 34, 0.3); }
+        .tier-hard { background: rgba(248, 81, 73, 0.08); border: 1px solid rgba(248, 81, 73, 0.3); }
+        .tier-label { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; }
+        .tier-easy .tier-label { color: var(--accent-green); }
+        .tier-medium .tier-label { color: var(--accent-orange); }
+        .tier-hard .tier-label { color: var(--accent-red); }
+
+        /* Lists */
+        ul, ol { margin: 15px 0 15px 25px; }
+        li { margin: 8px 0; }
+
+        /* Math */
+        .math { background: var(--bg-primary); padding: 15px; border-radius: 6px; margin: 15px 0; font-family: 'Times New Roman', serif; font-size: 1.1em; text-align: center; border: 1px solid var(--border); }
+
+        /* External links */
+        .resource-link { display: inline-block; background: var(--bg-tertiary); color: var(--accent); padding: 8px 16px; border-radius: 6px; text-decoration: none; margin: 5px; border: 1px solid var(--border); transition: 0.2s; }
+        .resource-link:hover { background: var(--accent); color: #fff; }
+
+        /* Progress indicator */
+        .progress-bar { height: 4px; background: var(--bg-tertiary); border-radius: 2px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s; }
+
+        @media print {
+            .tabs { display: none; }
+            .tab-content { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <header>
+        <h1>NumPy & Vectorization</h1>
+        <p class="subtitle">Complete Self-Contained Study Guide for Aspiring Quant Engineers</p>
+        <p style="margin-top:10px; color: var(--text-secondary);">100% Offline Capable &middot; Interactive Diagrams &middot; Colab Experiments &middot; Tiered Exercises</p>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('prereq')">Prerequisites</button>
+            <button class="tab-btn" onclick="showTab('ndarray')">1. ndarray</button>
+            <button class="tab-btn" onclick="showTab('memory')">2. Memory Layout</button>
+            <button class="tab-btn" onclick="showTab('indexing')">3. Indexing</button>
+            <button class="tab-btn" onclick="showTab('broadcasting')">4. Broadcasting</button>
+            <button class="tab-btn" onclick="showTab('vectorization')">5. Vectorization</button>
+            <button class="tab-btn" onclick="showTab('linalg')">6. Linear Algebra</button>
+            <button class="tab-btn" onclick="showTab('colab')">Colab Labs</button>
+            <button class="tab-btn" onclick="showTab('exercises')">Exercises</button>
+        </div>
+
+        <!-- ==================== PREREQUISITES ==================== -->
+        <div id="prereq" class="tab-content active">
+            <h2>Prerequisites: Before You NumPy</h2>
+            <p>Before diving into NumPy, you need to understand <strong>why</strong> NumPy exists. These three pillars support everything that follows.</p>
+
+            <div class="card">
+                <h3>Pillar 1: Python Lists vs. Arrays</h3>
+                <p>A Python list is a <strong>resizable array of pointers</strong>. Each element is a reference to a Python object somewhere in memory.</p>
+
+                <div class="diagram-container">
+                    <svg width="700" height="280" viewBox="0 0 700 280">
+                        <!-- Python List Diagram -->
+                        <text x="350" y="25" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="bold">Python List: Scattered in Memory</text>
+
+                        <!-- List structure -->
+                        <rect x="50" y="50" width="80" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2" rx="4"/>
+                        <text x="90" y="75" text-anchor="middle" fill="#c9d1d9" font-size="12">List Object</text>
+
+                        <!-- Pointers -->
+                        <line x1="130" y1="70" x2="180" y2="70" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line x1="130" y1="70" x2="180" y2="120" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line x1="130" y1="70" x2="180" y2="170" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line x1="130" y1="70" x2="180" y2="220" stroke="#8b949e" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <!-- Objects -->
+                        <rect x="190" y="50" width="100" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="240" y="75" text-anchor="middle" fill="#c9d1d9" font-size="12">int: 42</text>
+
+                        <rect x="190" y="100" width="100" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="240" y="125" text-anchor="middle" fill="#c9d1d9" font-size="12">float: 3.14</text>
+
+                        <rect x="190" y="150" width="100" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="240" y="175" text-anchor="middle" fill="#c9d1d9" font-size="12">str: "A"</text>
+
+                        <rect x="190" y="200" width="100" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="240" y="225" text-anchor="middle" fill="#c9d1d9" font-size="12">int: 7</text>
+
+                        <!-- NumPy Array -->
+                        <text x="500" y="25" text-anchor="middle" fill="#3fb950" font-size="16" font-weight="bold">NumPy ndarray: Contiguous Block</text>
+                        <rect x="400" y="60" width="220" height="50" fill="#1e2530" stroke="#3fb950" stroke-width="2" rx="4"/>
+                        <rect x="405" y="65" width="50" height="40" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="460" y="65" width="50" height="40" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="515" y="65" width="50" height="40" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="570" y="65" width="45" height="40" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <text x="430" y="90" text-anchor="middle" fill="#c9d1d9" font-size="12">42</text>
+                        <text x="485" y="90" text-anchor="middle" fill="#c9d1d9" font-size="12">3</text>
+                        <text x="540" y="90" text-anchor="middle" fill="#c9d1d9" font-size="12">7</text>
+                        <text x="592" y="90" text-anchor="middle" fill="#c9d1d9" font-size="12">1</text>
+                        <text x="510" y="140" text-anchor="middle" fill="#8b949e" font-size="12">All same type (int64) → contiguous bytes</text>
+
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#8b949e"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="warning">
+                    <strong>Quant Relevance:</strong> Processing 1 million tick prices in a Python list requires 1 million pointer dereferences. In an ndarray, the CPU loads a contiguous chunk into cache and processes it with SIMD instructions. The speed difference is often <strong>100x-1000x</strong>.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Pillar 2: Basic Linear Algebra Vocabulary</h3>
+                <table>
+                    <tr><th>Term</th><th>What It Is</th><th>Quant Example</th></tr>
+                    <tr><td><strong>Scalar</strong></td><td>A single number (0D)</td><td>Today's return of AAPL: +1.5%</td></tr>
+                    <tr><td><strong>Vector</strong></td><td>A 1D array of numbers</td><td>Daily returns of AAPL for 252 trading days</td></tr>
+                    <tr><td><strong>Matrix</strong></td><td>A 2D array (rows × columns)</td><td>Returns of 50 stocks (rows) over 252 days (cols)</td></tr>
+                    <tr><td><strong>Tensor</strong></td><td>N-dimensional array (N≥3)</td><td>Batch of images, or multi-asset option surfaces</td></tr>
+                    <tr><td><strong>Dot Product</strong></td><td>Sum of element-wise multiplication</td><td>Portfolio return = weights⃗ · returns⃗</td></tr>
+                </table>
+
+                <div class="math">
+                    Dot Product: <strong>a⃗ · b⃗ = Σ(a<sub>i</sub> × b<sub>i</sub>)</strong><br>
+                    Example: [0.3, 0.7] · [0.05, 0.02] = 0.3×0.05 + 0.7×0.02 = 0.029 (2.9% portfolio return)
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Pillar 3: Memory & Cache Hierarchy (The "Why" of Speed)</h3>
+                <p>Your CPU has a <strong>cache</strong> — super-fast memory that sits between the CPU and RAM. When data is contiguous (like ndarray), the CPU predicts you need the next element and pre-loads it.</p>
+
+                <div class="diagram-container">
+                    <svg width="700" height="200" viewBox="0 0 700 200">
+                        <text x="350" y="25" text-anchor="middle" fill="#c9d1d9" font-size="16" font-weight="bold">Memory Hierarchy (Speed vs Size)</text>
+
+                        <!-- CPU -->
+                        <rect x="300" y="40" width="100" height="40" fill="#f85149" stroke="#fff" stroke-width="2" rx="4" opacity="0.8"/>
+                        <text x="350" y="65" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">CPU Core</text>
+
+                        <!-- L1 Cache -->
+                        <rect x="280" y="100" width="140" height="30" fill="#d29922" stroke="#fff" stroke-width="1" rx="4" opacity="0.9"/>
+                        <text x="350" y="120" text-anchor="middle" fill="#fff" font-size="11">L1 Cache (~32KB) ~1ns</text>
+
+                        <!-- L2 Cache -->
+                        <rect x="250" y="145" width="200" height="30" fill="#58a6ff" stroke="#fff" stroke-width="1" rx="4" opacity="0.9"/>
+                        <text x="350" y="165" text-anchor="middle" fill="#fff" font-size="11">L2/L3 Cache (~1-32MB) ~10ns</text>
+
+                        <!-- RAM -->
+                        <rect x="150" y="100" width="100" height="80" fill="#3fb950" stroke="#fff" stroke-width="1" rx="4" opacity="0.6"/>
+                        <text x="200" y="145" text-anchor="middle" fill="#fff" font-size="11">RAM (~16GB)</text>
+                        <text x="200" y="160" text-anchor="middle" fill="#fff" font-size="10">~100ns</text>
+
+                        <!-- Arrows -->
+                        <line x1="350" y1="80" x2="350" y2="100" stroke="#fff" stroke-width="2"/>
+                        <line x1="350" y1="130" x2="350" y2="145" stroke="#fff" stroke-width="2"/>
+                        <line x1="280" y1="115" x2="250" y2="145" stroke="#fff" stroke-width="1"/>
+                    </svg>
+                </div>
+
+                <p><strong>Key Insight:</strong> Accessing RAM takes ~100x longer than accessing L1 cache. NumPy's contiguous memory layout maximizes cache hits. Python lists scatter data in RAM, causing frequent cache misses.</p>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources for Prerequisites</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/user/absolute_beginners.html" target="_blank">NumPy Absolute Beginners</a>
+                <a class="resource-link" href="https://jalammar.github.io/visual-interactive-guide-basics-neural-networks/" target="_blank">Visual Guide to Neural Nets (vectors)</a>
+                <a class="resource-link" href="https://www.youtube.com/watch?v=WDIJNjpK-gw" target="_blank">CPU Cache Explained (YouTube)</a>
+            </div>
+        </div>
+
+        <!-- ==================== NDARRAY ==================== -->
+        <div id="ndarray" class="tab-content">
+            <h2>Topic 1: The ndarray — NumPy's Atomic Unit</h2>
+
+            <div class="card">
+                <h3>What is an ndarray?</h3>
+                <p>An <code class="code-inline">ndarray</code> (N-dimensional array) is a <strong>homogeneous</strong>, <strong>fixed-size</strong>, <strong>contiguous</strong> block of memory interpreted as an N-dimensional array. It is <strong>not</strong> a Python list.</p>
+
+                <h4>The Anatomy of an ndarray</h4>
+                <div class="diagram-container">
+                    <svg width="800" height="350" viewBox="0 0 800 350">
+                        <text x="400" y="25" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="bold">Anatomy of np.array([[1,2,3],[4,5,6]])</text>
+
+                        <!-- Data buffer -->
+                        <rect x="50" y="50" width="600" height="60" fill="#1e2530" stroke="#3fb950" stroke-width="2" rx="4"/>
+                        <text x="350" y="45" text-anchor="middle" fill="#3fb950" font-size="12">Data Buffer (raw bytes in memory)</text>
+
+                        <rect x="55" y="55" width="95" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="155" y="55" width="95" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="255" y="55" width="95" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="355" y="55" width="95" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="455" y="55" width="95" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+                        <rect x="555" y="55" width="90" height="50" fill="#21262d" stroke="#3fb950" stroke-width="1"/>
+
+                        <text x="102" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">1</text>
+                        <text x="202" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">2</text>
+                        <text x="302" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">3</text>
+                        <text x="402" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">4</text>
+                        <text x="502" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">5</text>
+                        <text x="600" y="85" text-anchor="middle" fill="#c9d1d9" font-size="14">6</text>
+
+                        <!-- Metadata box -->
+                        <rect x="50" y="140" width="700" height="180" fill="#161b22" stroke="#58a6ff" stroke-width="2" rx="8"/>
+                        <text x="400" y="165" text-anchor="middle" fill="#58a6ff" font-size="14" font-weight="bold">Array Object (Metadata — overhead is tiny!)</text>
+
+                        <!-- Metadata items -->
+                        <rect x="70" y="180" width="150" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="145" y="200" text-anchor="middle" fill="#d29922" font-size="11">dtype: int64</text>
+                        <text x="145" y="218" text-anchor="middle" fill="#8b949e" font-size="10">8 bytes each</text>
+
+                        <rect x="240" y="180" width="150" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="315" y="200" text-anchor="middle" fill="#d29922" font-size="11">shape: (2, 3)</text>
+                        <text x="315" y="218" text-anchor="middle" fill="#8b949e" font-size="10">2 rows, 3 cols</text>
+
+                        <rect x="410" y="180" width="150" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="485" y="200" text-anchor="middle" fill="#d29922" font-size="11">ndim: 2</text>
+                        <text x="485" y="218" text-anchor="middle" fill="#8b949e" font-size="10">dimensions</text>
+
+                        <rect x="580" y="180" width="150" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="655" y="200" text-anchor="middle" fill="#d29922" font-size="11">strides: (24, 8)</text>
+                        <text x="655" y="218" text-anchor="middle" fill="#8b949e" font-size="10">bytes to next row/col</text>
+
+                        <rect x="70" y="250" width="200" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="170" y="270" text-anchor="middle" fill="#d29922" font-size="11">itemsize: 8</text>
+                        <text x="170" y="288" text-anchor="middle" fill="#8b949e" font-size="10">bytes per element</text>
+
+                        <rect x="290" y="250" width="200" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="390" y="270" text-anchor="middle" fill="#d29922" font-size="11">nbytes: 48</text>
+                        <text x="390" y="288" text-anchor="middle" fill="#8b949e" font-size="10">total memory (6×8)</text>
+
+                        <rect x="510" y="250" width="220" height="50" fill="#1e2530" stroke="#d29922" stroke-width="1" rx="4"/>
+                        <text x="620" y="270" text-anchor="middle" fill="#d29922" font-size="11">flags: C_CONTIGUOUS</text>
+                        <text x="620" y="288" text-anchor="middle" fill="#8b949e" font-size="10">memory layout order</text>
+
+                        <!-- Connecting lines -->
+                        <line x1="350" y1="110" x2="350" y2="140" stroke="#8b949e" stroke-width="2" stroke-dasharray="5,5"/>
+                    </svg>
+                </div>
+
+                <p>The array object itself is just a lightweight "view" or "header" pointing to a data buffer. Multiple arrays can share the same buffer (we'll see this in Indexing).</p>
+            </div>
+
+            <div class="card">
+                <h3>Creating ndarrays</h3>
+                <pre><code><span class="cmt"># Method 1: From Python lists (copies data)</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+a = np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])           <span class="cmt"># 1D vector</span>
+b = np.array([[<span class="num">1</span>, <span class="num">2</span>], [<span class="num">3</span>, <span class="num">4</span>]])    <span class="cmt"># 2D matrix</span>
+
+<span class="cmt"># Method 2: Convenience constructors ( Quant favorites )</span>
+zeros = np.zeros((<span class="num">1000</span>, <span class="num">50</span>))       <span class="cmt"># 1000 days × 50 stocks, initialized to 0.0</span>
+ones = np.ones((<span class="num">252</span>, <span class="num">10</span>))         <span class="cmt"># 252 trading days × 10 assets</span>
+empty = np.empty((<span class="num">500</span>, <span class="num">500</span>))       <span class="cmt"># FAST — uninitialized (garbage values)!</span>
+
+<span class="cmt"># Method 3: Sequences</span>
+linear = np.arange(<span class="num">0</span>, <span class="num">10</span>, <span class="num">0.5</span>)     <span class="cmt"># [0, 0.5, 1.0, ... 9.5]</span>
+space = np.linspace(<span class="num">0</span>, <span class="num">1</span>, <span class="num">100</span>)     <span class="cmt"># 100 points between 0 and 1 (inclusive)</span>
+
+<span class="cmt"># Method 4: Random ( essential for Monte Carlo )</span>
+uniform = np.random.rand(<span class="num">10000</span>, <span class="num">3</span>)   <span class="cmt"># U[0,1] — correlations, risk factors</span>
+normal = np.random.randn(<span class="num">10000</span>, <span class="num">3</span>)  <span class="cmt"># N(0,1) — Brownian motion increments!</span></code></pre>
+
+                <div class="tip">
+                    <strong>Quant Tip:</strong> Always use <code class="code-inline">np.empty</code> when you know you'll overwrite every element immediately. It's faster than <code class="code-inline">np.zeros</code> because it skips the initialization step.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>dtype: The Hidden Performance Lever</h3>
+                <p>Every element in an ndarray has the same <strong>data type</strong>. This is what enables vectorized operations.</p>
+
+                <table>
+                    <tr><th>dtype</th><th>Description</th><th>Memory</th><th>Quant Use Case</th></tr>
+                    <tr><td><code class="code-inline">float64</code></td><td>Double precision</td><td>8 bytes</td><td>Standard for prices, returns, risk metrics</td></tr>
+                    <tr><td><code class="code-inline">float32</code></td><td>Single precision</td><td>4 bytes</td><td>Deep learning, large simulations (2× memory)</td></tr>
+                    <tr><td><code class="code-inline">int64</code></td><td>64-bit integer</td><td>8 bytes</td><td>Timestamps, order IDs, volume (if whole units)</td></tr>
+                    <tr><td><code class="code-inline">int32</code></td><td>32-bit integer</td><td>4 bytes</td><td>Count data, categorical encodings</td></tr>
+                    <tr><td><code class="code-inline">bool</code></td><td>Boolean</td><td>1 byte</td><td>Masks, signals (buy/sell flags)</td></tr>
+                    <tr><td><code class="code-inline">datetime64[ns]</code></td><td>Nanosecond datetime</td><td>8 bytes</td><td>High-frequency trading timestamps</td></tr>
+                </table>
+
+                <pre><code><span class="cmt"># Explicit dtype control</span>
+prices = np.array([<span class="num">100.5</span>, <span class="num">101.2</span>, <span class="num">99.8</span>], dtype=np.float32)
+<span class="fn">print</span>(prices.dtype)   <span class="cmt"># float32</span>
+
+<span class="cmt"># Casting (creates a copy with new dtype)</span>
+prices_f64 = prices.astype(np.float64)</code></pre>
+
+                <div class="danger">
+                    <strong>Precision Trap:</strong> In quant finance, never use <code class="code-inline">float32</code> for cumulative operations (like compound returns over years) or matrix inversion. Rounding errors accumulate. Use <code class="code-inline">float64</code> for all portfolio math.
+                </div>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/reference/arrays.ndarray.html" target="_blank">Official ndarray Docs</a>
+                <a class="resource-link" href="https://www.pythonlikeyoumeanit.com/Module3_IntroducingNumpy/ArrayTraversal.html" target="_blank">Array Traversal Visualized</a>
+            </div>
+        </div>
+
+        <!-- ==================== MEMORY LAYOUT ==================== -->
+        <div id="memory" class="tab-content">
+            <h2>Topic 2: Memory Layout & Strides</h2>
+            <p>Understanding memory layout separates junior quants from senior quants. It explains <strong>why</strong> some operations are instant and others are slow.</p>
+
+            <div class="card">
+                <h3>Row-Major (C-order) vs Column-Major (Fortran-order)</h3>
+                <p>When we store a 2D matrix in 1D memory, we must choose an order. NumPy defaults to <strong>C-order</strong> (row-major).</p>
+
+                <div class="diagram-container">
+                    <svg width="900" height="400" viewBox="0 0 900 400">
+                        <text x="450" y="25" text-anchor="middle" fill="#c9d1d9" font-size="16" font-weight="bold">Matrix: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]</text>
+
+                        <!-- Matrix visual -->
+                        <rect x="350" y="45" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="405" y="45" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="460" y="45" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="350" y="90" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="405" y="90" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="460" y="90" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="350" y="135" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="405" y="135" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="460" y="135" width="50" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+
+                        <text x="375" y="70" text-anchor="middle" fill="#c9d1d9" font-size="14">1</text>
+                        <text x="430" y="70" text-anchor="middle" fill="#c9d1d9" font-size="14">2</text>
+                        <text x="485" y="70" text-anchor="middle" fill="#c9d1d9" font-size="14">3</text>
+                        <text x="375" y="115" text-anchor="middle" fill="#c9d1d9" font-size="14">4</text>
+                        <text x="430" y="115" text-anchor="middle" fill="#c9d1d9" font-size="14">5</text>
+                        <text x="485" y="115" text-anchor="middle" fill="#c9d1d9" font-size="14">6</text>
+                        <text x="375" y="160" text-anchor="middle" fill="#c9d1d9" font-size="14">7</text>
+                        <text x="430" y="160" text-anchor="middle" fill="#c9d1d9" font-size="14">8</text>
+                        <text x="485" y="160" text-anchor="middle" fill="#c9d1d9" font-size="14">9</text>
+
+                        <!-- C-order -->
+                        <text x="200" y="210" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="bold">C-order (Row-Major)</text>
+                        <text x="200" y="230" text-anchor="middle" fill="#8b949e" font-size="11">Last index changes fastest</text>
+
+                        <rect x="50" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="110" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="170" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="230" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="290" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="350" y="250" width="55" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+
+                        <text x="77" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">1</text>
+                        <text x="137" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">2</text>
+                        <text x="197" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">3</text>
+                        <text x="257" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">4</text>
+                        <text x="317" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">5</text>
+                        <text x="377" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">6</text>
+
+                        <text x="200" y="315" text-anchor="middle" fill="#8b949e" font-size="11">strides = (24, 8) bytes</text>
+                        <text x="200" y="335" text-anchor="middle" fill="#8b949e" font-size="11">Row access: FAST (contiguous)</text>
+
+                        <!-- Fortran-order -->
+                        <text x="700" y="210" text-anchor="middle" fill="#d29922" font-size="14" font-weight="bold">F-order (Column-Major)</text>
+                        <text x="700" y="230" text-anchor="middle" fill="#8b949e" font-size="11">First index changes fastest</text>
+
+                        <rect x="550" y="250" width="55" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+                        <rect x="610" y="250" width="55" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+                        <rect x="670" y="250" width="55" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+                        <rect x="730" y="250" width="55" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+                        <rect x="790" y="250" width="55" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+                        <rect x="850" y="250" width="40" height="40" fill="#1e2530" stroke="#d29922" stroke-width="2"/>
+
+                        <text x="577" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">1</text>
+                        <text x="637" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">4</text>
+                        <text x="697" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">7</text>
+                        <text x="757" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">2</text>
+                        <text x="817" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">5</text>
+                        <text x="870" y="275" text-anchor="middle" fill="#c9d1d9" font-size="14">8</text>
+
+                        <text x="700" y="315" text-anchor="middle" fill="#8b949e" font-size="11">strides = (8, 24) bytes</text>
+                        <text x="700" y="335" text-anchor="middle" fill="#8b949e" font-size="11">Column access: FAST (contiguous)</text>
+                    </svg>
+                </div>
+
+                <pre><code><span class="cmt"># Check memory layout</span>
+arr = np.arange(<span class="num">12</span>).reshape(<span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">print</span>(arr.flags)
+<span class="cmt"># C_CONTIGUOUS : True</span>
+<span class="cmt"># F_CONTIGUOUS : False</span>
+
+<span class="cmt"># Create Fortran-order array</span>
+arr_f = np.asfortranarray(arr)
+<span class="cmt"># OR: arr_f = np.array(arr, order='F')</span>
+
+<span class="cmt"># The .strides attribute tells you how many bytes to jump</span>
+<span class="fn">print</span>(arr.strides)     <span class="cmt"># (32, 8) for float64: 4 cols × 8 bytes, 1 col × 8 bytes</span>
+<span class="fn">print</span>(arr_f.strides)   <span class="cmt"># (8, 24) — columns are contiguous</span></code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Strides: The Secret to NumPy's Flexibility</h3>
+                <p><strong>Strides</strong> define how many bytes to jump to get to the next element along each dimension. They allow NumPy to create <strong>views</strong> without copying data.</p>
+
+                <div class="math">
+                    For shape (3, 4) and dtype float64 (8 bytes):<br>
+                    C-order strides = (4 × 8, 8) = <strong>(32, 8)</strong><br>
+                    F-order strides = (8, 3 × 8) = <strong>(8, 24)</strong>
+                </div>
+
+                <pre><code><span class="cmt"># Transpose: Just swaps strides and shape! No copy.</span>
+arr_t = arr.T
+<span class="fn">print</span>(arr_t.strides)   <span class="cmt"># (8, 32) — shape is now (4, 3)</span>
+<span class="fn">print</span>(arr_t.flags.c_contiguous)  <span class="cmt"># False! Transpose of C-order is NOT C-contiguous</span>
+
+<span class="cmt"># Slicing also creates views by adjusting strides</span>
+every_other = arr[:, ::<span class="num">2</span>]
+<span class="fn">print</span>(every_other.strides)  <span class="cmt"># (32, 16) — jumps 2 columns at a time</span></code></pre>
+
+                <div class="warning">
+                    <strong>Performance Warning:</strong> Iterating over rows in C-order is cache-friendly. Iterating over columns in C-order causes <strong>strided access</strong> — the CPU jumps 32 bytes each time, wasting cache lines. In quant code processing time-series (columns=time), this matters enormously.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Contiguity and the .ravel() vs .flatten() Distinction</h3>
+                <pre><code><span class="cmt"># .ravel() returns a view when possible (fast, shares memory)</span>
+flat = arr.ravel()        <span class="cmt"># Usually O(1) — just changes shape/strides</span>
+
+<span class="cmt"># .flatten() ALWAYS returns a copy (safe, slow)</span>
+flat_copy = arr.flatten() <span class="cmt"># O(N) — allocates new memory</span>
+
+<span class="cmt"># Force contiguity before passing to C/Fortran libraries</span>
+contig = np.ascontiguousarray(arr_t)  <span class="cmt"># Makes a copy if needed</span></code></pre>
+
+                <div class="tip">
+                    <strong>Quant Workflow:</strong> When passing data to C++ quant libraries (like QuantLib) or GPU kernels (CuPy/CUDA), the API often requires C-contiguous arrays. Always check <code class="code-inline">.flags.c_contiguous</code> before interop.
+                </div>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.strides.html" target="_blank">Strides Documentation</a>
+                <a class="resource-link" href="https://ajcr.net/stride-guide-part-1/" target="_blank">Stride Guide (Deep Dive)</a>
+                <a class="resource-link" href="https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays/" target="_blank">Memory Layout by Eli Bendersky</a>
+            </div>
+        </div>
+
+        <!-- ==================== INDEXING ==================== -->
+        <div id="indexing" class="tab-content">
+            <h2>Topic 3: Indexing & Slicing — Views vs Copies</h2>
+            <p>This is the <strong>#1 source of bugs</strong> in quant code. Master this and you'll avoid silent data corruption.</p>
+
+            <div class="card">
+                <h3>Basic Indexing: Always Returns a View</h3>
+                <p>Basic indexing (slices, integers, <code class="code-inline">np.newaxis</code>) manipulates shape and strides without copying data.</p>
+
+                <div class="diagram-container">
+                    <svg width="800" height="350" viewBox="0 0 800 350">
+                        <text x="400" y="25" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="bold">View Example: arr[0, :] — First Row Slice</text>
+
+                        <!-- Original array -->
+                        <text x="200" y="55" text-anchor="middle" fill="#c9d1d9" font-size="13" font-weight="bold">Original Array (3×4)</text>
+                        <rect x="100" y="70" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="165" y="70" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="230" y="70" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="295" y="70" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+
+                        <rect x="100" y="115" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="165" y="115" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="230" y="115" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="295" y="115" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+
+                        <rect x="100" y="160" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="165" y="160" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="230" y="160" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="295" y="160" width="60" height="40" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+
+                        <text x="130" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">0</text>
+                        <text x="195" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">1</text>
+                        <text x="260" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">2</text>
+                        <text x="325" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">3</text>
+                        <text x="130" y="140" text-anchor="middle" fill="#c9d1d9" font-size="12">4</text>
+                        <text x="195" y="140" text-anchor="middle" fill="#c9d1d9" font-size="12">5</text>
+                        <text x="260" y="140" text-anchor="middle" fill="#c9d1d9" font-size="12">6</text>
+                        <text x="325" y="140" text-anchor="middle" fill="#c9d1d9" font-size="12">7</text>
+                        <text x="130" y="185" text-anchor="middle" fill="#c9d1d9" font-size="12">8</text>
+                        <text x="195" y="185" text-anchor="middle" fill="#c9d1d9" font-size="12">9</text>
+                        <text x="260" y="185" text-anchor="middle" fill="#c9d1d9" font-size="12">10</text>
+                        <text x="325" y="185" text-anchor="middle" fill="#c9d1d9" font-size="12">11</text>
+
+                        <!-- Highlight first row -->
+                        <rect x="95" y="65" width="265" height="50" fill="none" stroke="#3fb950" stroke-width="3" stroke-dasharray="8,4"/>
+
+                        <!-- Arrow -->
+                        <path d="M 400 95 Q 450 95 500 95" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+                        <text x="450" y="85" text-anchor="middle" fill="#8b949e" font-size="11">VIEW (shares memory)</text>
+
+                        <!-- Result -->
+                        <text x="650" y="55" text-anchor="middle" fill="#3fb950" font-size="13" font-weight="bold">Result: shape=(4,)</text>
+                        <rect x="550" y="70" width="60" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="615" y="70" width="60" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="680" y="70" width="60" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="745" y="70" width="60" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <text x="580" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">0</text>
+                        <text x="645" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">1</text>
+                        <text x="710" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">2</text>
+                        <text x="775" y="95" text-anchor="middle" fill="#c9d1d9" font-size="12">3</text>
+
+                        <text x="650" y="135" text-anchor="middle" fill="#8b949e" font-size="11">strides=(8,) — points into original buffer</text>
+
+                        <!-- Memory buffer -->
+                        <text x="400" y="240" text-anchor="middle" fill="#c9d1d9" font-size="13" font-weight="bold">Underlying Memory Buffer (shared)</text>
+                        <rect x="150" y="260" width="500" height="50" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="400" y="290" text-anchor="middle" fill="#c9d1d9" font-size="14">[0] [1] [2] [3] [4] [5] [6] [7] [8] [9] [10] [11]</text>
+
+                        <defs>
+                            <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#8b949e"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+arr = np.arange(<span class="num">12</span>).reshape(<span class="num">3</span>, <span class="num">4</span>)
+
+<span class="cmt"># BASIC INDEXING → VIEW (shares memory)</span>
+row = arr[<span class="num">0</span>, :]       <span class="cmt"># View of first row</span>
+col = arr[:, <span class="num">0</span>]       <span class="cmt"># View of first column (strided!)</span>
+sub = arr[<span class="num">0</span>:<span class="num">2</span>, <span class="num">1</span>:<span class="num">3</span>]  <span class="cmt"># 2×2 view</span>
+
+<span class="cmt"># Verify: modify view, original changes!</span>
+row[<span class="num">0</span>] = <span class="num">999</span>
+<span class="fn">print</span>(arr[<span class="num">0</span>, <span class="num">0</span>])    <span class="cmt"># 999 (!!!)</span></code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Advanced Indexing: Always Returns a Copy</h3>
+                <p>When you use <strong>boolean arrays</strong> or <strong>integer arrays</strong> for indexing, NumPy cannot represent the result with simple strides. It must copy data.</p>
+
+                <pre><code><span class="cmt"># BOOLEAN INDEXING (Masking) — COPY</span>
+mask = arr > <span class="num">5</span>
+filtered = arr[mask]     <span class="cmt"># 1D copy of elements > 5</span>
+filtered[<span class="num">0</span>] = <span class="num">999</span>       <span class="cmt"># arr is UNCHANGED</span>
+
+<span class="cmt"># Quant use case: Select returns of tech stocks on high-vol days</span>
+returns = np.random.randn(<span class="num">252</span>, <span class="num">10</span>)  <span class="cmt"># 252 days, 10 stocks</span>
+vol_spike = np.std(returns, axis=<span class="num">1</span>) > <span class="num">0.03</span>
+high_vol_returns = returns[vol_spike]   <span class="cmt"># Only high volatility days</span>
+
+<span class="cmt"># FANCY INDEXING (Integer arrays) — COPY</span>
+rows = np.array([<span class="num">0</span>, <span class="num">2</span>])
+cols = np.array([<span class="num">1</span>, <span class="num">3</span>])
+result = arr[rows, cols]   <span class="cmt"># Elements at (0,1) and (2,3) — COPY</span>
+
+<span class="cmt"># Mixed indexing: Basic + Advanced → COPY</span>
+mixed = arr[[<span class="num">0</span>, <span class="num">2</span>], :]    <span class="cmt"># Integer list for rows → COPY!</span></code></pre>
+
+                <div class="danger">
+                    <strong>Silent Killer:</strong> <code class="code-inline">arr[[0, 1]]</code> (list of ints) creates a copy, but <code class="code-inline">arr[0:2]</code> (slice) creates a view. The syntax difference is subtle but the performance/memory implications are massive.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>The np.newaxis Trick</h3>
+                <p>Add a dimension of size 1. Essential for broadcasting (next topic).</p>
+                <pre><code>vec = np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])     <span class="cmt"># shape: (3,)</span>
+
+<span class="cmt"># Add axis to make it column vector or row vector</span>
+col = vec[:, np.newaxis]    <span class="cmt"># shape: (3, 1)</span>
+row = vec[np.newaxis, :]    <span class="cmt"># shape: (1, 3)</span>
+
+<span class="cmt"># Equivalent shorthand</span>
+col = vec[:, <span class="num">None</span>]
+row = vec[<span class="num">None</span>, :]</code></pre>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/user/basics.indexing.html" target="_blank">NumPy Indexing Guide</a>
+                <a class="resource-link" href="https://scipy-lectures.org/advanced/advanced_numpy/#indexing-scheme-strides" target="_blank">Scipy Lectures: Advanced Indexing</a>
+            </div>
+        </div>
+
+        <!-- ==================== BROADCASTING ==================== -->
+        <div id="broadcasting" class="tab-content">
+            <h2>Topic 4: Broadcasting — The Art of Stretching Arrays</h2>
+            <p>Broadcasting allows NumPy to perform arithmetic on arrays of different shapes <strong>without explicitly copying data</strong>. It is the engine behind almost all quant vectorized code.</p>
+
+            <div class="card">
+                <h3>The Intuition: Virtual Replication</h3>
+                <p>When arrays have different shapes, NumPy "virtually" stretches the smaller array to match the larger one — but <strong>without actually allocating memory</strong>.</p>
+
+                <div class="diagram-container">
+                    <svg width="850" height="500" viewBox="0 0 850 500">
+                        <text x="425" y="25" text-anchor="middle" fill="#58a6ff" font-size="16" font-weight="bold">Broadcasting: 3×3 + 1×3</text>
+
+                        <!-- Array A -->
+                        <text x="150" y="55" text-anchor="middle" fill="#c9d1d9" font-size="13" font-weight="bold">Array A (3×3)</text>
+                        <rect x="80" y="70" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="125" y="70" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="170" y="70" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="80" y="110" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="125" y="110" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="170" y="110" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="80" y="150" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="125" y="150" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <rect x="170" y="150" width="40" height="35" fill="#21262d" stroke="#58a6ff" stroke-width="2"/>
+                        <text x="100" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">1</text>
+                        <text x="145" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">2</text>
+                        <text x="190" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">3</text>
+                        <text x="100" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">4</text>
+                        <text x="145" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">5</text>
+                        <text x="190" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">6</text>
+                        <text x="100" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">7</text>
+                        <text x="145" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">8</text>
+                        <text x="190" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">9</text>
+
+                        <!-- Plus sign -->
+                        <text x="260" y="125" text-anchor="middle" fill="#c9d1d9" font-size="24" font-weight="bold">+</text>
+
+                        <!-- Array B -->
+                        <text x="370" y="55" text-anchor="middle" fill="#c9d1d9" font-size="13" font-weight="bold">Array B (1×3)</text>
+                        <rect x="325" y="110" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="370" y="110" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <rect x="415" y="110" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2"/>
+                        <text x="345" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">10</text>
+                        <text x="390" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">20</text>
+                        <text x="435" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">30</text>
+
+                        <!-- Stretched B (ghost) -->
+                        <rect x="325" y="70" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <rect x="370" y="70" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <rect x="415" y="70" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <rect x="325" y="150" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <rect x="370" y="150" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <rect x="415" y="150" width="40" height="35" fill="#1e2530" stroke="#3fb950" stroke-width="2" stroke-dasharray="5,3" opacity="0.4"/>
+                        <text x="370" y="200" text-anchor="middle" fill="#8b949e" font-size="11">Virtually stretched (no copy)</text>
+
+                        <!-- Equals -->
+                        <text x="500" y="125" text-anchor="middle" fill="#c9d1d9" font-size="24" font-weight="bold">=</text>
+
+                        <!-- Result -->
+                        <text x="650" y="55" text-anchor="middle" fill="#d29922" font-size="13" font-weight="bold">Result (3×3)</text>
+                        <rect x="580" y="70" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="625" y="70" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="670" y="70" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="580" y="110" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="625" y="110" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="670" y="110" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="580" y="150" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="625" y="150" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <rect x="670" y="150" width="40" height="35" fill="#21262d" stroke="#d29922" stroke-width="2"/>
+                        <text x="600" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">11</text>
+                        <text x="645" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">22</text>
+                        <text x="690" y="92" text-anchor="middle" fill="#c9d1d9" font-size="12">33</text>
+                        <text x="600" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">14</text>
+                        <text x="645" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">25</text>
+                        <text x="690" y="132" text-anchor="middle" fill="#c9d1d9" font-size="12">36</text>
+                        <text x="600" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">17</text>
+                        <text x="645" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">28</text>
+                        <text x="690" y="172" text-anchor="middle" fill="#c9d1d9" font-size="12">39</text>
+
+                        <!-- Rules -->
+                        <text x="425" y="260" text-anchor="middle" fill="#58a6ff" font-size="14" font-weight="bold">The Three Rules of Broadcasting</text>
+                        <rect x="50" y="280" width="750" height="180" fill="#161b22" stroke="#30363d" stroke-width="1" rx="8"/>
+                        <text x="70" y="310" fill="#c9d1d9" font-size="13">1. <tspan fill="#ff7b72">Align dimensions from the RIGHT</tspan>. Compare shape tuples element-wise.</text>
+                        <text x="70" y="340" fill="#c9d1d9" font-size="13">2. If dimensions are <tspan fill="#3fb950">equal</tspan>, they are compatible.</text>
+                        <text x="70" y="370" fill="#c9d1d9" font-size="13">3. If one dimension is <tspan fill="#d29922">1</tspan>, it is stretched to match the other.</text>
+                        <text x="70" y="400" fill="#c9d1d9" font-size="13">4. If dimensions are neither equal nor 1 → <tspan fill="#f85149">ValueError</tspan>.</text>
+                        <text x="70" y="435" fill="#8b949e" font-size="12">Example: (3, 4, 5) + (4, 1) → align: (3, 4, 5) vs (__, 4, 1) → result: (3, 4, 5)</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Broadcasting in Code</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Example 1: Scalar broadcasting (most basic)</span>
+prices = np.array([<span class="num">100</span>, <span class="num">105</span>, <span class="num">98</span>, <span class="num">110</span>])
+returns = (prices - <span class="num">100</span>) / <span class="num">100</span>   <span class="cmt"># scalar 100 is broadcast to [100, 100, 100, 100]</span>
+
+<span class="cmt"># Example 2: Row vector broadcast across matrix (quant classic)</span>
+returns_matrix = np.random.randn(<span class="num">252</span>, <span class="num">10</span>)   <span class="cmt"># 252 days × 10 stocks</span>
+mean_returns = returns_matrix.mean(axis=<span class="num">0</span>)    <span class="cmt"># shape: (10,) — mean per stock</span>
+demeaned = returns_matrix - mean_returns        <span class="cmt"># Broadcasting: (252,10) - (10,) → (252,10)</span>
+
+<span class="cmt"># Example 3: Column vector broadcast (time-weighting)</span>
+weights = np.array([<span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0.3</span>, <span class="num">0.4</span>])    <span class="cmt"># shape: (4,)</span>
+portfolio = returns_matrix[:, :<span class="num">4</span>] * weights    <span class="cmt"># (252,4) * (4,) → each column scaled</span>
+
+<span class="cmt"># Example 4: Explicit newaxis for alignment</span>
+row_vec = np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])          <span class="cmt"># shape (3,)</span>
+col_vec = np.array([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>])[:, <span class="num">None</span>]  <span class="cmt"># shape (3,1)</span>
+outer_product = row_vec * col_vec    <span class="cmt"># (3,) * (3,1) → (3,3) — outer product!</span></code></pre>
+
+                <div class="tip">
+                    <strong>Quant Pattern:</strong> Centering data (subtracting mean) and standardizing ((x-μ)/σ) are pure broadcasting operations. You will write these 100 times in your quant career.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Broadcasting Debugging</h3>
+                <pre><code><span class="cmt"># When broadcasting fails</span>
+a = np.ones((<span class="num">3</span>, <span class="num">4</span>))
+b = np.ones((<span class="num">3</span>,))       <span class="cmt"># shape (3,)</span>
+<span class="cmt"># a + b would fail: align (3,4) vs (_,3) → 4 vs 3 mismatch!</span>
+
+<span class="cmt"># Fix: Make b a column vector</span>
+result = a + b[:, np.newaxis]   <span class="cmt"># (3,4) + (3,1) → (3,4) ✓</span>
+
+<span class="cmt"># Or use np.broadcast_to to visualize what happens</span>
+b_stretched = np.broadcast_to(b[:, np.newaxis], (<span class="num">3</span>, <span class="num">4</span>))</code></pre>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/user/basics.broadcasting.html" target="_blank">Official Broadcasting Docs</a>
+                <a class="resource-link" href="http://www.scipy-lectures.org/intro/numpy/operations.html#broadcasting" target="_blank">Scipy Lectures: Broadcasting</a>
+                <a class="resource-link" href="https://stackoverflow.com/questions/37955859/what-is-the-intuition-behind-numpy-broadcasting" target="_blank">StackOverflow: Broadcasting Intuition</a>
+            </div>
+        </div>
+
+        <!-- ==================== VECTORIZATION ==================== -->
+        <div id="vectorization" class="tab-content">
+            <h2>Topic 5: Vectorization vs Loops</h2>
+            <p>Vectorization is the practice of replacing explicit Python loops with NumPy array operations. In quant finance, this is not optional — it is mandatory.</p>
+
+            <div class="card">
+                <h3>Why Loops Are Slow in Python</h3>
+                <p>Python is an interpreted language. Every loop iteration incurs:</p>
+                <ol>
+                    <li><strong>Type checking</strong> — Is this a float? An int? A custom object?</li>
+                    <li><strong>Dynamic dispatch</strong> — Which function to call?</li>
+                    <li><strong>Object unboxing</strong> — Extract the actual C value from the Python object.</li>
+                    <li><strong>Bytecode overhead</strong> — The interpreter reads and decodes instructions.</li>
+                </ol>
+                <p>NumPy pushes the loop into <strong>compiled C</strong>, eliminating all four overheads.</p>
+
+                <div class="diagram-container">
+                    <svg width="800" height="280" viewBox="0 0 800 280">
+                        <text x="400" y="25" text-anchor="middle" fill="#c9d1d9" font-size="16" font-weight="bold">Python Loop vs NumPy Vectorized</text>
+
+                        <!-- Python loop -->
+                        <rect x="50" y="50" width="300" height="200" fill="#161b22" stroke="#f85149" stroke-width="2" rx="8"/>
+                        <text x="200" y="75" text-anchor="middle" fill="#f85149" font-size="14" font-weight="bold">Python Loop</text>
+                        <text x="200" y="100" text-anchor="middle" fill="#8b949e" font-size="11">for i in range(N):</text>
+                        <text x="200" y="120" text-anchor="middle" fill="#8b949e" font-size="11">    c[i] = a[i] + b[i]</text>
+
+                        <rect x="80" y="140" width="60" height="30" fill="#1e2530" stroke="#8b949e" stroke-width="1"/>
+                        <text x="110" y="160" text-anchor="middle" fill="#c9d1d9" font-size="10">Type chk</text>
+                        <rect x="150" y="140" width="60" height="30" fill="#1e2530" stroke="#8b949e" stroke-width="1"/>
+                        <text x="180" y="160" text-anchor="middle" fill="#c9d1d9" font-size="10">Dispatch</text>
+                        <rect x="220" y="140" width="60" height="30" fill="#1e2530" stroke="#8b949e" stroke-width="1"/>
+                        <text x="250" y="160" text-anchor="middle" fill="#c9d1d9" font-size="10">Unbox</text>
+                        <rect x="80" y="180" width="200" height="30" fill="#1e2530" stroke="#8b949e" stroke-width="1"/>
+                        <text x="180" y="200" text-anchor="middle" fill="#c9d1d9" font-size="10">C operation (fast, but surrounded by slowness)</text>
+
+                        <text x="200" y="235" text-anchor="middle" fill="#f85149" font-size="12">× N iterations = SLOW</text>
+
+                        <!-- NumPy -->
+                        <rect x="450" y="50" width="300" height="200" fill="#161b22" stroke="#3fb950" stroke-width="2" rx="8"/>
+                        <text x="600" y="75" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="bold">NumPy Vectorized</text>
+                        <text x="600" y="100" text-anchor="middle" fill="#8b949e" font-size="11">c = a + b</text>
+
+                        <rect x="480" y="130" width="240" height="40" fill="#1e2530" stroke="#3fb950" stroke-width="1"/>
+                        <text x="600" y="155" text-anchor="middle" fill="#c9d1d9" font-size="11">Single Python call → compiled C loop</text>
+
+                        <rect x="480" y="180" width="240" height="30" fill="#1e2530" stroke="#3fb950" stroke-width="1"/>
+                        <text x="600" y="200" text-anchor="middle" fill="#c9d1d9" font-size="11">SIMD: Process 4 doubles per CPU instruction</text>
+
+                        <text x="600" y="235" text-anchor="middle" fill="#3fb950" font-size="12">One-shot = FAST (often 100× faster)</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Universal Functions (ufuncs)</h3>
+                <p>ufuncs are vectorized wrappers for functions that operate element-wise. They support broadcasting and type casting.</p>
+
+                <table>
+                    <tr><th>Category</th><th>Functions</th><th>Quant Use</th></tr>
+                    <tr><td>Arithmetic</td><td><code class="code-inline">add, subtract, multiply, divide, power, mod</code></td><td>P&L calculations, position sizing</td></tr>
+                    <tr><td>Math</td><td><code class="code-inline">sin, cos, exp, log, sqrt</code></td><td>Black-Scholes, log-returns</td></tr>
+                    <tr><td>Comparison</td><td><code class="code-inline">greater, less, equal, logical_and</code></td><td>Signal generation, stop-loss triggers</td></tr>
+                    <tr><td>Reduction</td><td><code class="code-inline">sum, prod, mean, std, min, max</code></td><td>Risk metrics, portfolio aggregation</td></tr>
+                </table>
+
+                <pre><code><span class="cmt"># ufunc with broadcasting and reduction</span>
+returns = np.random.randn(<span class="num">1000</span>, <span class="num">50</span>)
+
+<span class="cmt"># Element-wise (ufunc)</span>
+log_returns = np.log(<span class="num">1</span> + returns)   <span class="cmt"># log(1+r) approximation</span>
+
+<span class="cmt"># Reduction (collapses dimension)</span>
+volatility = np.std(returns, axis=<span class="num">0</span>)   <span class="cmt"># Per-stock volatility</span>
+sharpe = np.mean(returns, axis=<span class="num">0</span>) / volatility
+
+<span class="cmt"># Accumulation (cumulative product)</span>
+cum_returns = np.cumprod(<span class="num">1</span> + returns, axis=<span class="num">0</span>)  <span class="cmt"># Equity curve</span>
+
+<span class="cmt"># Outer product (ufunc method)</span>
+weights = np.array([<span class="num">0.3</span>, <span class="num">0.7</span>])
+scenarios = np.array([<span class="num">0.05</span>, <span class="num">0.02</span>, <span class="num">-0.01</span>])
+<span class="cmt"># np.multiply.outer(weights, scenarios) → 2×3 matrix of all combinations</span></code></pre>
+            </div>
+
+            <div class="card">
+                <h3>When You MUST Loop (Rare but Real)</h3>
+                <p>Not everything vectorizes cleanly. Path-dependent derivatives and sequential logic need loops.</p>
+
+                <pre><code><span class="cmt"># Path-dependent option: Can't vectorize time dependency</span>
+<span class="kw">def</span> <span class="fn">knock_in_barrier</span>(paths, barrier):
+    <span class="cmt"># paths: (num_sims, num_steps)</span>
+    <span class="cmt"># Barrier option: payoff depends on whether price crossed B at ANY prior time</span>
+    n_sims, n_steps = paths.shape
+    payoffs = np.empty(n_sims)
+
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n_sims):
+        knocked_in = <span class="num">False</span>
+        <span class="kw">for</span> t <span class="kw">in</span> <span class="fn">range</span>(n_steps):
+            <span class="kw">if</span> paths[i, t] < barrier:
+                knocked_in = <span class="num">True</span>
+            <span class="kw">if</span> knocked_in <span class="kw">and</span> t == n_steps - <span class="num">1</span>:
+                payoffs[i] = <span class="fn">max</span>(paths[i, t] - <span class="num">100</span>, <span class="num">0</span>)
+    <span class="kw">return</span> payoffs
+
+<span class="cmt"># Optimization: Use numba or Cython for such loops</span>
+<span class="cmt"># from numba import jit</span>
+<span class="cmt"># @jit(nopython=True)</span>
+<span class="cmt"># def knock_in_barrier_fast(paths, barrier): ...</span></code></pre>
+
+                <div class="warning">
+                    <strong>Rule of Thumb:</strong> If the operation at time <em>t</em> depends on the result at time <em>t-1</em> in a non-linear way, you likely need a loop or a compiled accelerator (Numba/Cython).
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Profiling: Prove It To Yourself</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Setup: 1 million prices</span>
+N = <span class="num">1_000_000</span>
+prices = np.random.randn(N)
+
+<span class="cmt"># Method 1: Python loop (DON'T DO THIS)</span>
+<span class="cmt"># %%timeit</span>
+result_loop = np.empty(N)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(N):
+    result_loop[i] = prices[i] ** <span class="num">2</span>
+<span class="cmt"># ~200 ms (slow)</span>
+
+<span class="cmt"># Method 2: List comprehension (still Python)</span>
+result_list = [p**<span class="num">2</span> <span class="kw">for</span> p <span class="kw">in</span> prices]
+<span class="cmt"># ~150 ms (better, but still Python objects)</span>
+
+<span class="cmt"># Method 3: NumPy vectorized (THE WAY)</span>
+result_vec = prices ** <span class="num">2</span>
+<span class="cmt"># ~1 ms (200× faster!)</span>
+
+<span class="cmt"># Method 4: NumPy in-place (saves memory)</span>
+result_inplace = np.empty_like(prices)
+np.multiply(prices, prices, out=result_inplace)
+<span class="cmt"># ~0.8 ms — no temporary array allocated</span></code></pre>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/reference/ufuncs.html" target="_blank">ufuncs Documentation</a>
+                <a class="resource-link" href="https://www.labri.fr/perso/nrougier/from-python-to-numpy/" target="_blank">From Python to NumPy (Free Book)</a>
+                <a class="resource-link" href="https://numba.pydata.org/" target="_blank">Numba (JIT for loops)</a>
+            </div>
+        </div>
+
+        <!-- ==================== LINEAR ALGEBRA ==================== -->
+        <div id="linalg" class="tab-content">
+            <h2>Topic 6: Linear Algebra for Quants</h2>
+            <p>Quantitative finance is applied linear algebra. Portfolio optimization, risk models, PCA, and regression all boil down to matrix operations.</p>
+
+            <div class="card">
+                <h3>Core Operations</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Setup: 5 assets, covariance matrix</span>
+n_assets = <span class="num">5</span>
+returns = np.random.randn(<span class="num">252</span>, n_assets) * <span class="num">0.02</span>  <span class="cmt"># 2% daily vol</span>
+
+<span class="cmt"># === DOT PRODUCT ===</span>
+<span class="cmt"># Portfolio return = w^T · r (weights dotted with returns)</span>
+weights = np.array([<span class="num">0.2</span>, <span class="num">0.2</span>, <span class="num">0.2</span>, <span class="num">0.2</span>, <span class="num">0.2</span>])
+port_return = weights @ returns.T   <span class="cmt"># @ is matrix mult operator (Python 3.5+)</span>
+<span class="cmt"># OR: np.dot(weights, returns.T)</span>
+
+<span class="cmt"># === MATRIX MULTIPLICATION ===</span>
+<span class="cmt"># Covariance matrix: Σ = (R^T · R) / (n-1)</span>
+cov = np.cov(returns, rowvar=<span class="num">False</span>)   <span class="cmt"># 5×5 covariance matrix</span>
+
+<span class="cmt"># Portfolio variance: σ²_p = w^T · Σ · w</span>
+port_var = weights @ cov @ weights    <span class="cmt"># Scalar</span>
+port_vol = np.sqrt(port_var)
+
+<span class="cmt"># === TRANSPOSE & INVERSE ===</span>
+A = np.array([[<span class="num">4</span>, <span class="num">2</span>], [<span class="num">3</span>, <span class="num">1</span>]])
+A_inv = np.linalg.inv(A)
+<span class="fn">print</span>(A @ A_inv)   <span class="cmt"># Identity matrix (numerically close)</span>
+
+<span class="cmt"># === DETERMINANT ===</span>
+det = np.linalg.det(cov)
+<span class="cmt"># If det ≈ 0, matrix is singular (multicollinearity in assets!)</span></code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Eigendecomposition & PCA</h3>
+                <p>Eigenvalues and eigenvectors decompose a matrix into its fundamental modes. In quant finance, this is <strong>Principal Component Analysis (PCA)</strong>.</p>
+
+                <div class="math">
+                    Σv = λv<br>
+                    Where Σ = covariance matrix, λ = eigenvalue (variance explained), v = eigenvector (portfolio weights of principal component)
+                </div>
+
+                <pre><code><span class="cmt"># PCA on returns: Find dominant risk factors</span>
+eigenvalues, eigenvectors = np.linalg.eigh(cov)  <span class="cmt"># eigh for symmetric matrices</span>
+
+<span class="cmt"># Sort by magnitude (largest eigenvalue = most variance)</span>
+idx = np.argsort(eigenvalues)[::<span class="num">-1</span>]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+<span class="cmt"># Variance explained by each component</span>
+var_explained = eigenvalues / eigenvalues.sum()
+<span class="fn">print</span>(<span class="str">"PC1 explains:"</span>, var_explained[<span class="num">0</span>])
+
+<span class="cmt"># First principal component (market factor)</span>
+pc1 = eigenvectors[:, <span class="num">0</span>]
+<span class="cmt"># This is the portfolio of assets that captures maximum variance</span>
+
+<span class="cmt"># Project returns onto PC1</span>
+market_factor = returns @ pc1   <span class="cmt"># Time series of the dominant factor</span></code></pre>
+
+                <div class="tip">
+                    <strong>Quant Insight:</strong> In equity markets, PC1 usually explains 20-40% of variance and resembles the market portfolio. PC2 often captures sector rotation (e.g., tech vs energy). PCs beyond 5 are usually noise.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Cholesky Decomposition: The Monte Carlo Engine</h3>
+                <p>If Σ is positive-definite (valid covariance matrix), it can be decomposed as Σ = L·L<sup>T</sup> where L is lower-triangular. This is how we generate correlated random variables.</p>
+
+                <div class="diagram-container">
+                    <svg width="700" height="200" viewBox="0 0 700 200">
+                        <text x="350" y="25" text-anchor="middle" fill="#c9d1d9" font-size="14" font-weight="bold">Cholesky: Generating Correlated Brownian Motions</text>
+
+                        <rect x="50" y="60" width="120" height="80" fill="#1e2530" stroke="#58a6ff" stroke-width="2" rx="4"/>
+                        <text x="110" y="90" text-anchor="middle" fill="#58a6ff" font-size="12">Independent</text>
+                        <text x="110" y="110" text-anchor="middle" fill="#58a6ff" font-size="12">N(0,1)</text>
+                        <text x="110" y="130" text-anchor="middle" fill="#8b949e" font-size="11">Z ~ N(0,I)</text>
+
+                        <text x="220" y="105" text-anchor="middle" fill="#c9d1d9" font-size="20">×</text>
+
+                        <rect x="260" y="60" width="120" height="80" fill="#1e2530" stroke="#d29922" stroke-width="2" rx="4"/>
+                        <text x="320" y="90" text-anchor="middle" fill="#d29922" font-size="12">Cholesky</text>
+                        <text x="320" y="110" text-anchor="middle" fill="#d29922" font-size="12">L</text>
+                        <text x="320" y="130" text-anchor="middle" fill="#8b949e" font-size="11">Σ = LL^T</text>
+
+                        <text x="430" y="105" text-anchor="middle" fill="#c9d1d9" font-size="20">=</text>
+
+                        <rect x="470" y="60" width="120" height="80" fill="#1e2530" stroke="#3fb950" stroke-width="2" rx="4"/>
+                        <text x="530" y="90" text-anchor="middle" fill="#3fb950" font-size="12">Correlated</text>
+                        <text x="530" y="110" text-anchor="middle" fill="#3fb950" font-size="12">N(0,Σ)</text>
+                        <text x="530" y="130" text-anchor="middle" fill="#8b949e" font-size="11">X = LZ</text>
+                    </svg>
+                </div>
+
+                <pre><code><span class="cmt"># Monte Carlo with correlated assets</span>
+n_sims = <span class="num">100000</span>
+n_assets = <span class="num">5</span>
+
+<span class="cmt"># Step 1: Cholesky of covariance</span>
+L = np.linalg.cholesky(cov)   <span class="cmt"># 5×5 lower triangular</span>
+
+<span class="cmt"># Step 2: Independent standard normals</span>
+Z = np.random.randn(n_assets, n_sims)   <span class="cmt"># (5, 100000)</span>
+
+<span class="cmt"># Step 3: Correlated returns</span>
+correlated_returns = L @ Z   <span class="cmt"># (5,5) @ (5,100000) → (5,100000)</span>
+<span class="cmt"># Each column is now a sample from N(0, Σ)</span>
+
+<span class="cmt"># Verify: empirical covariance should match</span>
+empirical_cov = np.cov(correlated_returns)
+<span class="fn">print</span>(np.allclose(empirical_cov, cov, atol=<span class="num">0.001</span>))</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>SVD & Linear Regression (OLS)</h3>
+                <p>The Singular Value Decomposition is numerically stable for solving linear systems and doing regression.</p>
+
+                <pre><code><span class="cmt"># OLS: β = (X^T X)^(-1) X^T y</span>
+<span class="cmt"># DON'T compute inverse directly! Use lstsq or SVD.</span>
+
+<span class="cmt"># Generate factor model data</span>
+T = <span class="num">252</span>
+X = np.column_stack([
+    np.ones(T),           <span class="cmt"># intercept</span>
+    np.random.randn(T),   <span class="cmt"># factor 1</span>
+    np.random.randn(T)    <span class="cmt"># factor 2</span>
+])
+true_beta = np.array([<span class="num">0.001</span>, <span class="num">0.5</span>, <span class="num">-0.3</span>])
+y = X @ true_beta + np.random.randn(T) * <span class="num">0.01</span>
+
+<span class="cmt"># Method 1: np.linalg.lstsq (uses SVD under the hood — stable)</span>
+beta_lstsq, residuals, rank, s = np.linalg.lstsq(X, y, rcond=<span class="num">None</span>)
+
+<span class="cmt"># Method 2: Normal equation (UNSTABLE for ill-conditioned X)</span>
+<span class="cmt"># beta = np.linalg.inv(X.T @ X) @ X.T @ y  ← AVOID!</span>
+
+<span class="cmt"># Method 3: Manual SVD</span>
+U, S, Vt = np.linalg.svd(X, full_matrices=<span class="num">False</span>)
+beta_svd = Vt.T @ np.diag(<span class="num">1</span>/S) @ U.T @ y</code></pre>
+
+                <div class="danger">
+                    <strong>Numerical Stability:</strong> Never invert matrices to solve linear systems. The condition number of X<sup>T</sup>X is the square of X's condition number. Always use <code class="code-inline">lstsq</code>, <code class="code-inline">solve</code>, or Cholesky (if symmetric positive definite).
+                </div>
+            </div>
+
+            <div class="card tip">
+                <h4>External Resources</h4>
+                <a class="resource-link" href="https://numpy.org/doc/stable/reference/routines.linalg.html" target="_blank">NumPy Linear Algebra</a>
+                <a class="resource-link" href="https://www.quantstart.com/articles/Principal-Component-Analysis-of-Stock-Returns/" target="_blank">PCA of Stock Returns (QuantStart)</a>
+                <a class="resource-link" href="https://github.com/cvxgrp/cvxpy" target="_blank">CVXPY (Convex Optimization for Quants)</a>
+            </div>
+        </div>
+
+        <!-- ==================== COLAB EXPERIMENTS ==================== -->
+        <div id="colab" class="tab-content">
+            <h2>Colab Experiments: Copy, Paste, Run</h2>
+            <p>Each experiment is self-contained. Open <a href="https://colab.research.google.com" target="_blank" style="color:var(--accent)">Google Colab</a>, create a new notebook, and run these cells.</p>
+
+            <div class="card">
+                <h3>Experiment 1: Proving ndarray Speed</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> time
+
+<span class="cmt"># Create data</span>
+N = <span class="num">1_000_000</span>
+data = np.random.randn(N)
+
+<span class="cmt"># Python list loop</span>
+python_list = data.tolist()
+start = time.time()
+result = [x**<span class="num">2</span> + np.sin(x) <span class="kw">for</span> x <span class="kw">in</span> python_list]
+python_time = time.time() - start
+
+<span class="cmt"># NumPy vectorized</span>
+start = time.time()
+result = data**<span class="num">2</span> + np.sin(data)
+numpy_time = time.time() - start
+
+<span class="fn">print</span>(<span class="str">f"Python list: {python_time:.4f}s"</span>)
+<span class="fn">print</span>(<span class="str">f"NumPy:       {numpy_time:.4f}s"</span>)
+<span class="fn">print</span>(<span class="str">f"Speedup:     {python_time/numpy_time:.0f}x"</span>)</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Experiment 2: Memory Layout Inspector</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+arr = np.arange(<span class="num">24</span>).reshape(<span class="num">4</span>, <span class="num">6</span>)
+<span class="fn">print</span>(<span class="str">"Original:"</span>, arr.shape, arr.strides, arr.flags.c_contiguous)
+
+<span class="cmt"># Transpose</span>
+arr_t = arr.T
+<span class="fn">print</span>(<span class="str">"Transpose:"</span>, arr_t.shape, arr_t.strides, arr_t.flags.c_contiguous)
+
+<span class="cmt"># Slice with step</span>
+arr_slice = arr[:, ::<span class="num">2</span>]
+<span class="fn">print</span>(<span class="str">"Slice [::2]:"</span>, arr_slice.shape, arr_slice.strides, arr_slice.flags.c_contiguous)
+
+<span class="cmt"># Fancy indexing (COPY!)</span>
+arr_fancy = arr[[<span class="num">0</span>, <span class="num">2</span>], :]
+<span class="fn">print</span>(<span class="str">"Fancy [0,2]:"</span>, arr_fancy.shape, arr_fancy.strides, arr_fancy.flags.owndata)
+
+<span class="cmt"># Check if they share memory</span>
+<span class="fn">print</span>(<span class="str">"Shares memory with original?"</span>)
+<span class="fn">print</span>(<span class="str">"  Transpose:"</span>, np.shares_memory(arr, arr_t))
+<span class="fn">print</span>(<span class="str">"  Slice:    "</span>, np.shares_memory(arr, arr_slice))
+<span class="fn">print</span>(<span class="str">"  Fancy:    "</span>, np.shares_memory(arr, arr_fancy))</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Experiment 3: Broadcasting Puzzle Solver</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Puzzle 1: Can these broadcast?</span>
+a = np.ones((<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>))
+b = np.ones((<span class="num">4</span>, <span class="num">1</span>))
+<span class="kw">try</span>:
+    result = a + b
+    <span class="fn">print</span>(<span class="str">"Puzzle 1: SUCCESS"</span>, result.shape)
+<span class="kw">except</span> ValueError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">"Puzzle 1: FAIL"</span>, e)
+
+<span class="cmt"># Puzzle 2: Standardize a matrix</span>
+X = np.random.randn(<span class="num">100</span>, <span class="num">5</span>)
+<span class="cmt"># Your task: subtract mean of each column, divide by std of each column</span>
+<span class="cmt"># Do it in ONE LINE using broadcasting</span>
+X_standardized = (X - X.mean(axis=<span class="num">0</span>)) / X.std(axis=<span class="num">0</span>)
+<span class="fn">print</span>(<span class="str">"Mean after standardization:"</span>, X_standardized.mean(axis=<span class="num">0</span>))
+<span class="fn">print</span>(<span class="str">"Std after standardization: "</span>, X_standardized.std(axis=<span class="num">0</span>))</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Experiment 4: Markowitz Portfolio Optimization</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Simulate 3 assets, 252 days</span>
+np.random.seed(<span class="num">42</span>)
+returns = np.random.multivariate_normal(
+    mean=[<span class="num">0.001</span>, <span class="num">0.0005</span>, <span class="num">0.0008</span>],
+    cov=[[<span class="num">0.0004</span>, <span class="num">0.0001</span>, <span class="num">0.0001</span>],
+         [<span class="num">0.0001</span>, <span class="num">0.0003</span>, <span class="num">0.0002</span>],
+         [<span class="num">0.0001</span>, <span class="num">0.0002</span>, <span class="num">0.0005</span>]],
+    size=<span class="num">252</span>
+)
+
+<span class="cmt"># Compute covariance</span>
+Sigma = np.cov(returns, rowvar=<span class="num">False</span>)
+mu = returns.mean(axis=<span class="num">0</span>)
+
+<span class="cmt"># Minimum variance portfolio: w = Σ^(-1) · 1 / (1^T · Σ^(-1) · 1)</span>
+ones = np.ones(<span class="num">3</span>)
+<span class="cmt"># Use solve instead of inv for stability</span>
+w_minvar = np.linalg.solve(Sigma, ones)
+w_minvar = w_minvar / w_minvar.sum()
+
+<span class="cmt"># Tangency portfolio (max Sharpe, assuming rf=0)</span>
+w_tangency = np.linalg.solve(Sigma, mu)
+w_tangency = w_tangency / w_tangency.sum()
+
+<span class="fn">print</span>(<span class="str">"Min Var weights:  "</span>, w_minvar)
+<span class="fn">print</span>(<span class="str">"Tangency weights: "</span>, w_tangency)
+<span class="fn">print</span>(<span class="str">"Min Var vol:      "</span>, np.sqrt(w_minvar @ Sigma @ w_minvar))
+<span class="fn">print</span>(<span class="str">"Tangency return:  "</span>, w_tangency @ mu)</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Experiment 5: Vectorized Monte Carlo Option Pricing</h3>
+                <pre><code><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Parameters</span>
+S0, K, T, r, sigma = <span class="num">100</span>, <span class="num">105</span>, <span class="num">1.0</span>, <span class="num">0.05</span>, <span class="num">0.2</span>
+n_sims = <span class="num">1_000_000</span>
+
+<span class="cmt"># Vectorized Monte Carlo (no loops!)</span>
+Z = np.random.randn(n_sims)
+ST = S0 * np.exp((r - <span class="num">0.5</span>*sigma**<span class="num">2</span>)*T + sigma*np.sqrt(T)*Z)
+payoffs = np.maximum(ST - K, <span class="num">0</span>)
+price = np.exp(-r*T) * payoffs.mean()
+
+<span class="fn">print</span>(<span class="str">f"European Call Price: {price:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Standard Error:      {payoffs.std()/np.sqrt(n_sims):.4f}"</span>)
+
+<span class="cmt"># Compare with Black-Scholes analytical</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> norm
+d1 = (np.log(S0/K) + (r+<span class="num">0.5</span>*sigma**<span class="num">2</span>)*T) / (sigma*np.sqrt(T))
+d2 = d1 - sigma*np.sqrt(T)
+bs_price = S0*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+<span class="fn">print</span>(<span class="str">f"Black-Scholes:       {bs_price:.4f}"</span>)</code></pre>
+            </div>
+        </div>
+
+        <!-- ==================== EXERCISES ==================== -->
+        <div id="exercises" class="tab-content">
+            <h2>Practice Exercises</h2>
+            <p>Three tiers per topic. Do not skip the easy ones — they build muscle memory.</p>
+
+            <!-- NDARRAY EXERCISES -->
+            <div class="card">
+                <h3>Topic 1: ndarray</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Create a 1D array of integers from 10 to 50 (inclusive). Reshape it into a 5×8 matrix. What is the shape and dtype?</li>
+                        <li>Create a 3×3 matrix of ones with dtype <code class="code-inline">float32</code>. Verify its itemsize is 4 bytes.</li>
+                        <li>Generate a 1000-element array of random returns (normal distribution, mean=0, std=0.02). What is the total memory consumption in KB?</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Create an array representing daily timestamps for Q1 2024 (90 days) using <code class="code-inline">np.arange</code> with <code class="code-inline">dtype='datetime64[D]'</code>. Extract all Fridays.</li>
+                        <li>Construct a 5×5 diagonal matrix where diagonal elements are [1, 2, 3, 4, 5] <strong>without using np.diag</strong>. (Hint: use <code class="code-inline">np.zeros</code> and fancy indexing).</li>
+                        <li>Simulate a yield curve: create an array of maturities [1, 2, 5, 10, 30] years and corresponding yields [2.5, 2.8, 3.1, 3.5, 4.0]. Use structured arrays or separate arrays — which is better for quant work and why?</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Implement a function <code class="code-inline">create_price_matrix(tickers, days)</code> that returns a structured array with fields 'open', 'high', 'low', 'close' (all float64), initialized with random OHLC data. Ensure memory layout is C-contiguous and calculate total memory footprint programmatically.</li>
+                        <li>Create a 4D tensor of shape (2, 3, 4, 5) representing 2 portfolios, 3 assets each, 4 time steps, 5 scenarios. Set the element at portfolio 1, asset 2, time 3, scenario 4 to 99 without using chain indexing like <code class="code-inline">[1][2][3][4]</code>.</li>
+                        <li>Design a memory-efficient representation for a sparse correlation matrix (mostly zeros, some blocks of correlated assets). Compare memory usage of full <code class="code-inline">float64</code> ndarray vs a custom structure using object arrays. When would each be appropriate?</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- MEMORY LAYOUT EXERCISES -->
+            <div class="card">
+                <h3>Topic 2: Memory Layout</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Create a 3×4 array. Print its strides. Transpose it and print strides again. Verify the transpose is not C-contiguous.</li>
+                        <li>Given a (100, 50) array, create a Fortran-order copy. Verify using <code class="code-inline">.flags.f_contiguous</code>.</li>
+                        <li>Use <code class="code-inline">np.ravel()</code> and <code class="code-inline">np.flatten()</code> on a sliced array. Check which one returns a view and which returns a copy using <code class="code-inline">np.shares_memory()</code>.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Create a 1000×1000 matrix. Time row-wise summation vs column-wise summation. Explain the performance difference using stride concepts.</li>
+                        <li>Write a function <code class="code-inline">is_contiguous_slice(arr, slice_tuple)</code> that predicts whether a given slice will produce a contiguous array without running it. (Hint: analyze strides and step sizes).</li>
+                        <li>Given a non-contiguous array (e.g., a transposed matrix), write a function that returns the most efficient iteration order (row-major or column-major) based on stride analysis.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Implement a sliding window view of a 1D time series using <code class="code-inline">np.lib.stride_tricks.as_strided</code>. The function should take an array and window size, and return a 2D array where each row is a window. No copying allowed. Verify memory is shared.</li>
+                        <li>Explain and demonstrate why <code class="code-inline">arr[:, [0, 2, 4]]</code> produces a copy but <code class="code-inline">arr[:, 0:5:2]</code> produces a view. Write a test that fails if someone uses the copy-variant in performance-critical code.</li>
+                        <li>Memory-alignment experiment: Create arrays with different dtypes and measure cache-line efficiency. Plot access time vs stride size and identify the cache line size of your CPU (typically 64 bytes).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- INDEXING EXERCISES -->
+            <div class="card">
+                <h3>Topic 3: Indexing</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Given a 5×5 matrix, extract the anti-diagonal (top-right to bottom-left) using slicing.</li>
+                        <li>Create a boolean mask that selects all negative elements in a random 10×10 matrix. Set them to zero in-place.</li>
+                        <li>Use fancy indexing to reorder the rows of a matrix to [last, first, second, ..., second-to-last].</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Given daily returns for 10 stocks over 252 days, select all returns that are more than 2 standard deviations from the mean <strong>for each stock individually</strong> using broadcasting and boolean indexing.</li>
+                        <li>Implement a "look-ahead bias check": Given a matrix where rows are days and columns are features, write indexing code that creates X (features up to day t) and y (return on day t+1) for all valid t, resulting in X.shape=(251, n_features) and y.shape=(251,).</li>
+                        <li>Create a 3D array (time, stock, feature). Extract all features for stocks 0 and 2 at even time steps. Is the result a view or a copy? Prove it.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Write a function <code class="code-inline">safe_assign(arr, indices, values)</code> that assigns values to array elements at indices. If the indexed result is a view, modify the original. If it's a copy, raise a warning. (Hint: check <code class="code-inline">.base</code> attribute and <code class="code-inline">np.shares_memory</code>).</li>
+                        <li>Implement a "pairs trading" signal generator: Given two price series (1D arrays), create a 2D array of spread ratios for all pairs using broadcasting and outer indexing. Then select only pairs where correlation > 0.8 (you may compute correlation manually or use np.corrcoef).</li>
+                        <li>Advanced: Use np.ix_ to construct a block-diagonal mask from a 2D array. Given a correlation matrix, use ix_ to extract and modify specific sector blocks without affecting others.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- BROADCASTING EXERCISES -->
+            <div class="card">
+                <h3>Topic 4: Broadcasting</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Add a scalar 5 to every element of a 3×4 matrix using broadcasting.</li>
+                        <li>Multiply a column vector (3×1) by a row vector (1×4) to get a 3×4 matrix. Verify shapes.</li>
+                        <li>Normalize a 2D array by subtracting the row means (shape should go from (5,3) to (5,3)).</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Compute the pairwise Euclidean distance between 100 points in 3D space using broadcasting only (no loops, no scipy). Input: (100, 3), Output: (100, 100).</li>
+                        <li>Given portfolio weights (10,) and a covariance cube for 3 regimes (3, 10, 10), compute portfolio variance for all 3 regimes in a single vectorized expression.</li>
+                        <li>Create a "triangle wave" function using broadcasting: Given an array of time points t (1000,) and frequencies f (5,), generate a (5, 1000) matrix where each row is a triangle wave at the corresponding frequency.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Implement a batched matrix multiplication using broadcasting where you have (batch, n, m) @ (m, p) → (batch, n, p). Do this manually with np.einsum and compare with np.matmul.</li>
+                        <li>Given a 3D array of shape (assets, days, features) and a 2D weight matrix of shape (assets, features), compute a weighted score for each asset-day using broadcasting. The result should be (assets, days).</li>
+                        <li>Write a function that takes two arrays of arbitrary dimensions and returns whether they can broadcast together, <strong>without using NumPy's broadcasting</strong> (implement the rules manually). Test against NumPy's actual behavior.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- VECTORIZATION EXERCISES -->
+            <div class="card">
+                <h3>Topic 5: Vectorization</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Convert a Python loop that computes cumulative maximum of an array into a vectorized one-liner using <code class="code-inline">np.maximum.accumulate</code>.</li>
+                        <li>Vectorize the calculation of log-returns: r_t = log(P_t / P_{t-1}). Given prices (1000,), return log-returns (999,).</li>
+                        <li>Use <code class="code-inline">np.where</code> to implement a simple stop-loss: If price drops below 95% of max-so-far, set signal to -1 (sell), else 0.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Vectorize a simple moving average crossover strategy: Given short_window=20 and long_window=50 prices, generate signals (1 for buy, -1 for sell, 0 for hold) entirely with vectorized operations. No explicit loops.</li>
+                        <li>Implement vectorized Monte Carlo for Asian options (arithmetic average strike). The naive approach uses loops over paths; vectorize the averaging using cumulative sum and appropriate slicing.</li>
+                        <li>Use <code class="code-inline">np.select</code> to create a multi-condition signal: If RSI>70 → -1, elif RSI<30 → 1, elif MACD>0 → 0.5, else → 0. All conditions are arrays.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Vectorize the calculation of rolling window Sharpe ratio for a return series. Input: returns (1000,), window=30. Output: Sharpe ratios (971,). Use stride tricks or convolution — no Python loops.</li>
+                        <li>Implement a fully vectorized backtest for a long-only portfolio: Given returns matrix (days, assets) and target weights matrix (rebalance_days, assets), compute portfolio cumulative return assuming trades happen on rebalance days. Handle compounding correctly.</li>
+                        <li>Write a vectorized function to compute the Greeks (Delta, Gamma, Vega) for a portfolio of European options using finite differences on a vectorized Black-Scholes implementation. All inputs are arrays (strikes, maturities, underlyings).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- LINEAR ALGEBRA EXERCISES -->
+            <div class="card">
+                <h3>Topic 6: Linear Algebra</h3>
+
+                <div class="tier tier-easy">
+                    <div class="tier-label">🟢 Easy</div>
+                    <ol>
+                        <li>Solve the system of equations: 2x + y = 5, x - y = 1 using <code class="code-inline">np.linalg.solve</code>.</li>
+                        <li>Given a 2×2 covariance matrix, verify it is positive semi-definite by checking all eigenvalues are ≥ 0.</li>
+                        <li>Compute the outer product of two vectors using <code class="code-inline">np.outer</code> and verify it equals the matrix product of column vector × row vector.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-medium">
+                    <div class="tier-label">🟡 Medium</div>
+                    <ol>
+                        <li>Implement Ridge Regression (L2 regularization) from scratch using only NumPy: β = (X<sup>T</sup>X + λI)<sup>-1</sup>X<sup>T</sup>y. Use <code class="code-inline">np.linalg.solve</code> instead of inverse. Test on synthetic data.</li>
+                        <li>Perform PCA on a simulated yield curve (10 maturities, 500 observations). Plot (textually describe) the first 3 principal components and their explained variance ratios.</li>
+                        <li>Given a correlation matrix that is nearly singular (det < 1e-10), apply Tikhonov regularization (add small constant to diagonal) and verify the condition number improves.</li>
+                    </ol>
+                </div>
+
+                <div class="tier tier-hard">
+                    <div class="tier-label">🔴 Hard</div>
+                    <ol>
+                        <li>Implement the Black-Litterman portfolio model: Combine equilibrium returns with investor views. Formula: μ_BL = [(τΣ)<sup>-1</sup> + P<sup>T</sup>Ω<sup>-1</sup>P]<sup>-1</sup> [(τΣ)<sup>-1</sup>Π + P<sup>T</sup>Ω<sup>-1</sup>Q]. Use only NumPy linear algebra.</li>
+                        <li>Write a function that computes the efficient frontier for N assets using quadratic programming formulation with NumPy. Return weights, returns, and volatilities for 50 points on the frontier. (Hint: Use grid search on target returns and solve the minimum variance for each).</li>
+                        <li>Implement a Kalman Filter for online estimation of a time-varying beta (market exposure) of a stock. Use only NumPy matrix operations. The filter should update beta each day as new returns arrive.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Remove active class from buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            // Activate button
+            event.target.classList.add('active');
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                const tabs = ['prereq', 'ndarray', 'memory', 'indexing', 'broadcasting', 'vectorization', 'linalg', 'colab', 'exercises'];
+                const buttons = document.querySelectorAll('.tab-btn');
+                let current = tabs.findIndex(t => document.getElementById(t).classList.contains('active'));
+                if (e.key === 'ArrowRight') current = (current + 1) % tabs.length;
+                else current = (current - 1 + tabs.length) % tabs.length;
+                buttons[current].click();
+            }
+        });
+    </script>
+</body>
+</html>

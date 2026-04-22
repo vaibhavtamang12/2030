@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pandas Mastery — Complete Quant Engineer Study Guide</title>
+<style>
+:root {
+  --primary: #1a5276;
+  --primary-dark: #154360;
+  --secondary: #27ae60;
+  --accent: #e74c3c;
+  --warning: #f39c12;
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --text-light: #5d6d7e;
+  --border: #dce1e5;
+  --code-bg: #1e1e1e;
+  --code-text: #d4d4d4;
+  --sidebar-width: 280px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, var(--primary-dark), var(--primary));
+  color: white;
+  overflow-y: auto;
+  padding: 20px 0;
+  flex-shrink: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+.sidebar h1 {
+  font-size: 1.3rem;
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 15px;
+  line-height: 1.3;
+}
+.sidebar h1 span {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  margin-top: 5px;
+  font-weight: 400;
+}
+.nav-item {
+  display: block;
+  padding: 12px 20px;
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 0.92rem;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.nav-item:hover, .nav-item.active {
+  background: rgba(255,255,255,0.1);
+  border-left-color: #f1c40f;
+  color: white;
+}
+.nav-item.prereq { font-style: italic; opacity: 0.85; }
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+.tab-content {
+  display: none;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 30px;
+}
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+h2 { font-size: 2rem; color: var(--primary-dark); margin-bottom: 10px; border-bottom: 3px solid var(--secondary); padding-bottom: 10px; display: inline-block; }
+h3 { font-size: 1.4rem; color: var(--primary); margin: 35px 0 15px; }
+h4 { font-size: 1.1rem; color: var(--text); margin: 25px 0 10px; }
+p { margin-bottom: 15px; color: var(--text); }
+ul, ol { margin: 15px 0 15px 25px; }
+li { margin-bottom: 8px; }
+
+.card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 25px;
+  margin: 25px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+}
+.concept-box {
+  background: #eaf2f8;
+  border-left: 5px solid var(--primary);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+}
+.concept-box strong { color: var(--primary-dark); }
+.warning-box {
+  background: #fef5e7;
+  border-left: 5px solid var(--warning);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+}
+.colab-box {
+  background: #e9f7ef;
+  border: 2px dashed var(--secondary);
+  padding: 25px;
+  margin: 25px 0;
+  border-radius: 10px;
+}
+.colab-box h4 { color: var(--secondary); margin-top: 0; font-size: 1.2rem; }
+.colab-box ol { margin-left: 20px; }
+.colab-box li { margin-bottom: 12px; }
+
+.exercise-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 25px 0;
+}
+.exercise-tier {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 20px;
+  border-top: 4px solid;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.exercise-tier.easy { border-top-color: var(--secondary); }
+.exercise-tier.medium { border-top-color: var(--warning); }
+.exercise-tier.hard { border-top-color: var(--accent); }
+.exercise-tier h5 { font-size: 1rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.exercise-tier.easy h5 { color: var(--secondary); }
+.exercise-tier.medium h5 { color: var(--warning); }
+.exercise-tier.hard h5 { color: var(--accent); }
+.exercise-tier ol { margin-left: 18px; font-size: 0.95rem; }
+.exercise-tier li { margin-bottom: 10px; }
+
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 18px 0;
+  border: 1px solid #333;
+}
+code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  background: #e8e8e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #c0392b;
+}
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+.comment { color: #6a9955; }
+.string { color: #ce9178; }
+.keyword { color: #569cd6; }
+.func { color: #dcdcaa; }
+.number { color: #b5cea8; }
+.operator { color: #d4d4d4; }
+
+.svg-container {
+  text-align: center;
+  margin: 30px 0;
+  padding: 20px;
+  background: #fafafa;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+svg { max-width: 100%; height: auto; }
+
+.concept-map {
+  background: #f8f9fa;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+.concept-map svg { max-width: 700px; }
+
+.resource-link {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin: 5px 5px 5px 0;
+  transition: background 0.2s;
+}
+.resource-link:hover { background: var(--primary-dark); }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+.badge.prereq { background: #fdebd0; color: #9c640c; }
+.badge.core { background: #d4efdf; color: #1e8449; }
+.badge.advanced { background: #d6eaf8; color: #1a5276; }
+.badge.quant { background: #e8daef; color: #6c3483; }
+
+.footer-note {
+  margin-top: 50px;
+  padding-top: 20px;
+  border-top: 2px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-light);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  body { flex-direction: column; height: auto; }
+  .sidebar { width: 100%; height: auto; max-height: 60vh; }
+  .main { height: auto; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="sidebar">
+  <h1>Pandas Mastery <span>Complete Quant Engineer Study Guide<br>100% Offline Ready</span></h1>
+  <a class="nav-item prereq active" onclick="showTab('prereqs')">0. Prerequisites & Foundations</a>
+  <a class="nav-item" onclick="showTab('intro')">1. Introduction to Pandas</a>
+  <a class="nav-item" onclick="showTab('dataframe')">2. DataFrame Fundamentals</a>
+  <a class="nav-item" onclick="showTab('indexing')">3. Indexing & Selection</a>
+  <a class="nav-item" onclick="showTab('cleaning')">4. Data Cleaning</a>
+  <a class="nav-item" onclick="showTab('transform')">5. Data Transformation</a>
+  <a class="nav-item" onclick="showTab('groupby')">6. GroupBy & Aggregation</a>
+  <a class="nav-item" onclick="showTab('merge')">7. Merging & Joining</a>
+  <a class="nav-item" onclick="showTab('timeseries')">8. Time Series Essentials</a>
+  <a class="nav-item" onclick="showTab('window')">9. Window & Rolling Functions</a>
+  <a class="nav-item" onclick="showTab('financial')">10. Financial Computations</a>
+  <a class="nav-item" onclick="showTab('advanced')">11. Advanced & Performance</a>
+  <a class="nav-item" onclick="showTab('integration')">12. Integration & Workflow</a>
+  <a class="nav-item" onclick="showTab('capstone')">13. Capstone Projects</a>
+</div>
+
+<div class="main">
+
+<!-- ==================== PREREQUISITES ==================== -->
+<div id="prereqs" class="tab-content active">
+<h2><span class="badge prereq">Prerequisite</span> 0. Prerequisites & Foundations</h2>
+
+<div class="concept-box">
+<strong>Why this matters for Quants:</strong> Before manipulating financial data with Pandas, you need to understand how Python stores data, how NumPy performs fast math, and how basic statistics describe market behavior. These four pillars support everything in quantitative finance.
+</div>
+
+<h3>0.1 Python Fundamentals (The Language)</h3>
+<p>Python is the lingua franca of quantitative finance. Think of it as the instruction set you use to tell the computer what to do with data.</p>
+
+<h4>Variables & Data Types</h4>
+<p>A <strong>variable</strong> is a labeled box that stores a value. In Python, you do not need to declare the type explicitly.</p>
+<pre><code><span class="comment"># Primitive data types</span>
+price = <span class="number">150.75</span>           <span class="comment"># float (decimal number)</span>
+shares = <span class="number">100</span>             <span class="comment"># int (whole number)</span>
+ticker = <span class="string">"AAPL"</span>          <span class="comment"># str (text)</span>
+is_active = <span class="keyword">True</span>         <span class="comment"># bool (True/False)</span></code></pre>
+
+<h4>Data Structures</h4>
+<p>Before Pandas, Python provides native containers:</p>
+<ul>
+<li><strong>List</strong> <code>[1, 2, 3]</code>: Ordered, mutable collection. Like a row in a spreadsheet.</li>
+<li><strong>Dictionary</strong> <code>{"key": "value"}</code>: Key-value pairs. Like a lookup table for stock metadata.</li>
+<li><strong>Tuple</strong> <code>(1, 2, 3)</code>: Immutable ordered collection. Use for fixed records (e.g., OHLC as a tuple).</li>
+</ul>
+
+<pre><code><span class="comment"># List of closing prices</span>
+closes = [<span class="number">150.0</span>, <span class="number">152.5</span>, <span class="number">151.0</span>, <span class="number">153.25</span>]
+
+<span class="comment"># Dictionary mapping ticker to sector</span>
+sector_map = {<span class="string">"AAPL"</span>: <span class="string">"Technology"</span>, <span class="string">"JPM"</span>: <span class="string">"Finance"</span>}
+
+<span class="comment"># Accessing data</span>
+<span class="func">print</span>(closes[<span class="number">0</span>])        <span class="comment"># First element: 150.0</span>
+<span class="func">print</span>(sector_map[<span class="string">"AAPL"</span>]) <span class="comment"># Lookup: Technology</span></code></pre>
+
+<h4>Control Flow & Functions</h4>
+<p>Quant strategies require logic. Use <code>if/else</code> for decisions and <code>for</code> loops for iteration. However, in Pandas, we replace slow Python loops with <strong>vectorized operations</strong> (covered later).</p>
+
+<pre><code><span class="comment"># Function to calculate simple return</span>
+<span class="keyword">def</span> <span class="func">simple_return</span>(p_today, p_yesterday):
+    <span class="keyword">return</span> (p_today - p_yesterday) / p_yesterday
+
+<span class="comment"># List comprehension (Pythonic and faster than loops)</span>
+squared = [x**<span class="number">2</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="func">range</span>(<span class="number">10</span>)]</code></pre>
+
+<div class="warning-box">
+<strong>Quant Warning:</strong> Native Python loops are slow for large datasets. A quant processing tick data (millions of rows) must use vectorized NumPy/Pandas operations, not <code>for</code> loops.
+</div>
+
+<h3>0.2 NumPy Essentials (The Engine)</h3>
+<p>Pandas is built directly on top of <strong>NumPy</strong>. Understanding NumPy is non-negotiable. NumPy provides the <code>ndarray</code>: a fast, homogeneous, multi-dimensional array.</p>
+
+<div class="svg-container">
+<svg width="600" height="220" viewBox="0 0 600 220">
+  <rect x="50" y="40" width="500" height="140" rx="10" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="300" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#154360">NumPy ndarray (Homogeneous, Contiguous Memory)</text>
+  <rect x="70" y="70" width="80" height="80" fill="#aed6f1" stroke="#1a5276" rx="4"/>
+  <text x="110" y="115" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+  <text x="110" y="135" text-anchor="middle" font-size="12" fill="#5d6d7e">150.25</text>
+
+  <rect x="160" y="70" width="80" height="80" fill="#aed6f1" stroke="#1a5276" rx="4"/>
+  <text x="200" y="115" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+  <text x="200" y="135" text-anchor="middle" font-size="12" fill="#5d6d7e">152.00</text>
+
+  <rect x="250" y="70" width="80" height="80" fill="#aed6f1" stroke="#1a5276" rx="4"/>
+  <text x="290" y="115" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+  <text x="290" y="135" text-anchor="middle" font-size="12" fill="#5d6d7e">151.75</text>
+
+  <rect x="340" y="70" width="80" height="80" fill="#aed6f1" stroke="#1a5276" rx="4"/>
+  <text x="380" y="115" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+  <text x="380" y="135" text-anchor="middle" font-size="12" fill="#5d6d7e">153.50</text>
+
+  <rect x="430" y="70" width="80" height="80" fill="#aed6f1" stroke="#1a5276" rx="4"/>
+  <text x="470" y="115" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+  <text x="470" y="135" text-anchor="middle" font-size="12" fill="#5d6d7e">155.00</text>
+
+  <text x="300" y="190" text-anchor="middle" font-size="13" fill="#5d6d7e">All elements same type → Stored in contiguous memory → C-speed operations</text>
+</svg>
+</div>
+
+<pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Create an array of prices</span>
+prices = np.array([<span class="number">150.25</span>, <span class="number">152.00</span>, <span class="number">151.75</span>, <span class="number">153.50</span>, <span class="number">155.00</span>])
+
+<span class="comment"># Vectorized operation: calculate returns for ALL elements at once</span>
+returns = np.diff(prices) / prices[:-<span class="number">1</span>]
+<span class="func">print</span>(returns)  <span class="comment"># [ 0.01164725 -0.00164474  0.01151393  0.00977199]</span>
+
+<span class="comment"># Broadcasting: add 1 to every element (no loop needed)</span>
+prices_plus_1 = prices + <span class="number">1</span>
+
+<span class="comment"># Statistical aggregates</span>
+<span class="func">print</span>(np.mean(prices), np.std(prices))</code></pre>
+
+<h4>Key NumPy Concepts for Pandas</h4>
+<ul>
+<li><strong>Shape & Dimensions:</strong> <code>prices.shape</code> tells you the array dimensions. A DataFrame is essentially a 2D NumPy array with labels.</li>
+<li><strong>Broadcasting:</strong> NumPy automatically aligns arrays of different shapes for arithmetic. This is the magic behind Pandas operations.</li>
+<li><strong>Vectorization:</strong> Operations apply to entire arrays element-wise in compiled C code.</li>
+<li><strong>Boolean Indexing:</strong> <code>prices[prices > 152]</code> selects elements where the condition is True. Pandas extends this powerfully.</li>
+</ul>
+
+<h3>0.3 Statistics & Probability Basics</h3>
+<p>Quantitative engineering is applied statistics. You do not need a PhD, but you must internalize these concepts:</p>
+
+<div class="card">
+<h4>Measures of Central Tendency</h4>
+<ul>
+<li><strong>Mean (Average):</strong> <code>sum(x) / len(x)</code>. The "center of gravity" of returns.</li>
+<li><strong>Median:</strong> The middle value when sorted. Robust to outliers (e.g., one flash crash won't skew it).</li>
+<li><strong>Mode:</strong> Most frequent value. Less common in continuous price data.</li>
+</ul>
+
+<h4>Measures of Dispersion (Risk!)</h4>
+<ul>
+<li><strong>Variance:</strong> Average squared deviation from the mean. Units are squared dollars (hard to interpret).</li>
+<li><strong>Standard Deviation (Volatility):</strong> Square root of variance. Measured in same units as data. This is the most common measure of risk in finance.</li>
+<li><strong>Percentiles/Quantiles:</strong> The 5th percentile of returns tells you: "On the worst 5% of days, I lost at least X%." Essential for Value-at-Risk (VaR).</li>
+</ul>
+
+<h4>Correlation</h4>
+<p>Correlation measures how two assets move together. Range: <code>-1</code> (perfect inverse) to <code>+1</code> (perfect sync). Quants use correlation matrices to build diversified portfolios.</p>
+</div>
+
+<h3>0.4 Environment Setup</h3>
+<p>For this guide, we use <strong>Google Colab</strong> (free, cloud-based Jupyter notebooks) so you do not need to install anything locally.</p>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Environment Check</h4>
+<ol>
+<li>Go to <a href="https://colab.research.google.com" target="_blank">colab.research.google.com</a> and create a new notebook.</li>
+<li>Run the following in a code cell to verify your environment:</li>
+</ol>
+<pre><code><span class="keyword">import</span> sys
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="func">print</span>(<span class="string">"Python version:"</span>, sys.version)
+<span class="func">print</span>(<span class="string">"NumPy version:"</span>, np.__version__)
+<span class="func">print</span>(<span class="string">"Pandas version:"</span>, pd.__version__)
+
+<span class="comment"># Quick sanity check</span>
+arr = np.array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="func">print</span>(<span class="string">"Array sum:"</span>, arr.sum())</code></pre>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy Quickstart (Official)</a>
+<a class="resource-link" href="https://docs.python.org/3/tutorial/" target="_blank">Python Official Tutorial</a>
+<a class="resource-link" href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a Python list of 5 stock tickers. Print the 3rd ticker.</li>
+      <li>Create a NumPy array of 10 random integers between 50 and 150. Calculate the mean and standard deviation.</li>
+      <li>Write a function <code>is_even(n)</code> that returns True if n is even.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Create a dictionary mapping 3 tickers to their current prices. Write a loop that prints "{ticker}: ${price}" for each.</li>
+      <li>Generate 1000 random returns from a normal distribution (mean=0.001, std=0.02). Calculate the 5th and 95th percentiles.</li>
+      <li>Using NumPy, compute the dot product of two 1D arrays: weights [0.3, 0.7] and returns [0.05, 0.02].</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Simulate a random walk: Start price = 100. Generate 252 daily returns from N(0.0005, 0.02). Compute the price series using cumulative product. Plot mentally or describe the trend.</li>
+      <li>Without using Pandas, implement a function that takes two NumPy arrays (prices_A, prices_B) and returns their rolling 5-day correlation as an array.</li>
+    </ol>
+  </div>
+</div>
+
+<div class="footer-note">Prerequisites complete. You are ready for Pandas.</div>
+</div>
+
+<!-- ==================== TOPIC 1: INTRODUCTION ==================== -->
+<div id="intro" class="tab-content">
+<h2><span class="badge core">Core</span> 1. Introduction to Pandas</h2>
+
+<h3>What is Pandas?</h3>
+<p><strong>Pandas</strong> = <strong>Pan</strong>el <strong>Da</strong>ta. It is an open-source library that provides high-performance, easy-to-use data structures for data analysis. For a quant engineer, Pandas is the bridge between raw market data and actionable signals.</p>
+
+<div class="concept-box">
+<strong>Analogy:</strong> If NumPy is the engine of a race car, Pandas is the entire vehicle with a dashboard, GPS, and labels. NumPy gives you speed; Pandas gives you labeled, tabular data with time-series superpowers.
+</div>
+
+<h3>The Two Core Data Structures</h3>
+
+<div class="svg-container">
+<svg width="700" height="320" viewBox="0 0 700 320">
+  <!-- Series -->
+  <rect x="20" y="20" width="300" height="280" rx="10" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="170" y="45" text-anchor="middle" font-size="16" font-weight="bold" fill="#154360">Series (1-Dimensional)</text>
+  <text x="170" y="65" text-anchor="middle" font-size="12" fill="#5d6d7e">Like a single column with row labels</text>
+
+  <rect x="40" y="90" width="80" height="30" fill="#f39c12" rx="4" opacity="0.9"/>
+  <text x="80" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Index</text>
+  <rect x="130" y="90" width="80" height="30" fill="#27ae60" rx="4" opacity="0.9"/>
+  <text x="170" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Data</text>
+  <rect x="220" y="90" width="80" height="30" fill="#8e44ad" rx="4" opacity="0.9"/>
+  <text x="260" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">dtype</text>
+
+  <text x="80" y="150" text-anchor="middle" font-size="14" fill="#154360">2024-01-01</text>
+  <text x="170" y="150" text-anchor="middle" font-size="14" fill="#154360">150.25</text>
+  <text x="260" y="150" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+
+  <text x="80" y="180" text-anchor="middle" font-size="14" fill="#154360">2024-01-02</text>
+  <text x="170" y="180" text-anchor="middle" font-size="14" fill="#154360">152.00</text>
+  <text x="260" y="180" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+
+  <text x="80" y="210" text-anchor="middle" font-size="14" fill="#154360">2024-01-03</text>
+  <text x="170" y="210" text-anchor="middle" font-size="14" fill="#154360">151.75</text>
+  <text x="260" y="210" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+
+  <text x="80" y="240" text-anchor="middle" font-size="14" fill="#154360">2024-01-04</text>
+  <text x="170" y="240" text-anchor="middle" font-size="14" fill="#154360">153.50</text>
+  <text x="260" y="240" text-anchor="middle" font-size="14" fill="#154360">float64</text>
+
+  <text x="170" y="280" text-anchor="middle" font-size="12" fill="#5d6d7e">Example: Closing prices of AAPL</text>
+
+  <!-- DataFrame -->
+  <rect x="380" y="20" width="300" height="280" rx="10" fill="#e9f7ef" stroke="#27ae60" stroke-width="2"/>
+  <text x="530" y="45" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e8449">DataFrame (2-Dimensional)</text>
+  <text x="530" y="65" text-anchor="middle" font-size="12" fill="#5d6d7e">Like a full spreadsheet / SQL table</text>
+
+  <rect x="400" y="90" width="60" height="30" fill="#bdc3c7" rx="4"/>
+  <text x="430" y="110" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">Index</text>
+  <rect x="470" y="90" width="60" height="30" fill="#3498db" rx="4"/>
+  <text x="500" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Open</text>
+  <rect x="540" y="90" width="60" height="30" fill="#3498db" rx="4"/>
+  <text x="570" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">High</text>
+  <rect x="610" y="90" width="60" height="30" fill="#3498db" rx="4"/>
+  <text x="640" y="110" text-anchor="middle" font-size="13" fill="white" font-weight="bold">Close</text>
+
+  <text x="430" y="150" text-anchor="middle" font-size="13" fill="#2c3e50">Day 1</text>
+  <text x="500" y="150" text-anchor="middle" font-size="13" fill="#2c3e50">150.0</text>
+  <text x="570" y="150" text-anchor="middle" font-size="13" fill="#2c3e50">153.0</text>
+  <text x="640" y="150" text-anchor="middle" font-size="13" fill="#2c3e50">152.0</text>
+
+  <text x="430" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">Day 2</text>
+  <text x="500" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">152.0</text>
+  <text x="570" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">155.0</text>
+  <text x="640" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">154.5</text>
+
+  <text x="530" y="280" text-anchor="middle" font-size="12" fill="#5d6d7e">Example: OHLC market data</text>
+</svg>
+</div>
+
+<h3>Series Deep Dive</h3>
+<p>A <code>Series</code> is a 1D labeled array. It wraps a NumPy array and adds an <strong>index</strong>. Every quant calculation starts here: a single time-series of prices, returns, or volumes.</p>
+
+<pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Creating a Series from a list</span>
+prices = pd.Series([<span class="number">150.25</span>, <span class="number">152.00</span>, <span class="number">151.75</span>, <span class="number">153.50</span>])
+<span class="func">print</span>(prices)
+<span class="comment"># Output shows default integer index: 0, 1, 2, 3</span>
+
+<span class="comment"># Creating a Series with a custom index (dates as strings for simplicity)</span>
+prices_idx = pd.Series(
+    [<span class="number">150.25</span>, <span class="number">152.00</span>, <span class="number">151.75</span>, <span class="number">153.50</span>],
+    index=[<span class="string">"2024-01-01"</span>, <span class="string">"2024-01-02"</span>, <span class="string">"2024-01-03"</span>, <span class="string">"2024-01-04"</span>],
+    name=<span class="string">"AAPL_Close"</span>
+)
+<span class="func">print</span>(prices_idx)
+
+<span class="comment"># A Series behaves like a NumPy array + dict hybrid</span>
+<span class="func">print</span>(prices_idx[<span class="string">"2024-01-02"</span>])   <span class="comment"># Dict-like label access</span>
+<span class="func">print</span>(prices_idx[<span class="number">1</span>])             <span class="comment"># Array-like position access (avoid this; ambiguous)</span></code></pre>
+
+<div class="warning-box">
+<strong>Critical Distinction:</strong> A Series has both <em>position</em> (0, 1, 2...) and <em>label</em> (your custom index). Accessing by <code>[1]</code> uses position if the index is not integer-based, but this behavior changes if your index <em>is</em> integers. This ambiguity is why we later use <code>.loc[]</code> and <code>.iloc[]</code>.
+</div>
+
+<h3>DataFrame Deep Dive</h3>
+<p>A <code>DataFrame</code> is a dictionary of Series sharing the same index. It is the primary structure for quant work: each column is a variable (Open, High, Low, Close, Volume), and each row is an observation (a timestamp).</p>
+
+<pre><code><span class="comment"># Creating a DataFrame from a dictionary of lists</span>
+data = {
+    <span class="string">"Open"</span>: [<span class="number">150.0</span>, <span class="number">152.0</span>, <span class="number">151.5</span>],
+    <span class="string">"High"</span>: [<span class="number">153.0</span>, <span class="number">155.0</span>, <span class="number">154.0</span>],
+    <span class="string">"Low"</span>:  [<span class="number">149.5</span>, <span class="number">151.0</span>, <span class="number">150.0</span>],
+    <span class="string">"Close"</span>:[<span class="number">152.0</span>, <span class="number">154.5</span>, <span class="number">153.0</span>]
+}
+index = [<span class="string">"2024-01-01"</span>, <span class="string">"2024-01-02"</span>, <span class="string">"2024-01-03"</span>]
+df = pd.DataFrame(data, index=index)
+<span class="func">print</span>(df)
+
+<span class="comment"># Each column IS a Series</span>
+<span class="func">print</span>(<span class="func">type</span>(df[<span class="string">"Close"</span>]))  <span class="comment"># &lt;class 'pandas.core.series.Series'&gt;</span>
+
+<span class="comment"># Shape gives (rows, columns) — your first sanity check</span>
+<span class="func">print</span>(df.shape)  <span class="comment"># (3, 4)</span></code></pre>
+
+<h3>Reading External Data</h3>
+<p>In practice, quants do not type data manually. Pandas reads CSV, Excel, SQL, Parquet, JSON, and more.</p>
+
+<pre><code><span class="comment"># Reading a CSV (most common in quant finance)</span>
+<span class="comment"># df = pd.read_csv("aapl_prices.csv")</span>
+
+<span class="comment"># Reading from a URL directly</span>
+url = <span class="string">"https://raw.githubusercontent.com/datasets/finance-vix/main/data/vix-daily.csv"</span>
+<span class="comment"># df = pd.read_csv(url, parse_dates=["Date"], index_col="Date")</span>
+
+<span class="comment"># Key parameters for quant data:</span>
+<span class="comment"># parse_dates: converts string dates to datetime objects</span>
+<span class="comment"># index_col: sets a column as the row index (usually 'Date')</span>
+<span class="comment"># usecols: load only columns you need (saves memory)</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Your First Pandas Objects</h4>
+<ol>
+<li>Open a new Colab notebook.</li>
+<li>Run: <code>import pandas as pd; print(pd.__version__)</code></li>
+<li>Create a Series of 5 daily returns: <code>[0.01, -0.005, 0.002, 0.008, -0.003]</code> with dates as the index.</li>
+<li>Convert that Series to a DataFrame with column name <code>"Returns"</code>.</li>
+<li>Calculate the cumulative product of (1 + returns) to get a price series starting at 100.</li>
+</ol>
+<pre><code>returns = pd.Series([<span class="number">0.01</span>, -<span class="number">0.005</span>, <span class="number">0.002</span>, <span class="number">0.008</span>, -<span class="number">0.003</span>],
+                    index=pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">5</span>),
+                    name=<span class="string">"Returns"</span>)
+price = <span class="number">100</span> * (<span class="number">1</span> + returns).cumprod()
+<span class="func">print</span>(price)</code></pre>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/dsintro.html" target="_blank">Pandas Data Structures (Official)</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html" target="_blank">pd.read_csv Documentation</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a Series named <code>Volumes</code> with values [1000, 1500, 1200, 1800] and index ["Mon", "Tue", "Wed", "Thu"].</li>
+      <li>Create a DataFrame with columns <code>Ticker</code>, <code>Price</code>, <code>PE_Ratio</code> for 3 stocks.</li>
+      <li>What is the <code>.dtype</code> of a Series containing only integers? What if one element is <code>None</code>?</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Create a DataFrame from a dictionary where keys are column names and values are NumPy arrays of length 10.</li>
+      <li>Read a CSV from a URL (use the VIX URL above). Print the first 5 rows and the index dtype.</li>
+      <li>Create a Series with integer index [10, 20, 30]. Try accessing <code>s[10]</code>. Explain what happens and why this is dangerous.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Build a DataFrame that represents a portfolio: columns are <code>Asset</code>, <code>Weight</code>, <code>Expected_Return</code>, <code>Volatility</code>. Compute the portfolio expected return as the weighted sum (hint: use <code>df['Weight'] * df['Expected_Return']</code> then sum).</li>
+      <li>Explain in your own words: Why is a DataFrame called a "dictionary of Series" and not a "2D NumPy array with labels"? Use <code>.dtypes</code> to prove that columns can have different types.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 2: DATAFRAME FUNDAMENTALS ==================== -->
+<div id="dataframe" class="tab-content">
+<h2><span class="badge core">Core</span> 2. DataFrame Fundamentals</h2>
+
+<h3>Inspecting Your Data</h3>
+<p>When you receive a new dataset, never blindly analyze it. Quants follow a strict inspection protocol to avoid garbage-in-garbage-out.</p>
+
+<div class="card">
+<table style="width:100%; border-collapse: collapse; margin-top:10px;">
+<tr style="background:#eaf2f8; border-bottom:2px solid #1a5276;">
+<th style="padding:10px; text-align:left;">Method</th>
+<th style="padding:10px; text-align:left;">Purpose</th>
+<th style="padding:10px; text-align:left;">Quant Use-Case</th>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>df.head(n)</code></td>
+<td style="padding:10px;">First n rows</td>
+<td style="padding:10px;">Verify data import; check column order</td>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>df.tail(n)</code></td>
+<td style="padding:10px;">Last n rows</td>
+<td style="padding:10px;">Check most recent price data</td>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>df.info()</code></td>
+<td style="padding:10px;">Column types, non-null counts, memory</td>
+<td style="padding:10px;">Detect missing data; optimize memory (e.g., float64 vs float32)</td>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>df.describe()</code></td>
+<td style="padding:10px;">Summary statistics</td>
+<td style="padding:10px;">Quick mean, std, min, max of returns/prices</td>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>df.shape</code></td>
+<td style="padding:10px;">(rows, columns)</td>
+<td style="padding:10px;">Confirm expected dimensions (e.g., 252 trading days)</td>
+</tr>
+<tr>
+<td style="padding:10px;"><code>df.dtypes</code></td>
+<td style="padding:10px;">Data type of each column</td>
+<td style="padding:10px;">Ensure prices are numeric, dates are datetime</td>
+</tr>
+</table>
+</div>
+
+<pre><code><span class="comment"># Generate synthetic OHLC data for demonstration</span>
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+np.random.seed(<span class="number">42</span>)
+
+dates = pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">252</span>, freq=<span class="string">"B"</span>)  <span class="comment"># Business days</span>
+returns = np.random.normal(<span class="number">0.001</span>, <span class="number">0.02</span>, <span class="func">len</span>(dates))
+price = <span class="number">100</span> * np.exp(np.cumsum(returns))
+
+ohlc = pd.DataFrame({
+    <span class="string">"Open"</span>: price * (<span class="number">1</span> + np.random.normal(<span class="number">0</span>, <span class="number">0.005</span>, <span class="func">len</span>(dates))),
+    <span class="string">"High"</span>: price * (<span class="number">1</span> + np.abs(np.random.normal(<span class="number">0</span>, <span class="number">0.01</span>, <span class="func">len</span>(dates)))),
+    <span class="string">"Low"</span>:  price * (<span class="number">1</span> - np.abs(np.random.normal(<span class="number">0</span>, <span class="number">0.01</span>, <span class="func">len</span>(dates)))),
+    <span class="string">"Close"</span>: price,
+    <span class="string">"Volume"</span>: np.random.randint(<span class="number">1000000</span>, <span class="number">5000000</span>, <span class="func">len</span>(dates))
+}, index=dates)
+
+<span class="comment"># Inspection protocol</span>
+<span class="func">print</span>(ohlc.head(<span class="number">3</span>))
+<span class="func">print</span>(<span class="string">"\n--- Info ---"</span>)
+ohlc.info()
+<span class="func">print</span>(<span class="string">"\n--- Description ---"</span>)
+<span class="func">print</span>(ohlc.describe())</code></pre>
+
+<h3>Understanding the Index</h3>
+<p>The <strong>index</strong> is the row label. In quant finance, this is almost always a <strong>datetime index</strong>. The index is not just a column; it is the "anchor" for alignment, joining, and time-series operations.</p>
+
+<div class="concept-box">
+<strong>Quant Insight:</strong> In Pandas, when you add two Series together, they align by index label, not by position. This is incredibly powerful for finance: you can add the returns of two stocks on the same date even if the rows are in different orders.
+</div>
+
+<pre><code><span class="comment"># The index object</span>
+<span class="func">print</span>(ohlc.index)       <span class="comment"># DatetimeIndex</span>
+<span class="func">print</span>(ohlc.columns)     <span class="comment"># Index of column names</span>
+
+<span class="comment"># Resetting vs Setting index</span>
+df_reset = ohlc.reset_index()   <span class="comment"># Moves index to a column named 'index'</span>
+df_indexed = df_reset.set_index(<span class="string">"index"</span>)  <span class="comment"># Sets a column as the new index</span>
+
+<span class="comment"># For time series, ensure the index is sorted</span>
+<span class="func">print</span>(ohlc.index.is_monotonic_increasing)  <span class="comment"># Should be True</span></code></pre>
+
+<h3>Column Operations</h3>
+<pre><code><span class="comment"># Selecting a single column → Series</span>
+closes = ohlc[<span class="string">"Close"</span>]
+
+<span class="comment"># Selecting multiple columns → DataFrame (pass a LIST!)</span>
+ohlc_only = ohlc[[<span class="string">"Open"</span>, <span class="string">"High"</span>, <span class="string">"Low"</span>, <span class="string">"Close"</span>]]
+
+<span class="comment"># Adding a new column</span>
+ohlc[<span class="string">"Range"</span>] = ohlc[<span class="string">"High"</span>] - ohlc[<span class="string">"Low"</span>]
+
+<span class="comment"># Dropping columns</span>
+ohlc = ohlc.drop(columns=[<span class="string">"Range"</span>])
+
+<span class="comment"># Renaming columns</span>
+ohlc = ohlc.rename(columns={<span class="string">"Volume"</span>: <span class="string">"Vol"</span>})</code></pre>
+
+<div class="warning-box">
+<strong>Common Trap:</strong> <code>df["Close"]</code> returns a Series. <code>df[["Close"]]</code> returns a DataFrame with one column. Some methods expect a DataFrame, so if you get a shape error, check whether you used single or double brackets.
+</div>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Data Inspection Pipeline</h4>
+<ol>
+<li>Generate the synthetic OHLC data shown above.</li>
+<li>Run <code>.info()</code>. How much memory does the DataFrame use? Can you reduce it by changing <code>Volume</code> to <code>int32</code>?</li>
+<li>Use <code>.describe()</code> on the <code>Close</code> column. What is the standard deviation? This is the volatility proxy.</li>
+<li>Add a column <code>Return</code> using <code>df['Close'].pct_change()</code>. Run <code>.describe()</code> on returns. What is the mean daily return?</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/basics.html" target="_blank">Pandas Basics (Official)</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.info.html" target="_blank">DataFrame.info()</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a DataFrame with 5 rows and 3 columns. Print <code>.shape</code>, <code>.dtypes</code>, and <code>.columns</code>.</li>
+      <li>Select only the first 2 columns using a list of column names.</li>
+      <li>Add a new column that is the sum of two existing columns.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Given a DataFrame of stock prices, use <code>.describe()</code> to find the 25th and 75th percentiles of price. What do these represent statistically?</li>
+      <li>Create a DataFrame with an integer index [5, 3, 8, 1]. Sort it by index. Why is sorting the index critical for time-series analysis?</li>
+      <li>Load a dataset with <code>pd.read_csv</code>. Use <code>usecols</code> to load only 3 columns. Compare memory usage with <code>.info()</code> against loading all columns.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Write a function <code>inspect_quant_data(df)</code> that takes any DataFrame and prints: (a) whether the index is a DatetimeIndex, (b) memory usage in MB, (c) any columns with >5% missing values, (d) whether any price column contains negative values.</li>
+      <li>Explain the difference between <code>df['Close']</code>, <code>df[['Close']]</code>, and <code>df.Close</code>. List one danger of dot notation.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 3: INDEXING & SELECTION ==================== -->
+<div id="indexing" class="tab-content">
+<h2><span class="badge core">Core</span> 3. Indexing & Selection</h2>
+
+<h3>The Indexing Problem</h3>
+<p>Pandas offers multiple ways to select data. This flexibility is powerful but confusing for beginners. In quantitative finance, selecting the right data quickly and unambiguously is critical—your trading signal depends on it.</p>
+
+<div class="concept-box">
+<strong>Golden Rule:</strong> Use <code>.loc[]</code> for labels and <code>.iloc[]</code> for positions. Avoid plain <code>[]</code> for row selection because its behavior changes based on context.
+</div>
+
+<div class="svg-container">
+<svg width="750" height="400" viewBox="0 0 750 400">
+  <text x="375" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#154360">loc vs iloc: The Critical Distinction</text>
+
+  <!-- loc diagram -->
+  <rect x="20" y="50" width="340" height="330" rx="10" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="190" y="75" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a5276">.loc[label_based]</text>
+
+  <text x="40" y="110" font-size="13" fill="#5d6d7e">Index Labels:</text>
+  <rect x="40" y="120" width="60" height="30" fill="#f39c12" rx="4"/>
+  <text x="70" y="140" text-anchor="middle" font-size="13" fill="white">"Mon"</text>
+  <rect x="110" y="120" width="60" height="30" fill="#f39c12" rx="4"/>
+  <text x="140" y="140" text-anchor="middle" font-size="13" fill="white">"Tue"</text>
+  <rect x="180" y="120" width="60" height="30" fill="#f39c12" rx="4"/>
+  <text x="210" y="140" text-anchor="middle" font-size="13" fill="white">"Wed"</text>
+  <rect x="250" y="120" width="60" height="30" fill="#f39c12" rx="4"/>
+  <text x="280" y="140" text-anchor="middle" font-size="13" fill="white">"Thu"</text>
+
+  <text x="40" y="190" font-size="13" fill="#5d6d7e">Syntax:</text>
+  <text x="40" y="215" font-size="14" fill="#154360" font-family="monospace">df.loc["Tue", "Close"]</text>
+  <text x="40" y="240" font-size="13" fill="#5d6d7e">Meaning: Row labeled "Tue",</text>
+  <text x="40" y="260" font-size="13" fill="#5d6d7e">Column labeled "Close"</text>
+
+  <rect x="40" y="290" width="300" height="60" fill="#fdebd0" rx="6"/>
+  <text x="50" y="315" font-size="13" fill="#7e5109">✓ Includes the last element</text>
+  <text x="50" y="335" font-size="13" fill="#7e5109">✓ Uses names, not numbers</text>
+
+  <!-- iloc diagram -->
+  <rect x="390" y="50" width="340" height="330" rx="10" fill="#e9f7ef" stroke="#27ae60" stroke-width="2"/>
+  <text x="560" y="75" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e8449">.iloc[position_based]</text>
+
+  <text x="410" y="110" font-size="13" fill="#5d6d7e">Integer Positions:</text>
+  <rect x="410" y="120" width="60" height="30" fill="#8e44ad" rx="4"/>
+  <text x="440" y="140" text-anchor="middle" font-size="13" fill="white">0</text>
+  <rect x="480" y="120" width="60" height="30" fill="#8e44ad" rx="4"/>
+  <text x="510" y="140" text-anchor="middle" font-size="13" fill="white">1</text>
+  <rect x="550" y="120" width="60" height="30" fill="#8e44ad" rx="4"/>
+  <text x="580" y="140" text-anchor="middle" font-size="13" fill="white">2</text>
+  <rect x="620" y="120" width="60" height="30" fill="#8e44ad" rx="4"/>
+  <text x="650" y="140" text-anchor="middle" font-size="13" fill="white">3</text>
+
+  <text x="410" y="190" font-size="13" fill="#5d6d7e">Syntax:</text>
+  <text x="410" y="215" font-size="14" fill="#1e8449" font-family="monospace">df.iloc[1, 2]</text>
+  <text x="410" y="240" font-size="13" fill="#5d6d7e">Meaning: 2nd row (0-indexed),</text>
+  <text x="410" y="260" font-size="13" fill="#5d6d7e">3rd column (0-indexed)</text>
+
+  <rect x="410" y="290" width="300" height="60" fill="#d4efdf" rx="6"/>
+  <text x="420" y="315" font-size="13" fill="#145a32">✓ Excludes the last element (like Python)</text>
+  <text x="420" y="335" font-size="13" fill="#145a32">✓ Uses integers only</text>
+</svg>
+</div>
+
+<h3>.loc[] — Label-Based Selection</h3>
+<pre><code><span class="comment"># Setup</span>
+dates = pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">5</span>, freq=<span class="string">"B"</span>)
+df = pd.DataFrame({
+    <span class="string">"Open"</span>: [<span class="number">100</span>, <span class="number">102</span>, <span class="number">101</span>, <span class="number">103</span>, <span class="number">105</span>],
+    <span class="string">"Close"</span>: [<span class="number">102</span>, <span class="number">101</span>, <span class="number">103</span>, <span class="number">105</span>, <span class="number">104</span>]
+}, index=dates)
+
+<span class="comment"># Single value</span>
+<span class="func">print</span>(df.loc[<span class="string">"2024-01-02"</span>, <span class="string">"Close"</span>])   <span class="comment"># 101</span>
+
+<span class="comment"># Entire row</span>
+row = df.loc[<span class="string">"2024-01-02"</span>]   <span class="comment"># Returns a Series</span>
+
+<span class="comment"># Entire column</span>
+col = df.loc[:, <span class="string">"Close"</span>]     <span class="comment"># The colon means "all rows"</span>
+
+<span class="comment"># Slice (INCLUSIVE of end point!)</span>
+slice_df = df.loc[<span class="string">"2024-01-02"</span>:<span class="string">"2024-01-04"</span>, <span class="string">"Open"</span>:<span class="string">"Close"</span>]
+
+<span class="comment"># List of labels</span>
+df.loc[[<span class="string">"2024-01-02"</span>, <span class="string">"2024-01-04"</span>], [<span class="string">"Open"</span>, <span class="string">"Close"</span>]]</code></pre>
+
+<h3>.iloc[] — Position-Based Selection</h3>
+<pre><code><span class="comment"># Same rules as Python/NumPy indexing</span>
+<span class="func">print</span>(df.iloc[<span class="number">0</span>, <span class="number">1</span>])        <span class="comment"># Row 0, Column 1 → 102</span>
+<span class="func">print</span>(df.iloc[<span class="number">1</span>:<span class="number">3</span>, <span class="number">0</span>])      <span class="comment"># Rows 1,2 (3 is EXCLUDED), Column 0</span>
+<span class="func">print</span>(df.iloc[-<span class="number">1</span>])          <span class="comment"># Last row</span>
+<span class="func">print</span>(df.iloc[:, -<span class="number">1</span>])       <span class="comment"># Last column</span></code></pre>
+
+<h3>Boolean Indexing (Masking)</h3>
+<p>This is the quant's best friend. You select rows based on conditions.</p>
+
+<pre><code><span class="comment"># Select days where Close > 102</span>
+mask = df[<span class="string">"Close"</span>] > <span class="number">102</span>
+<span class="func">print</span>(df[mask])   <span class="comment"># or directly: df[df["Close"] > 102]</span>
+
+<span class="comment"># Multiple conditions</span>
+<span class="comment"># Note: use & (and), | (or), ~ (not) with parentheses!</span>
+condition = (df[<span class="string">"Close"</span>] > <span class="number">102</span>) & (df[<span class="string">"Open"</span>] < <span class="number">103</span>)
+<span class="func">print</span>(df[condition])
+
+<span class="comment"># .loc with boolean mask</span>
+<span class="func">print</span>(df.loc[df[<span class="string">"Close"</span>] > <span class="number">102</span>, [<span class="string">"Open"</span>, <span class="string">"Close"</span>]])</code></pre>
+
+<div class="warning-box">
+<strong>Operator Trap:</strong> You cannot use Python's <code>and</code>, <code>or</code>, <code>not</code> with Pandas boolean Series. You must use <code>&</code>, <code>|</code>, <code>~</code>. Also, each condition must be wrapped in parentheses due to operator precedence.
+</div>
+
+<h3>Setting Values</h3>
+<pre><code><span class="comment"># Setting with .loc</span>
+df.loc[<span class="string">"2024-01-02"</span>, <span class="string">"Close"</span>] = <span class="number">999</span>
+
+<span class="comment"># Setting a whole column</span>
+df.loc[:, <span class="string">"Signal"</span>] = <span class="number">0</span>   <span class="comment"># Initializes a new column with zeros</span>
+
+<span class="comment"># Setting based on condition (e.g., generate a buy signal)</span>
+df.loc[df[<span class="string">"Close"</span>] > df[<span class="string">"Open"</span>], <span class="string">"Signal"</span>] = <span class="number">1</span>   <span class="comment"># 1 = Buy</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Signal Generation with Boolean Indexing</h4>
+<ol>
+<li>Create a DataFrame with 20 days of random OHLC data (use <code>np.random</code>).</li>
+<li>Select all days where <code>Close > Open</code> (bullish days). Count them.</li>
+<li>Create a column <code>Signal</code> where: 1 if Close > Open AND Volume > median(Volume), else 0.</li>
+<li>Use <code>.iloc</code> to select the last 5 rows and first 2 columns.</li>
+<li>Use <code>.loc</code> to set all "Low" values below 95 to exactly 95 (floor).</li>
+</ol>
+<pre><code><span class="comment"># Starter code</span>
+np.random.seed(<span class="number">1</span>)
+dates = pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">20</span>, freq=<span class="string">"B"</span>)
+df = pd.DataFrame({
+    <span class="string">"Open"</span>: np.random.randint(<span class="number">90</span>, <span class="number">110</span>, <span class="number">20</span>),
+    <span class="string">"High"</span>: np.random.randint(<span class="number">100</span>, <span class="number">120</span>, <span class="number">20</span>),
+    <span class="string">"Low"</span>: np.random.randint(<span class="number">80</span>, <span class="number">100</span>, <span class="number">20</span>),
+    <span class="string">"Close"</span>: np.random.randint(<span class="number">90</span>, <span class="number">115</span>, <span class="number">20</span>),
+    <span class="string">"Volume"</span>: np.random.randint(<span class="number">1e6</span>, <span class="number">5e6</span>, <span class="number">20</span>)
+}, index=dates)
+
+<span class="comment"># Your task: implement the 5 steps above</span></code></pre>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/indexing.html" target="_blank">Indexing and Selecting Data (Official)</a>
+<a class="resource-link" href="https://www.youtube.com/watch?v=lxth5xX5uJ4" target="_blank">Video: loc vs iloc Explained</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Given a DataFrame with index ["A","B","C","D"], select row "B" using <code>.loc</code>.</li>
+      <li>Select the 3rd row using <code>.iloc</code>.</li>
+      <li>Select all rows where a column <code>Value</code> is greater than 10.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Create a DataFrame of 4 stocks and 3 metrics. Select all stocks where PE &lt; 20 and Dividend &gt; 2.</li>
+      <li>Given a time-series DataFrame, select all data from March 2024 using a slice with <code>.loc</code> (assume DatetimeIndex).</li>
+      <li>Explain why <code>df.loc[0:2]</code> gives 3 rows but <code>df.iloc[0:2]</code> gives only 2 rows.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement a "stop-loss" filter: Select all rows where the price has dropped more than 5% from the previous day's close. Use <code>.loc</code> and <code>.shift()</code>.</li>
+      <li>Create a function <code>select_rebalance_dates(df, month_end=True)</code> that returns only the last trading day of each month from a daily DataFrame. (Hint: use <code>df.index.is_month_end</code>).</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 4: DATA CLEANING ==================== -->
+<div id="cleaning" class="tab-content">
+<h2><span class="badge core">Core</span> 4. Data Cleaning</h2>
+
+<h3>The Quant's Cleaning Mandate</h3>
+<p>Real financial data is messy. Missing ticks, stock splits recorded as outliers, delistings causing NaNs, and timezone mismatches are daily realities. A quant who does not clean data builds models on illusions.</p>
+
+<div class="concept-box">
+<strong>Principle:</strong> Always ask: <em>Why</em> is the data missing? In finance, missing data is not random—it often contains information (e.g., halted trading, delisting). Blindly filling NaNs with the mean can destroy your strategy.
+</div>
+
+<h3>Missing Data (NaN)</h3>
+<p>Pandas uses <code>np.nan</code> (Not a Number) to represent missing floating-point data. For integers, Pandas uses nullable <code>Int64</code> (capital I) or converts to float.</p>
+
+<pre><code><span class="comment"># Detecting missing data</span>
+df = pd.DataFrame({
+    <span class="string">"A"</span>: [<span class="number">1.0</span>, <span class="number">2.0</span>, np.nan, <span class="number">4.0</span>],
+    <span class="string">"B"</span>: [<span class="number">5</span>, np.nan, np.nan, <span class="number">8</span>]
+})
+
+<span class="func">print</span>(df.isna())        <span class="comment"># Boolean mask: True where NaN</span>
+<span class="func">print</span>(df.isna().sum())  <span class="comment"># Count NaNs per column</span>
+<span class="func">print</span>(df.isna().mean()) <span class="comment"># Proportion missing (critical check!)</span>
+
+<span class="comment"># Dropping missing data</span>
+df_drop_rows = df.dropna()             <span class="comment"># Drop ANY row with a NaN</span>
+df_drop_cols = df.dropna(axis=<span class="number">1</span>)       <span class="comment"># Drop columns with ANY NaN</span>
+df_drop_thresh = df.dropna(thresh=<span class="number">2</span>)   <span class="comment"># Keep rows with at least 2 non-NaN values</span>
+
+<span class="comment"># Filling missing data</span>
+df_fill_zero = df.fillna(<span class="number">0</span>)          <span class="comment"># Rarely correct for prices</span>
+df_fill_mean = df.fillna(df.mean())    <span class="comment"># Forward-looking bias danger!</span>
+
+<span class="comment"># Forward fill (ffill) — CRITICAL for time series</span>
+<span class="comment"># Use previous valid observation to fill gap</span>
+df_ffill = df.ffill()
+
+<span class="comment"># Backward fill (bfill) — Use next valid observation</span>
+df_bfill = df.bfill()
+
+<span class="comment"># Limit the fill (e.g., only fill 1 consecutive NaN)</span>
+df_ffill_limited = df.ffill(limit=<span class="number">1</span>)</code></pre>
+
+<div class="warning-box">
+<strong>Quant Danger:</strong> Filling price data with the mean implies future knowledge (look-ahead bias). For time-series, <code>ffill()</code> is usually safer because it only uses past data. Never use <code>df.mean()</code> fill on a training set without understanding the leakage implications.
+</div>
+
+<h3>Handling Duplicates</h3>
+<pre><code><span class="comment"># Detect duplicates</span>
+<span class="func">print</span>(df.duplicated())           <span class="comment"># True for duplicated rows</span>
+<span class="func">print</span>(df.duplicated().sum())     <span class="comment"># Count duplicates</span>
+
+<span class="comment"># Drop duplicates</span>
+df_unique = df.drop_duplicates()
+
+<span class="comment"># Drop duplicates based on specific columns (e.g., same timestamp)</span>
+df.drop_duplicates(subset=[<span class="string">"timestamp"</span>], keep=<span class="string">"last"</span>, inplace=<span class="keyword">True</span>)
+<span class="comment"># keep="first" or "last" determines which duplicate survives</span></code></pre>
+
+<h3>Type Conversion</h3>
+<p>Data types determine memory usage and computational speed. Quants often work with millions of rows—optimizing types matters.</p>
+
+<pre><code><span class="comment"># Common conversions</span>
+df[<span class="string">"price"</span>] = pd.to_numeric(df[<span class="string">"price"</span>], errors=<span class="string">"coerce"</span>)
+<span class="comment"># errors="coerce" converts bad values (like "N/A") to NaN instead of crashing</span>
+
+df[<span class="string">"date"</span>] = pd.to_datetime(df[<span class="string">"date"</span>])
+<span class="comment"># Converts strings to datetime64[ns] — unlocks .dt accessor and resampling</span>
+
+df[<span class="string">"category"</span>] = df[<span class="string">"category"</span>].astype(<span class="string">"category"</span>)
+<span class="comment"># Converts string column to categorical — massive memory savings for repeated strings</span>
+
+<span class="comment"># Downcasting numerics (memory optimization)</span>
+df[<span class="string">"int_col"</span>] = pd.to_numeric(df[<span class="string">"int_col"</span>], downcast=<span class="string">"integer"</span>)
+df[<span class="string">"float_col"</span>] = pd.to_numeric(df[<span class="string">"float_col"</span>], downcast=<span class="string">"float"</span>)</code></pre>
+
+<h3>Outlier Detection (Basic)</h3>
+<p>Outliers in finance can be legitimate (market crashes) or errors (bad ticks). You must distinguish them.</p>
+
+<pre><code><span class="comment"># Z-score method (|z| > 3 is roughly 99.7% of normal data)</span>
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+z_scores = np.abs(stats.zscore(df[<span class="string">"returns"</span>].dropna()))
+outliers = df[z_scores > <span class="number">3</span>]
+
+<span class="comment"># IQR method (Interquartile Range)</span>
+Q1 = df[<span class="string">"returns"</span>].quantile(<span class="number">0.25</span>)
+Q3 = df[<span class="string">"returns"</span>].quantile(<span class="number">0.75</span>)
+IQR = Q3 - Q1
+outliers_iqr = df[(df[<span class="string">"returns"</span>] < (Q1 - <span class="number">1.5</span> * IQR)) | (df[<span class="string">"returns"</span>] > (Q3 + <span class="number">1.5</span> * IQR))]
+
+<span class="comment"># Winsorization: cap outliers instead of removing</span>
+df[<span class="string">"returns_capped"</span>] = df[<span class="string">"returns"</span>].clip(lower=Q1 - <span class="number">1.5</span>*IQR, upper=Q3 + <span class="number">1.5</span>*IQR)</code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Clean a Dirty Dataset</h4>
+<ol>
+<li>Create a DataFrame with columns <code>Date</code>, <code>Price</code>, <code>Volume</code> with intentional problems: duplicate dates, a "N/A" string in Price, missing Volume, and an obvious outlier price of 9999.</li>
+<li>Convert <code>Date</code> to datetime and set as index.</li>
+<li>Use <code>pd.to_numeric</code> with <code>errors="coerce"</code> to clean Price.</li>
+<li>Forward-fill missing Volume, then backward-fill any remaining NaNs.</li>
+<li>Remove duplicates keeping the first occurrence.</li>
+<li>Cap the Price outlier at the 99th percentile using <code>.quantile(0.99)</code> and <code>.clip()</code>.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/missing_data.html" target="_blank">Missing Data (Official)</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/scale.html" target="_blank">Scaling to Large Datasets</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a Series with 2 NaN values. Count them using <code>.isna()</code>.</li>
+      <li>Fill the NaNs with the number 0.</li>
+      <li>Convert a column of strings ["1.5", "2.5", "bad", "3.0"] to numeric, coercing errors to NaN.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Load a dataset. Calculate the percentage of missing values per column. Drop columns with >20% missing.</li>
+      <li>Explain the difference between <code>df.dropna()</code> and <code>df.dropna(how="all")</code>.</li>
+      <li>Given daily price data with weekend gaps, use <code>ffill()</code> to fill weekend prices. Is this appropriate? When might it fail?</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement a function <code>clean_ohlc(df)</code> that: (a) removes rows where High < Low, (b) removes rows where any price is ≤ 0, (c) fills missing Close using the average of that day's Open, High, Low if available, else ffill.</li>
+      <li>Detect and interpolate a single missing day in a time series without using <code>fillna</code> (use <code>pd.date_range</code> to find missing dates, then <code>reindex</code> and <code>interpolate(method="linear")</code>).</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 5: DATA TRANSFORMATION ==================== -->
+<div id="transform" class="tab-content">
+<h2><span class="badge core">Core</span> 5. Data Transformation</h2>
+
+<h3>From Raw Data to Signals</h3>
+<p>Raw prices are not tradable signals. Transformation converts data into features: returns, moving averages, volatility regimes, technical indicators. This section covers the mechanics of changing data shape and values.</p>
+
+<h3>apply(), map(), applymap()</h3>
+<p>These are often confused. Here is the definitive quant guide:</p>
+
+<div class="card">
+<table style="width:100%; border-collapse: collapse;">
+<tr style="background:#eaf2f8; border-bottom:2px solid #1a5276;">
+<th style="padding:10px; text-align:left;">Method</th>
+<th style="padding:10px; text-align:left;">Operates On</th>
+<th style="padding:10px; text-align:left;">Use Case</th>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>series.map(func)</code></td>
+<td style="padding:10px;">Each element of a Series</td>
+<td style="padding:10px;">Map tickers to sectors; encode labels</td>
+</tr>
+<tr style="border-bottom:1px solid #dce1e5;">
+<td style="padding:10px;"><code>series.apply(func)</code></td>
+<td style="padding:10px;">Each element of a Series</td>
+<td style="padding:10px;">Custom element-wise calculation</td>
+</tr>
+<tr>
+<td style="padding:10px;"><code>df.apply(func, axis=0/1)</code></td>
+<td style="padding:10px;">Entire column (axis=0) or row (axis=1)</td>
+<td style="padding:10px;">Row-wise portfolio calculation</td>
+</tr>
+</table>
+</div>
+
+<pre><code><span class="comment"># map(): element-wise on Series</span>
+tickers = pd.Series([<span class="string">"AAPL"</span>, <span class="string">"MSFT"</span>, <span class="string">"JPM"</span>])
+sector_map = {<span class="string">"AAPL"</span>: <span class="string">"Tech"</span>, <span class="string">"MSFT"</span>: <span class="string">"Tech"</span>, <span class="string">"JPM"</span>: <span class="string">"Finance"</span>}
+sectors = tickers.map(sector_map)
+
+<span class="comment"># apply() with lambda on Series</span>
+prices = pd.Series([<span class="number">150.25</span>, <span class="number">200.50</span>, <span class="number">75.00</span>])
+<span class="comment"># Classify by price level</span>
+labels = prices.apply(<span class="keyword">lambda</span> x: <span class="string">"Large"</span> <span class="keyword">if</span> x > <span class="number">100</span> <span class="keyword">else</span> <span class="string">"Small"</span>)
+
+<span class="comment"># apply() on DataFrame rows (axis=1)</span>
+df = pd.DataFrame({
+    <span class="string">"Open"</span>: [<span class="number">100</span>, <span class="number">102</span>],
+    <span class="string">"Close"</span>: [<span class="number">102</span>, <span class="number">101</span>],
+    <span class="string">"Volume"</span>: [<span class="number">1000</span>, <span class="number">2000</span>]
+})
+<span class="comment"># Calculate a custom VWAP approximation per row</span>
+df[<span class="string">"VWAP_Proxy"</span>] = df.apply(<span class="keyword">lambda</span> row: (row[<span class="string">"Open"</span>] + row[<span class="string">"Close"</span>]) / <span class="number">2</span> * row[<span class="string">"Volume"</span>], axis=<span class="number">1</span>)</code></pre>
+
+<div class="warning-box">
+<strong>Performance Warning:</strong> <code>apply()</code> is a Python loop in disguise. It is convenient but slow. For quant work, prefer vectorized operations. If you find yourself using <code>apply</code> on >100,000 rows, stop and look for a vectorized alternative.
+</div>
+
+<h3>Vectorized Operations (The Quant Way)</h3>
+<pre><code><span class="comment"># BAD: Looping through rows</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="func">len</span>(df)):
+    df.loc[i, <span class="string">"Return"</span>] = df.loc[i, <span class="string">"Close"</span>] / df.loc[i, <span class="string">"Open"</span>] - <span class="number">1</span>
+
+<span class="comment"># GOOD: Vectorized (100x+ faster)</span>
+df[<span class="string">"Return"</span>] = df[<span class="string">"Close"</span>] / df[<span class="string">"Open"</span>] - <span class="number">1</span>
+
+<span class="comment"># Vectorized with conditions (no apply needed)</span>
+df[<span class="string">"Signal"</span>] = np.where(df[<span class="string">"Close"</span>] > df[<span class="string">"Open"</span>], <span class="number">1</span>, -<span class="number">1</span>)
+<span class="comment"># np.where(condition, value_if_true, value_if_false)</span>
+
+<span class="comment"># Vectorized clip (Winsorize)</span>
+df[<span class="string">"Return_Capped"</span>] = df[<span class="string">"Return"</span>].clip(-<span class="number">0.05</span>, <span class="number">0.05</span>)</code></pre>
+
+<h3>String Operations (.str accessor)</h3>
+<pre><code><span class="comment"># When you have string data (e.g., news sentiment, tickers)</span>
+df[<span class="string">"Ticker"</span>] = pd.Series([<span class="string">" aapl "</span>, <span class="string">"MSFT"</span>, <span class="string">"JPM"</span>])
+
+<span class="comment"># Vectorized string methods</span>
+df[<span class="string">"Ticker_Clean"</span>] = df[<span class="string">"Ticker"</span>].str.upper().str.strip()
+df[<span class="string">"Is_Tech"</span>] = df[<span class="string">"Ticker_Clean"</span>].str.contains(<span class="string">"AAPL|MSFT|GOOGL"</span>)
+
+<span class="comment"># Extract using regex</span>
+df[<span class="string">"Year"</span>] = df[<span class="string">"Date_String"</span>].str.extract(<span class="string">r"(\d{4})"</span>)</code></pre>
+
+<h3>Categorical Data</h3>
+<p>Convert low-cardinality strings (sectors, ratings, signal types) to categorical for memory and speed.</p>
+<pre><code><span class="comment"># Convert to category</span>
+df[<span class="string">"Sector"</span>] = df[<span class="string">"Sector"</span>].astype(<span class="string">"category"</span>)
+
+<span class="comment"># Ordered categories (e.g., credit ratings)</span>
+ratings = pd.CategoricalDtype(
+    categories=[<span class="string">"AAA"</span>, <span class="string">"AA"</span>, <span class="string">"A"</span>, <span class="string">"BBB"</span>, <span class="string">"BB"</span>],
+    ordered=<span class="keyword">True</span>
+)
+df[<span class="string">"Rating"</span>] = df[<span class="string">"Rating"</span>].astype(ratings)
+<span class="comment"># Now you can sort and compare: df[df["Rating"] > "BB"]</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Feature Engineering Pipeline</h4>
+<ol>
+<li>Create a DataFrame with 100 rows of synthetic daily data: <code>Open, High, Low, Close, Ticker</code>.</li>
+<li>Add a column <code>Body</code> = <code>|Close - Open|</code> using vectorized operations.</li>
+<li>Add a column <code>Direction</code> using <code>np.where</code>: "Up" if Close > Open, else "Down".</li>
+<li>Convert <code>Direction</code> to categorical.</li>
+<li>Map <code>Ticker</code> to a sector using a dictionary and <code>.map()</code>.</li>
+<li>Calculate the row-wise average of OHLC (a proxy for typical price) using <code>.mean(axis=1)</code>—no apply!</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/basics.html#row-or-column-wise-function-application" target="_blank">Apply Documentation</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/text.html" target="_blank">Working with Text Data</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a Series [1, 2, 3, 4]. Use <code>.apply()</code> to square each element.</li>
+      <li>Use vectorized operations to add 10 to every element of a DataFrame column.</li>
+      <li>Convert a column of ["yes", "no", "yes"] to [1, 0, 1] using <code>.map()</code>.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Given a DataFrame of prices, create a column <code>LogReturn</code> using vectorized <code>np.log(Close / Close.shift(1))</code>. Why is this better than a loop?</li>
+      <li>Use <code>np.select()</code> to create a 3-level signal: Strong Buy (Close > Open * 1.02), Buy (Close > Open), else Hold.</li>
+      <li>Extract the year and month from a string column <code>"2024-03-15"</code> using <code>.str</code> accessors.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement a vectorized RSI (Relative Strength Index) calculation using only Pandas/NumPy on a price series. RSI = 100 - (100 / (1 + RS)), where RS = avg gain / avg loss over 14 days. Use <code>.diff()</code>, <code>.clip()</code>, and <code>.rolling()</code>.</li>
+      <li>Write a function that takes a DataFrame and converts every column that has &lt; 50 unique string values to categorical, reporting the memory saved.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 6: GROUPBY ==================== -->
+<div id="groupby" class="tab-content">
+<h2><span class="badge core">Core</span> 6. GroupBy & Aggregation</h2>
+
+<h3>Split-Apply-Combine</h3>
+<p>The GroupBy paradigm is the SQL <code>GROUP BY</code> equivalent in Pandas. For quants, it is essential for analyzing sectors, calculating monthly statistics, or backtesting strategies across regimes.</p>
+
+<div class="svg-container">
+<svg width="700" height="280" viewBox="0 0 700 280">
+  <text x="350" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#154360">Split → Apply → Combine</text>
+
+  <!-- Split -->
+  <rect x="20" y="50" width="200" height="200" rx="10" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="120" y="75" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">1. SPLIT</text>
+  <text x="120" y="100" text-anchor="middle" font-size="12" fill="#5d6d7e">Data grouped by key</text>
+  <rect x="40" y="120" width="160" height="30" fill="#aed6f1" rx="4"/>
+  <text x="120" y="140" text-anchor="middle" font-size="12" fill="#154360">Tech: AAPL, MSFT...</text>
+  <rect x="40" y="160" width="160" height="30" fill="#aed6f1" rx="4"/>
+  <text x="120" y="180" text-anchor="middle" font-size="12" fill="#154360">Finance: JPM, BAC...</text>
+  <rect x="40" y="200" width="160" height="30" fill="#aed6f1" rx="4"/>
+  <text x="120" y="220" text-anchor="middle" font-size="12" fill="#154360">Energy: XOM, CVX...</text>
+
+  <!-- Arrow -->
+  <text x="250" y="160" font-size="24" fill="#5d6d7e">→</text>
+
+  <!-- Apply -->
+  <rect x="280" y="50" width="200" height="200" rx="10" fill="#fef5e7" stroke="#f39c12" stroke-width="2"/>
+  <text x="380" y="75" text-anchor="middle" font-size="14" font-weight="bold" fill="#9c640c">2. APPLY</text>
+  <text x="380" y="100" text-anchor="middle" font-size="12" fill="#5d6d7e">Function per group</text>
+  <rect x="300" y="120" width="160" height="30" fill="#f9e79f" rx="4"/>
+  <text x="380" y="140" text-anchor="middle" font-size="12" fill="#7e5109">mean(), std(), sum()</text>
+  <rect x="300" y="160" width="160" height="30" fill="#f9e79f" rx="4"/>
+  <text x="380" y="180" text-anchor="middle" font-size="12" fill="#7e5109">custom_function()</text>
+  <rect x="300" y="200" width="160" height="30" fill="#f9e79f" rx="4"/>
+  <text x="380" y="220" text-anchor="middle" font-size="12" fill="#7e5109">rank(), transform()</text>
+
+  <!-- Arrow -->
+  <text x="510" y="160" font-size="24" fill="#5d6d7e">→</text>
+
+  <!-- Combine -->
+  <rect x="540" y="50" width="140" height="200" rx="10" fill="#e9f7ef" stroke="#27ae60" stroke-width="2"/>
+  <text x="610" y="75" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e8449">3. COMBINE</text>
+  <text x="610" y="100" text-anchor="middle" font-size="12" fill="#5d6d7e">Aggregated result</text>
+  <rect x="560" y="130" width="100" height="30" fill="#a9dfbf" rx="4"/>
+  <text x="610" y="150" text-anchor="middle" font-size="12" fill="#145a32">Tech: μ=0.12</text>
+  <rect x="560" y="170" width="100" height="30" fill="#a9dfbf" rx="4"/>
+  <text x="610" y="190" text-anchor="middle" font-size="12" fill="#145a32">Fin: μ=0.08</text>
+  <rect x="560" y="210" width="100" height="30" fill="#a9dfbf" rx="4"/>
+  <text x="610" y="230" text-anchor="middle" font-size="12" fill="#145a32">Ene: μ=0.05</text>
+</svg>
+</div>
+
+<h3>Basic GroupBy Mechanics</h3>
+<pre><code><span class="comment"># Sample data: multi-stock panel</span>
+df = pd.DataFrame({
+    <span class="string">"Ticker"</span>: [<span class="string">"AAPL"</span>, <span class="string">"AAPL"</span>, <span class="string">"MSFT"</span>, <span class="string">"MSFT"</span>, <span class="string">"JPM"</span>, <span class="string">"JPM"</span>],
+    <span class="string">"Sector"</span>: [<span class="string">"Tech"</span>, <span class="string">"Tech"</span>, <span class="string">"Tech"</span>, <span class="string">"Tech"</span>, <span class="string">"Finance"</span>, <span class="string">"Finance"</span>],
+    <span class="string">"Return"</span>: [<span class="number">0.01</span>, -<span class="number">0.02</span>, <span class="number">0.015</span>, <span class="number">0.005</span>, <span class="number">0.008</span>, -<span class="number">0.004</span>],
+    <span class="string">"Volume"</span>: [<span class="number">1e6</span>, <span class="number">1.2e6</span>, <span class="number">0.8e6</span>, <span class="number">0.9e6</span>, <span class="number">2e6</span>, <span class="number">1.8e6</span>]
+})
+
+<span class="comment"># Group by one column</span>
+sector_returns = df.groupby(<span class="string">"Sector"</span>)[<span class="string">"Return"</span>].mean()
+<span class="func">print</span>(sector_returns)
+
+<span class="comment"># Group by multiple columns</span>
+<span class="comment"># Not applicable here but syntax is:</span>
+<span class="comment"># df.groupby(["Sector", "Industry"])["Return"].mean()</span>
+
+<span class="comment"># Multiple aggregations at once</span>
+agg_stats = df.groupby(<span class="string">"Sector"</span>)[<span class="string">"Return"</span>].agg([<span class="string">"mean"</span>, <span class="string">"std"</span>, <span class="string">"min"</span>, <span class="string">"max"</span>, <span class="string">"count"</span>])
+<span class="func">print</span>(agg_stats)
+
+<span class="comment"># Named aggregations (clean column names)</span>
+agg_named = df.groupby(<span class="string">"Sector"</span>).agg(
+    avg_return=(<span class="string">"Return"</span>, <span class="string">"mean"</span>),
+    vol_return=(<span class="string">"Return"</span>, <span class="string">"std"</span>),
+    total_volume=(<span class="string">"Volume"</span>, <span class="string">"sum"</span>)
+)
+<span class="func">print</span>(agg_named)</code></pre>
+
+<h3>transform() vs agg() vs filter()</h3>
+<pre><code><span class="comment"># agg(): Reduces each group to a single value</span>
+<span class="comment"># Result has length = number of groups</span>
+
+<span class="comment"># transform(): Returns a Series/DataFrame with SAME length as input</span>
+<span class="comment"># Useful for demeaning (removing group average from each observation)</span>
+df[<span class="string">"Sector_Mean"</span>] = df.groupby(<span class="string">"Sector"</span>)[<span class="string">"Return"</span>].transform(<span class="string">"mean"</span>)
+df[<span class="string">"Demeaned_Return"</span>] = df[<span class="string">"Return"</span>] - df[<span class="string">"Sector_Mean"</span>]
+
+<span class="comment"># filter(): Keeps or drops entire groups based on a condition</span>
+<span class="comment"># Keep only sectors with average return > 0</span>
+high_perf = df.groupby(<span class="string">"Sector"</span>).filter(<span class="keyword">lambda</span> x: x[<span class="string">"Return"</span>].mean() > <span class="number">0</span>)
+<span class="func">print</span>(high_perf)</code></pre>
+
+<h3>Pivot Tables</h3>
+<p>Pivot tables are GroupBy operations arranged in a spreadsheet format. Essential for quant reporting.</p>
+
+<pre><code><span class="comment"># Pivot table: Sector vs mean Return and Volume</span>
+pivot = df.pivot_table(
+    values=[<span class="string">"Return"</span>, <span class="string">"Volume"</span>],
+    index=<span class="string">"Sector"</span>,
+    aggfunc={<span class="string">"Return"</span>: [<span class="string">"mean"</span>, <span class="string">"std"</span>], <span class="string">"Volume"</span>: <span class="string">"sum"</span>}
+)
+<span class="func">print</span>(pivot)
+
+<span class="comment"># Cross-tabulation (frequency table)</span>
+<span class="comment"># Useful for regime analysis: e.g., count of up/down days per sector</span>
+df[<span class="string">"Direction"</span>] = np.where(df[<span class="string">"Return"</span>] > <span class="number">0</span>, <span class="string">"Up"</span>, <span class="string">"Down"</span>)
+crosstab = pd.crosstab(df[<span class="string">"Sector"</span>], df[<span class="string">"Direction"</span>])
+<span class="func">print</span>(crosstab)</code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Sector Analysis Dashboard</h4>
+<ol>
+<li>Create a DataFrame with 100 rows: <code>Date, Ticker, Sector, Return, MarketCap</code>. Use 3 sectors and 5 tickers.</li>
+<li>Calculate the equal-weighted average return per sector per month (create a <code>Month</code> column first).</li>
+<li>Compute the volatility (std) of returns per sector.</li>
+<li>Add a column <code>Rank</code> that ranks each stock within its sector by MarketCap using <code>groupby().rank()</code>.</li>
+<li>Create a pivot table showing average Return by Sector (rows) and Month (columns).</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/groupby.html" target="_blank">GroupBy (Official)</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/reference/api/pandas.pivot_table.html" target="_blank">Pivot Table</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Group a DataFrame by <code>Color</code> and calculate the mean of <code>Price</code>.</li>
+      <li>Use <code>.agg()</code> to get both mean and count per group.</li>
+      <li>Create a crosstab of two categorical columns.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Given daily returns by ticker, group by ticker and calculate the Sharpe-like ratio: mean(return) / std(return).</li>
+      <li>Use <code>transform()</code> to add a column showing each observation's z-score within its sector.</li>
+      <li>Filter groups to keep only sectors with more than 10 stocks.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement a function that computes the Herfindahl-Hirschman Index (HHI) for market concentration per sector: sum of squared market share weights, using only <code>groupby</code> and <code>transform</code>.</li>
+      <li>Create a "factor-neutral" return series: For each stock, subtract the equal-weighted average return of all stocks in the same sector and same market-cap quintile on that day. This requires multi-level groupby.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 7: MERGING ==================== -->
+<div id="merge" class="tab-content">
+<h2><span class="badge core">Core</span> 7. Merging, Joining & Concatenation</h2>
+
+<h3>Why Quants Need Joins</h3>
+<p>You rarely have all data in one file. Prices come from one vendor, fundamentals from another, and sentiment from a third. Merging aligns these datasets by a common key (usually date + ticker).</p>
+
+<div class="svg-container">
+<svg width="700" height="320" viewBox="0 0 700 320">
+  <text x="350" y="25" text-anchor="middle" font-size="18" font-weight="bold" fill="#154360">SQL-Style Joins in Pandas</text>
+
+  <!-- Inner -->
+  <g transform="translate(30,50)">
+    <circle cx="50" cy="50" r="40" fill="#3498db" opacity="0.5"/>
+    <circle cx="90" cy="50" r="40" fill="#e74c3c" opacity="0.5"/>
+    <text x="70" y="55" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Inner</text>
+    <text x="70" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">Only matching keys</text>
+    <text x="70" y="140" text-anchor="middle" font-size="11" fill="#5d6d7e">(most common)</text>
+  </g>
+
+  <!-- Left -->
+  <g transform="translate(200,50)">
+    <circle cx="50" cy="50" r="40" fill="#3498db" opacity="0.8"/>
+    <circle cx="90" cy="50" r="40" fill="#e74c3c" opacity="0.3"/>
+    <text x="70" y="55" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Left</text>
+    <text x="70" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">All left + matching right</text>
+    <text x="70" y="140" text-anchor="middle" font-size="11" fill="#5d6d7e">(preserve time index)</text>
+  </g>
+
+  <!-- Right -->
+  <g transform="translate(370,50)">
+    <circle cx="50" cy="50" r="40" fill="#3498db" opacity="0.3"/>
+    <circle cx="90" cy="50" r="40" fill="#e74c3c" opacity="0.8"/>
+    <text x="70" y="55" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Right</text>
+    <text x="70" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">All right + matching left</text>
+  </g>
+
+  <!-- Outer -->
+  <g transform="translate(540,50)">
+    <circle cx="50" cy="50" r="40" fill="#3498db" opacity="0.6"/>
+    <circle cx="90" cy="50" r="40" fill="#e74c3c" opacity="0.6"/>
+    <text x="70" y="55" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Outer</text>
+    <text x="70" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">All keys from both</text>
+    <text x="70" y="140" text-anchor="middle" font-size="11" fill="#5d6d7e">(NaN where no match)</text>
+  </g>
+
+  <text x="350" y="240" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">Quant Example:</text>
+  <text x="350" y="265" text-anchor="middle" font-size="12" fill="#5d6d7e">Left = Price data (daily). Right = Earnings announcements (sparse dates).</text>
+  <text x="350" y="285" text-anchor="middle" font-size="12" fill="#5d6d7e">Use Left Join to keep all price dates, attaching earnings only on announcement days.</text>
+</svg>
+</div>
+
+<h3>pd.merge()</h3>
+<pre><code><span class="comment"># Two DataFrames to merge</span>
+prices = pd.DataFrame({
+    <span class="string">"Date"</span>: [<span class="string">"2024-01-01"</span>, <span class="string">"2024-01-02"</span>, <span class="string">"2024-01-03"</span>],
+    <span class="string">"Ticker"</span>: [<span class="string">"AAPL"</span>, <span class="string">"AAPL"</span>, <span class="string">"AAPL"</span>],
+    <span class="string">"Close"</span>: [<span class="number">150</span>, <span class="number">152</span>, <span class="number">151</span>]
+})
+
+earnings = pd.DataFrame({
+    <span class="string">"Date"</span>: [<span class="string">"2024-01-02"</span>, <span class="string">"2024-01-04"</span>],
+    <span class="string">"Ticker"</span>: [<span class="string">"AAPL"</span>, <span class="string">"AAPL"</span>],
+    <span class="string">"EPS"</span>: [<span class="number">2.5</span>, <span class="number">2.8</span>]
+})
+
+<span class="comment"># Inner join: only dates present in BOTH</span>
+inner = pd.merge(prices, earnings, on=[<span class="string">"Date"</span>, <span class="string">"Ticker"</span>], how=<span class="string">"inner"</span>)
+
+<span class="comment"># Left join: keep all prices, attach EPS where available</span>
+left = pd.merge(prices, earnings, on=[<span class="string">"Date"</span>, <span class="string">"Ticker"</span>], how=<span class="string">"left"</span>)
+
+<span class="comment"># If column names differ, use left_on and right_on</span>
+<span class="comment"># pd.merge(df1, df2, left_on="date", right_on="Date", how="outer")</span>
+
+<span class="comment"># Indicator column shows source of each row</span>
+merged = pd.merge(prices, earnings, on=[<span class="string">"Date"</span>, <span class="string">"Ticker"</span>], how=<span class="string">"outer"</span>, indicator=<span class="keyword">True</span>)
+<span class="func">print</span>(merged[<span class="string">"_merge"</span>].value_counts())</code></pre>
+
+<h3>pd.concat()</h3>
+<p>Use <code>concat</code> to stack DataFrames vertically (more rows) or horizontally (more columns).</p>
+
+<pre><code><span class="comment"># Vertical concat: append more time periods</span>
+q1 = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">100</span>, <span class="number">101</span>]}, index=[<span class="string">"Jan"</span>, <span class="string">"Feb"</span>])
+q2 = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">102</span>, <span class="number">103</span>]}, index=[<span class="string">"Mar"</span>, <span class="string">"Apr"</span>])
+annual = pd.concat([q1, q2], axis=<span class="number">0</span>)   <span class="comment"># axis=0 is default (stack rows)</span>
+
+<span class="comment"># Horizontal concat: add more columns side-by-side</span>
+prices_df = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">100</span>, <span class="number">101</span>]})
+volumes_df = pd.DataFrame({<span class="string">"Volume"</span>: [<span class="number">1e6</span>, <span class="number">1.1e6</span>]})
+combined = pd.concat([prices_df, volumes_df], axis=<span class="number">1</span>)
+
+<span class="comment"># Keys create a MultiIndex (hierarchical)</span>
+combined = pd.concat([q1, q2], keys=[<span class="string">"Q1"</span>, <span class="string">"Q2"</span>])
+<span class="func">print</span>(combined)
+<span class="comment"># Access: combined.loc["Q1"]</span></code></pre>
+
+<h3>join() — Index-Based</h3>
+<pre><code><span class="comment"># join() merges on indices by default (convenient for time series)</span>
+df1 = pd.DataFrame({<span class="string">"A"</span>: [<span class="number">1</span>, <span class="number">2</span>]}, index=[<span class="string">"x"</span>, <span class="string">"y"</span>])
+df2 = pd.DataFrame({<span class="string">"B"</span>: [<span class="number">3</span>, <span class="number">4</span>]}, index=[<span class="string">"x"</span>, <span class="string">"z"</span>])
+<span class="func">print</span>(df1.join(df2, how=<span class="string">"outer"</span>))</code></pre>
+
+<div class="warning-box">
+<strong>Merge Checklist for Quants:</strong>
+<ol>
+<li>Check for duplicate keys before merging—they cause a Cartesian explosion (memory blowup).</li>
+<li>Always verify the indicator column or row counts post-merge.</li>
+<li>For time-series, ensure both sides are sorted by date before merging.</li>
+<li>Be aware of timezone differences if merging intraday data.</li>
+</ol>
+</div>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Build a Multi-Source Dataset</h4>
+<ol>
+<li>Create a price DataFrame: columns <code>Date, Ticker, Close, Volume</code> for 3 stocks over 10 days.</li>
+<li>Create a fundamentals DataFrame: columns <code>Ticker, Sector, MarketCap</code> (one row per ticker).</li>
+<li>Left-merge fundamentals into prices so every price row gets its Sector and MarketCap.</li>
+<li>Create a sentiment DataFrame: <code>Date, Ticker, Sentiment_Score</code> for random days. Outer-merge this with the price DataFrame.</li>
+<li>Use <code>concat</code> to vertically stack price data for two different months, then verify the index is continuous.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/merging.html" target="_blank">Merge, Join, Concatenate (Official)</a>
+<a class="resource-link" href="https://www.sqlshack.com/introduction-to-sql-server-inner-join/" target="_blank">SQL Joins Explained</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Merge two DataFrames on a single common column using <code>how="inner"</code>.</li>
+      <li>Concatenate two DataFrames vertically. Reset the index afterward.</li>
+      <li>Use <code>.join()</code> to combine two DataFrames that share the same index.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Merge price data with dividend data. Use a left join and count how many price rows have missing dividends.</li>
+      <li>Concatenate 3 DataFrames horizontally. Handle overlapping column names using the <code>suffixes</code> parameter in <code>merge</code>.</li>
+      <li>Merge on index after converting a date column to datetime index in both DataFrames.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement an "as-of" merge: Given daily prices and sparse earnings dates, assign to each price row the most recent earnings date (not future) and corresponding EPS. (Hint: use <code>pd.merge_asof</code> with <code>direction="backward"</code>).</li>
+      <li>Detect and resolve a Cartesian explosion: Create two DataFrames with duplicate keys, merge them, and explain why the output has more rows than either input. Fix by deduplicating keys first.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 8: TIME SERIES ==================== -->
+<div id="timeseries" class="tab-content">
+<h2><span class="badge quant">Quant Essential</span> 8. Time Series Essentials</h2>
+
+<h3>Time is the Independent Variable</h3>
+<p>For a quant, time is not just another column—it is the dimension along which all analysis happens. Pandas has world-class time-series capabilities built on the <code>DatetimeIndex</code>.</p>
+
+<div class="concept-box">
+<strong>Why this matters:</strong> A regular DataFrame with a string column "2024-01-01" cannot be resampled, shifted, or aligned. Converting to <code>DatetimeIndex</code> unlocks the full quant toolkit.
+</div>
+
+<h3>Datetime Fundamentals</h3>
+<pre><code><span class="comment"># Creating datetime objects</span>
+ts = pd.Timestamp(<span class="string">"2024-03-15 09:30:00"</span>)
+<span class="func">print</span>(ts.dayofweek)   <span class="comment"># 4 = Friday</span>
+<span class="func">print</span>(ts.quarter)     <span class="comment"># 1</span>
+<span class="func">print</span>(ts.is_month_end) <span class="comment"># False</span>
+
+<span class="comment"># DatetimeIndex: the heart of quant time series</span>
+dates = pd.date_range(start=<span class="string">"2024-01-01"</span>, periods=<span class="number">10</span>, freq=<span class="string">"B"</span>)  <span class="comment"># Business days</span>
+<span class="func">print</span>(dates)
+
+<span class="comment"># Common frequencies</span>
+<span class="comment"># "D" = daily, "B" = business day, "W" = weekly</span>
+<span class="comment"># "M" = month end, "Q" = quarter end, "A" = year end</span>
+<span class="comment"># "H" = hourly, "T" or "min" = minute</span>
+
+<span class="comment"># Parsing strings to datetime</span>
+raw_dates = [<span class="string">"2024-01-01"</span>, <span class="string">"01/02/2024"</span>, <span class="string">"2024-03-15 14:30:00"</span>]
+parsed = pd.to_datetime(raw_dates, dayfirst=<span class="keyword">False</span>)
+<span class="func">print</span>(parsed)</code></pre>
+
+<h3>Resampling</h3>
+<p>Resampling changes the frequency of your data. Upsampling (low freq → high freq) introduces NaNs; downsampling (high freq → low freq) requires an aggregation rule.</p>
+
+<div class="svg-container">
+<svg width="650" height="240" viewBox="0 0 650 240">
+  <text x="325" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#154360">Resampling: Daily → Monthly</text>
+
+  <!-- Daily bars -->
+  <text x="150" y="55" text-anchor="middle" font-size="13" fill="#5d6d7e">Daily Data</text>
+  <rect x="30" y="70" width="12" height="40" fill="#3498db"/>
+  <rect x="50" y="70" width="12" height="50" fill="#3498db"/>
+  <rect x="70" y="70" width="12" height="35" fill="#3498db"/>
+  <rect x="90" y="70" width="12" height="60" fill="#3498db"/>
+  <rect x="110" y="70" width="12" height="45" fill="#3498db"/>
+  <rect x="130" y="70" width="12" height="55" fill="#3498db"/>
+  <rect x="150" y="70" width="12" height="40" fill="#3498db"/>
+  <rect x="170" y="70" width="12" height="50" fill="#3498db"/>
+  <rect x="190" y="70" width="12" height="65" fill="#3498db"/>
+  <rect x="210" y="70" width="12" height="45" fill="#3498db"/>
+  <rect x="230" y="70" width="12" height="55" fill="#3498db"/>
+  <rect x="250" y="70" width="12" height="40" fill="#3498db"/>
+  <rect x="270" y="70" width="12" height="50" fill="#3498db"/>
+  <text x="150" y="135" text-anchor="middle" font-size="11" fill="#5d6d7e">Jan 1-14 (14 days)</text>
+
+  <!-- Arrow -->
+  <text x="325" y="110" font-size="24" fill="#5d6d7e">→</text>
+  <text x="325" y="140" text-anchor="middle" font-size="11" fill="#5d6d7e">.resample("M").mean()</text>
+
+  <!-- Monthly bar -->
+  <text x="500" y="55" text-anchor="middle" font-size="13" fill="#5d6d7e">Monthly Aggregate</text>
+  <rect x="450" y="80" width="100" height="50" fill="#27ae60" rx="4"/>
+  <text x="500" y="110" text-anchor="middle" font-size="14" fill="white" font-weight="bold">μ = 48.2</text>
+  <text x="500" y="150" text-anchor="middle" font-size="11" fill="#5d6d7e">Single observation</text>
+</svg>
+</div>
+
+<pre><code><span class="comment"># Generate intraday-like data</span>
+minutes = pd.date_range(<span class="string">"2024-01-01 09:30"</span>, periods=<span class="number">390</span>, freq=<span class="string">"T"</span>)  <span class="comment"># One trading day of minutes</span>
+prices = <span class="number">100</span> + np.cumsum(np.random.normal(<span class="number">0</span>, <span class="number">0.01</span>, <span class="func">len</span>(minutes)))
+intRADAY = pd.DataFrame({<span class="string">"Price"</span>: prices}, index=minutes)
+
+<span class="comment"># Downsampling: Minute → Hourly (take the last price of each hour)</span>
+hourly = intraday.resample(<span class="string">"H"</span>).last()
+
+<span class="comment"># OHLC resampling (classic quant operation)</span>
+ohlc = intraday[<span class="string">"Price"</span>].resample(<span class="string">"H"</span>).ohlc()
+<span class="func">print</span>(ohlc.head())
+
+<span class="comment"># Upsampling: Daily → Hourly (introduces NaNs)</span>
+daily = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">100</span>, <span class="number">101</span>, <span class="number">102</span>]},
+                     index=pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">3</span>, freq=<span class="string">"D"</span>))
+up = daily.resample(<span class="string">"6H"</span>).asfreq()   <span class="comment"># asfreq = just introduce NaNs</span>
+up_filled = daily.resample(<span class="string">"6H"</span>).ffill()  <span class="comment"># Forward fill</span></code></pre>
+
+<h3>Shifting & Lagging</h3>
+<p>Calculating returns requires aligning today's price with yesterday's price. <code>.shift(n)</code> moves data by n periods.</p>
+
+<pre><code><span class="comment"># Daily price data</span>
+df = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">100</span>, <span class="number">102</span>, <span class="number">101</span>, <span class="number">105</span>, <span class="number">104</span>]},
+                  index=pd.date_range(<span class="string">"2024-01-01"</span>, periods=<span class="number">5</span>))
+
+<span class="comment"># Previous day's close</span>
+df[<span class="string">"Prev_Close"</span>] = df[<span class="string">"Close"</span>].shift(<span class="number">1</span>)
+
+<span class="comment"># Daily return</span>
+df[<span class="string">"Return"</span>] = df[<span class="string">"Close"</span>] / df[<span class="string">"Close"</span>].shift(<span class="number">1</span>) - <span class="number">1</span>
+
+<span class="comment"># Future return (lead) — useful for labeling in machine learning</span>
+df[<span class="string">"Future_1d_Return"</span>] = df[<span class="string">"Close"</span>].shift(-<span class="number">1</span>) / df[<span class="string">"Close"</span>] - <span class="number">1</span>
+
+<span class="comment"># Percent change (convenience method)</span>
+df[<span class="string">"Pct_Change"</span>] = df[<span class="string">"Close"</span>].pct_change()
+
+<span class="func">print</span>(df)</code></pre>
+
+<h3>Datetime Accessor (.dt)</h3>
+<pre><code><span class="comment"># Extract features from datetime index</span>
+df[<span class="string">"Year"</span>] = df.index.year
+df[<span class="string">"Month"</span>] = df.index.month
+df[<span class="string">"DayOfWeek"</span>] = df.index.dayofweek   <span class="comment"># Monday=0, Sunday=6</span>
+df[<span class="string">"Quarter"</span>] = df.index.quarter
+
+<span class="comment"># If you have a datetime column instead of index</span>
+<span class="comment"># df["Date"].dt.year, df["Date"].dt.is_month_end, etc.</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Time-Series Feature Engineering</h4>
+<ol>
+<li>Generate 2 years of daily business-day data for a synthetic stock price.</li>
+<li>Resample to monthly frequency and calculate monthly returns.</li>
+<li>Create a column <code>DayOfWeek</code> and group by it to calculate average return per weekday. Is Monday statistically different from Friday?</li>
+<li>Shift the price by 1 day and calculate returns. Verify that the first return is NaN.</li>
+<li>Upsample monthly returns back to daily and forward-fill. Explain why this creates look-ahead bias if used improperly.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/timeseries.html" target="_blank">Time Series / Date Functionality</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.resample.html" target="_blank">Resample Documentation</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a DatetimeIndex of 10 business days starting 2024-01-01.</li>
+      <li>Convert a column of strings to datetime using <code>pd.to_datetime</code>.</li>
+      <li>Use <code>.shift(1)</code> to create a lagged version of a Series.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Resample minute-level data to 5-minute OHLC bars.</li>
+      <li>Calculate the year-to-date cumulative return from a daily return series.</li>
+      <li>Find all month-end dates in a 1-year DatetimeIndex and extract the corresponding prices.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement a "seasonality" analyzer: Group daily returns by calendar month (1-12) and test if January returns are statistically different from other months using a t-test (use <code>scipy.stats</code>).</li>
+      <li>Given a DataFrame with irregular timestamps, reindex it to a regular 1-minute grid and interpolate missing values linearly. Discuss the dangers of interpolation in financial data.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 9: WINDOW FUNCTIONS ==================== -->
+<div id="window" class="tab-content">
+<h2><span class="badge quant">Quant Essential</span> 9. Window & Rolling Functions</h2>
+
+<h3>The Moving Window Concept</h3>
+<p>Markets are non-stationary. A 20-day volatility estimate from 2020 is useless in 2024. Rolling windows allow quants to compute statistics on a local, evolving subset of data.</p>
+
+<div class="svg-container">
+<svg width="650" height="260" viewBox="0 0 650 260">
+  <text x="325" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#154360">Rolling Window: 3-Day Moving Average</text>
+
+  <!-- Timeline -->
+  <line x1="50" y1="80" x2="600" y2="80" stroke="#2c3e50" stroke-width="2"/>
+
+  <!-- Days -->
+  <circle cx="80" cy="80" r="6" fill="#3498db"/>
+  <text x="80" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 1</text>
+  <text x="80" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">P=100</text>
+
+  <circle cx="180" cy="80" r="6" fill="#3498db"/>
+  <text x="180" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 2</text>
+  <text x="180" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">P=102</text>
+
+  <circle cx="280" cy="80" r="6" fill="#3498db"/>
+  <text x="280" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 3</text>
+  <text x="280" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">P=101</text>
+
+  <circle cx="380" cy="80" r="6" fill="#3498db"/>
+  <text x="380" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 4</text>
+  <text x="380" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">P=105</text>
+
+  <circle cx="480" cy="80" r="6" fill="#3498db"/>
+  <text x="480" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 5</text>
+  <text x="480" y="120" text-anchor="middle" font-size="11" fill="#5d6d7e">P=104</text>
+
+  <circle cx="580" cy="80" r="6" fill="#3498db"/>
+  <text x="580" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">Day 6</text>
+
+  <!-- Window brackets -->
+  <rect x="55" y="55" width="240" height="30" fill="none" stroke="#e74c3c" stroke-width="2" rx="5"/>
+  <text x="175" y="50" text-anchor="middle" font-size="12" fill="#e74c3c" font-weight="bold">Window 1 → MA=101.0</text>
+
+  <rect x="155" y="145" width="240" height="30" fill="none" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="275" y="195" text-anchor="middle" font-size="12" fill="#27ae60" font-weight="bold">Window 2 → MA=102.67</text>
+
+  <rect x="255" y="55" width="240" height="30" fill="none" stroke="#f39c12" stroke-width="2" rx="5"/>
+  <text x="375" y="50" text-anchor="middle" font-size="12" fill="#f39c12" font-weight="bold">Window 3 → MA=103.33</text>
+</svg>
+</div>
+
+<h3>Rolling Statistics</h3>
+<pre><code><span class="comment"># Setup: 1 year of daily returns</span>
+np.random.seed(<span class="number">42</span>)
+dates = pd.date_range(<span class="string">"2023-01-01"</span>, periods=<span class="number">252</span>, freq=<span class="string">"B"</span>)
+returns = pd.Series(np.random.normal(<span class="number">0.0005</span>, <span class="number">0.02</span>, <span class="func">len</span>(dates)), index=dates)
+price = <span class="number">100</span> * (<span class="number">1</span> + returns).cumprod()
+
+<span class="comment"># Rolling mean (Moving Average)</span>
+price_sma_20 = price.rolling(window=<span class="number">20</span>).mean()
+price_sma_50 = price.rolling(window=<span class="number">50</span>).mean()
+
+<span class="comment"># Rolling standard deviation (Realized Volatility)</span>
+vol_20d = returns.rolling(window=<span class="number">20</span>).std() * np.sqrt(<span class="number">252</span>)  <span class="comment"># Annualized</span>
+
+<span class="comment"># Rolling min/max (support/resistance proxies)</span>
+rolling_high = price.rolling(window=<span class="number">20</span>).max()
+rolling_low = price.rolling(window=<span class="number">20</span>).min()
+
+<span class="comment"># Rolling sum (e.g., cumulative volume over window)</span>
+volume = pd.Series(np.random.randint(<span class="number">1e6</span>, <span class="number">5e6</span>, <span class="func">len</span>(dates)), index=dates)
+vol_sum_5d = volume.rolling(window=<span class="number">5</span>).sum()</code></pre>
+
+<h3>Expanding Windows</h3>
+<p>Unlike rolling (fixed window), expanding uses all data from the start up to the current point. Useful for backtests that must not use future data.</p>
+
+<pre><code><span class="comment"># Expanding mean: uses all history up to date t</span>
+expanding_mean = price.expanding().mean()
+
+<span class="comment"># Expanding max drawdown calculation</span>
+rolling_max = price.expanding().max()
+drawdown = (price - rolling_max) / rolling_max
+
+<span class="comment"># Cumulative product (buy-and-hold return)</span>
+cum_return = (<span class="number">1</span> + returns).cumprod()</code></pre>
+
+<h3>Exponentially Weighted Windows (EWM)</h3>
+<p>EWM gives more weight to recent observations. This is how quants build adaptive indicators that react faster to new information than simple moving averages.</p>
+
+<pre><code><span class="comment"># Exponentially weighted moving average</span>
+<span class="comment"># span=20 means approximately equivalent to 20-day SMA in terms of center of mass</span>
+ewma_20 = price.ewm(span=<span class="number">20</span>, adjust=<span class="keyword">False</span>).mean()
+
+<span class="comment"># Exponentially weighted moving standard deviation</span>
+ewmstd_20 = returns.ewm(span=<span class="number">20</span>).std()
+
+<span class="comment"># Halflife: the period of time for the weight to decay to half</span>
+<span class="comment"># ewm(halflife=10) is common in risk management</span>
+risk_est = returns.ewm(halflife=<span class="number">10</span>).std()</code></pre>
+
+<h3>Custom Rolling Apply</h3>
+<pre><code><span class="comment"># Apply a custom function to each window</span>
+<span class="comment"># Example: rolling Sharpe ratio</span>
+<span class="keyword">def</span> <span class="func">sharpe</span>(window_returns):
+    <span class="keyword">return</span> window_returns.mean() / window_returns.std()
+
+rolling_sharpe = returns.rolling(<span class="number">63</span>).apply(sharpe, raw=<span class="keyword">True</span>)
+<span class="comment"># raw=True passes NumPy array (faster)</span>
+<span class="comment"># 63 days ≈ 3 months</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Build Bollinger Bands</h4>
+<ol>
+<li>Generate 1 year of daily prices.</li>
+<li>Calculate the 20-day Simple Moving Average (SMA).</li>
+<li>Calculate the 20-day rolling standard deviation of prices.</li>
+<li>Create Upper Band = SMA + 2*std and Lower Band = SMA - 2*std.</li>
+<li>Create a signal: 1 when price touches lower band (potential buy), -1 when price touches upper band (potential sell).</li>
+<li>Compare the SMA to an EWMA with span=20. Which reacts faster to a sudden price drop?</li>
+</ol>
+<pre><code><span class="comment"># Starter</span>
+sma = price.rolling(<span class="number">20</span>).mean()
+std = price.rolling(<span class="number">20</span>).std()
+upper = sma + <span class="number">2</span>*std
+lower = sma - <span class="number">2</span>*std</code></pre>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/window.html" target="_blank">Window Functions (Official)</a>
+<a class="resource-link" href="https://www.investopedia.com/terms/b/bollingerbands.asp" target="_blank">Investopedia: Bollinger Bands</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Calculate a 5-day rolling mean of a price Series.</li>
+      <li>Calculate the expanding sum of daily returns.</li>
+      <li>Compute a 10-day EWMA of prices.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Calculate rolling 30-day annualized volatility. What does multiplying by sqrt(252) do?</li>
+      <li>Compute the rolling correlation between two return series over a 60-day window.</li>
+      <li>Implement a rolling maximum drawdown function using expanding windows.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Build a rolling beta calculator: For each 90-day window, regress stock returns against market returns (use <code>np.polyfit</code> or <code>np.cov</code>). Return a Series of betas.</li>
+      <li>Implement a custom rolling function that calculates the percentage of up-days within a 20-day window. Use <code>.rolling().apply()</code> with <code>raw=True</code> for speed.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 10: FINANCIAL COMPUTATIONS ==================== -->
+<div id="financial" class="tab-content">
+<h2><span class="badge quant">Quant Essential</span> 10. Financial Computations</h2>
+
+<h3>The Quant's Formula Sheet</h3>
+<p>This section ties together all previous Pandas skills into actual quantitative finance calculations. These are the building blocks of strategies, risk models, and portfolio analytics.</p>
+
+<h3>Returns</h3>
+<pre><code><span class="comment"># Simple returns</span>
+returns = df[<span class="string">"Close"</span>].pct_change()
+<span class="comment"># Equivalent to: df["Close"] / df["Close"].shift(1) - 1</span>
+
+<span class="comment"># Log returns (time-additive, preferred for statistical analysis)</span>
+log_returns = np.log(df[<span class="string">"Close"</span>] / df[<span class="string">"Close"</span>].shift(<span class="number">1</span>))
+
+<span class="comment"># Why log returns? log(P_t / P_{t-1}) + log(P_{t-1} / P_{t-2}) = log(P_t / P_{t-2})</span>
+<span class="comment"># Simple returns do not compound additively.</span>
+
+<span class="comment"># Cumulative returns</span>
+cum_simple = (<span class="number">1</span> + returns).cumprod() - <span class="number">1</span>
+cum_log = log_returns.cumsum().apply(np.exp) - <span class="number">1</span>   <span class="comment"># Convert back to simple</span>
+
+<span class="comment"># Multi-period returns (e.g., monthly from daily)</span>
+monthly_returns = returns.resample(<span class="string">"M"</span>).apply(<span class="keyword">lambda</span> x: (<span class="number">1</span>+x).prod() - <span class="number">1</span>)</code></pre>
+
+<h3>Volatility & Risk</h3>
+<pre><code><span class="comment"># Realized volatility (annualized)</span>
+realized_vol = returns.rolling(<span class="number">21</span>).std() * np.sqrt(<span class="number">252</span>)
+<span class="comment"># 21 trading days ≈ 1 month; 252 ≈ trading days per year</span>
+
+<span class="comment"># Value at Risk (VaR) — Historical simulation</span>
+var_95 = returns.quantile(<span class="number">0.05</span>)   <span class="comment"># 5th percentile of historical returns</span>
+<span class="comment"># Interpretation: We expect to lose more than var_95 on 5% of days</span>
+
+<span class="comment"># Conditional VaR (Expected Shortfall)</span>
+cvar_95 = returns[returns <= var_95].mean()
+
+<span class="comment"># Maximum Drawdown</span>
+wealth_index = (<span class="number">1</span> + returns).cumprod()
+peak = wealth_index.expanding().max()
+drawdown = (wealth_index - peak) / peak
+max_dd = drawdown.min()</code></pre>
+
+<h3>Portfolio Math</h3>
+<pre><code><span class="comment"># Correlation matrix (diversification analysis)</span>
+returns_df = pd.DataFrame({
+    <span class="string">"AAPL"</span>: np.random.normal(<span class="number">0.001</span>, <span class="number">0.02</span>, <span class="number">252</span>),
+    <span class="string">"MSFT"</span>: np.random.normal(<span class="number">0.001</span>, <span class="number">0.018</span>, <span class="number">252</span>),
+    <span class="string">"JPM"</span>: np.random.normal(<span class="number">0.0005</span>, <span class="number">0.015</span>, <span class="number">252</span>)
+}, index=pd.date_range(<span class="string">"2023-01-01"</span>, periods=<span class="number">252</span>))
+
+corr_matrix = returns_df.corr()
+<span class="func">print</span>(corr_matrix)
+
+<span class="comment"># Portfolio return (weighted sum)</span>
+weights = np.array([<span class="number">0.4</span>, <span class="number">0.4</span>, <span class="number">0.2</span>])
+portfolio_return = returns_df @ weights   <span class="comment"># Matrix multiplication</span>
+
+<span class="comment"># Portfolio volatility (accounting for correlation)</span>
+cov_matrix = returns_df.cov() * <span class="number">252</span>   <span class="comment"># Annualized covariance</nportfolio_vol = np.sqrt(weights @ cov_matrix.values @ weights.T)</span>
+
+<span class="comment"># Sharpe Ratio (assuming risk-free rate = 0 for simplicity)</span>
+sharpe = portfolio_return.mean() / portfolio_return.std() * np.sqrt(<span class="number">252</span>)</code></pre>
+
+<h3>Simple Technical Indicators</h3>
+<pre><code><span class="comment"># RSI (Relative Strength Index) — simplified</span>
+delta = df[<span class="string">"Close"</span>].diff()
+gain = delta.clip(lower=<span class="number">0</span>)
+loss = -delta.clip(upper=<span class="number">0</span>)
+avg_gain = gain.rolling(<span class="number">14</span>).mean()
+avg_loss = loss.rolling(<span class="number">14</span>).mean()
+rs = avg_gain / avg_loss
+rsi = <span class="number">100</span> - (<span class="number">100</span> / (<span class="number">1</span> + rs))
+
+<span class="comment"># MACD (Moving Average Convergence Divergence)</span>
+ema_12 = df[<span class="string">"Close"</span>].ewm(span=<span class="number">12</span>).mean()
+ema_26 = df[<span class="string">"Close"</span>].ewm(span=<span class="number">26</span>).mean()
+macd = ema_12 - ema_26
+signal_line = macd.ewm(span=<span class="number">9</span>).mean()</code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Full Portfolio Analyzer</h4>
+<ol>
+<li>Create a DataFrame of daily returns for 5 assets over 2 years.</li>
+<li>Assign random weights that sum to 1.</li>
+<li>Calculate portfolio daily returns, cumulative returns, and plot mentally.</li>
+<li>Compute annualized return, volatility, and Sharpe ratio.</li>
+<li>Calculate the correlation matrix. Which pair is most correlated? Least?</li>
+<li>Calculate rolling 60-day Sharpe ratio for the portfolio.</li>
+<li>Compute maximum drawdown and the date it occurred.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://www.investopedia.com/terms/r/returnoninvestment.asp" target="_blank">Investopedia: ROI & Returns</a>
+<a class="resource-link" href="https://en.wikipedia.org/wiki/Sharpe_ratio" target="_blank">Wikipedia: Sharpe Ratio</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Calculate daily simple returns from a price Series.</li>
+      <li>Compute cumulative returns over 10 days.</li>
+      <li>Calculate the mean and standard deviation of returns.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Given two return series, compute their correlation and covariance.</li>
+      <li>Calculate the 95% historical VaR for a return series.</li>
+      <li>Compute the rolling 30-day beta of a stock against a market index.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Implement the Kelly Criterion: f* = (μ - r) / σ² for a portfolio. Use rolling 252-day estimates of μ and σ. Plot the recommended leverage over time.</li>
+      <li>Build a minimum variance portfolio optimizer using only Pandas/NumPy (no external optimizers). Use grid search over weight combinations that sum to 1.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 11: ADVANCED ==================== -->
+<div id="advanced" class="tab-content">
+<h2><span class="badge advanced">Advanced</span> 11. Advanced & Performance</h2>
+
+<h3>MultiIndex (Hierarchical Data)</h3>
+<p>Real quant data is naturally hierarchical: Date → Ticker → Field. MultiIndex handles this without redundant columns.</p>
+
+<pre><code><span class="comment"># Creating a MultiIndex DataFrame</span>
+arrays = [
+    [<span class="string">"AAPL"</span>, <span class="string">"AAPL"</span>, <span class="string">"MSFT"</span>, <span class="string">"MSFT"</span>],
+    [<span class="string">"2024-01-01"</span>, <span class="string">"2024-01-02"</span>, <span class="string">"2024-01-01"</span>, <span class="string">"2024-01-02"</span>]
+]
+index = pd.MultiIndex.from_arrays(arrays, names=[<span class="string">"Ticker"</span>, <span class="string">"Date"</span>])
+df = pd.DataFrame({<span class="string">"Close"</span>: [<span class="number">150</span>, <span class="number">152</span>, <span class="number">300</span>, <span class="number">305</span>], <span class="string">"Volume"</span>: [<span class="number">1e6</span>, <span class="number">1.2e6</span>, <span class="number">0.8e6</span>, <span class="number">0.9e6</span>]}, index=index)
+
+<span class="comment"># Selection</span>
+<span class="func">print</span>(df.loc[<span class="string">"AAPL"</span>])          <span class="comment"># All data for AAPL</span>
+<span class="func">print</span>(df.loc[(<span class="string">"AAPL"</span>, <span class="string">"2024-01-01"</span>)])  <span class="comment"># Specific row</span>
+
+<span class="comment"># Cross-section: select all tickers at a specific date level</span>
+<span class="func">print</span>(df.xs(<span class="string">"2024-01-01"</span>, level=<span class="string">"Date"</span>))
+
+<span class="comment"># Unstack: pivot inner level to columns</span>
+unstacked = df.unstack(level=<span class="string">"Ticker"</span>)
+<span class="func">print</span>(unstacked)</code></pre>
+
+<h3>Memory Optimization</h3>
+<pre><code><span class="comment"># Check deep memory usage</span>
+<span class="func">print</span>(df.info(memory_usage=<span class="string">"deep"</span>))
+
+<span class="comment"># Downcast numerics</span>
+df[<span class="string">"Volume"</span>] = pd.to_numeric(df[<span class="string">"Volume"</span>], downcast=<span class="string">"integer"</span>)
+
+<span class="comment"># Convert strings to category</span>
+df[<span class="string">"Sector"</span>] = df[<span class="string">"Sector"</span>].astype(<span class="string">"category"</span>)
+
+<span class="comment"># Use float32 instead of float64 if precision allows</span>
+df[<span class="string">"Close"</span>] = df[<span class="string">"Close"</span>].astype(<span class="string">"float32"</span>)
+<span class="comment"># For prices, float32 gives ~7 decimal digits — sufficient for most prices</span></code></pre>
+
+<h3>query() and eval()</h3>
+<pre><code><span class="comment"># query(): SQL-like filtering (faster for large DataFrames)</span>
+result = df.query(<span class="string">"Close > 150 and Volume > 1e6"</span>)
+<span class="comment"># Much cleaner than df[(df["Close"] > 150) & (df["Volume"] > 1e6)]</span>
+
+<span class="comment"># eval(): Evaluate string expressions efficiently</span>
+df.eval(<span class="string">"Dollar_Volume = Close * Volume"</span>, inplace=<span class="keyword">True</span>)
+<span class="comment"># Uses numexpr under the hood for speed</span></code></pre>
+
+<h3>Interoperability</h3>
+<pre><code><span class="comment"># To NumPy (for scikit-learn, scipy)</span>
+arr = df[[<span class="string">"Close"</span>, <span class="string">"Volume"</span>]].to_numpy()
+<span class="comment"># Old way df.values still works but to_numpy() is preferred</span>
+
+<span class="comment"># To dictionary</span>
+records = df.to_dict(<span class="string">"records"</span>)   <span class="comment"># List of dicts</span>
+
+<span class="comment"># Chunked reading (for massive CSVs that don't fit in RAM)</span>
+<span class="comment"># for chunk in pd.read_csv("huge.csv", chunksize=100000):</span>
+<span class="comment">#     process(chunk)</span></code></pre>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: Optimize a Large Dataset</h4>
+<ol>
+<li>Create a DataFrame with 1 million rows: <code>ID</code> (int), <code>Category</code> (one of 10 strings), <code>Value</code> (float), <code>Flag</code> (bool).</li>
+<li>Measure memory with <code>.info(memory_usage="deep")</code>.</li>
+<li>Optimize: downcast <code>ID</code> to int32, <code>Category</code> to category, <code>Value</code> to float32.</li>
+<li>Measure memory again. Calculate the percentage saved.</li>
+<li>Compare the speed of boolean indexing vs <code>.query()</code> for filtering <code>Value > 0.5</code>. Use <code>%timeit</code> in a cell.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/advanced.html" target="_blank">MultiIndex / Advanced Indexing</a>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/scale.html" target="_blank">Scaling to Large Datasets</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Create a MultiIndex from two lists and build a DataFrame.</li>
+      <li>Select all rows for one level of the outer index.</li>
+      <li>Use <code>.query()</code> to filter a DataFrame.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Unstack a MultiIndex DataFrame so that tickers become columns.</li>
+      <li>Stack it back to the original format.</li>
+      <li>Write a function that optimizes any DataFrame by downcasting and categorizing automatically.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Process a 5-million-row CSV in chunks. For each chunk, calculate the mean return per sector and aggregate the results into a final DataFrame without loading the full file.</li>
+      <li>Implement a custom accessor <code>@pd.api.extensions.register_dataframe_accessor("quant")</code> that adds a <code>.sharpe()</code> method directly to any DataFrame.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 12: INTEGRATION ==================== -->
+<div id="integration" class="tab-content">
+<h2><span class="badge advanced">Advanced</span> 12. Integration & Workflow</h2>
+
+<h3>The Quant Pipeline</h3>
+<p>Professional quants do not work in isolated cells—they build reproducible pipelines: Ingest → Clean → Transform → Model → Output. Pandas sits at the center of this ecosystem.</p>
+
+<div class="svg-container">
+<svg width="650" height="180" viewBox="0 0 650 180">
+  <rect x="10" y="60" width="110" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="65" y="85" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Ingest</text>
+  <text x="65" y="105" text-anchor="middle" font-size="10" fill="white">read_csv</text>
+
+  <text x="135" y="95" font-size="20" fill="#5d6d7e">→</text>
+
+  <rect x="160" y="60" width="110" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="215" y="85" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Clean</text>
+  <text x="215" y="105" text-anchor="middle" font-size="10" fill="white">dropna, ffill</text>
+
+  <text x="285" y="95" font-size="20" fill="#5d6d7e">→</text>
+
+  <rect x="310" y="60" width="110" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="365" y="85" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Transform</text>
+  <text x="365" y="105" text-anchor="middle" font-size="10" fill="white">pct_change, rolling</text>
+
+  <text x="435" y="95" font-size="20" fill="#5d6d7e">→</text>
+
+  <rect x="460" y="60" width="110" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="515" y="85" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Analyze</text>
+  <text x="515" y="105" text-anchor="middle" font-size="10" fill="white">groupby, merge</text>
+
+  <text x="585" y="95" font-size="20" fill="#5d6d7e">→</text>
+
+  <rect x="610" y="60" width="110" height="60" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="665" y="85" text-anchor="middle" font-size="12" fill="white" font-weight="bold">Export</text>
+  <text x="665" y="105" text-anchor="middle" font-size="10" fill="white">to_csv, to_parquet</text>
+
+  <text x="325" y="155" text-anchor="middle" font-size="13" fill="#5d6d7e">Pandas is the glue between data sources and statistical models</text>
+</svg>
+</div>
+
+<h3>Visualization Integration</h3>
+<pre><code><span class="comment"># Pandas has built-in plotting (Matplotlib backend)</span>
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Line plot of price and moving averages</span>
+ax = price.plot(figsize=(<span class="number">10</span>, <span class="number">5</span>), label=<span class="string">"Price"</span>)
+price_sma_20.plot(ax=ax, label=<span class="string">"SMA20"</span>)
+price_sma_50.plot(ax=ax, label=<span class="string">"SMA50"</span>)
+plt.legend()
+plt.title(<span class="string">"Price with Moving Averages"</span>)
+<span class="comment"># plt.show() in scripts; Colab displays automatically</span>
+
+<span class="comment"># Histogram of returns</span>
+returns.hist(bins=<span class="number">50</span>, figsize=(<span class="number">8</span>, <span class="number">4</span>))
+plt.title(<span class="string">"Return Distribution"</span>)
+
+<span class="comment"># Correlation heatmap</span>
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+sns.heatmap(returns_df.corr(), annot=<span class="keyword">True</span>, cmap=<span class="string">"coolwarm"</span>)
+</code></pre>
+
+<h3>Exporting Data</h3>
+<pre><code><span class="comment"># CSV (universal but slow and large)</span>
+df.to_csv(<span class="string">"output.csv"</span>, index=<span class="keyword">True</span>)
+
+<span class="comment"># Parquet (compressed, fast, preserves types — preferred for quant)</span>
+df.to_parquet(<span class="string">"output.parquet"</span>)
+
+<span class="comment"># Excel (for PMs who want to see results)</span>
+<span class="keyword">with</span> pd.ExcelWriter(<span class="string">"report.xlsx"</span>) <span class="keyword">as</span> writer:
+    df.to_excel(writer, sheet_name=<span class="string">"Prices"</span>)
+    corr_matrix.to_excel(writer, sheet_name=<span class="string">"Correlations"</span>)
+
+<span class="comment"># Pickle (Python object serialization — fast but Python-only)</span>
+df.to_pickle(<span class="string">"data.pkl"</span>)</code></pre>
+
+<h3>Best Practices for Quant Workflows</h3>
+<div class="card">
+<ol>
+<li><strong>Never modify raw data in-place.</strong> Always create new columns (<code>df["new"]</code>) rather than overwriting source data.</li>
+<li><strong>Avoid loops.</strong> If your code has a <code>for</code> loop iterating over DataFrame rows, there is almost certainly a vectorized solution.</li>
+<li><strong>Check for look-ahead bias.</strong> Any transformation using future data (e.g., mean-centering with global mean) invalidates a backtest.</li>
+<li><strong>Use <code>inplace=False</code></strong> (default) to maintain a functional pipeline where each step returns a new object.</li>
+<li><strong>Version your data.</strong> Save intermediate Parquet files with dates in filenames: <code>prices_2024_cleaned.parquet</code>.</li>
+<li><strong>Document units.</strong> Is your return 0.01 (1%) or 1.0 (100%)? Consistency prevents catastrophic errors.</li>
+</ol>
+</div>
+
+<div class="colab-box">
+<h4>🧪 Colab Experiment: End-to-End Pipeline</h4>
+<ol>
+<li><strong>Ingest:</strong> Generate synthetic daily data for 4 assets over 1 year.</li>
+<li><strong>Clean:</strong> Introduce 5% random NaNs, then forward-fill.</li>
+<li><strong>Transform:</strong> Calculate returns, 20-day SMA, and 20-day volatility.</li>
+<li><strong>Analyze:</strong> Compute correlation matrix, portfolio Sharpe (equal weights), and max drawdown.</li>
+<li><strong>Export:</strong> Save the final DataFrame to Parquet and CSV. Compare file sizes.</li>
+<li><strong>Visualize:</strong> Plot cumulative returns of all 4 assets on one chart.</li>
+</ol>
+</div>
+
+<h3>External Resources</h3>
+<a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/io.html" target="_blank">IO Tools (Read/Write)</a>
+<a class="resource-link" href="https://matplotlib.org/stable/tutorials/introductory/pyplot.html" target="_blank">Matplotlib Pyplot Tutorial</a>
+
+<div class="exercise-container">
+  <div class="exercise-tier easy">
+    <h5>🟢 Easy</h5>
+    <ol>
+      <li>Save a DataFrame to CSV and read it back.</li>
+      <li>Plot a simple line chart of a price Series using <code>.plot()</code>.</li>
+      <li>Write a DataFrame to an Excel file with two sheets.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier medium">
+    <h5>🟡 Medium</h5>
+    <ol>
+      <li>Create a function <code>pipeline(df)</code> that chains 5 operations and returns the result. Ensure no intermediate variables are modified in-place.</li>
+      <li>Plot a histogram of returns with 50 bins and a vertical line at the mean.</li>
+      <li>Export a MultiIndex DataFrame to Parquet and verify it reads back correctly.</li>
+    </ol>
+  </div>
+  <div class="exercise-tier hard">
+    <h5>🔴 Hard</h5>
+    <ol>
+      <li>Build a parameterized backtest function: Inputs are price DataFrame, signal DataFrame (-1,0,1), and transaction cost. Output is a DataFrame of daily P&L, cumulative P&L, and running Sharpe. No loops allowed.</li>
+      <li>Create a reusable module-style pipeline class with methods <code>.load()</code>, <code>.clean()</code>, <code>.engineer_features()</code>, <code>.evaluate()</code> that each return <code>self</code> for method chaining.</li>
+    </ol>
+  </div>
+</div>
+</div>
+
+<!-- ==================== TOPIC 13: CAPSTONE ==================== -->
+<div id="capstone" class="tab-content">
+<h2><span class="badge quant">Capstone</span> 13. Capstone Projects</h2>
+
+<p>These projects integrate all skills. They are designed to mimic real quant interview tasks and portfolio construction workflows.</p>
+
+<div class="card">
+<h3>Project 1: The Cross-Sectional Momentum Screener</h3>
+<p><strong>Scenario:</strong> You are a quant analyst at a long/short equity fund. Every month, you must rank 100 stocks by their 12-month past return (excluding the most recent month to avoid reversal), and select the top 10 and bottom 10.</p>
+
+<h4>Requirements:</h4>
+<ol>
+<li>Generate synthetic daily price data for 100 stocks over 2 years.</li>
+<li>Calculate monthly returns for each stock.</li>
+<li>For each month-end, compute the 11-month cumulative return (t-12 to t-1).</li>
+<li>Rank stocks within that month. Select decile 10 (winners) and decile 1 (losers).</li>
+<li>Calculate the equal-weighted return of the long-short portfolio for the subsequent month.</li>
+<li>Compute the Sharpe ratio and max drawdown of this strategy.</li>
+</ol>
+
+<h4>Skills Tested:</h4>
+<p>Time-series, GroupBy, shift, ranking, merge, portfolio math.</p>
+</div>
+
+<div class="card">
+<h3>Project 2: The Risk Parity Allocator</h3>
+<p><strong>Scenario:</strong> Instead of equal weights, allocate capital inversely proportional to each asset's volatility. Higher volatility assets get smaller weights.</p>
+
+<h4>Requirements:</h4>
+<ol>
+<li>Use 5 asset return series (synthetic or real).</li>
+<li>Calculate rolling 60-day volatility for each asset.</li>
+<li>At each month-end, set weights = (1/vol_i) / sum(1/vol_j).</li>
+<li>Compute the portfolio return for the next month using these weights.</li>
+<li>Compare cumulative returns of Risk Parity vs Equal Weight vs 60/40 benchmark.</li>
+</ol>
+
+<h4>Skills Tested:</h4>
+<p>Rolling windows, GroupBy, transform, vectorization, visualization.</p>
+</div>
+
+<div class="card">
+<h3>Project 3: The Earnings Surprise Analyzer</h3>
+<p><strong>Scenario:</strong> Merge quarterly earnings data with daily price data. Measure the price drift before and after the announcement.</p>
+
+<h4>Requirements:</h4>
+<ol>
+<li>Create a daily price DataFrame for 20 stocks over 3 years.</li>
+<li>Create a sparse earnings DataFrame: Date, Ticker, EPS_Actual, EPS_Estimate.</li>
+<li>Calculate Surprise = (Actual - Estimate) / |Estimate|.</li>
+<li>Merge earnings into prices using <code>pd.merge_asof</code> (backward, by ticker).</li>
+<li>For each earnings event, extract the return from t-5 to t+5 (event study).</li>
+<li>Group by surprise quintile and plot the average cumulative return path.</li>
+</ol>
+
+<h4>Skills Tested:</h4>
+<p>Merge_asof, time alignment, shift, GroupBy, visualization.</p>
+</div>
+
+<div class="card">
+<h3>Project 4: The Intraday Microstructure Cleaner</h3>
+<p><strong>Scenario:</strong> Clean real-world tick data with bad prints, duplicates, and missing timestamps.</p>
+
+<h4>Requirements:</h4>
+<ol>
+<li>Generate synthetic 1-minute bars with occasional bad ticks (negative prices, zero volume).</li>
+<li>Remove ticks where High < Low or Volume = 0.</li>
+<li>Remove duplicate timestamps keeping the last.</li>
+<li>Reindex to a complete 1-minute grid (9:30-16:00) and forward-fill missing bars up to 5 minutes.</li>
+<li>Resample to 5-minute OHLC bars.</li>
+<li>Calculate the realized variance for the day: sum of squared 5-min returns.</li>
+</ol>
+
+<h4>Skills Tested:</h4>
+<p>Cleaning, resample, reindex, interpolation, time-series math.</p>
+</div>
+
+<div class="footer-note" style="margin-top:40px;">
+<strong>Congratulations.</strong> You have completed the Pandas Mastery Study Guide for Quant Engineers.<br>
+Revisit each tab, complete all exercises, and build the capstone projects to solidify your skills.<br>
+<em>"The best time to plant a tree was 20 years ago. The second best time is now."</em>
+</div>
+</div>
+
+</div> <!-- end main -->
+
+<script>
+function showTab(tabId) {
+  // Hide all tabs
+  var tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+
+  // Show selected
+  document.getElementById(tabId).classList.add('active');
+
+  // Update sidebar active state
+  var navs = document.querySelectorAll('.nav-item');
+  navs.forEach(function(n) { n.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+}
+</script>
+
+</body>
+</html>
