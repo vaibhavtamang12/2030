@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Series & Modeling — Quant Engineer Study Guide</title>
+<style>
+:root{
+  --bg:#0b0f19;--panel:#111827;--text:#e2e8f0;--muted:#94a3b8;
+  --accent:#38bdf8;--accent2:#818cf8;--border:#1f2937;--good:#34d399;--warn:#fbbf24;--bad:#f87171;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,'Open Sans','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+header{padding:2rem 1rem;text-align:center;background:linear-gradient(180deg,#0f172a,#0b0f19);border-bottom:1px solid var(--border)}
+h1{margin:.2rem 0;font-size:1.8rem;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:.95rem}
+nav{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;padding:1rem;background:#0b1222;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+button.tab-btn{background:#1f2937;border:1px solid #334155;color:#cbd5e1;padding:.55rem .9rem;border-radius:.4rem;cursor:pointer;font-size:.85rem;transition:.2s}
+button.tab-btn:hover{border-color:var(--accent);color:#fff}
+button.tab-btn.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0b0f19;border-color:transparent;font-weight:700}
+.container{max-width:1100px;margin:0 auto;padding:1.5rem 1rem}
+.tab-content{display:none;animation:fade .3s}
+.tab-content.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:.6rem;padding:1.25rem;margin:1rem 0}
+h2{margin-top:0;font-size:1.25rem;color:#fff;border-bottom:1px solid var(--border);padding-bottom:.5rem}
+h3{color:#bae6fd;font-size:1.05rem;margin:1.2rem 0 .5rem}
+h4{color:#e2e8f0;font-size:.95rem;margin:1rem 0 .4rem}
+p{margin:.6rem 0}
+ul,ol{margin:.4rem 0 .4rem 1.2rem}
+li{margin:.25rem 0}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace}
+code{background:#0b1222;padding:.15rem .35rem;border-radius:.3rem;font-size:.9em;color:#7dd3fc;border:1px solid #1f2937}
+pre{background:#0b1222;border:1px solid var(--border);padding:.9rem;border-radius:.5rem;overflow-x:auto;font-size:.85rem;line-height:1.5}
+pre code{background:none;padding:0;border:none}
+.tip{background:#064e3b;border:1px solid #065f46;border-radius:.5rem;padding:.8rem 1rem;margin:1rem 0;color:#a7f3d0}
+.warn{background:#451a03;border:1px solid #78350f;border-radius:.5rem;padding:.8rem 1rem;margin:1rem 0;color:#fde68a}
+.exercise{background:#1e1b4b;border:1px solid #312e81;border-radius:.5rem;padding:.8rem 1rem;margin:.6rem 0}
+.exercise strong{color:#c7d2fe}
+.tier-e{border-left:4px solid var(--good)}
+.tier-m{border-left:4px solid var(--warn)}
+.tier-h{border-left:4px solid var(--bad)}
+.canvas-wrap{text-align:center;margin:1rem 0}
+canvas{background:#0b1222;border:1px solid var(--border);border-radius:.5rem;max-width:100%}
+.controls{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin:.6rem 0}
+.controls label{color:#cbd5e1;font-size:.9rem}
+input[type=range]{flex:1;min-width:120px}
+button.action{background:#1d4ed8;border:1px solid #2563eb;color:#fff;padding:.45rem .8rem;border-radius:.4rem;cursor:pointer;font-size:.85rem}
+button.action:hover{background:#2563eb}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}
+th,td{border:1px solid var(--border);padding:.5rem .6rem;text-align:left}
+th{background:#0f172a;color:#bae6fd}
+td{background:#0b1222}
+.svg-wrap{display:flex;justify-content:center;margin:1rem 0}
+.svg-wrap svg{max-width:100%;height:auto}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:800px){.two-col{grid-template-columns:1fr}}
+a{color:var(--accent)}
+a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Time Series & Modeling</h1>
+  <div class="sub">A Self-Contained Study Guide for Aspiring Quant Engineers &nbsp;|&nbsp; 100% Offline Ready</div>
+</header>
+
+<nav>
+  <button class="tab-btn active" onclick="showTab('prereq')">Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('basics')">1. Foundations</button>
+  <button class="tab-btn" onclick="showTab('eda')">2. EDA & Stationarity</button>
+  <button class="tab-btn" onclick="showTab('arima')">3. ARIMA Family</button>
+  <button class="tab-btn" onclick="showTab('vol')">4. Volatility (GARCH)</button>
+  <button class="tab-btn" onclick="showTab('statespace')">5. State Space & Kalman</button>
+  <button class="tab-btn" onclick="showTab('multi')">6. Multivariate & Coint.</button>
+  <button class="tab-btn" onclick="showTab('ml')">7. ML for Time Series</button>
+  <button class="tab-btn" onclick="showTab('dl')">8. Deep Learning</button>
+  <button class="tab-btn" onclick="showTab('backtest')">9. Backtesting & Risk</button>
+</nav>
+
+<div class="container">
+
+<!-- ================= PREREQUISITES ================= -->
+<div id="prereq" class="tab-content active">
+
+<div class="card">
+<h2>Prerequisites</h2>
+<p>Before touching time series models, you need a shared language with the literature and the code. This section is the bedrock.</p>
+
+<h3>A. Python & Data Stack</h3>
+<ul>
+<li><strong>NumPy</strong>: N-dimensional arrays, broadcasting, vectorization. Time series are arrays indexed by time.</li>
+<li><strong>Pandas</strong>: <code>DataFrame</code>, <code>Series</code>, datetime indexing (<code>pd.to_datetime</code>), resampling (<code>.resample()</code>), rolling windows (<code>.rolling()</code>), shifting (<code>.shift()</code>).</li>
+<li><strong>Matplotlib / Plotly</strong>: Line plots are the bread and butter of diagnostics.</li>
+</ul>
+
+<h3>B. Statistics & Probability</h3>
+<ul>
+<li><strong>Random Variables</strong>: Expectation <code>E[X]</code>, Variance <code>Var(X)</code>, Covariance <code>Cov(X,Y)</code>.</li>
+<li><strong>Normal Distribution</strong>: Returns are often modeled as normal (or transformed to be closer to normal).</li>
+<li><strong>Law of Large Numbers & CLT</strong>: Justify using sample means to estimate population means.</li>
+<li><strong>Hypothesis Testing</strong>: Null vs alternative, p-values, t-tests. You will use this constantly in unit-root tests.</li>
+</ul>
+
+<h3>C. Linear Algebra (Light)</h3>
+<ul>
+<li>Vectors, matrices, transpose, matrix multiplication.</li>
+<li>Identity matrix <code>I</code>, inverse <code>A⁻¹</code>.</li>
+<li>Eigenvalues (stability of VAR models depends on eigenvalues inside the unit circle).</li>
+</ul>
+
+<h3>D. Calculus (Light)</h3>
+<ul>
+<li>Derivative: rate of change. Used in gradient-based optimization of models.</li>
+<li>Partial derivative: how a function changes when you tweak one parameter.</li>
+<li>Logarithm & exponent rules: log-returns are <code>ln(Pt / Pt-1)</code>.</li>
+</ul>
+
+<h3>E. Finance Basics for Quants</h3>
+<ul>
+<li><strong>Simple return</strong>: <code>Rt = (Pt - Pt-1)/Pt-1</code></li>
+<li><strong>Log return</strong>: <code>rt = ln(Pt) - ln(Pt-1)</code>. Additive across time, which makes math easier.</li>
+<li><strong>Volatility</strong>: Standard deviation of returns. Usually annualized.</li>
+<li><strong>Sharpe Ratio</strong>: <code>(Return - RiskFree) / Volatility</code>. Risk-adjusted performance.</li>
+</ul>
+
+<div class="tip"><strong>Tip:</strong> If any term above feels foreign, spend 30 minutes on it now. Everything that follows assumes you are comfortable with these ideas.</div>
+</div>
+
+<div class="card">
+<h3>Quick Colab: Environment Check</h3>
+<pre><code># Run this in a Colab cell to confirm your stack
+import numpy as np, pandas as pd, matplotlib.pyplot as plt
+print(np.__version__, pd.__version__)
+
+# Generate a simple random walk
+np.random.seed(42)
+n = 200
+steps = np.random.normal(size=n)
+walk = np.cumsum(steps)
+
+pd.Series(walk).plot(title="Random Walk", figsize=(9,3))
+plt.grid(True, alpha=0.3)
+plt.show()</code></pre>
+</div>
+
+<div class="card">
+<h3>Practice: Prerequisites</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Create a Pandas Series of 100 daily dates starting 2020-01-01 and compute a 7-day rolling average of random numbers.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Given a price series, write a function that returns both simple and log returns. Verify that for small changes, simple ≈ log.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Implement a simple vectorized backtester that takes a signal array (1=long, -1=short, 0=flat) and a price series, and returns the cumulative PnL curve without using loops.</div>
+</div>
+</div>
+
+<!-- ================= FOUNDATIONS ================= -->
+<div id="basics" class="tab-content">
+
+<div class="card">
+<h2>1. Time Series Foundations</h2>
+<p>A <strong>time series</strong> is a sequence of data points recorded at successive equally spaced time intervals. In quant finance, the series is usually asset prices, returns, trading volumes, or macroeconomic indicators.</p>
+
+<h3>Components of a Time Series</h3>
+<p>Most series can be decomposed into four parts. Understanding them helps you choose the right model.</p>
+
+<div class="svg-wrap">
+<svg width="720" height="340" viewBox="0 0 720 340">
+  <rect width="720" height="340" fill="#0b1222" rx="8"/>
+  <text x="20" y="28" fill="#bae6fd" font-size="14" font-weight="700">Additive Decomposition: Yt = Tt + St + Ct + εt</text>
+  <!-- Trend -->
+  <text x="20" y="60" fill="#34d399" font-size="12" font-weight="700">Trend (Tt)</text>
+  <path d="M120,60 Q240,30 360,70 T600,40" fill="none" stroke="#34d399" stroke-width="2"/>
+  <!-- Seasonal -->
+  <text x="20" y="130" fill="#fbbf24" font-size="12" font-weight="700">Seasonal (St)</text>
+  <path d="M120,130 L140,110 L160,150 L180,110 L200,150 L220,110 L240,150 L260,110 L280,150 L300,110 L320,150 L340,110 L360,150 L380,110 L400,150 L420,110 L440,150 L460,110 L480,150 L500,110 L520,150 L540,110 L560,150 L580,110 L600,130" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <!-- Cyclical -->
+  <text x="20" y="200" fill="#f87171" font-size="12" font-weight="700">Cyclical (Ct)</text>
+  <path d="M120,200 Q240,160 360,210 T600,180" fill="none" stroke="#f87171" stroke-width="2"/>
+  <!-- Irregular -->
+  <text x="20" y="270" fill="#94a3b8" font-size="12" font-weight="700">Irregular (εt)</text>
+  <path d="M120,270 L140,260 L160,280 L180,265 L200,275 L220,260 L240,285 L260,270 L280,265 L300,275 L320,260 L340,280 L360,270 L380,265 L400,275 L420,260 L440,285 L460,270 L480,265 L500,275 L520,260 L540,280 L560,270 L580,265 L600,275" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- Observed -->
+  <text x="20" y="315" fill="#e2e8f0" font-size="12" font-weight="700">Observed = Sum</text>
+  <path d="M120,315 Q180,290 240,310 T360,300 T480,320 T600,295" fill="none" stroke="#e2e8f0" stroke-width="2.5"/>
+</svg>
+</div>
+
+<ul>
+<li><strong style="color:var(--good)">Trend:</strong> Long-term direction. Example: a stock index drifting upward over decades due to economic growth.</li>
+<li><strong style="color:var(--warn)">Seasonality:</strong> Repeating pattern at fixed intervals. Example: retail sales spike every December.</li>
+<li><strong style="color:var(--bad)">Cyclical:</strong> Oscillations without a fixed period, usually tied to business cycles (multi-year).</li>
+<li><strong style="color:var(--muted)">Irregular / Noise:</strong> Random, unpredictable fluctuations.</li>
+</ul>
+
+<h3>Stationarity</h3>
+<p>A stationary series has statistical properties that do not change over time. This is the <em>single most important prerequisite</em> for many models.</p>
+
+<div class="two-col">
+<div>
+<h4>Weak (Wide-Sense) Stationarity</h4>
+<ol>
+<li>Constant mean: <code>E[Yt] = μ</code> for all <code>t</code></li>
+<li>Constant variance: <code>Var(Yt) = σ²</code></li>
+<li>Covariance depends only on lag <code>k</code>: <code>Cov(Yt, Yt-k) = γ(k)</code></li>
+</ol>
+</div>
+<div>
+<h4>Strict Stationarity</h4>
+<p>The entire joint distribution is time-invariant. Much stronger and rarely needed in practice.</p>
+</div>
+</div>
+
+<div class="warn"><strong>Why it matters:</strong> If means and variances shift over time, a model trained on historical data is describing a distribution that no longer exists. Non-stationary series tend to produce spurious regressions.</div>
+
+<h3>White Noise & Random Walk</h3>
+<ul>
+<li><strong>White Noise (εt)</strong>: <code>E[εt]=0</code>, constant variance, zero autocorrelation. The "unpredictable" part of a good model should look like white noise.</li>
+<li><strong>Random Walk</strong>: <code>Yt = Yt-1 + εt</code>. The variance grows with time (<code>t·σ²</code>), so it is <em>non-stationary</em>. Differencing it once yields white noise.</li>
+</ul>
+
+<div class="canvas-wrap">
+<canvas id="cStationarity" width="700" height="260"></canvas>
+<div class="controls">
+  <button class="action" onclick="drawStationary()">Stationary AR(1)</button>
+  <button class="action" onclick="drawRandomWalk()">Random Walk</button>
+  <span style="color:#94a3b8;font-size:.85rem">← Click to compare</span>
+</div>
+</div>
+<script>
+(function(){
+  const c=document.getElementById('cStationarity'),x=c.getContext('2d');
+  function clear(){x.fillStyle='#0b1222';x.fillRect(0,0,700,260);x.strokeStyle='#1f2937';x.lineWidth=1;
+    for(let i=0;i<=260;i+=40){x.beginPath();x.moveTo(0,i);x.lineTo(700,i);x.stroke();}
+    for(let i=0;i<=700;i+=70){x.beginPath();x.moveTo(i,0);x.lineTo(i,260);x.stroke();}
+  }
+  function line(ys,color){
+    x.beginPath();x.strokeStyle=color;x.lineWidth=2;
+    for(let i=0;i<ys.length;i++){let px=i*(700/ys.length),py=130-ys[i]*8;if(i===0)x.moveTo(px,py);else x.lineTo(px,py);}
+    x.stroke();
+  }
+  window.drawStationary=function(){
+    clear();let y=[],v=0;for(let i=0;i<200;i++){v=0.7*v+Math.random()*2-1;y.push(v);}line(y,'#38bdf8');
+    x.fillStyle='#bae6fd';x.font='12px sans-serif';x.fillText('Stationary AR(1): mean-reverting, constant variance',10,20);
+  };
+  window.drawRandomWalk=function(){
+    clear();let y=[],v=0;for(let i=0;i<200;i++){v+=Math.random()*2-1;y.push(v);}line(y,'#f87171');
+    x.fillStyle='#fecaca';x.font='12px sans-serif';x.fillText('Random Walk: wanders, variance grows',10,20);
+  };
+  drawStationary();
+})();
+</script>
+
+<h3>Colab Experiment: Generate Components</h3>
+<pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(0)
+n = 500
+t = np.arange(n)
+
+# Components
+trend = 0.02 * t
+seasonal = 10 * np.sin(2 * np.pi * t / 50)
+cyclical = 5 * np.sin(2 * np.pi * t / 150)
+noise = np.random.normal(0, 2, n)
+
+# Combine
+ts = trend + seasonal + cyclical + noise
+
+fig, ax = plt.subplots(5, 1, figsize=(10, 10), sharex=True)
+ax[0].plot(ts); ax[0].set_title("Observed")
+ax[1].plot(trend); ax[1].set_title("Trend")
+ax[2].plot(seasonal); ax[2].set_title("Seasonal")
+ax[3].plot(cyclical); ax[3].set_title("Cyclical")
+ax[4].plot(noise); ax[4].set_title("Irregular")
+plt.tight_layout(); plt.show()</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Book: <em>Forecasting: Principles and Practice</em> (Hyndman & Athanasopoulos) — free online.</li>
+<li>Book: <em>Analysis of Financial Time Series</em> (Tsay) — the quant classic.</li>
+<li>Video: "Time Series Decomposition" by ritvikmath (YouTube).</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: Foundations</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Generate 300 points of a random walk and plot it. Compute its mean in the first half vs. the second half. Are they similar?</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Create a series with a known trend and seasonality. Use Pandas <code>.diff()</code> to remove the trend and verify the mean becomes roughly constant.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Prove numerically (via simulation) that the variance of a random walk after <code>T</code> steps is <code>T·σ²</code> where <code>σ²</code> is the variance of the step noise.</div>
+</div>
+</div>
+
+<!-- ================= EDA ================= -->
+<div id="eda" class="tab-content">
+
+<div class="card">
+<h2>2. Exploratory Analysis & Stationarity Tests</h2>
+<p>Before modeling, you must inspect the data. EDA for time series is different from cross-sectional EDA because order matters.</p>
+
+<h3>Autocorrelation Function (ACF)</h3>
+<p>ACF measures the linear relationship between <code>Yt</code> and <code>Yt-k</code> for various lags <code>k</code>.</p>
+<p style="text-align:center;font-size:1.05rem">ρ(k) = Cov(Yt, Yt-k) / Var(Yt)</p>
+
+<div class="svg-wrap">
+<svg width="680" height="240" viewBox="0 0 680 240">
+  <rect width="680" height="240" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">ACF of a Trending Series (slow decay)</text>
+  <line x1="40" y1="200" x2="640" y2="200" stroke="#475569" stroke-width="1"/>
+  <line x1="40" y1="40" x2="40" y2="200" stroke="#475569" stroke-width="1"/>
+  <!-- bars -->
+  <rect x="55" y="80" width="18" height="120" fill="#38bdf8" opacity="0.85"/>
+  <rect x="85" y="95" width="18" height="105" fill="#38bdf8" opacity="0.85"/>
+  <rect x="115" y="110" width="18" height="90" fill="#38bdf8" opacity="0.85"/>
+  <rect x="145" y="120" width="18" height="80" fill="#38bdf8" opacity="0.85"/>
+  <rect x="175" y="128" width="18" height="72" fill="#38bdf8" opacity="0.85"/>
+  <rect x="205" y="135" width="18" height="65" fill="#38bdf8" opacity="0.85"/>
+  <rect x="235" y="142" width="18" height="58" fill="#38bdf8" opacity="0.85"/>
+  <rect x="265" y="148" width="18" height="52" fill="#38bdf8" opacity="0.85"/>
+  <rect x="295" y="152" width="18" height="48" fill="#38bdf8" opacity="0.85"/>
+  <rect x="325" y="155" width="18" height="45" fill="#38bdf8" opacity="0.85"/>
+  <!-- confidence dashed -->
+  <line x1="40" y1="140" x2="640" y2="140" stroke="#f87171" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="650" y="143" fill="#f87171" font-size="10">conf. bound</text>
+  <text x="40" y="220" fill="#94a3b8" font-size="10">Lag 1</text>
+  <text x="600" y="220" fill="#94a3b8" font-size="10">Lag 30</text>
+</svg>
+</div>
+
+<p>For a <strong>stationary</strong> series, ACF decays quickly. For a <strong>random walk</strong>, ACF decays very slowly because <code>Yt</code> is strongly correlated with all past values.</p>
+
+<h3>Partial Autocorrelation Function (PACF)</h3>
+<p>PACF measures the correlation between <code>Yt</code> and <code>Yt-k</code> <em>after removing</em> the effect of intermediate lags <code>1...k-1</code>. It is crucial for identifying the order <code>p</code> in AR models.</p>
+
+<h3>Decomposition</h3>
+<p>Two classical models:</p>
+<ul>
+<li><strong>Additive</strong>: <code>Yt = Tt + St + εt</code> (seasonal fluctuations are constant in magnitude)</li>
+<li><strong>Multiplicative</strong>: <code>Yt = Tt × St × εt</code> (seasonal fluctuations grow with the trend). Use log-transform to convert to additive.</li>
+</ul>
+
+<h3>Unit Root Tests</h3>
+<table>
+<tr><th>Test</th><th>Null Hypothesis</th><th>Stationarity Conclusion</th><th>Typical Use</th></tr>
+<tr><td>Augmented Dickey-Fuller (ADF)</td><td>Unit root exists (non-stationary)</td><td>Reject null → stationary</td><td>Most common first test</td></tr>
+<tr><td>KPSS</td><td>Series is stationary</td><td>Reject null → non-stationary</td><td>Confirmatory; opposite null to ADF</td></tr>
+<tr><td>PP (Phillips-Perron)</td><td>Unit root exists</td><td>Robust to heteroskedasticity</td><td>Alternative to ADF</td></tr>
+</table>
+
+<div class="tip"><strong>Rule of thumb:</strong> If ADF says non-stationary and KPSS says non-stationary → difference the series and test again. If they disagree, inspect the series visually.</div>
+
+<h3>Interactive ACF Demo</h3>
+<div class="canvas-wrap">
+<canvas id="cACF" width="680" height="240"></canvas>
+<div class="controls">
+  <button class="action" onclick="drawACF('ar')">AR(1) ACF</button>
+  <button class="action" onclick="drawACF('ma')">MA(1) ACF</button>
+  <button class="action" onclick="drawACF('rw')">Random Walk ACF</button>
+</div>
+</div>
+<script>
+(function(){
+  const c=document.getElementById('cACF'),x=c.getContext('2d');
+  function grid(){x.fillStyle='#0b1222';x.fillRect(0,0,680,240);x.strokeStyle='#1f2937';x.lineWidth=1;
+    for(let i=0;i<=240;i+=40){x.beginPath();x.moveTo(0,i);x.lineTo(680,i);x.stroke();}
+    x.beginPath();x.moveTo(30,120);x.lineTo(650,120);x.strokeStyle='#475569';x.stroke();
+  }
+  function bars(vals,title,color){
+    grid();let n=vals.length,w=580/n;
+    for(let i=0;i<n;i++){
+      let h=vals[i]*100;let y=h>=0?120-h:120;
+      x.fillStyle=color;x.fillRect(35+i*w,y,w-4,Math.abs(h));
+    }
+    x.fillStyle='#bae6fd';x.font='12px sans-serif';x.fillText(title,10,20);
+    x.strokeStyle='#f87171';x.beginPath();x.moveTo(30,80);x.lineTo(650,80);x.setLineDash([4,4]);x.stroke();x.setLineDash([]);
+    x.beginPath();x.moveTo(30,160);x.lineTo(650,160);x.stroke();
+  }
+  window.drawACF=function(type){
+    if(type==='ar') bars([0.85,0.72,0.61,0.52,0.44,0.37,0.31,0.26,0.22,0.19,0.16,0.13,0.11,0.09,0.08],'AR(1) ACF: geometric decay','#38bdf8');
+    if(type==='ma') bars([0.60,0.30,0.05,-0.02,0.01,-0.01,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00],'MA(1) ACF: cuts off after lag 1','#34d399');
+    if(type==='rw') bars([0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,0.80,0.78,0.76,0.74,0.72,0.70],'Random Walk ACF: very slow decay','#f87171');
+  };
+  drawACF('ar');
+})();
+</script>
+
+<h3>Colab Experiment: ADF & Decomposition</h3>
+<pre><code>!pip install statsmodels -q
+import numpy as np, pandas as pd
+from statsmodels.tsa.stattools import adfuller
+from statsmodels.tsa.seasonal import seasonal_decompose
+import matplotlib.pyplot as plt
+
+# Generate non-stationary series
+np.random.seed(1)
+rw = np.cumsum(np.random.normal(size=300))
+
+# ADF test
+result = adfuller(rw)
+print(f'ADF Statistic: {result[0]:.4f}')
+print(f'p-value: {result[1]:.4f}')
+print('Non-stationary' if result[1] > 0.05 else 'Stationary')
+
+# Decompose a synthetic seasonal series
+t = np.arange(300)
+series = pd.Series(0.05*t + 10*np.sin(2*np.pi*t/30) + np.random.normal(0,1,300),
+                   index=pd.date_range('2020-01-01', periods=300, freq='D'))
+decomp = seasonal_decompose(series, model='additive', period=30)
+decomp.plot(); plt.show()</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>StatQuest: "Time Series Analysis / Autocorrelation" (YouTube).</li>
+<li>Article: "Stationarity and Unit Root Testing" — Duke Econometrics notes.</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: EDA & Stationarity</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Load any stock price CSV. Plot the price and its first difference. Which looks more stationary?</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Compute and plot the ACF for a pure white noise series of length 1000. How many spikes exceed the confidence bounds? (Expect ~5% by chance).</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Implement the ADF test statistic formula manually for an AR(1) process (no library), compare your result to <code>statsmodels</code>, and explain any discrepancy.</div>
+</div>
+</div>
+
+<!-- ================= ARIMA ================= -->
+<div id="arima" class="tab-content">
+
+<div class="card">
+<h2>3. ARIMA Family of Models</h2>
+<p>ARIMA is the workhorse of univariate time series forecasting. The name encodes three operations: <strong>AR</strong> (autoregression), <strong>I</strong> (differencing), and <strong>MA</strong> (moving average).</p>
+
+<h3>AR(p): Autoregressive Model</h3>
+<p>The current value is a linear combination of past values plus noise.</p>
+<pre><code>Yt = c + φ1·Yt-1 + φ2·Yt-2 + ... + φp·Yt-p + εt</code></pre>
+<p>For stationarity, the roots of the characteristic polynomial must lie <em>outside</em> the unit circle. In practice for AR(1): <code>|φ1| < 1</code>.</p>
+
+<div class="svg-wrap">
+<svg width="640" height="180" viewBox="0 0 640 180">
+  <rect width="640" height="180" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">AR(1) Intuition</text>
+  <circle cx="80" cy="100" r="22" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="80" y="105" fill="#38bdf8" font-size="12" text-anchor="middle">Yt-1</text>
+  <circle cx="280" cy="100" r="22" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="280" y="105" fill="#38bdf8" font-size="12" text-anchor="middle">Yt</text>
+  <circle cx="480" cy="100" r="22" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="480" y="105" fill="#38bdf8" font-size="12" text-anchor="middle">Yt+1</text>
+  <line x1="102" y1="100" x2="258" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="302" y1="100" x2="458" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="180" y="92" fill="#cbd5e1" font-size="11" text-anchor="middle">φ weight</text>
+  <text x="380" y="92" fill="#cbd5e1" font-size="11" text-anchor="middle">φ weight</text>
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>
+</svg>
+</div>
+
+<h4>Identification via PACF</h4>
+<p>For an AR(p) process, the PACF "cuts off" after lag <code>p</code>. The ACF decays exponentially or as a damped sine wave.</p>
+
+<h3>MA(q): Moving Average Model</h3>
+<pre><code>Yt = μ + εt + θ1·εt-1 + θ2·εt-2 + ... + θq·εt-q</code></pre>
+<p>Here the current value depends on past <em>shocks</em> (errors), not past values. MA models are always stationary. They are invertible if roots lie outside the unit circle.</p>
+
+<h4>Identification via ACF</h4>
+<p>For an MA(q) process, the ACF cuts off after lag <code>q</code>. The PACF decays gradually.</p>
+
+<h3>ARMA(p,q)</h3>
+<p>Combine both:</p>
+<pre><code>Yt = c + Σ φi·Yt-i + εt + Σ θj·εt-j</code></pre>
+<p>Use ACF/PACF together to identify orders, or use information criteria.</p>
+
+<h3>ARIMA(p,d,q)</h3>
+<p>If a series is non-stationary, difference it <code>d</code> times until it becomes stationary, then fit ARMA.</p>
+<ul>
+<li><code>d=0</code>: original series is stationary</li>
+<li><code>d=1</code>: first differences (e.g., random walk → white noise)</li>
+<li><code>d=2</code>: second differences (rarely needed in finance)</li>
+</ul>
+
+<h3>SARIMA(p,d,q)(P,D,Q)m</h3>
+<p>Extends ARIMA with seasonal terms. <code>m</code> is the seasonal period (e.g., 12 for monthly data, 7 for daily with weekly seasonality).</p>
+
+<h3>Model Selection: AIC & BIC</h3>
+<table>
+<tr><th>Criterion</th><th>Formula Idea</th><th>Behavior</th></tr>
+<tr><td>AIC</td><td>Goodness-of-fit − 2·k</td><td>Can overfit; tends to pick larger models</td></tr>
+<tr><td>BIC</td><td>Goodness-of-fit − ln(n)·k</td><td>Heavier penalty for parameters; more parsimonious</td></tr>
+</table>
+<p>where <code>k</code> = number of parameters, <code>n</code> = sample size. Lower is better.</p>
+
+<h3>Box-Jenkins Methodology</h3>
+<ol>
+<li><strong>Identification:</strong> Use plots, ACF/PACF, and ADF to choose <code>p, d, q</code>.</li>
+<li><strong>Estimation:</strong> Fit the model via maximum likelihood or least squares.</li>
+<li><strong>Diagnostic Checking:</strong> Residuals should look like white noise. Check ACF of residuals and use Ljung-Box test.</li>
+<li><strong>Forecasting:</strong> Project forward; confidence intervals widen with horizon.</li>
+</ol>
+
+<div class="tip"><strong>Quant tip:</strong> In trading, ARIMA forecasts are rarely tradable alone because the signal-to-noise ratio is low. They are more useful for variance modeling, mean-reversion detection, or as a baseline.</div>
+
+<h3>Colab Experiment: Box-Jenkins Pipeline</h3>
+<pre><code>!pip install statsmodels pmdarima -q
+import pandas as pd, numpy as np
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import matplotlib.pyplot as plt
+
+# Use airline passengers data (built into statsmodels)
+from statsmodels.datasets import get_rdataset
+data = get_rdataset("AirPassengers").data
+data['Month'] = pd.to_datetime(data['Month'])
+data.set_index('Month', inplace=True)
+y = data['value']
+
+# 1) Make stationary (log + diff)
+y_log = np.log(y)
+y_diff = y_log.diff().dropna()
+
+# 2) Plot ACF/PACF of differenced series
+fig, ax = plt.subplots(1,2,figsize=(12,4))
+plot_acf(y_diff, ax=ax[0], lags=40); ax[0].set_title('ACF')
+plot_pacf(y_diff, ax=ax[1], lags=40); ax[1].set_title('PACF')
+plt.show()
+
+# 3) Fit SARIMA(1,1,1)(1,1,1,12)
+model = ARIMA(y_log, order=(1,1,1), seasonal_order=(1,1,1,12))
+res = model.fit()
+print(res.summary())
+
+# 4) Forecast
+forecast = res.get_forecast(steps=24)
+mean = forecast.predicted_mean
+conf = forecast.conf_int()
+
+plt.figure(figsize=(10,4))
+plt.plot(y_log.index, y_log, label='Observed')
+plt.plot(pd.date_range(y_log.index[-1], periods=25, freq='MS')[1:], mean, label='Forecast', color='orange')
+plt.fill_between(conf.index, conf.iloc[:,0], conf.iloc[:,1], color='orange', alpha=0.2)
+plt.legend(); plt.title('SARIMA Forecast'); plt.show()</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Hyndman & Athanasopoulos: Chapters 8, 9, 12.</li>
+<li>Rob J Hyndman's blog post: "The ARIMA model is not as complicated as it looks."</li>
+<li>Video: ritvikmath ARIMA playlist.</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: ARIMA</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Fit an AR(1) to a simulated stationary series with <code>φ=0.6</code>. Is the estimated <code>φ</code> close to 0.6?</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Given a series, use a grid search over <code>p=0..3, d=0..2, q=0..3</code> and select the best model by BIC. Compare out-of-sample RMSE of the BIC-chosen model vs. an overfit high-order model.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Implement the conditional sum-of-squares estimator for an MA(1) process from scratch (initialize ε₀=0, iterate). Compare your coefficients to statsmodels' MLE estimate and discuss efficiency.</div>
+</div>
+</div>
+
+<!-- ================= VOLATILITY ================= -->
+<div id="vol" class="tab-content">
+
+<div class="card">
+<h2>4. Volatility Modeling: ARCH & GARCH</h2>
+<p>For quants, modeling the <em>mean</em> is often less profitable than modeling the <em>variance</em> (volatility). Volatility clustering is the phenomenon where large changes tend to be followed by large changes, of either sign.</p>
+
+<h3>Heteroskedasticity</h3>
+<p>Standard regression assumes constant variance (homoskedasticity). Financial returns violate this: calm periods alternate with turbulent periods.</p>
+
+<h3>ARCH(q): Autoregressive Conditional Heteroskedasticity</h3>
+<p>Engle (1982). The variance at time <code>t</code> depends on past squared residuals.</p>
+<pre><code>σt² = ω + α1·εt-1² + α2·εt-2² + ... + αq·εt-q²</code></pre>
+<p>Constraints: <code>ω > 0</code>, <code>αi ≥ 0</code>, and <code>Σαi < 1</code> for stationarity of variance.</p>
+
+<h3>GARCH(p,q): Generalized ARCH</h3>
+<p>Bollerslev (1986). Adds autoregressive terms for variance itself—the most widely used model in quant finance.</p>
+<pre><code>σt² = ω + Σ αi·εt-i² + Σ βj·σt-j²</code></pre>
+<p>GARCH(1,1) is the industry standard:</p>
+<pre><code>σt² = ω + α·εt-1² + β·σt-1²</code></pre>
+
+<div class="svg-wrap">
+<svg width="680" height="220" viewBox="0 0 680 220">
+  <rect width="680" height="220" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">GARCH(1,1) Volatility Clustering</text>
+  <!-- return series -->
+  <path d="M40,110 L60,90 L80,130 L100,100 L120,140 L140,80 L160,120 L180,70 L200,150 L220,60 L240,140 L260,80 L280,130 L300,90 L320,120 L340,100 L360,140 L380,70 L400,130 L420,90 L440,110 L460,80 L480,120 L500,100 L520,140 L540,60 L560,130 L580,90 L600,120 L620,100 L640,130" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+  <!-- volatility envelope -->
+  <path d="M40,110 Q120,80 200,110 T360,100 T520,120 T640,110" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="5,3"/>
+  <path d="M40,110 Q120,140 200,110 T360,120 T520,100 T640,110" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="500" y="60" fill="#f87171" font-size="11">+1σ envelope</text>
+  <text x="40" y="200" fill="#94a3b8" font-size="10">Returns oscillate more when volatility is high (wider envelope)</text>
+</svg>
+</div>
+
+<h3>Persistence & Half-Life</h3>
+<p>Persistence = <code>α + β</code>. If close to 1, shocks decay slowly. The half-life of a volatility shock is:</p>
+<pre><code>HL = ln(0.5) / ln(α + β)</code></pre>
+
+<h3>Extensions</h3>
+<ul>
+<li><strong>EGARCH:</strong> Models log-variance; captures leverage effect (bad news increases volatility more than good news).</li>
+<li><strong>GJR-GARCH:</strong> Adds an asymmetry term for negative shocks.</li>
+</ul>
+
+<h3>Colab Experiment: GARCH on S&P 500 Returns</h3>
+<pre><code>!pip install arch -q
+import yfinance as yf
+from arch import arch_model
+import matplotlib.pyplot as plt
+
+# Download S&P 500 data
+spy = yf.download('^GSPC', start='2015-01-01', end='2024-01-01', progress=False)
+returns = 100 * spy['Adj Close'].pct_change().dropna()
+
+# Fit GARCH(1,1)
+am = arch_model(returns, vol='Garch', p=1, q=1)
+res = am.fit(update_freq=5)
+print(res.summary())
+
+# Plot conditional volatility
+fig, ax = plt.subplots(figsize=(10,4))
+ax.plot(res.conditional_volatility, color='#38bdf8')
+ax.set_title('GARCH(1,1) Conditional Volatility')
+ax.set_ylabel('Volatility (%)'); plt.show()
+
+# Forecast next 5 days
+forecasts = res.forecast(horizon=5)
+print(forecasts.variance.iloc[-1])</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Book: Tsay, Ch. 3 (Conditional Heteroscedastic Models).</li>
+<li>Paper: Bollerslev (1986) "Generalized Autoregressive Conditional Heteroskedasticity".</li>
+<li>Blog: "The GARCH Model is Your Friend" by QuantStart.</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: Volatility</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Download any stock's daily returns. Plot the squared returns. Do you see clustering?</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Fit GARCH(1,1), EGARCH(1,1), and GJR-GARCH(1,1) to the same series. Compare AIC and interpret the asymmetry parameter in EGARCH/GJR.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Using a rolling window of 252 days, forecast one-day-ahead volatility with GARCH(1,1) each day. Evaluate with MSE against realized volatility (proxied by squared returns or 5-day realized var). Is it better than a simple 20-day rolling standard deviation?</div>
+</div>
+</div>
+
+<!-- ================= STATE SPACE ================= -->
+<div id="statespace" class="tab-content">
+
+<div class="card">
+<h2>5. State Space Models & Kalman Filter</h2>
+<p>State space models represent a time series as the observable output of a hidden (latent) state that evolves over time. They unify ARIMA, exponential smoothing, and many structural models under one framework.</p>
+
+<h3>The Two Equations</h3>
+<ul>
+<li><strong>Observation (Measurement) Equation:</strong> <code>Yt = Z·αt + εt</code></li>
+<li><strong>State Transition Equation:</strong> <code>αt = T·αt-1 + R·ηt</code></li>
+</ul>
+<p>Where <code>αt</code> is the hidden state vector, <code>εt</code> and <code>ηt</code> are noise terms.</p>
+
+<div class="svg-wrap">
+<svg width="700" height="260" viewBox="0 0 700 260">
+  <rect width="700" height="260" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">Kalman Filter Cycle</text>
+  <!-- boxes -->
+  <rect x="60" y="60" width="110" height="44" rx="6" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="115" y="86" fill="#38bdf8" font-size="12" text-anchor="middle">Prediction</text>
+  
+  <rect x="280" y="60" width="110" height="44" rx="6" fill="#1f2937" stroke="#34d399" stroke-width="2"/>
+  <text x="335" y="86" fill="#34d399" font-size="12" text-anchor="middle">Observation</text>
+  
+  <rect x="500" y="60" width="110" height="44" rx="6" fill="#1f2937" stroke="#fbbf24" stroke-width="2"/>
+  <text x="555" y="86" fill="#fbbf24" font-size="12" text-anchor="middle">Update</text>
+  
+  <!-- arrows -->
+  <line x1="170" y1="82" x2="280" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+  <line x1="390" y1="82" x2="500" y2="82" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+  <path d="M555,104 L555,180 L170,180 L170,104" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr2)"/>
+  
+  <!-- descriptions -->
+  <text x="115" y="140" fill="#cbd5e1" font-size="10" text-anchor="middle">αt|t-1 = T·αt-1|t-1</text>
+  <text x="115" y="155" fill="#cbd5e1" font-size="10" text-anchor="middle">Pt|t-1 = T·Pt-1|t-1·T' + RQR'</text>
+  
+  <text x="335" y="140" fill="#cbd5e1" font-size="10" text-anchor="middle">yt arrives</text>
+  <text x="335" y="155" fill="#cbd5e1" font-size="10" text-anchor="middle">vt = yt - Z·αt|t-1</text>
+  
+  <text x="555" y="140" fill="#cbd5e1" font-size="10" text-anchor="middle">Kt = Pt|t-1·Z' / (Z·Pt|t-1·Z' + H)</text>
+  <text x="555" y="155" fill="#cbd5e1" font-size="10" text-anchor="middle">αt|t = αt|t-1 + Kt·vt</text>
+  
+  <text x="350" y="200" fill="#94a3b8" font-size="10" text-anchor="middle">Updated state becomes prior for next step</text>
+  <defs><marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>
+</svg>
+</div>
+
+<h3>Kalman Filter Intuition</h3>
+<p>Imagine tracking a drone with a GPS sensor. The drone has a true position (state) and the GPS gives a noisy measurement. The Kalman filter optimally blends the model prediction with the new measurement, weighted by their respective uncertainties.</p>
+<ol>
+<li><strong>Predict:</strong> Use the state equation to guess the next state and its uncertainty.</li>
+<li><strong>Update:</strong> When the observation arrives, compute the prediction error (innovation). Adjust the state estimate proportionally to the Kalman Gain <code>K</code>. Higher <code>K</code> means you trust the observation more than the prediction.</li>
+</ol>
+
+<h3>Why Quants Care</h3>
+<ul>
+<li><strong>Dynamic Hedge Ratios:</strong> In pairs trading, the hedge ratio between two assets changes over time. Kalman filter estimates it recursively.</li>
+<li><strong>Missing Data:</strong> Handles irregularly spaced observations naturally.</li>
+<li><strong>Online Learning:</strong> Updates instantly as new data arrives—perfect for high-frequency settings.</li>
+</ul>
+
+<h3>Colab Experiment: Kalman Filter for Pairs Trading Hedge Ratio</h3>
+<pre><code>!pip install pykalman -q
+import numpy as np, pandas as pd, yfinance as yf
+import matplotlib.pyplot as plt
+from pykalman import KalmanFilter
+
+# Download two correlated assets (e.g., Coca-Cola vs Pepsi)
+tickers = ['KO', 'PEP']
+data = yf.download(tickers, start='2020-01-01', progress=False)['Adj Close']
+x = np.log(data['KO'])
+y = np.log(data['PEP'])
+
+# Kalman filter to estimate dynamic slope (hedge ratio) and intercept
+kf = KalmanFilter(
+    n_dim_obs=1,
+    n_dim_state=2,
+    initial_state_mean=np.zeros(2),
+    initial_state_covariance=np.ones((2,2)),
+    observation_matrices=np.vstack([x, np.ones(len(x))]).T[:, np.newaxis, :],
+    observation_covariance=1.0,
+    transition_covariance=0.001 * np.eye(2),
+    transition_matrices=np.eye(2)
+)
+state_means, state_covs = kf.filter(y.values)
+slope = state_means[:, 0]
+intercept = state_means[:, 1]
+spread = y - slope * x - intercept
+
+fig, ax = plt.subplots(2,1,figsize=(10,6), sharex=True)
+ax[0].plot(data.index, slope, color='#38bdf8'); ax[0].set_title('Dynamic Hedge Ratio (Slope)')
+ax[1].plot(data.index, spread, color='#fbbf24'); ax[1].set_title('Kalman Spread (Mean-Reverting)')
+ax[1].axhline(0, color='white', linestyle='--', alpha=0.4)
+plt.tight_layout(); plt.show()</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Book: <em>Forecasting, Structural Time Series Models and the Kalman Filter</em> (Harvey).</li>
+<li>Blog: "Kalman Filter for Dummies" by Ramkumar R.</li>
+<li>Video: "Understanding Kalman Filters" by MATLAB (YouTube).</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: State Space</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Simulate a random walk with observation noise. Apply a simple moving average smoother and plot it against the true state. Then run a Kalman filter and compare which tracks the true state better.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Implement a 1D Kalman filter from scratch (predict/update loop) for a constant velocity model. Track a synthetic moving object and plot the filtered position vs. true position.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Use the Kalman filter to estimate a time-varying AR(1) coefficient on a synthetic series where <code>φ</code> changes mid-sample. Plot the estimated <code>φ</code> over time and identify the regime change.</div>
+</div>
+</div>
+
+<!-- ================= MULTIVARIATE ================= -->
+<div id="multi" class="tab-content">
+
+<div class="card">
+<h2>6. Multivariate Time Series, VAR & Cointegration</h2>
+<p>So far we modeled one series. In quant finance, you almost always care about multiple assets simultaneously—pairs trading, statistical arbitrage, and macro forecasting all require multivariate tools.</p>
+
+<h3>VAR(p): Vector Autoregression</h3>
+<p>Each variable is modeled as a linear function of its own lags <em>and</em> the lags of all other variables in the system.</p>
+<pre><code>Yt = c + A1·Yt-1 + A2·Yt-2 + ... + Ap·Yt-p + εt</code></pre>
+<p>Where <code>Yt</code> is a vector, and <code>Ai</code> are coefficient matrices. A VAR(1) with 2 variables looks like:</p>
+<pre><code>y1,t = c1 + a11·y1,t-1 + a12·y2,t-1 + ε1,t
+y2,t = c2 + a21·y1,t-1 + a22·y2,t-1 + ε2,t</code></pre>
+
+<h4>Granger Causality</h4>
+<p>If the lags of <code>y2</code> significantly improve the prediction of <code>y1</code>, we say <code>y2</code> "Granger-causes" <code>y1</code>. This is a predictive concept, not true causality.</p>
+
+<h3>Cointegration</h3>
+<p>Two non-stationary series can have a stationary linear combination. This is the statistical foundation of <strong>pairs trading</strong>.</p>
+
+<div class="svg-wrap">
+<svg width="680" height="220" viewBox="0 0 680 220">
+  <rect width="680" height="220" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">Cointegration: Two Drunk Walkers on a Leash</text>
+  <!-- Asset A -->
+  <path d="M40,100 Q160,60 280,110 T520,90 T640,120" fill="none" stroke="#38bdf8" stroke-width="2"/>
+  <text x="40" y="85" fill="#38bdf8" font-size="11">Asset A (random walk)</text>
+  <!-- Asset B -->
+  <path d="M40,140 Q160,180 280,130 T520,150 T640,120" fill="none" stroke="#34d399" stroke-width="2"/>
+  <text x="40" y="165" fill="#34d399" font-size="11">Asset B (random walk)</text>
+  <!-- Spread -->
+  <path d="M40,190 Q160,170 280,185 T520,175 T640,190" fill="none" stroke="#fbbf24" stroke-width="2"/>
+  <text x="40" y="210" fill="#fbbf24" font-size="11">Spread A - B (stationary!)</text>
+</svg>
+</div>
+
+<h4>Engle-Granger Two-Step Method</h4>
+<ol>
+<li>Regress <code>Yt</code> on <code>Xt</code>: <code>Yt = α + β·Xt + εt</code></li>
+<li>Test residuals <code>εt</code> for stationarity (ADF). If stationary, the pair is cointegrated.</li>
+</ol>
+
+<h4>Vector Error Correction Model (VECM)</h4>
+<p>If variables are cointegrated, a VAR in differences misses the long-run equilibrium. VECM includes the error correction term:</p>
+<pre><code>ΔYt = α·β'·Yt-1 + Σ Γi·ΔYt-i + εt</code></pre>
+<p>The term <code>β'·Yt-1</code> is the disequilibrium; <code>α</code> is the speed of adjustment back to equilibrium.</p>
+
+<h3>Colab Experiment: Cointegrated Pairs</h3>
+<pre><code>!pip install statsmodels -q
+import numpy as np, pandas as pd, yfinance as yf
+from statsmodels.tsa.stattools import coint, adfuller
+import matplotlib.pyplot as plt
+
+# Download two cointegrated-looking stocks (e.g., energy peers)
+tickers = ['XOM', 'CVX']
+data = yf.download(tickers, start='2019-01-01', progress=False)['Adj Close']
+y1 = np.log(data['XOM'])
+y2 = np.log(data['CVX'])
+
+# Engle-Granger test
+score, pvalue, _ = coint(y1, y2)
+print(f'Cointegration test p-value: {pvalue:.4f}')
+print('Cointegrated' if pvalue < 0.05 else 'Not cointegrated')
+
+# Estimate hedge ratio via OLS
+import statsmodels.api as sm
+x = sm.add_constant(y2)
+model = sm.OLS(y1, x).fit()
+beta = model.params[1]
+spread = y1 - beta * y2
+
+# Plot
+fig, ax = plt.subplots(2,1,figsize=(10,6), sharex=True)
+ax[0].plot(data.index, y1, label='XOM'); ax[0].plot(data.index, y2, label='CVX')
+ax[0].legend(); ax[0].set_title('Log Prices')
+ax[1].plot(data.index, spread, color='#fbbf24'); ax[1].set_title('Spread (Cointegrating Residual)')
+ax[1].axhline(spread.mean(), color='white', linestyle='--', alpha=0.5)
+plt.tight_layout(); plt.show()
+
+# ADF on spread
+print('Spread ADF p-value:', adfuller(spread)[1])</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Book: Tsay, Ch. 8 (Multivariate Time Series).</li>
+<li>Video: "Cointegration and Pairs Trading" by Quantopian (archived but available).</li>
+<li>Paper: Engle & Granger (1987) "Co-integration and Error Correction".</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: Multivariate</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Fit a VAR(1) to two macro series (e.g., GDP growth and unemployment). Plot the impulse response of unemployment to a shock in GDP.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Scan a universe of 50 stocks for cointegrated pairs using the Engle-Granger test. Apply Bonferroni correction for multiple testing. Report the top 3 pairs by test statistic.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Build a walk-forward backtest for a cointegration-based pairs trading strategy. Include transaction costs, and compare in-sample cointegration vs. rolling 252-day out-of-sample cointegration stability.</div>
+</div>
+</div>
+
+<!-- ================= ML ================= -->
+<div id="ml" class="tab-content">
+
+<div class="card">
+<h2>7. Machine Learning for Time Series</h2>
+<p>Tree-based models (XGBoost, LightGBM, Random Forest) do not assume linearity and can capture complex interactions. However, they require careful feature engineering and validation because standard random train/test splits leak future information.</p>
+
+<h3>Feature Engineering for Time Series</h3>
+<ul>
+<li><strong>Lag features:</strong> <code>Yt-1, Yt-2, ...</code></li>
+<li><strong>Rolling statistics:</strong> mean, std, min, max over windows (7, 30, 60 days).</li>
+<li><strong>Date/time features:</strong> day of week, month, quarter, holidays.</li>
+<li><strong>Differences / momentum:</strong> <code>Yt - Yt-k</code>, percentage change.</li>
+<li><strong>Target encoding caution:</strong> Never use future information to compute features.</li>
+</ul>
+
+<h3>Cross-Validation: The Time Dimension</h3>
+<p>Never use KFold randomly! Use <strong>rolling-origin</strong> or <strong>expanding-window</strong> validation.</p>
+
+<div class="svg-wrap">
+<svg width="680" height="160" viewBox="0 0 680 160">
+  <rect width="680" height="160" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">Rolling-Origin Cross-Validation</text>
+  <!-- fold 1 -->
+  <rect x="40" y="50" width="180" height="28" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="130" y="68" fill="#38bdf8" font-size="10" text-anchor="middle">Train</text>
+  <rect x="220" y="50" width="60" height="28" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="250" y="68" fill="#fbbf24" font-size="10" text-anchor="middle">Test</text>
+  <!-- fold 2 -->
+  <rect x="40" y="90" width="240" height="28" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="160" y="108" fill="#38bdf8" font-size="10" text-anchor="middle">Train</text>
+  <rect x="280" y="90" width="60" height="28" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="310" y="108" fill="#fbbf24" font-size="10" text-anchor="middle">Test</text>
+  <!-- fold 3 -->
+  <rect x="40" y="130" width="300" height="28" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="190" y="148" fill="#38bdf8" font-size="10" text-anchor="middle">Train</text>
+  <rect x="340" y="130" width="60" height="28" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="370" y="148" fill="#fbbf24" font-size="10" text-anchor="middle">Test</text>
+</svg>
+</div>
+
+<h3>Tree-Based Models</h3>
+<p>XGBoost and LightGBM are popular because they:</p>
+<ul>
+<li>Handle non-linearities</li>
+<li>Provide feature importance</li>
+<li>Are fast and well-supported</li>
+</ul>
+<p>However, they do not extrapolate trends well beyond the training range. For strongly trending series, detrend first or use differenced targets.</p>
+
+<h3>Colab Experiment: XGBoost Forecast</h3>
+<pre><code>!pip install xgboost -q
+import numpy as np, pandas as pd
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+
+# Synthetic series with trend + seasonality + noise
+np.random.seed(5)
+n = 800
+t = np.arange(n)
+y = 0.02*t + 10*np.sin(2*np.pi*t/50) + np.random.normal(0, 2, n)
+df = pd.DataFrame({'y': y})
+
+# Feature engineering
+for lag in [1,2,3,5,10]:
+    df[f'lag_{lag}'] = df['y'].shift(lag)
+for w in [7,14,30]:
+    df[f'roll_mean_{w}'] = df['y'].shift(1).rolling(w).mean()
+    df[f'roll_std_{w}'] = df['y'].shift(1).rolling(w).std()
+df = df.dropna()
+
+# Train/test split (time-based)
+train = df.iloc[:600]
+test = df.iloc[600:]
+X_cols = [c for c in df.columns if c != 'y']
+
+model = XGBRegressor(n_estimators=300, learning_rate=0.05, max_depth=4)
+model.fit(train[X_cols], train['y'])
+preds = model.predict(test[X_cols])
+
+print('Test RMSE:', np.sqrt(mean_squared_error(test['y'], preds)))
+
+# Plot
+plt.figure(figsize=(10,4))
+plt.plot(range(n), y, label='Actual', alpha=0.7)
+plt.plot(test.index, preds, label='XGBoost Forecast', color='#f87171')
+plt.legend(); plt.title('XGBoost Time Series Forecast'); plt.show()
+
+# Feature importance
+importances = pd.Series(model.feature_importances_, index=X_cols).sort_values(ascending=False)
+print(importances.head(10))</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Blog: "Feature Engineering for Time Series" by Jason Brownlee.</li>
+<li>Blog: "Cross-Validation for Time Series" by Rob Hyndman.</li>
+<li>Book: <em>Advances in Financial Machine Learning</em> (Marcos López de Prado) — Ch. 7 on cross-validation.</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: ML for Time Series</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Using the feature set above, train a RandomForestRegressor and compare its RMSE to XGBoost on the same synthetic data.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Implement a purged k-fold cross-validator for time series (drop a gap between train and test to prevent leakage). Measure the variance of your RMSE across folds.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Build an ML-based volatility forecasting model. Engineer features from past returns (lags, realized vol, GARCH forecast) and use XGBoost to predict next-day squared return. Compare its R² to a GARCH(1,1) benchmark.</div>
+</div>
+</div>
+
+<!-- ================= DL ================= -->
+<div id="dl" class="tab-content">
+
+<div class="card">
+<h2>8. Deep Learning for Time Series</h2>
+<p>Neural networks can learn representations automatically. For sequences, we use architectures that respect temporal ordering.</p>
+
+<h3>RNN & LSTM</h3>
+<p>A Recurrent Neural Network (RNN) maintains a hidden state that acts as memory. However, basic RNNs suffer from vanishing gradients, making them forget long-term dependencies.</p>
+<p>LSTM (Long Short-Term Memory) solves this with gating mechanisms:</p>
+<ul>
+<li><strong>Forget gate:</strong> what to erase from memory</li>
+<li><strong>Input gate:</strong> what to write to memory</li>
+<li><strong>Output gate:</strong> what to output based on memory</li>
+</ul>
+
+<div class="svg-wrap">
+<svg width="640" height="200" viewBox="0 0 640 200">
+  <rect width="640" height="200" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">Unrolled RNN / LSTM</text>
+  <!-- cells -->
+  <rect x="60" y="80" width="70" height="50" rx="6" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="95" y="108" fill="#38bdf8" font-size="11" text-anchor="middle">Cell t-1</text>
+  <rect x="200" y="80" width="70" height="50" rx="6" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="235" y="108" fill="#38bdf8" font-size="11" text-anchor="middle">Cell t</text>
+  <rect x="340" y="80" width="70" height="50" rx="6" fill="#1f2937" stroke="#38bdf8" stroke-width="2"/>
+  <text x="375" y="108" fill="#38bdf8" font-size="11" text-anchor="middle">Cell t+1</text>
+  <!-- arrows -->
+  <line x1="130" y1="105" x2="200" y2="105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="270" y1="105" x2="340" y2="105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+  <line x1="410" y1="105" x2="480" y2="105" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr3)"/>
+  <!-- inputs -->
+  <text x="95" y="155" fill="#fbbf24" font-size="10" text-anchor="middle">xt-1</text>
+  <line x1="95" y1="150" x2="95" y2="130" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="235" y="155" fill="#fbbf24" font-size="10" text-anchor="middle">xt</text>
+  <line x1="235" y1="150" x2="235" y2="130" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="375" y="155" fill="#fbbf24" font-size="10" text-anchor="middle">xt+1</text>
+  <line x1="375" y1="150" x2="375" y2="130" stroke="#fbbf24" stroke-width="1.5"/>
+  <!-- outputs -->
+  <text x="95" y="65" fill="#34d399" font-size="10" text-anchor="middle">ht-1</text>
+  <line x1="95" y1="70" x2="95" y2="80" stroke="#34d399" stroke-width="1.5"/>
+  <text x="235" y="65" fill="#34d399" font-size="10" text-anchor="middle">ht</text>
+  <line x1="235" y1="70" x2="235" y2="80" stroke="#34d399" stroke-width="1.5"/>
+  <text x="375" y="65" fill="#34d399" font-size="10" text-anchor="middle">ht+1</text>
+  <line x1="375" y1="70" x2="375" y2="80" stroke="#34d399" stroke-width="1.5"/>
+  <text x="520" y="108" fill="#94a3b8" font-size="11">...</text>
+  <defs><marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/></marker></defs>
+</svg>
+</div>
+
+<h3>1D CNNs</h3>
+<p>Convolutional layers can detect local patterns (e.g., momentum bursts) across time. They are faster to train than RNNs and often combined with them.</p>
+
+<h3>Transformers</h3>
+<p>Self-attention allows the model to look at all time steps simultaneously and learn which past moments are relevant for the current prediction. Challenges for finance:</p>
+<ul>
+<li>Quadratic complexity with sequence length</li>
+<li>Positional encoding must encode time explicitly</li>
+<li>Overfitting is a major risk with limited financial data</li>
+</ul>
+
+<div class="warn"><strong>Quant warning:</strong> Deep learning is data-hungry. A 10-year daily stock history is only ~2,520 points. Unless you have a large panel of assets or high-frequency data, regularized linear models or trees often outperform LSTMs.</div>
+
+<h3>Colab Experiment: LSTM Volatility Forecast</h3>
+<pre><code>import numpy as np, pandas as pd, yfinance as yf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Data
+spy = yf.download('^GSPC', start='2015-01-01', end='2024-01-01', progress=False)
+rets = spy['Adj Close'].pct_change().dropna().values.reshape(-1,1)
+
+# Target: realized volatility proxy (squared returns)
+# Features: past 20 days of returns
+window = 20
+X, y = [], []
+for i in range(window, len(rets)):
+    X.append(rets[i-window:i])
+    y.append(rets[i]**2)  # proxy for volatility
+X, y = np.array(X), np.array(y)
+
+# Scale
+scaler = StandardScaler()
+X = scaler.fit_transform(X.reshape(-1,1)).reshape(X.shape)
+
+# Split
+split = int(0.8*len(X))
+X_train, X_test = X[:split], X[split:]
+y_train, y_test = y[:split], y[split:]
+
+# LSTM
+model = Sequential([
+    LSTM(32, input_shape=(window,1)),
+    Dense(16, activation='relu'),
+    Dense(1)
+])
+model.compile(optimizer='adam', loss='mse')
+model.fit(X_train, y_train, epochs=15, batch_size=32, validation_split=0.1, verbose=1)
+
+preds = model.predict(X_test).flatten()
+
+plt.figure(figsize=(10,4))
+plt.plot(y_test, label='Realized (Proxy)', alpha=0.6)
+plt.plot(preds, label='LSTM Forecast', color='#f87171')
+plt.title('LSTM Volatility Forecast'); plt.legend(); plt.show()</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Blog: "The Illustrated Transformer" by Jay Alammar.</li>
+<li>Paper: "Temporal Fusion Transformers for Interpretable Multi-horizon Time Series Forecasting" (Lim et al.).</li>
+<li>Course: DeepLearning.AI Sequence Models (Coursera).</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: Deep Learning</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Train an LSTM to predict the next value of a synthetic sine wave. Plot predictions vs. actual.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Compare an LSTM, a 1D CNN, and a simple feedforward network on the same multivariate feature set. Use early stopping and report out-of-sample RMSE.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Implement a Transformer encoder block from scratch (using NumPy or PyTorch) for time series regression. Test it on a panel of 50 stocks' returns and compare Sharpe of a long/short portfolio built from its predictions vs. an XGBoost baseline.</div>
+</div>
+</div>
+
+<!-- ================= BACKTESTING ================= -->
+<div id="backtest" class="tab-content">
+
+<div class="card">
+<h2>9. Backtesting & Quant Risk Management</h2>
+<p>A model is useless if it cannot be translated into a tradable strategy and validated without cheating. Backtesting is where most quant strategies die.</p>
+
+<h3>Walk-Forward Analysis</h3>
+<p>Instead of one train/test split, retrain the model periodically and test on the subsequent period. This mimics real deployment.</p>
+
+<div class="svg-wrap">
+<svg width="680" height="180" viewBox="0 0 680 180">
+  <rect width="680" height="180" fill="#0b1222" rx="8"/>
+  <text x="20" y="24" fill="#bae6fd" font-size="13" font-weight="700">Walk-Forward Backtest</text>
+  <!-- periods -->
+  <rect x="40" y="60" width="120" height="30" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="100" y="79" fill="#38bdf8" font-size="10" text-anchor="middle">Train 1</text>
+  <rect x="160" y="60" width="60" height="30" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="190" y="79" fill="#fbbf24" font-size="10" text-anchor="middle">Test 1</text>
+  
+  <rect x="40" y="100" width="180" height="30" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="130" y="119" fill="#38bdf8" font-size="10" text-anchor="middle">Train 2</text>
+  <rect x="220" y="100" width="60" height="30" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="250" y="119" fill="#fbbf24" font-size="10" text-anchor="middle">Test 2</text>
+  
+  <rect x="40" y="140" width="300" height="30" fill="#1f2937" stroke="#38bdf8" stroke-width="1"/>
+  <text x="190" y="159" fill="#38bdf8" font-size="10" text-anchor="middle">Train 3</text>
+  <rect x="340" y="140" width="60" height="30" fill="#1f2937" stroke="#fbbf24" stroke-width="1"/>
+  <text x="370" y="159" fill="#fbbf24" font-size="10" text-anchor="middle">Test 3</text>
+</svg>
+</div>
+
+<h3>Data Leakage: The Silent Killer</h3>
+<ul>
+<li><strong>Look-ahead bias:</strong> Using information not available at time <code>t</code> (e.g., end-of-day data to make an intraday decision).</li>
+<li><strong>Survivorship bias:</strong> Only testing on stocks that still exist today (dead companies are excluded).</li>
+<li><strong>Point-in-time data:</strong> Ensure your features reflect what was known at timestamp <code>t</code>, not revised data.</li>
+</ul>
+
+<h3>Risk Metrics</h3>
+<table>
+<tr><th>Metric</th><th>Formula / Intuition</th><th>Interpretation</th></tr>
+<tr><td>Sharpe Ratio</td><td>(Rp − Rf) / σp</td><td>Risk-adjusted return; higher is better</td></tr>
+<tr><td>Sortino Ratio</td><td>(Rp − Rf) / σd</td><td>Like Sharpe but only penalizes downside volatility</td></tr>
+<tr><td>Max Drawdown</td><td>max peak-to-trough decline</td><td>Worst continuous loss; measures tail pain</td></tr>
+<tr><td>Calmar Ratio</td><td>Return / Max Drawdown</td><td>Return per unit of worst-case loss</td></tr>
+<tr><td>VaR (95%)</td><td>5th percentile of return distribution</td><td>"On a bad day, we lose no more than X"</td></tr>
+<tr><td>CVaR (Expected Shortfall)</td><td>Average of returns beyond VaR</td><td>Average loss in the tail; more informative than VaR</td></tr>
+</table>
+
+<h3>Transaction Costs & Slippage</h3>
+<p>Always subtract realistic costs. A strategy that looks amazing at 0 cost often disappears with 5-10 bps per trade. Model:</p>
+<pre><code>Net Return = Gross Return − (commission + spread/2 + slippage_estimate)</code></pre>
+
+<h3>Overfitting & The Multiple Testing Problem</h3>
+<p>If you test 100 strategies, ~5 will appear significant at p&lt;0.05 by chance. Solutions:</p>
+<ul>
+<li>Out-of-sample testing on truly untouched data</li>
+<li>Lower significance thresholds (Bonferroni, False Discovery Rate)</li>
+<li>Simulate under the null (Monte Carlo permutation tests)</li>
+</ul>
+
+<h3>Colab Experiment: Backtest Framework</h3>
+<pre><code>import numpy as np, pandas as pd
+import matplotlib.pyplot as plt
+
+# Synthetic price and signal
+np.random.seed(7)
+n = 1000
+price = 100 * np.exp(np.cumsum(np.random.normal(0.0002, 0.01, n)))
+# Simple mean-reversion signal: z-score of 20-day returns
+returns = pd.Series(price).pct_change()
+z = (returns - returns.rolling(20).mean()) / returns.rolling(20).std()
+signal = np.where(z > 1, -1, np.where(z < -1, 1, 0))  # short if high, long if low
+
+# Backtest with transaction cost
+tcost = 0.001  # 10 bps
+position = pd.Series(signal).shift(1).fillna(0)  # no lookahead
+strategy_returns = position * returns - np.abs(position.diff()) * tcost
+cumulative = (1 + strategy_returns.fillna(0)).cumprod()
+buyhold = (1 + returns.fillna(0)).cumprod()
+
+plt.figure(figsize=(10,4))
+plt.plot(cumulative, label='Strategy', color='#38bdf8')
+plt.plot(buyhold, label='Buy & Hold', color='#94a3b8', alpha=0.7)
+plt.title('Simple Mean-Reversion Backtest'); plt.legend(); plt.yscale('log')
+plt.grid(True, alpha=0.3); plt.show()
+
+# Metrics
+def sharpe(r): return np.sqrt(252) * r.mean() / r.std()
+print('Strategy Sharpe:', sharpe(strategy_returns))
+print('Max Drawdown:', ((cumulative / cumulative.cummax()) - 1).min())</code></pre>
+
+<h3>External Resources</h3>
+<ul>
+<li>Book: <em>Advances in Financial Machine Learning</em> (López de Prado) — Ch. 10-16 on backtesting.</li>
+<li>Book: <em>Quantitative Trading</em> (Ernest Chan).</li>
+<li>Paper: "The Deflated Sharpe Ratio" (Bailey & López de Prado, 2014).</li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Practice: Backtesting & Risk</h3>
+<div class="exercise tier-e"><strong>Easy:</strong> Take a simple moving-average crossover strategy. Calculate its Sharpe ratio, max drawdown, and win rate.</div>
+<div class="exercise tier-m"><strong>Medium:</strong> Implement a walk-forward backtest for an ARIMA-based trading rule on a stock price series. Use an expanding training window and report the out-of-sample Sharpe vs. in-sample Sharpe.</div>
+<div class="exercise tier-h"><strong>Hard:</strong> Generate 1,000 random strategies (permuted signals) on your dataset. Compute the empirical p-value of your best strategy's Sharpe ratio against this null distribution. Is it still significant after deflation?</div>
+</div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>

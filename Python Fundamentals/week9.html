@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance & Profiling: The Complete Quant Engineer's Study Guide</title>
+<style>
+:root {
+  --primary: #1a237e;
+  --primary-light: #534bae;
+  --accent: #00bfa5;
+  --danger: #ff5252;
+  --warning: #ffd740;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #2c3e50;
+  --text-light: #546e7a;
+  --code-bg: #263238;
+  --border: #e0e6ed;
+  --success: #69f0ae;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+.container { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 300px;
+  background: var(--primary);
+  color: white;
+  padding: 2rem 1rem;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+.sidebar h1 { font-size: 1.3rem; margin-bottom: 0.5rem; line-height: 1.3; }
+.sidebar .subtitle { font-size: 0.85rem; opacity: 0.8; margin-bottom: 2rem; }
+.nav-item {
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.1); }
+.nav-item.active { background: rgba(255,255,255,0.15); border-left-color: var(--accent); font-weight: 600; }
+.nav-item .num { display: inline-block; width: 24px; opacity: 0.7; }
+.main {
+  margin-left: 300px;
+  flex: 1;
+  padding: 2rem;
+  max-width: 950px;
+}
+.section { display: none; animation: fadeIn 0.3s; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+}
+h2 { color: var(--primary); margin-bottom: 1rem; font-size: 1.75rem; border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; display: inline-block; }
+h3 { color: var(--primary-light); margin: 1.5rem 0 0.75rem; font-size: 1.25rem; }
+h4 { color: var(--text); margin: 1.25rem 0 0.5rem; font-size: 1.1rem; }
+p { margin-bottom: 1rem; color: var(--text-light); }
+ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-light); }
+li { margin-bottom: 0.5rem; }
+code {
+  background: #eceff1;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #c62828;
+}
+pre {
+  background: var(--code-bg);
+  color: #aed581;
+  padding: 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  position: relative;
+}
+pre .comment { color: #546e7a; }
+pre .keyword { color: #c792ea; }
+pre .string { color: #c3e88d; }
+pre .function { color: #82aaff; }
+pre .number { color: #f78c6c; }
+pre .decorator { color: #ffcb6b; }
+.code-header {
+  background: #1c262b;
+  color: #90a4ae;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -1rem;
+  font-family: monospace;
+  border-bottom: 1px solid #37474f;
+}
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.tag.concept { background: #e3f2fd; color: #1565c0; }
+.tag.lab { background: #e8f5e9; color: #2e7d32; }
+.tag.warn { background: #fff3e0; color: #ef6c00; }
+.exercise-box {
+  border-left: 4px solid var(--accent);
+  background: #f1f8e9;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-radius: 0 8px 8px 0;
+}
+.exercise-box.medium { border-left-color: var(--warning); background: #fffde7; }
+.exercise-box.hard { border-left-color: var(--danger); background: #ffebee; }
+.exercise-title { font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+.resource-link {
+  display: block;
+  padding: 0.75rem;
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  color: var(--primary);
+  transition: all 0.2s;
+}
+.resource-link:hover { background: #f0f4f8; border-color: var(--primary-light); }
+svg { max-width: 100%; height: auto; margin: 1.5rem 0; }
+.diagram-caption {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+.tip {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  border-radius: 0 8px 8px 0;
+}
+.tip strong { color: #1565c0; }
+.warning {
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  border-radius: 0 8px 8px 0;
+}
+.warning strong { color: #e65100; }
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 300px;
+  right: 0;
+  height: 4px;
+  background: #e0e0e0;
+  z-index: 99;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.3s;
+}
+@media (max-width: 768px) {
+  .sidebar { width: 100%; position: relative; height: auto; }
+  .main { margin-left: 0; }
+  .container { flex-direction: column; }
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { background: #f5f7fa; font-weight: 600; color: var(--primary); }
+tr:hover { background: #fafafa; }
+.solution { display: none; margin-top: 1rem; padding: 1rem; background: #f5f7fa; border-radius: 6px; }
+.solution-toggle { color: var(--primary); cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block; }
+.solution-toggle:hover { text-decoration: underline; }
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div class="container">
+<aside class="sidebar">
+  <h1>⚡ Performance & Profiling</h1>
+  <div class="subtitle">Complete Quant Engineer Study Guide</div>
+  <nav>
+    <div class="nav-item active" onclick="showSection(0)"><span class="num">0.</span> Prerequisites</div>
+    <div class="nav-item" onclick="showSection(1)"><span class="num">1.</span> The Performance Landscape</div>
+    <div class="nav-item" onclick="showSection(2)"><span class="num">2.</span> Measuring Code</div>
+    <div class="nav-item" onclick="showSection(3)"><span class="num">3.</span> Big O & Complexity</div>
+    <div class="nav-item" onclick="showSection(4)"><span class="num">4.</span> CPU Profiling</div>
+    <div class="nav-item" onclick="showSection(5)"><span class="num">5.</span> Line-by-Line Profiling</div>
+    <div class="nav-item" onclick="showSection(6)"><span class="num">6.</span> Memory Management</div>
+    <div class="nav-item" onclick="showSection(7)"><span class="num">7.</span> NumPy Optimization</div>
+    <div class="nav-item" onclick="showSection(8)"><span class="num">8.</span> Pandas Optimization</div>
+    <div class="nav-item" onclick="showSection(9)"><span class="num">9.</span> Concurrency</div>
+    <div class="nav-item" onclick="showSection(10)"><span class="num">10.</span> JIT Compilation</div>
+    <div class="nav-item" onclick="showSection(11)"><span class="num">11.</span> I/O & Data Formats</div>
+    <div class="nav-item" onclick="showSection(12)"><span class="num">12.</span> Case Study</div>
+  </nav>
+</aside>
+
+<main class="main">
+
+<!-- SECTION 0: PREREQUISITES -->
+<div class="section active" id="section-0">
+  <div class="card">
+    <h2>0. Prerequisites & Setup</h2>
+    <p>Before we dive into performance engineering, let's ensure you have the foundational tools and concepts. This guide assumes you are a motivated beginner—you do not need to be an expert, but you should be comfortable with the ideas below. Think of this section as tuning your instrument before the concert.</p>
+    
+    <h3>0.1 Python Fundamentals</h3>
+    <p>Python is the lingua franca of quantitative finance. You should be able to read and write:</p>
+    <ul>
+      <li><strong>Variables and types:</strong> <code>int</code>, <code>float</code>, <code>str</code>, <code>list</code>, <code>dict</code>, <code>tuple</code></li>
+      <li><strong>Control flow:</strong> <code>if/else</code>, <code>for</code> loops, <code>while</code> loops, <code>try/except</code></li>
+      <li><strong>Functions:</strong> Defining functions with <code>def</code>, arguments, return values, and scope</li>
+      <li><strong>Comprehensions:</strong> List comprehensions like <code>[x*2 for x in data]</code> are faster and more Pythonic than raw loops</li>
+      <li><strong>Classes (basic):</strong> Understanding <code>class</code>, <code>__init__</code>, and methods</li>
+    </ul>
+    <div class="tip"><strong>Quick Check:</strong> Can you write a function that takes a list of numbers and returns the average? If yes, you are ready.</div>
+
+    <h3>0.2 NumPy & Pandas Essentials</h3>
+    <p>Quantitative work is built on top of NumPy (numerical arrays) and Pandas (labeled tables). You do not need to be an expert, but you should understand:</p>
+    <ul>
+      <li><strong>NumPy:</strong> Creating arrays (<code>np.array</code>), shapes (<code>.shape</code>), dtypes, element-wise operations, indexing/slicing, and basic broadcasting</li>
+      <li><strong>Pandas:</strong> Creating DataFrames, selecting columns, filtering rows with boolean masks, and reading CSV files</li>
+    </ul>
+    <p>Why this matters: Performance engineering in Python is largely about avoiding slow Python loops by using fast C-backed libraries like NumPy and Pandas. If these concepts are foreign, spend 30 minutes on any introductory Colab notebook before proceeding.</p>
+
+    <h3>0.3 Basic Math Intuition</h3>
+    <p>Quant finance uses math, but we will keep it intuitive:</p>
+    <ul>
+      <li><strong>Summation (Σ):</strong> Adding up a series of numbers. <code>sum([1,2,3])</code> is Σx.</li>
+      <li><strong>Functions:</strong> A machine that takes an input and gives an output. <code>f(x) = x²</code></li>
+      <li><strong>Matrices:</strong> Think of them as Excel spreadsheets filled with numbers. A portfolio covariance matrix is just a big grid.</li>
+      <li><strong>Probability:</strong> Basic ideas of randomness, mean, and standard deviation.</li>
+    </ul>
+
+    <h3>0.4 Terminal & Environment Basics</h3>
+    <p>You should know how to:</p>
+    <ul>
+      <li>Open a terminal / command prompt</li>
+      <li>Navigate folders with <code>cd</code> and list files with <code>ls</code> (or <code>dir</code> on Windows)</li>
+      <li>Install packages with <code>pip install package_name</code></li>
+      <li>Run a Python script with <code>python script.py</code></li>
+    </ul>
+
+    <h3>0.5 Google Colab Setup</h3>
+    <p>Every experiment in this guide is designed to run in <a href="https://colab.research.google.com" target="_blank" style="color:var(--accent)">Google Colab</a> (free). To prepare:</p>
+    <ol>
+      <li>Open Colab and create a new notebook.</li>
+      <li>Set the runtime to GPU if needed (Runtime → Change runtime type), though most experiments use CPU.</li>
+      <li>Install profiling tools with <code>!pip install line_profiler memory_profiler numba</code></li>
+    </ol>
+    <div class="code-header">Setup Cell — Run this first in every Colab session</div>
+    <pre><span class="comment"># Run this in the first cell of every Colab notebook for this guide</span>
+<span class="keyword">import</span> subprocess
+<span class="keyword">import</span> sys
+
+packages = [<span class="string">'line_profiler'</span>, <span class="string">'memory_profiler'</span>, <span class="string">'numba'</span>, <span class="string">'snakeviz'</span>, <span class="string">'hypothesis'</span>]
+<span class="keyword">for</span> pkg <span class="keyword">in</span> packages:
+    subprocess.check_call([sys.executable, <span class="string">'-m'</span>, <span class="string">'pip'</span>, <span class="string">'install'</span>, <span class="string">'-q'</span>, pkg])
+
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> time, random, os, gc
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+<span class="function">print</span>(<span class="string">"✅ Environment ready!"</span>)</pre>
+  </div>
+
+  <div class="card">
+    <h3>0.6 How to Use This Guide</h3>
+    <p>Each topic follows a consistent pattern:</p>
+    <ol>
+      <li><span class="tag concept">Concept</span> The theory explained in plain English with analogies.</li>
+      <li><span class="tag concept">Visual</span> Inline SVG diagrams to build intuition.</li>
+      <li><span class="tag lab">Colab Lab</span> A hands-on experiment you can run immediately.</li>
+      <li><span class="tag lab">Exercises</span> Three tiers: Easy (conceptual), Medium (implementation), Hard (analysis).</li>
+      <li><span class="tag warn">Resources</span> Curated links for deeper dives (requires internet).</li>
+    </ol>
+    <p>Work through the sections in order. Later sections build on earlier ones. Do not skip the prerequisites.</p>
+  </div>
+</div>
+
+<!-- SECTION 1: THE PERFORMANCE LANDSCAPE -->
+<div class="section" id="section-1">
+  <div class="card">
+    <h2>1. The Performance Landscape</h2>
+    <p>Performance engineering is the discipline of making software run faster or use fewer resources. For a quant engineer, this is not a luxury—it is a competitive advantage. A strategy backtest that takes 3 hours to run can only be iterated 3 times per day. An optimized backtest that takes 3 minutes can be iterated 180 times per day. That is the difference between finding a profitable strategy and missing it entirely.</p>
+    
+    <h3>1.1 Latency vs. Throughput</h3>
+    <p>Performance has two faces. Imagine a coffee shop:</p>
+    <ul>
+      <li><strong>Latency</strong> is how long one customer waits from ordering to receiving their coffee. In trading, this is <em>tick-to-trade</em> latency—the time between seeing a market signal and executing an order. High-Frequency Trading (HFT) firms obsess over microseconds.</li>
+      <li><strong>Throughput</strong> is how many customers the shop serves per hour. In quant research, this is how many backtests, parameter sweeps, or simulations you can run per hour. A data scientist cares more about throughput than latency.</li>
+    </ul>
+    <p>Optimizing for one can hurt the other. A single espresso machine with an expert barista has low latency (each coffee is fast) but limited throughput. Ten automated vending machines have high throughput but slightly higher latency per cup. In code, batching work increases throughput but may add latency for individual items.</p>
+
+    <h3>1.2 The Hardware Stack</h3>
+    <p>Your code runs on physical hardware. Understanding the hierarchy of speed helps you make smarter decisions.</p>
+    
+    <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#ff6b6b"/><stop offset="100%" style="stop-color:#ee5a5a"/></linearGradient>
+        <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#feca57"/><stop offset="100%" style="stop-color:#f9a825"/></linearGradient>
+        <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#48dbfb"/><stop offset="100%" style="stop-color:#0288d1"/></linearGradient>
+        <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#ff9ff3"/><stop offset="100%" style="stop-color:#d81b60"/></linearGradient>
+        <linearGradient id="g5" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#a29bfe"/><stop offset="100%" style="stop-color:#5e35b1"/></linearGradient>
+      </defs>
+      <path d="M 250 20 L 300 55 L 200 55 Z" fill="url(#g1)" stroke="#b71c1c" stroke-width="1.5"/>
+      <text x="250" y="48" text-anchor="middle" fill="white" font-size="11" font-weight="bold">CPU Registers</text>
+      <text x="250" y="68" text-anchor="middle" fill="#666" font-size="9">&lt;1 KB · ~0.3 ns</text>
+      
+      <path d="M 250 75 L 320 110 L 180 110 Z" fill="url(#g2)" stroke="#f57f17" stroke-width="1.5"/>
+      <text x="250" y="103" text-anchor="middle" font-size="11" font-weight="bold">L1 Cache</text>
+      <text x="250" y="123" text-anchor="middle" fill="#666" font-size="9">32-64 KB · ~1 ns</text>
+      
+      <path d="M 250 130 L 340 165 L 160 165 Z" fill="#81d4fa" stroke="#0277bd" stroke-width="1.5"/>
+      <text x="250" y="158" text-anchor="middle" font-size="11" font-weight="bold">L2/L3 Cache</text>
+      <text x="250" y="178" text-anchor="middle" fill="#666" font-size="9">256 KB-32 MB · ~4-40 ns</text>
+      
+      <path d="M 250 185 L 360 220 L 140 220 Z" fill="url(#g4)" stroke="#ad1457" stroke-width="1.5"/>
+      <text x="250" y="213" text-anchor="middle" font-size="11" font-weight="bold" fill="white">RAM (Memory)</text>
+      <text x="250" y="233" text-anchor="middle" fill="#666" font-size="9">8-64 GB · ~100 ns</text>
+      
+      <path d="M 250 240 L 380 275 L 120 275 Z" fill="url(#g5)" stroke="#4527a0" stroke-width="1.5"/>
+      <text x="250" y="268" text-anchor="middle" font-size="11" font-weight="bold" fill="white">SSD / Disk</text>
+      <text x="250" y="288" text-anchor="middle" fill="#666" font-size="9">256 GB-4 TB · ~10-100 μs</text>
+      
+      <text x="420" y="150" font-size="10" fill="#999">Slower &amp; Larger →</text>
+      <text x="80" y="150" font-size="10" fill="#999">← Faster &amp; Smaller</text>
+    </svg>
+    <div class="diagram-caption">Figure 1.1: The Memory Hierarchy. Each level is ~10-100x slower than the one above it. Performance engineering is often about keeping data in the faster levels.</div>
+
+    <p>Notice the massive gap between RAM and disk. Reading from SSD is <strong>100,000x slower</strong> than reading from CPU cache. When we optimize, we often try to:</p>
+    <ol>
+      <li>Keep data in cache (small, fast loops over contiguous memory)</li>
+      <li>Avoid reading from disk (load data once, process in memory)</li>
+      <li>Minimize RAM allocations (fewer objects = less garbage collection)</li>
+    </ol>
+
+    <h3>1.3 The Optimization Hierarchy</h3>
+    <p>Not all optimizations are equal. Follow this priority order:</p>
+    <table>
+      <tr><th>Priority</th><th>Optimization</th><th>Typical Speedup</th><th>Difficulty</th></tr>
+      <tr><td>1</td><td>Algorithm & Big O</td><td>Infinite (can make impossible possible)</td><td>Medium</td></tr>
+      <tr><td>2</td><td>Data Structures</td><td>10x-100x</td><td>Low</td></tr>
+      <tr><td>3</td><td>Vectorization (NumPy/Pandas)</td><td>10x-100x</td><td>Low-Medium</td></tr>
+      <tr><td>4</td><td>Concurrency (Parallelism)</td><td>2x-16x (core limited)</td><td>Medium</td></tr>
+      <tr><td>5</td><td>JIT / Native Code (Numba/Cython)</td><td>10x-100x</td><td>Medium-High</td></tr>
+      <tr><td>6</td><td>Rewriting in C++/Rust</td><td>2x-10x over Numba</td><td>High</td></tr>
+    </table>
+    <div class="warning"><strong>Premature Optimization:</strong> Donald Knuth famously said, "Premature optimization is the root of all evil." This means: write clear, correct code first. Then measure. Then optimize the hot spots.</div>
+  </div>
+
+  <div class="card">
+    <h3>1.4 Colab Experiment: Feeling the Hardware</h3>
+    <p>Let's write a small script to feel the difference between CPU-bound and memory-bound work.</p>
+    <div class="code-header">Colab Experiment 1.1: Cache vs Memory Bound</div>
+    <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+
+<span class="comment"># Small array fits in CPU cache</span>
+small = np.random.rand(<span class="number">1000</span>)
+<span class="comment"># Large array exceeds cache, must live in RAM</span>
+large = np.random.rand(<span class="number">10_000_000</span>)
+
+<span class="keyword">def</span> <span class="function">sum_array</span>(arr):
+    <span class="keyword">return</span> np.sum(arr)
+
+<span class="comment"># Warm-up</span>
+sum_array(small)
+sum_array(large)
+
+<span class="comment"># Time small (cache-friendly)</span>
+start = time.perf_counter()
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10000</span>):
+    sum_array(small)
+t_small = time.perf_counter() - start
+
+<span class="comment"># Time large (memory-bound)</span>
+start = time.perf_counter()
+<span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10</span>):
+    sum_array(large)
+t_large = time.perf_counter() - start
+
+<span class="function">print</span>(<span class="string">f"Small (cache): {t_small*1000:.2f} ms total"</span>)
+<span class="function">print</span>(<span class="string">f"Large (RAM):   {t_large*1000:.2f} ms total"</span>)
+<span class="function">print</span>(<span class="string">f"Ratio per element: {(t_large/10)/(t_small/10000):.2f}x"</span>)</pre>
+    <p><strong>Expected Observation:</strong> The large array is not proportionally slower. It is <em>much</em> slower per element because the CPU constantly waits for RAM. This is the "memory wall."</p>
+  </div>
+
+  <div class="card">
+    <h3>1.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy: Concept Check</div>
+      <p>1. Define latency and throughput in your own words. Give one quant finance example for each.</p>
+      <p>2. Why is reading from SSD so much slower than reading from L1 cache? (Hint: think about physical distance and technology.)</p>
+      <p>3. List the six levels of the optimization hierarchy in order. Why should algorithmic improvements come before rewriting code in C++?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium: Calculation</div>
+      <p>A backtest currently takes 4 hours to run. After an algorithmic improvement (Big O), it takes 10 minutes. After vectorization, it takes 30 seconds. After parallelizing across 8 cores, it takes 5 seconds.</p>
+      <p>Calculate the speedup factor at each stage. Which stage gave the biggest absolute improvement in seconds saved?</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard: Analysis</div>
+      <p>Research the concept of <strong>roofline models</strong> in computer architecture. Draw a simplified roofline model (on paper) for a modern CPU. Mark where you think a naive Python loop calculating a moving average would sit. Mark where a NumPy vectorized version would sit. Explain the vertical and horizontal distance between the two points.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>1.6 External Resources</h3>
+    <a class="resource-link" href="https://colin-scott.github.io/personal_website/research/interactive_latency.html" target="_blank">📊 Interactive Latency Numbers Every Programmer Should Know</a>
+    <a class="resource-link" href="https://wiki.python.org/moin/PythonSpeed" target="_blank">📚 Python Speed Performance Tips (Official Wiki)</a>
+    <a class="resource-link" href="https://pydata.org/" target="_blank">🎥 PyData Talks (Search for "performance")</a>
+  </div>
+</div>
+
+<!-- SECTION 2: MEASURING CODE -->
+<div class="section" id="section-2">
+  <div class="card">
+    <h2>2. Measuring Before Optimizing</h2>
+    <p>The first rule of performance engineering is: <strong>measure first, optimize second</strong>. If you do not measure, you are guessing. Guessing is expensive—you might spend days rewriting a function that accounts for 0.1% of runtime while ignoring the function that accounts for 80%.</p>
+    
+    <h3>2.1 The Right Way to Measure Time</h3>
+    <p>Python offers several ways to measure time. Use the right tool for the job:</p>
+    <ul>
+      <li><code>time.time()</code>: Returns wall-clock time (seconds since epoch). <strong>Do not use this for benchmarking.</strong> It can jump backward if the system clock adjusts.</li>
+      <li><code>time.perf_counter()</code>: High-resolution timer for short intervals. <strong>Use this.</strong> It measures elapsed time with the highest available resolution.</li>
+      <li><code>time.process_time()</code>: Measures CPU time spent by the current process only, excluding sleep. Good for understanding CPU burn vs. waiting.</li>
+    </ul>
+
+    <h3>2.2 The timeit Module</h3>
+    <p>For microbenchmarks (small snippets), use the <code>timeit</code> module. It disables garbage collection, runs multiple trials, and reports the best time (which reduces noise from OS scheduling).</p>
+    <div class="code-header">Using timeit</div>
+    <pre><span class="keyword">import</span> timeit
+
+<span class="comment"># Measure list comprehension vs for-loop</span>
+setup = <span class="string">"data = list(range(1000))"</span>
+
+loop_code = <span class="string">"""
+result = []
+for x in data:
+    result.append(x * 2)
+"""</span>
+
+comp_code = <span class="string">"result = [x * 2 for x in data]"</span>
+
+t_loop = timeit.timeit(loop_code, setup=setup, number=<span class="number">10000</span>)
+t_comp = timeit.timeit(comp_code, setup=setup, number=<span class="number">10000</span>)
+
+<span class="function">print</span>(<span class="string">f"Loop:  {t_loop:.4f}s"</span>)
+<span class="function">print</span>(<span class="string">f"Comp:  {t_comp:.4f}s"</span>)
+<span class="function">print</span>(<span class="string">f"Speedup: {t_loop/t_comp:.1f}x"</span>)</pre>
+
+    <h3>2.3 Statistical Rigor in Benchmarking</h3>
+    <p>Computers are noisy. Your benchmark is affected by:</p>
+    <ul>
+      <li><strong>OS Scheduling:</strong> The operating system pauses your program to run other tasks.</li>
+      <li><strong>CPU Turbo Boost:</strong> Modern CPUs slow down when hot. The first run may be faster.</li>
+      <li><strong>Cache Warm-up:</strong> The first access to data is slow (cache miss). Subsequent accesses are fast (cache hit).</li>
+      <li><strong>Garbage Collection:</strong> Python may pause to clean up memory mid-benchmark.</li>
+    </ul>
+    <p>Best practices:</p>
+    <ol>
+      <li>Run multiple trials (at least 7) and take the <strong>median</strong>, not the mean. Median is robust to outliers.</li>
+      <li>Report the minimum, median, and standard deviation.</li>
+      <li>Warm up the code with 1-2 throwaway runs before timing.</li>
+      <li>Run on a quiet machine (close browsers and background apps).</li>
+    </ol>
+
+    <h3>2.4 A Robust Benchmarking Template</h3>
+    <p>Here is a reusable function you should copy into every Colab notebook:</p>
+    <div class="code-header">benchmark.py — Your new best friend</div>
+    <pre><span class="keyword">import</span> time
+<span class="keyword">import</span> statistics
+
+<span class="keyword">def</span> <span class="function">benchmark</span>(func, *args, n_trials=<span class="number">7</span>, warmup=<span class="number">1</span>, **kwargs):
+    <span class="string">"""
+    Robust benchmarking function.
+    Returns dict with min, median, mean, stdev times in milliseconds.
+    """</span>
+    <span class="comment"># Warmup runs</span>
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(warmup):
+        func(*args, **kwargs)
+    
+    times = []
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(n_trials):
+        gc.collect()  <span class="comment"># Clean slate</span>
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        times.append((end - start) * <span class="number">1000</span>)  <span class="comment"># ms</span>
+    
+    <span class="keyword">return</span> {
+        <span class="string">'min'</span>: <span class="function">min</span>(times),
+        <span class="string">'median'</span>: statistics.median(times),
+        <span class="string">'mean'</span>: statistics.mean(times),
+        <span class="string">'stdev'</span>: statistics.stdev(times) <span class="keyword">if</span> <span class="function">len</span>(times) > <span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span>,
+        <span class="string">'result'</span>: result
+    }
+
+<span class="comment"># Example usage:</span>
+<span class="keyword">def</span> <span class="function">slow_sum</span>(n):
+    <span class="keyword">return</span> <span class="function">sum</span>(<span class="function">range</span>(n))
+
+stats = benchmark(slow_sum, <span class="number">1_000_000</span>)
+<span class="function">print</span>(<span class="string">f"Median: {stats['median']:.2f} ms ± {stats['stdev']:.2f} ms"</span>)</pre>
+  </div>
+
+  <div class="card">
+    <h3>2.5 Colab Experiment: The Cost of a Python Loop</h3>
+    <p>Let's quantify exactly how slow Python loops are compared to built-in functions.</p>
+    <div class="code-header">Experiment 2.1: Loop vs Vectorized vs Built-in</div>
+    <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+data = <span class="function">list</span>(<span class="function">range</span>(<span class="number">100_000</span>))
+arr = np.arange(<span class="number">100_000</span>)
+
+<span class="keyword">def</span> <span class="function">python_loop</span>(data):
+    total = <span class="number">0</span>
+    <span class="keyword">for</span> x <span class="keyword">in</span> data:
+        total += x
+    <span class="keyword">return</span> total
+
+<span class="keyword">def</span> <span class="function">python_builtin</span>(data):
+    <span class="keyword">return</span> <span class="function">sum</span>(data)
+
+<span class="keyword">def</span> <span class="function">numpy_sum</span>(arr):
+    <span class="keyword">return</span> np.sum(arr)
+
+<span class="comment"># Run benchmark</span>
+<span class="keyword">for</span> name, func, arg <span class="keyword">in</span> [(<span class="string">'Loop'</span>, python_loop, data),
+                         (<span class="string">'Built-in'</span>, python_builtin, data),
+                         (<span class="string">'NumPy'</span>, numpy_sum, arr)]:
+    stats = benchmark(func, arg, n_trials=<span class="number">5</span>)
+    <span class="function">print</span>(<span class="string">f"{name:12} | Median: {stats['median']:8.2f} ms"</span>)</pre>
+    <p><strong>Expected Result:</strong> NumPy is typically 50-100x faster than a Python loop. The built-in <code>sum</code> is also written in C and beats the manual loop by ~5-10x.</p>
+  </div>
+
+  <div class="card">
+    <h3>2.6 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. Why is <code>time.perf_counter()</code> better than <code>time.time()</code> for benchmarking?</p>
+      <p>2. What does "cache warm-up" mean? Why should you do 1-2 throwaway runs before timing?</p>
+      <p>3. Run the benchmarking template on <code>sum(range(10_000))</code> with <code>n_trials=3</code> and <code>n_trials=20</code>. How much does the standard deviation change?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a function <code>compare_methods(funcs, args)</code> that takes a dictionary of functions and runs the benchmark template on each. It should print a formatted table ranking them by median time. Test it by comparing <code>list.append</code>, <code>list.extend</code>, and list concatenation (<code>+</code>) for building a list of 10,000 integers.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Investigate <strong>systematic bias</strong> in benchmarking. Write an experiment that demonstrates the effect of CPU thermal throttling. Hint: Run a heavy computation in a tight loop for 60 seconds, timing each iteration. Plot time vs. iteration number (use matplotlib). You should see a gradual slowdown. Explain why this happens and how to mitigate it in benchmark design.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2.7 Resources</h3>
+    <a class="resource-link" href="https://docs.python.org/3/library/timeit.html" target="_blank">📚 Python timeit Documentation</a>
+    <a class="resource-link" href="https://pyperf.readthedocs.io/" target="_blank">📚 pyperf — Robust Benchmarking Suite</a>
+  </div>
+</div>
+
+<!-- SECTION 3: BIG O -->
+<div class="section" id="section-3">
+  <div class="card">
+    <h2>3. Big O & Algorithmic Complexity</h2>
+    <p>Big O notation describes how much an algorithm's resource usage (time or memory) grows relative to its input size. It is the <strong>single most important concept</strong> in performance engineering because a better algorithm can turn an overnight job into a millisecond job.</p>
+    
+    <h3>3.1 The Intuition</h3>
+    <p>Imagine you are looking for a specific book in a library:</p>
+    <ul>
+      <li><strong>O(1) — Constant Time:</strong> You know exactly where the book is. You walk directly to shelf 4, row 2. The time does not depend on how big the library is.</li>
+      <li><strong>O(log n) — Logarithmic:</strong> The library is sorted by title. You open the catalog in the middle. If your title is alphabetically before the middle, you search the left half; otherwise, the right half. Each step halves the problem. A library with 1,000,000 books needs only ~20 checks.</li>
+      <li><strong>O(n) — Linear:</strong> The library is unsorted. You scan every shelf one by one. Twice as many books takes twice as long.</li>
+      <li><strong>O(n log n) — Linearithmic:</strong> You want to sort the books by title. An efficient sorting algorithm (like Merge Sort or Timsort) does this by repeatedly dividing and merging. It is only slightly worse than linear.</li>
+      <li><strong>O(n²) — Quadratic:</strong> You want to find all pairs of books written by the same author. You compare every book with every other book. 10 books → 100 comparisons. 1,000 books → 1,000,000 comparisons.</li>
+      <li><strong>O(2^n) — Exponential:</strong> You want to try every possible subset of books to fit in your bag. Each book is either "in" or "out." 10 books → 1,024 subsets. 50 books → 1 quadrillion subsets. Impossible.</li>
+    </ul>
+
+    <svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+      <rect width="500" height="300" fill="#fafafa"/>
+      <line x1="50" y1="250" x2="450" y2="250" stroke="#333" stroke-width="2"/>
+      <line x1="50" y1="250" x2="50" y2="30" stroke="#333" stroke-width="2"/>
+      <text x="250" y="280" text-anchor="middle" font-size="12">Input Size (n)</text>
+      <text x="20" y="150" text-anchor="middle" font-size="12" transform="rotate(-90 20 150)">Operations</text>
+      
+      <line x1="50" y1="220" x2="450" y2="220" stroke="#00bfa5" stroke-width="3"/>
+      <text x="460" y="225" font-size="12" fill="#00bfa5" font-weight="bold">O(1)</text>
+      
+      <path d="M 50 220 Q 150 200 250 180 T 450 160" fill="none" stroke="#2196f3" stroke-width="2"/>
+      <text x="460" y="165" font-size="12" fill="#2196f3" font-weight="bold">O(log n)</text>
+      
+      <line x1="50" y1="220" x2="450" y2="80" stroke="#ff9800" stroke-width="2"/>
+      <text x="460" y="85" font-size="12" fill="#ff9800" font-weight="bold">O(n)</text>
+      
+      <path d="M 50 220 Q 200 180 300 120 T 450 60" fill="none" stroke="#9c27b0" stroke-width="2"/>
+      <text x="460" y="65" font-size="12" fill="#9c27b0" font-weight="bold">O(n log n)</text>
+      
+      <path d="M 50 220 Q 150 200 200 150 T 300 50" fill="none" stroke="#f44336" stroke-width="2"/>
+      <text x="310" y="45" font-size="12" fill="#f44336" font-weight="bold">O(n²)</text>
+    </svg>
+    <div class="diagram-caption">Figure 3.1: Growth rates of common Big O classes. Notice how O(n²) explodes compared to O(n log n).</div>
+
+    <h3>3.2 Quant Finance Examples</h3>
+    <table>
+      <tr><th>Task</th><th>Naive Approach</th><th>Complexity</th><th>Better Approach</th><th>Complexity</th></tr>
+      <tr><td>Price lookup</td><td>Scan list of prices</td><td>O(n)</td><td>Dictionary/hash map</td><td>O(1)</td></tr>
+      <tr><td>Sort trades by time</td><td>Bubble sort</td><td>O(n²)</td><td>Python <code>sorted()</code> (Timsort)</td><td>O(n log n)</td></tr>
+      <tr><td>Portfolio variance</td><td>Triple nested loop</td><td>O(n³)</td><td>Matrix algebra (NumPy)</td><td>O(n³) but 1000x faster in C</td></tr>
+      <tr><td>Pairwise correlations</td><td>Double loop over all pairs</td><td>O(n²)</td><td>Vectorized <code>np.corrcoef</code></td><td>O(n²) but parallelized</td></tr>
+      <tr><td>Subset sum (knapsack)</td><td>Try all subsets</td><td>O(2^n)</td><td>Dynamic programming</td><td>O(n·W)</td></tr>
+    </table>
+
+    <h3>3.3 Amortized Analysis</h3>
+    <p>Sometimes an individual operation is slow, but the <em>average</em> over many operations is fast. Python's <code>list.append()</code> is the classic example.</p>
+    <p>Appending to a Python list is usually O(1). But when the list runs out of pre-allocated space, Python must allocate a new, larger array and copy all elements over. That single append is O(n). However, because Python over-allocates (typically 1.125x growth), the <em>average</em> cost across millions of appends is still O(1). We call this <strong>amortized O(1)</strong>.</p>
+  </div>
+
+  <div class="card">
+    <h3>3.4 Colab Experiment: Complexity in Action</h3>
+    <p>Let's watch different complexities explode in real time.</p>
+    <div class="code-header">Experiment 3.1: Timing Different Complexities</div>
+    <pre><span class="keyword">import</span> time
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+sizes = [<span class="number">100</span>, <span class="number">200</span>, <span class="number">400</span>, <span class="number">800</span>, <span class="number">1600</span>, <span class="number">3200</span>]
+times_constant = []
+times_linear = []
+times_quadratic = []
+
+<span class="keyword">for</span> n <span class="keyword">in</span> sizes:
+    data = <span class="function">list</span>(<span class="function">range</span>(n))
+    
+    <span class="comment"># O(1): Access first element</span>
+    start = time.perf_counter()
+    _ = data[<span class="number">0</span>]
+    times_constant.append((time.perf_counter()-start)*<span class="number">1e6</span>)
+    
+    <span class="comment"># O(n): Sum all elements</span>
+    start = time.perf_counter()
+    _ = <span class="function">sum</span>(data)
+    times_linear.append((time.perf_counter()-start)*<span class="number">1e6</span>)
+    
+    <span class="comment"># O(n^2): Nested loop (avoid n > 5000!)</span>
+    start = time.perf_counter()
+    total = <span class="number">0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> data:
+        <span class="keyword">for</span> j <span class="keyword">in</span> data:
+            total += i*j
+    times_quadratic.append((time.perf_counter()-start)*<span class="number">1e6</span>)
+
+plt.figure(figsize=(<span class="number">10</span>,<span class="number">5</span>))
+plt.plot(sizes, times_constant, <span class="string">'o-'</span>, label=<span class="string">'O(1) - constant'</span>)
+plt.plot(sizes, times_linear, <span class="string">'s-'</span>, label=<span class="string">'O(n) - linear'</span>)
+plt.plot(sizes, times_quadratic, <span class="string">'^-'</span>, label=<span class="string">'O(n²) - quadratic'</span>)
+plt.xlabel(<span class="string">'Input Size'</span>); plt.ylabel(<span class="string">'Time (microseconds)'</span>)
+plt.legend(); plt.yscale(<span class="string">'log'</span>); plt.grid(<span class="keyword">True</span>)
+plt.title(<span class="string">'Complexity Growth Visualization'</span>)
+plt.show()</pre>
+    <p><strong>Observation:</strong> On a log scale, O(n) looks like a straight line with slope 1. O(n²) has slope 2. O(1) is flat. If your code's timing curve looks like O(n²) but you expected O(n), you have a nested loop bug.</p>
+  </div>
+
+  <div class="card">
+    <h3>3.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What is the Big O of looking up a key in a Python dictionary? Why?</p>
+      <p>2. A function takes 2 seconds for n=1000 and 8 seconds for n=2000. What is its likely Big O?</p>
+      <p>3. Explain amortized O(1) for list append in one sentence.</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a function <code>find_duplicate(nums)</code> that finds any duplicate number in a list. First implement the O(n²) nested-loop version. Then implement the O(n) version using a set. Benchmark both with lists of size 1,000 and 10,000. Plot the results.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Matrix multiplication of two n×n matrices is O(n³) in the naive implementation. Strassen's algorithm achieves approximately O(n^2.81). Research Strassen's algorithm and implement the 2×2 base case in Python. Benchmark naive vs. Strassen for n=64, 128, 256 (use recursive decomposition). At what matrix size does the overhead of recursion make Strassen slower than naive NumPy dot product? Explain your findings.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3.6 Resources</h3>
+    <a class="resource-link" href="https://www.bigocheatsheet.com/" target="_blank">📊 Big-O Cheat Sheet</a>
+    <a class="resource-link" href="https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/" target="_blank">🎥 MIT 6.006 Introduction to Algorithms (Free Course)</a>
+  </div>
+</div>
+
+<!-- SECTION 4: CPU PROFILING -->
+<div class="section" id="section-4">
+  <div class="card">
+    <h2>4. CPU Profiling with cProfile</h2>
+    <p>Profiling is like giving your code an MRI scan. Instead of guessing where the bottleneck is, you instrument the code to record exactly how much time is spent in each function. <code>cProfile</code> is Python's built-in profiler. It is deterministic (records every call) and has low enough overhead for most quant workflows.</p>
+    
+    <h3>4.1 How cProfile Works</h3>
+    <p>cProfile hooks into the Python interpreter. Every time a function is called or returns, cProfile records the time. After the program finishes, it prints a table showing:</p>
+    <ul>
+      <li><code>ncalls</code>: Number of calls</li>
+      <li><code>tottime</code>: Total time spent in the function, <strong>excluding</strong> subcalls. This tells you if the function itself is slow.</li>
+      <li><code>cumtime</code>: Cumulative time spent in the function, <strong>including</strong> subcalls. This tells you if the function calls slow things.</li>
+      <li><code>percall</code>: Average time per call</li>
+    </ul>
+
+    <h3>4.2 Basic Usage</h3>
+    <div class="code-header">Profiling a script</div>
+    <pre><span class="keyword">import</span> cProfile
+<span class="keyword">import</span> pstats
+<span class="keyword">import</span> io
+
+<span class="keyword">def</span> <span class="function">heavy_computation</span>(n):
+    <span class="keyword">return</span> <span class="function">sum</span>(i*i <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n))
+
+<span class="keyword">def</span> <span class="function">main</span>():
+    result = heavy_computation(<span class="number">1_000_000</span>)
+    <span class="function">print</span>(<span class="string">f"Result: {result}"</span>)
+
+<span class="comment"># Profile it</span>
+profiler = cProfile.Profile()
+profiler.enable()
+main()
+profiler.disable()
+
+<span class="comment"># Print sorted stats</span>
+s = io.StringIO()
+ps = pstats.Stats(profiler, stream=s).sort_stats(<span class="string">'cumulative'</span>)
+ps.print_stats(<span class="number">10</span>)
+<span class="function">print</span>(s.getvalue())</pre>
+
+    <h3>4.3 Reading the Output</h3>
+    <p>The output table is dense. Here is how to read it:</p>
+    <pre>   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.123    0.123    0.456    0.456 script.py:10(main)
+  1000000    0.200    0.000    0.200    0.000 {built-in method builtins.sum}
+        1    0.133    0.133    0.133    0.133 script.py:5(heavy_computation)</pre>
+    <p>In this example:</p>
+    <ul>
+      <li><code>main</code> has high <code>cumtime</code> (0.456) but low <code>tottime</code> (0.123). It is not slow itself; it calls slow things.</li>
+      <li><code>sum</code> (built-in) has <code>tottime = cumtime = 0.200</code>. This is where the actual work happens.</li>
+      <li><code>heavy_computation</code> has equal tottime and cumtime (0.133), meaning it does work itself and calls nothing slow.</li>
+    </ul>
+
+    <h3>4.4 Visualizing with Snakeviz</h3>
+    <p>For complex programs, text tables are overwhelming. <code>snakeviz</code> creates an interactive sunburst chart in your browser.</p>
+    <div class="code-header">Using snakeviz in Colab</div>
+    <pre><span class="comment"># Save profile to disk</span>
+profiler.dump_stats(<span class="string">'/tmp/profile.stats'</span>)
+
+<span class="comment"># In terminal: snakeviz /tmp/profile.stats</span>
+<span class="comment"># In Colab/Jupyter, use:</span>
+<span class="keyword">import</span> snakeviz
+<span class="comment"># Or simply download the .stats file and view locally</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>4.5 Colab Experiment: Find the Bottleneck</h3>
+    <p>Here is a deliberately slow quant-style script. Your job is to profile it and identify the top 3 time sinks.</p>
+    <div class="code-header">Experiment 4.1: The Slow Backtest</div>
+    <pre><span class="keyword">import</span> random
+<span class="keyword">import</span> cProfile, pstats, io
+
+<span class="keyword">def</span> <span class="function">generate_prices</span>(n):
+    <span class="string">"""Generate fake price series"""</span>
+    prices = [<span class="number">100.0</span>]
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(n):
+        prices.append(prices[-<span class="number">1</span>] * (<span class="number">1</span> + random.gauss(<span class="number">0</span>, <span class="number">0.02</span>)))
+    <span class="keyword">return</span> prices
+
+<span class="keyword">def</span> <span class="function">moving_average</span>(prices, window):
+    <span class="string">"""Naive moving average"""</span>
+    result = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(prices) - window):
+        avg = <span class="function">sum</span>(prices[i:i+window]) / window
+        result.append(avg)
+    <span class="keyword">return</span> result
+
+<span class="keyword">def</span> <span class="function">generate_signals</span>(prices, ma):
+    <span class="string">"""Generate buy/sell signals"""</span>
+    signals = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(ma)):
+        <span class="keyword">if</span> prices[i+window] > ma[i]:
+            signals.append(<span class="string">'BUY'</span>)
+        <span class="keyword">else</span>:
+            signals.append(<span class="string">'SELL'</span>)
+    <span class="keyword">return</span> signals
+
+<span class="keyword">def</span> <span class="function">run_backtest</span>():
+    prices = generate_prices(<span class="number">50000</span>)
+    ma = moving_average(prices, <span class="number">20</span>)
+    signals = generate_signals(prices, ma)
+    <span class="keyword">return</span> <span class="function">len</span>([s <span class="keyword">for</span> s <span class="keyword">in</span> signals <span class="keyword">if</span> s == <span class="string">'BUY'</span>])
+
+<span class="comment"># Profile this</span>
+pr = cProfile.Profile()
+pr.enable()
+run_backtest()
+pr.disable()
+
+s = io.StringIO()
+pstats.Stats(pr, stream=s).sort_stats(<span class="string">'tottime'</span>).print_stats(<span class="number">15</span>)
+<span class="function">print</span>(s.getvalue())</pre>
+    <p><strong>Questions to answer:</strong></p>
+    <ol>
+      <li>Which function has the highest <code>tottime</code>?</li>
+      <li>What percentage of total time is spent in <code>random.gauss</code>?</li>
+      <li>Is the time dominated by computation or by Python interpreter overhead?</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>4.6 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What is the difference between <code>tottime</code> and <code>cumtime</code>? If a function has high <code>cumtime</code> but low <code>tottime</code>, what does that mean?</p>
+      <p>2. Profile a simple <code>for</code> loop that appends to a list 100,000 times. What percentage of time is spent in <code>list.append</code>?</p>
+      <p>3. Why does cProfile sometimes show <code>{built-in method ...}</code> instead of a filename?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a decorator <code>@profiled</code> that wraps any function and prints its cumulative time and number of calls each time it runs. Use <code>cProfile.Profile()</code> inside the decorator. Apply it to a recursive Fibonacci function and a memoized Fibonacci function. Compare the call counts.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Implement a <strong>statistical profiler</strong> from scratch. Instead of tracing every call (like cProfile), sample the call stack every 1 millisecond using <code>sys._current_frames()</code>. Run it on the slow backtest from Experiment 4.1. Compare the top functions identified by your statistical profiler vs. cProfile. Discuss the trade-offs: overhead, accuracy, and granularity.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>4.7 Resources</h3>
+    <a class="resource-link" href="https://docs.python.org/3/library/profile.html" target="_blank">📚 Python Profilers Documentation</a>
+    <a class="resource-link" href="https://jiffyclub.github.io/snakeviz/" target="_blank">📊 Snakeviz Interactive Visualizer</a>
+  </div>
+</div>
+
+<!-- SECTION 5: LINE PROFILING -->
+<div class="section" id="section-5">
+  <div class="card">
+    <h2>5. Line-by-Line Profiling</h2>
+    <p>cProfile tells you <em>which function</em> is slow. <code>line_profiler</code> tells you <em>which line</em> inside that function is slow. This is crucial when a function contains 50 lines of mixed logic—some fast, some catastrophic.</p>
+    
+    <h3>5.1 Installation & Usage</h3>
+    <p>line_profiler is not in the standard library. Install it:</p>
+    <pre>!pip install line_profiler</pre>
+    <p>Use the <code>@profile</code> decorator on the function you want to inspect. Then run with <code>kernprof</code>:</p>
+    <pre>$ kernprof -l -v script.py</pre>
+    <p>In Colab/Jupyter, use the magic command:</p>
+    <pre>%load_ext line_profiler
+%lprun -f my_function my_function(args)</pre>
+
+    <h3>5.2 Reading line_profiler Output</h3>
+    <p>The output shows each line with:</p>
+    <ul>
+      <li><code>Line #</code>: Line number</li>
+      <li><code>Hits</code>: Number of times executed</li>
+      <li><code>Time</code>: Total time spent on that line</li>
+      <li><code>Per Hit</code>: Average time per execution</li>
+      <li><code>% Time</code>: Percentage of total function time</li>
+      <li><code>Line Contents</code>: The actual code</li>
+    </ul>
+    <p>Look for lines with high <code>% Time</code>. Often, the bottleneck is a single line inside a loop.</p>
+  </div>
+
+  <div class="card">
+    <h3>5.3 Colab Experiment: The Guilty Line</h3>
+    <div class="code-header">Experiment 5.1: Pinpoint the Slowness</div>
+    <pre><span class="comment"># In Colab: first run %load_ext line_profiler</span>
+
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">slow_portfolio_calc</span>(returns, weights):
+    <span class="string">"""Calculate portfolio variance the slow way"""</span>
+    n = <span class="function">len</span>(returns)
+    var = <span class="number">0.0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(n):
+            var += weights[i] * weights[j] * np.cov(returns[i], returns[j])[<span class="number">0</span>,<span class="number">1</span>]
+    <span class="keyword">return</span> var
+
+<span class="comment"># Generate fake data</span>
+np.random.seed(<span class="number">42</span>)
+returns = np.random.randn(<span class="number">50</span>, <span class="number">100</span>)  <span class="comment"># 50 assets, 100 days</span>
+weights = np.random.rand(<span class="number">50</span>)
+weights /= weights.sum()
+
+<span class="comment"># Profile it (uncomment in Colab)</span>
+<span class="comment"># %lprun -f slow_portfolio_calc slow_portfolio_calc(returns, weights)</span></pre>
+    <p><strong>Expected Result:</strong> The line with <code>np.cov(...)</code> inside the double loop will consume >95% of time. Computing covariance for a pair of arrays inside a loop is algorithmically terrible and computationally expensive.</p>
+  </div>
+
+  <div class="card">
+    <h3>5.4 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What does the <code>Hits</code> column tell you? If one line has 1 hit but 80% of time, what kind of operation is it likely doing?</p>
+      <p>2. Why must you use <code>kernprof</code> or <code>%lprun</code> instead of just running the script normally with <code>@profile</code>?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Take the slow backtest from Section 4. Add <code>@profile</code> to <code>moving_average</code>. Run line_profiler. Identify the exact line that dominates. Rewrite only that line using a faster approach (hint: cumulative sum). Re-profile and measure the speedup.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>line_profiler adds significant overhead (~10-100x slowdown). Design an experiment that quantifies this overhead. Compare the wall-clock time of a function run normally vs. run under line_profiler. Plot the overhead factor vs. function size (number of lines). At what point does line_profiler become impractical for real-time trading code?</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>5.5 Resources</h3>
+    <a class="resource-link" href="https://github.com/pyutils/line_profiler" target="_blank">📚 line_profiler GitHub</a>
+  </div>
+</div>
+
+<!-- SECTION 6: MEMORY MANAGEMENT -->
+<div class="section" id="section-6">
+  <div class="card">
+    <h2>6. Memory Management & Profiling</h2>
+    <p>Speed is not the only resource that matters. Memory is equally critical. A quant script that processes tick data can easily allocate gigabytes of RAM. If you run out of memory, your program crashes or starts swapping to disk, making it thousands of times slower. Worse, memory leaks in long-running trading infrastructure can cause outages.</p>
+    
+    <h3>6.1 How Python Manages Memory</h3>
+    <p>Python uses two mechanisms:</p>
+    <ol>
+      <li><strong>Reference Counting:</strong> Every Python object has a counter tracking how many variables point to it. When the count hits zero, the memory is freed immediately. This is simple and fast but cannot handle circular references (A points to B, B points to A).</li>
+      <li><strong>Generational Garbage Collection:</strong> A secondary collector detects circular references. It classifies objects into three generations (0, 1, 2). New objects start in generation 0. If they survive a collection, they move to generation 1, then 2. Older generations are scanned less frequently.</li>
+    </ol>
+
+    <svg viewBox="0 0 400 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="50" width="100" height="60" rx="5" fill="#fff9c4" stroke="#f57f17" stroke-width="2"/>
+      <text x="200" y="75" text-anchor="middle" font-size="12" font-weight="bold">Object: 42</text>
+      <text x="200" y="95" text-anchor="middle" font-size="14" font-weight="bold" fill="#d32f2f">refcount = 2</text>
+      <line x1="80" y1="80" x2="150" y2="80" stroke="#333" stroke-width="2"/>
+      <polygon points="150,80 140,75 140,85" fill="#333"/>
+      <rect x="20" y="65" width="60" height="30" rx="3" fill="#e3f2fd" stroke="#1565c0" stroke-width="1"/>
+      <text x="50" y="84" text-anchor="middle" font-size="11">x</text>
+      <line x1="320" y1="80" x2="250" y2="80" stroke="#333" stroke-width="2"/>
+      <polygon points="250,80 260,75 260,85" fill="#333"/>
+      <rect x="320" y="65" width="60" height="30" rx="3" fill="#e3f2fd" stroke="#1565c0" stroke-width="1"/>
+      <text x="350" y="84" text-anchor="middle" font-size="11">y</text>
+    </svg>
+    <div class="diagram-caption">Figure 6.1: Reference Counting. The integer object 42 has refcount=2 because both x and y point to it.</div>
+
+    <h3>6.2 Memory Profiling with memory_profiler</h3>
+    <p>Install: <code>pip install memory_profiler</code></p>
+    <p>Use <code>@profile</code> decorator and run with <code>python -m memory_profiler script.py</code>, or use the IPython magic <code>%memit</code> and <code>%mprun</code>.</p>
+    <div class="code-header">Memory profiling example</div>
+    <pre><span class="keyword">from</span> memory_profiler <span class="keyword">import</span> profile
+
+<span class="decorator">@profile</span>
+<span class="keyword">def</span> <span class="function">process_data</span>():
+    data = [<span class="function">list</span>(<span class="function">range</span>(<span class="number">100000</span>)) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10</span>)]  <span class="comment"># ~80 MB</span>
+    result = [d[<span class="number">0</span>] <span class="keyword">for</span> d <span class="keyword">in</span> data]
+    <span class="keyword">del</span> data  <span class="comment"># Explicitly free memory</span>
+    gc.collect()
+    <span class="keyword">return</span> result
+
+process_data()</pre>
+
+    <h3>6.3 Memory Optimization Techniques</h3>
+    <ul>
+      <li><strong>Generators:</strong> Use <code>yield</code> instead of building massive lists. A generator produces one item at a time.</li>
+      <li><strong>__slots__:</strong> Normally, Python objects store attributes in a dictionary (<code>__dict__</code>), which is memory-heavy. <code>__slots__</code> pre-declares attributes, eliminating the dict.</li>
+      <li><strong>Arrays vs Lists:</strong> A <code>list</code> of floats stores Python objects (28 bytes each + pointer). A <code>numpy.array</code> stores raw C doubles (8 bytes each).</li>
+      <li><strong>Object Pools:</strong> Reuse objects instead of creating new ones in hot loops.</li>
+    </ul>
+    <div class="code-header">__slots__ example</div>
+    <pre><span class="keyword">class</span> <span class="function">HeavyPoint</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, x, y):
+        self.x = x
+        self.y = y
+
+<span class="keyword">class</span> <span class="function">LightPoint</span>:
+    <span class="keyword">__slots__</span> = (<span class="string">'x'</span>, <span class="string">'y'</span>)
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, x, y):
+        self.x = x
+        self.y = y
+
+<span class="comment"># LightPoint uses ~50% less memory per instance</span></pre>
+  </div>
+
+  <div class="card">
+    <h3>6.4 Colab Experiment: Memory Investigation</h3>
+    <div class="code-header">Experiment 6.1: Find the Memory Hog</div>
+    <pre><span class="keyword">import</span> tracemalloc
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">leaky_backtest</span>():
+    <span class="string">"""Simulates a backtest that accidentally keeps references"""</span>
+    all_prices = []
+    <span class="keyword">for</span> day <span class="keyword">in</span> <span class="function">range</span>(<span class="number">100</span>):
+        <span class="comment"># Simulate 1000 assets, 1000 days each iteration</span>
+        prices = np.random.rand(<span class="number">1000</span>, <span class="number">1000</span>)
+        all_prices.append(prices)  <span class="comment"># Oops! Keeps everything</span>
+        <span class="comment"># Some computation...</span>
+        signal = prices.mean(axis=<span class="number">1</span>)
+    <span class="keyword">return</span> all_prices
+
+<span class="comment"># Trace memory</span>
+tracemalloc.start()
+snapshot1 = tracemalloc.take_snapshot()
+
+_ = leaky_backtest()
+
+snapshot2 = tracemalloc.take_snapshot()
+top_stats = snapshot2.compare_to(snapshot1, <span class="string">'lineno'</span>)
+
+<span class="function">print</span>(<span class="string">"Top 5 memory differences:"</span>)
+<span class="keyword">for</span> stat <span class="keyword">in</span> top_stats[:<span class="number">5</span>]:
+    <span class="function">print</span>(stat)</pre>
+    <p><strong>Fix:</strong> Remove <code>all_prices.append(prices)</code> if historical prices are not needed. Or use a fixed-size deque if only recent history matters.</p>
+  </div>
+
+  <div class="card">
+    <h3>6.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What is a memory leak? Why are they dangerous in long-running trading systems?</p>
+      <p>2. How much memory does a Python list of 1,000,000 integers use approximately? (Hint: each int is ~28 bytes, each list pointer is 8 bytes.)</p>
+      <p>3. What does <code>gc.collect()</code> do? When should you call it manually?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a generator <code>streaming_mean(filename)</code> that reads a CSV of stock prices one row at a time and yields a running mean. Do NOT load the entire file into memory. Profile the peak memory usage of your generator vs. a list-based approach using <code>tracemalloc</code> on a 100MB CSV file.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Implement a custom <strong>object pool</strong> for <code>__slots__</code>-based trade event objects. When a trade is processed, instead of deleting it, return it to the pool. Benchmark memory allocation rate and GC pause times for a simulation generating 1 million trade events: (a) with normal object creation, (b) with your object pool. Report fragmentation metrics using <code>tracemalloc</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>6.6 Resources</h3>
+    <a class="resource-link" href="https://pypi.org/project/memory-profiler/" target="_blank">📚 memory_profiler Documentation</a>
+    <a class="resource-link" href="https://docs.python.org/3/library/tracemalloc.html" target="_blank">📚 Python tracemalloc (Built-in)</a>
+  </div>
+</div>
+
+<!-- SECTION 7: NUMPY OPTIMIZATION -->
+<div class="section" id="section-7">
+  <div class="card">
+    <h2>7. NumPy Optimization</h2>
+    <p>NumPy is the bedrock of quant computing in Python. It provides N-dimensional arrays backed by highly optimized C and Fortran code. The key to NumPy performance is <strong>vectorization</strong>: replacing Python loops with array-wide operations that execute in compiled code.</p>
+    
+    <h3>7.1 Why Python Loops Are Slow</h3>
+    <p>Every iteration of a Python <code>for</code> loop does the following:</p>
+    <ol>
+      <li>Fetch the iterator object</li>
+      <li>Call <code>__next__()</code></li>
+      <li>Check the type of the element</li>
+      <li>Look up the operation (e.g., <code>+</code>) in the object's method table</li>
+      <li>Allocate a new Python object for the result</li>
+      <li>Store the result</li>
+    </ol>
+    <p>This overhead is ~50-200 nanoseconds per iteration. For 1 million iterations, that is 50-200 milliseconds of pure overhead—before doing any actual math. NumPy avoids all of this by operating on typed, contiguous memory blocks in C.</p>
+
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <text x="150" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#d32f2f">Python Loop</text>
+      <rect x="50" y="40" width="40" height="40" fill="#ffccbc" stroke="#d32f2f" stroke-width="2"/>
+      <rect x="100" y="40" width="40" height="40" fill="#ffccbc" stroke="#d32f2f" stroke-width="2"/>
+      <rect x="150" y="40" width="40" height="40" fill="#ffccbc" stroke="#d32f2f" stroke-width="2"/>
+      <rect x="200" y="40" width="40" height="40" fill="#ffccbc" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="70" y1="80" x2="70" y2="120" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="120" y1="80" x2="120" y2="120" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="170" y1="80" x2="170" y2="120" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="220" y1="80" x2="220" y2="120" stroke="#d32f2f" stroke-width="2"/>
+      <rect x="50" y="120" width="40" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+      <rect x="100" y="120" width="40" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+      <rect x="150" y="120" width="40" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+      <rect x="200" y="120" width="40" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+      <text x="150" y="180" text-anchor="middle" font-size="11" fill="#666">4 separate Python operations</text>
+      
+      <text x="450" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">NumPy Vectorization</text>
+      <rect x="350" y="50" width="200" height="40" fill="#bbdefb" stroke="#1565c0" stroke-width="2"/>
+      <text x="450" y="75" text-anchor="middle" font-size="12">Array [a,b,c,d]</text>
+      <line x1="450" y1="90" x2="450" y2="130" stroke="#1565c0" stroke-width="4"/>
+      <polygon points="450,130 440,115 460,115" fill="#1565c0"/>
+      <rect x="350" y="130" width="200" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="2"/>
+      <text x="450" y="155" text-anchor="middle" font-size="12">Result [a',b',c',d']</text>
+      <text x="450" y="190" text-anchor="middle" font-size="11" fill="#666">1 SIMD operation in C</text>
+    </svg>
+    <div class="diagram-caption">Figure 7.1: Vectorization replaces many scalar operations with one batched operation.</div>
+
+    <h3>7.2 Broadcasting</h3>
+    <p>Broadcasting allows NumPy to perform arithmetic on arrays of different shapes without explicit loops. The rules are:</p>
+    <ol>
+      <li>If arrays have different dimensions, prepend 1s to the smaller shape.</li>
+      <li>Two dimensions are compatible if they are equal or one of them is 1.</li>
+    </ol>
+    <div class="code-header">Broadcasting examples</div>
+    <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+a = np.array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])          <span class="comment"># shape (3,)</span>
+b = np.array([[<span class="number">10</span>], [<span class="number">20</span>], [<span class="number">30</span>]])  <span class="comment"># shape (3,1)</span>
+
+<span class="comment"># Broadcasting: a becomes (3,3), b becomes (3,3)</span>
+<span class="function">print</span>((a + b).shape)  <span class="comment"># (3, 3)</span></pre>
+
+    <h3>7.3 Views vs Copies</h3>
+    <p>NumPy can return a <strong>view</strong> (shares memory) or a <strong>copy</strong> (new memory). Views are instant; copies are expensive.</p>
+    <ul>
+      <li><strong>View:</strong> Slicing (<code>arr[::2]</code>), <code>reshape</code>, <code>ravel</code></li>
+      <li><strong>Copy:</strong> Fancy indexing (<code>arr[[0,2,4]]</code>), <code>flatten</code>, <code>arr.T.copy()</code></li>
+    </ul>
+    <p>Check with <code>arr.flags['OWNDATA']</code> or <code>np.shares_memory(a, b)</code>.</p>
+  </div>
+
+  <div class="card">
+    <h3>7.4 Colab Experiment: Vectorize Everything</h3>
+    <div class="code-header">Experiment 7.1: Moving Average Wars</div>
+    <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+
+prices = np.random.randn(<span class="number">1_000_000</span>)
+window = <span class="number">20</span>
+
+<span class="comment"># Method 1: Pure Python loop</span>
+<span class="keyword">def</span> <span class="function">ma_loop</span>(prices, window):
+    result = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(prices)-window):
+        result.append(<span class="function">sum</span>(prices[i:i+window])/window)
+    <span class="keyword">return</span> np.array(result)
+
+<span class="comment"># Method 2: Cumulative sum vectorization</span>
+<span class="keyword">def</span> <span class="function">ma_cumsum</span>(prices, window):
+    cumsum = np.cumsum(np.insert(prices, <span class="number">0</span>, <span class="number">0</span>))
+    <span class="keyword">return</span> (cumsum[window:] - cumsum[:-window]) / window
+
+<span class="comment"># Method 3: NumPy convolution</span>
+<span class="keyword">def</span> <span class="function">ma_convolve</span>(prices, window):
+    <span class="keyword">return</span> np.convolve(prices, np.ones(window)/window, mode=<span class="string">'valid'</span>)
+
+<span class="comment"># Benchmark</span>
+<span class="keyword">for</span> name, func <span class="keyword">in</span> [(<span class="string">'Loop'</span>, ma_loop), (<span class="string">'Cumsum'</span>, ma_cumsum), (<span class="string">'Convolve'</span>, ma_convolve)]:
+    start = time.perf_counter()
+    r = func(prices, window)
+    elapsed = (time.perf_counter() - start) * <span class="number">1000</span>
+    <span class="function">print</span>(<span class="string">f"{name:10}: {elapsed:8.2f} ms | shape: {r.shape}"</span>)</pre>
+    <p><strong>Expected:</strong> Loop ~2,000 ms. Cumsum ~5 ms. Convolve ~15 ms. The vectorized cumsum is ~400x faster.</p>
+  </div>
+
+  <div class="card">
+    <h3>7.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What is vectorization? Why is a NumPy vectorized operation faster than a Python loop?</p>
+      <p>2. Given <code>a.shape = (100, 1)</code> and <code>b.shape = (100,)</code>, what is <code>(a + b).shape</code>?</p>
+      <p>3. Does <code>arr[::2]</code> create a copy or a view? How can you check?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Implement a vectorized <strong>exponential moving average (EMA)</strong> without Python loops. The formula is: <code>EMA_t = α * price_t + (1-α) * EMA_{t-1}</code>. Hint: Use <code>np.zeros_like</code> and one loop is acceptable if vectorization is impossible—but there is a way using <code>scipy.signal.lfilter</code> or pure NumPy via cumulative products.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Implement a vectorized <strong>pairwise distance matrix</strong> for 5,000 points in 3D space using only NumPy (no <code>scipy.spatial.distance</code>). Benchmark your implementation against <code>scipy.spatial.distance.cdist</code>. Your goal is to get within 2x of SciPy's speed. Hint: Use the identity <code>||a-b||² = ||a||² + ||b||² - 2a·b</code> and broadcasting.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>7.6 Resources</h3>
+    <a class="resource-link" href="https://numpy.org/doc/stable/user/whatisnumpy.html" target="_blank">📚 NumPy Official Docs</a>
+    <a class="resource-link" href="https://www.labri.fr/perso/nrougier/from-python-to-numpy/" target="_blank">📖 From Python to NumPy (Free Book)</a>
+  </div>
+</div>
+
+<!-- SECTION 8: PANDAS OPTIMIZATION -->
+<div class="section" id="section-8">
+  <div class="card">
+    <h2>8. Pandas Optimization</h2>
+    <p>Pandas is built on top of NumPy but adds labels, missing data handling, and heterogeneous types. This power comes with overhead. The difference between a well-written Pandas pipeline and a poorly written one can be 100x or more.</p>
+    
+    <h3>8.1 How Pandas Works Internally</h3>
+    <p>A DataFrame is not just a Python dict of lists. Internally, Pandas uses a <strong>BlockManager</strong> that groups columns by data type into contiguous NumPy arrays (blocks). This means:</p>
+    <ul>
+      <li>Operations on a single column are fast (one NumPy array).</li>
+      <li>Row-wise operations are slow (must access multiple blocks).</li>
+      <li>Adding/removing columns is cheap. Adding/removing rows is expensive.</li>
+    </ul>
+
+    <h3>8.2 Anti-Patterns to Avoid</h3>
+    <table>
+      <tr><th>Anti-Pattern</th><th>Why Slow</th><th>Better Alternative</th></tr>
+      <tr><td><code>for idx, row in df.iterrows():</code></td><td>Constructs a Series per row, pure Python loop</td><td>Vectorized ops or <code>df.apply</code> with axis=0</td></tr>
+      <tr><td><code>df.apply(func, axis=1)</code></td><td>Still loops in Python, just hidden</td><td>Vectorized NumPy ops on columns</td></tr>
+      <tr><td><code>df['col'][idx] = val</code></td><td>Chained indexing, triggers copy warnings</td><td><code>df.loc[idx, 'col'] = val</code></td></tr>
+      <tr><td>Growing DataFrames in a loop</td><td>Reallocates and copies entire DataFrame each iteration</td><td>Build list of dicts, then <code>pd.DataFrame(list)</code></td></tr>
+      <tr><td><code>df[df.col == val]</code> in a loop</td><td>Boolean mask creation is O(n) each time</td><td>Use <code>groupby</code> or merge</td></tr>
+    </table>
+
+    <h3>8.3 Advanced Optimizations</h3>
+    <ul>
+      <li><strong>eval/query:</strong> Pandas can use <code>numexpr</code> to evaluate complex expressions element-wise without intermediate arrays.</li>
+      <li><strong>Categoricals:</strong> Convert low-cardinality string columns (e.g., 'BUY'/'SELL', ticker symbols) to <code>category</code> dtype. Reduces memory 10x and speeds up groupby.</li>
+      <li><strong>Chunked processing:</strong> For files larger than RAM, use <code>pd.read_csv(chunksize=...)</code> or <code>pd.read_parquet</code>.</li>
+    </ul>
+    <div class="code-header">Categorical example</div>
+    <pre><span class="comment"># Without categorical: 100MB+</span>
+df[<span class="string">'side'</span>] = [<span class="string">'BUY'</span> <span class="keyword">if</span> x><span class="number">0</span> <span class="keyword">else</span> <span class="string">'SELL'</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10_000_000</span>)]
+
+<span class="comment"># With categorical: ~10MB</span>
+df[<span class="string">'side'</span>] = df[<span class="string">'side'</span>].astype(<span class="string">'category'</span>)</pre>
+  </div>
+
+  <div class="card">
+    <h3>8.4 Colab Experiment: Pandas Pipeline Optimization</h3>
+    <div class="code-header">Experiment 8.1: The Slow Signal Generator</div>
+    <pre><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+
+<span class="comment"># Create fake tick data</span>
+n = <span class="number">500_000</span>
+df = pd.DataFrame({
+    <span class="string">'price'</span>: np.random.randn(n).cumsum() + <span class="number">100</span>,
+    <span class="string">'volume'</span>: np.random.randint(<span class="number">1</span>, <span class="number">1000</span>, n),
+    <span class="string">'symbol'</span>: np.random.choice([<span class="string">'AAPL'</span>, <span class="string">'GOOGL'</span>, <span class="string">'MSFT'</span>], n)
+})
+
+<span class="comment"># SLOW: Row-wise loop</span>
+<span class="keyword">def</span> <span class="function">slow_signal</span>(df):
+    signals = []
+    <span class="keyword">for</span> _, row <span class="keyword">in</span> df.iterrows():
+        <span class="keyword">if</span> row[<span class="string">'price'</span>] > <span class="number">100</span> <span class="keyword">and</span> row[<span class="string">'volume'</span>] > <span class="number">500</span>:
+            signals.append(<span class="string">'STRONG_BUY'</span>)
+        <span class="keyword">else</span>:
+            signals.append(<span class="string">'HOLD'</span>)
+    df[<span class="string">'signal'</span>] = signals
+    <span class="keyword">return</span> df
+
+<span class="comment"># FAST: Vectorized</span>
+<span class="keyword">def</span> <span class="function">fast_signal</span>(df):
+    df[<span class="string">'signal'</span>] = <span class="string">'HOLD'</span>
+    df.loc[(df.price > <span class="number">100</span>) &amp; (df.volume > <span class="number">500</span>), <span class="string">'signal'</span>] = <span class="string">'STRONG_BUY'</span>
+    <span class="keyword">return</span> df
+
+<span class="comment"># Benchmark</span>
+<span class="keyword">for</span> name, func <span class="keyword">in</span> [(<span class="string">'Loop'</span>, slow_signal), (<span class="string">'Vectorized'</span>, fast_signal)]:
+    start = time.perf_counter()
+    _ = func(df.copy())
+    <span class="function">print</span>(<span class="string">f"{name}: {(time.perf_counter()-start)*1000:.1f} ms"</span>)</pre>
+    <p><strong>Expected:</strong> Loop ~30,000 ms. Vectorized ~10 ms. <strong>3,000x speedup.</strong></p>
+  </div>
+
+  <div class="card">
+    <h3>8.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. Why is <code>iterrows()</code> slow? What does it construct on every iteration?</p>
+      <p>2. Convert a DataFrame column with 10 million rows containing only 'A', 'B', 'C' to categorical. How much memory do you save?</p>
+      <p>3. What is the difference between <code>df['col']</code> and <code>df[['col']]</code> in terms of return type?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Given a DataFrame of trades with columns <code>timestamp</code>, <code>symbol</code>, <code>price</code>, <code>quantity</code>, calculate the Volume-Weighted Average Price (VWAP) per symbol using only vectorized operations. No loops, no apply. Hint: <code>groupby</code> + <code>transform</code>.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Implement a <strong>rolling window correlation</strong> between two price series using Pandas. First, use <code>.rolling(window).apply(lambda x: x.corr(...))</code>. Then, optimize it using NumPy's <code>stride_tricks.sliding_window_view</code> (or manual convolution). Benchmark both on 1 million rows with window=100. Explain why the Pandas version is slow (hint: look at the profiler output).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>8.6 Resources</h3>
+    <a class="resource-link" href="https://pandas.pydata.org/docs/user_guide/enhancingperf.html" target="_blank">📚 Pandas Performance Guide</a>
+    <a class="resource-link" href="https://tomaugspurger.github.io/modern-1-intro" target="_blank">📖 Modern Pandas (Tom Augspurger)</a>
+  </div>
+</div>
+
+<!-- SECTION 9: CONCURRENCY -->
+<div class="section" id="section-9">
+  <div class="card">
+    <h2>9. Concurrency & Parallelism</h2>
+    <p>Modern CPUs have multiple cores. A single Python process uses only one core at a time due to the <strong>Global Interpreter Lock (GIL)</strong>. To use all cores, you must understand the concurrency landscape.</p>
+    
+    <h3>9.1 The GIL Explained</h3>
+    <p>The GIL is a mutex (lock) that protects access to Python objects. It ensures that only one thread executes Python bytecode at a time. This means:</p>
+    <ul>
+      <li><strong>Threading</strong> does NOT speed up CPU-bound Python code. Threads alternate, not run simultaneously.</li>
+      <li><strong>Multiprocessing</strong> spawns new Python processes, each with its own GIL and memory space. This bypasses the GIL but has overhead.</li>
+      <li><strong>Asyncio</strong> uses a single thread with an event loop. Perfect for waiting on thousands of network connections.</li>
+    </ul>
+
+    <svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg">
+      <rect x="150" y="20" width="200" height="240" rx="10" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+      <text x="250" y="45" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">Python Interpreter</text>
+      <rect x="200" y="55" width="100" height="30" rx="5" fill="#ff5252"/>
+      <text x="250" y="75" text-anchor="middle" fill="white" font-size="12" font-weight="bold">🔒 GIL</text>
+      <rect x="170" y="100" width="60" height="40" rx="5" fill="#69f0ae" stroke="#00c853" stroke-width="2"/>
+      <text x="200" y="125" text-anchor="middle" font-size="11">Thread 1</text>
+      <line x1="200" y1="140" x2="200" y2="180" stroke="#666" stroke-width="2" stroke-dasharray="4"/>
+      <circle cx="200" cy="190" r="8" fill="#00c853"/>
+      <rect x="270" y="100" width="60" height="40" rx="5" fill="#ffd740" stroke="#ffab00" stroke-width="2" opacity="0.5"/>
+      <text x="300" y="125" text-anchor="middle" font-size="11">Thread 2</text>
+      <line x1="300" y1="140" x2="300" y2="180" stroke="#666" stroke-width="2" stroke-dasharray="4"/>
+      <circle cx="300" cy="190" r="8" fill="#bdbdbd"/>
+      <rect x="220" y="160" width="60" height="40" rx="5" fill="#ffd740" stroke="#ffab00" stroke-width="2" opacity="0.5"/>
+      <text x="250" y="185" text-anchor="middle" font-size="11">Thread 3</text>
+      <line x1="250" y1="200" x2="250" y2="220" stroke="#666" stroke-width="2" stroke-dasharray="4"/>
+      <circle cx="250" cy="230" r="8" fill="#bdbdbd"/>
+      <text x="250" y="265" text-anchor="middle" font-size="11" fill="#666">Only ONE thread executes Python bytecode at a time</text>
+    </svg>
+    <div class="diagram-caption">Figure 9.1: The Global Interpreter Lock allows only one thread to hold the Python interpreter at a time.</div>
+
+    <h3>9.2 When to Use What</h3>
+    <table>
+      <tr><th>Model</th><th>Use Case</th><th>Quant Example</th><th>GIL Impact</th></tr>
+      <tr><td>Threading</td><td>I/O bound (waiting)</td><td>Downloading market data from 10 APIs</td><td>OK (releases GIL during I/O)</td></tr>
+      <tr><td>Multiprocessing</td><td>CPU bound (compute)</td><td>Parallel backtests, Monte Carlo</td><td>Bypassed (separate processes)</td></tr>
+      <tr><td>Asyncio</td><td>Many I/O connections</td><td>WebSocket feeds from 100 exchanges</td><td>Single thread, no GIL issue</td></tr>
+      <tr><td>Numba (nogil)</td><td>CPU bound in compiled code</td><td>Custom indicator calculation</td><td>Released inside Numba</td></tr>
+    </table>
+
+    <h3>9.3 concurrent.futures</h3>
+    <p>The cleanest way to parallelize in modern Python:</p>
+    <div class="code-header">ProcessPoolExecutor for CPU-bound work</div>
+    <pre><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">monte_carlo_pi</span>(n):
+    <span class="string">"""Estimate pi using n random points"""</span>
+    pts = np.random.rand(n, <span class="number">2</span>)
+    inside = np.sum(np.sum(pts**<span class="number">2</span>, axis=<span class="number">1</span>) < <span class="number">1</span>)
+    <span class="keyword">return</span> <span class="number">4</span> * inside / n
+
+<span class="comment"># Run 8 simulations in parallel</span>
+<span class="keyword">with</span> ProcessPoolExecutor(max_workers=<span class="number">4</span>) <span class="keyword">as</span> executor:
+    results = <span class="function">list</span>(executor.map(monte_carlo_pi, [<span class="number">1_000_000</span>]*<span class="number">8</span>))
+<span class="function">print</span>(results)</pre>
+  </div>
+
+  <div class="card">
+    <h3>9.4 Colab Experiment: Parallel Monte Carlo</h3>
+    <div class="code-header">Experiment 9.1: Scaling with Cores</div>
+    <pre><span class="keyword">import</span> time
+<span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor, ThreadPoolExecutor
+
+<span class="keyword">def</span> <span class="function">cpu_task</span>(x):
+    <span class="comment"># CPU-intensive: matrix multiplication</span>
+    a = np.random.rand(<span class="number">500</span>, <span class="number">500</span>)
+    <span class="keyword">return</span> np.linalg.det(a)
+
+<span class="comment"># Sequential</span>
+start = time.perf_counter()
+seq = [cpu_task(i) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">8</span>)]
+t_seq = time.perf_counter() - start
+
+<span class="comment"># Threading (won't help CPU-bound)</span>
+start = time.perf_counter()
+<span class="keyword">with</span> ThreadPoolExecutor(<span class="number">4</span>) <span class="keyword">as</span> ex:
+    thr = <span class="function">list</span>(ex.map(cpu_task, <span class="function">range</span>(<span class="number">8</span>)))
+t_thr = time.perf_counter() - start
+
+<span class="comment"># Multiprocessing</span>
+start = time.perf_counter()
+<span class="keyword">with</span> ProcessPoolExecutor(<span class="number">4</span>) <span class="keyword">as</span> ex:
+    proc = <span class="function">list</span>(ex.map(cpu_task, <span class="function">range</span>(<span class="number">8</span>)))
+t_proc = time.perf_counter() - start
+
+<span class="function">print</span>(<span class="string">f"Sequential: {t_seq:.2f}s"</span>)
+<span class="function">print</span>(<span class="string">f"Threading:  {t_thr:.2f}s (overhead: {t_thr/t_seq:.1f}x)"</span>)
+<span class="function">print</span>(<span class="string">f"Processing: {t_proc:.2f}s (speedup: {t_seq/t_proc:.1f}x)"</span>)</pre>
+    <p><strong>Expected:</strong> Threading is equal or slower than sequential. Multiprocessing gives near-linear speedup (close to 4x on a 4-core machine).</p>
+  </div>
+
+  <div class="card">
+    <h3>9.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What does GIL stand for? Why does it prevent threads from speeding up CPU-bound code?</p>
+      <p>2. Name one task that is I/O bound and one that is CPU bound in quant finance.</p>
+      <p>3. Why is <code>ProcessPoolExecutor</code> slower than sequential for very small tasks?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a parallel backtest runner. Given a list of parameter dictionaries (e.g., different moving average windows), use <code>ProcessPoolExecutor</code> to run backtests in parallel. Each backtest is a pure function that takes parameters and returns Sharpe ratio. Aggregate results into a DataFrame. Benchmark vs. sequential execution for 20 parameter sets.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Implement a <strong>shared-memory</strong> parallel array sum using <code>multiprocessing.shared_memory</code>. Create a 100-million-element NumPy array in shared memory. Spawn 4 processes that each sum a quarter of the array. Compare the performance and memory overhead against <code>ProcessPoolExecutor</code> with standard argument passing. Explain when shared memory is essential.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>9.6 Resources</h3>
+    <a class="resource-link" href="https://realpython.com/python-concurrency/" target="_blank">📖 Real Python: Concurrency Guide</a>
+    <a class="resource-link" href="https://docs.python.org/3/library/concurrent.futures.html" target="_blank">📚 concurrent.futures Docs</a>
+  </div>
+</div>
+
+<!-- SECTION 10: JIT COMPILATION -->
+<div class="section" id="section-10">
+  <div class="card">
+    <h2>10. JIT Compilation with Numba & Cython</h2>
+    <p>When vectorization is impossible (e.g., complex loops with conditionals), Just-In-Time (JIT) compilation can bridge the gap. JIT compilers translate Python code to fast machine code at runtime.</p>
+    
+    <h3>10.1 Numba</h3>
+    <p>Numba is the easiest JIT compiler for Python. Add <code>@jit</code> or <code>@njit</code> (no-Python mode) to a function, and Numba compiles it to LLVM bytecode.</p>
+    <div class="code-header">Numba basics</div>
+    <pre><span class="keyword">from</span> numba <span class="keyword">import</span> njit, prange
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="decorator">@njit</span>
+<span class="keyword">def</span> <span class="function">sum_2d</span>(arr):
+    total = <span class="number">0.0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(arr.shape[<span class="number">0</span>]):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(arr.shape[<span class="number">1</span>]):
+            total += arr[i, j]
+    <span class="keyword">return</span> total
+
+<span class="comment"># First call compiles (slow), subsequent calls are fast</span>
+arr = np.random.rand(<span class="number">1000</span>, <span class="number">1000</span>)
+<span class="function">print</span>(sum_2d(arr))</pre>
+
+    <h3>10.2 Numba Advanced Features</h3>
+    <ul>
+      <li><code>parallel=True</code>: Automatically parallelize loops (releases GIL)</li>
+      <li><code>prange</code>: Parallel range (like OpenMP)</li>
+      <li><code>fastmath=True</code>: Allow unsafe floating-point optimizations for speed</li>
+      <li><code>cache=True</code>: Cache compiled function to disk</li>
+    </ul>
+    <div class="code-header">Parallel Numba</div>
+    <pre><span class="decorator">@njit</span>(parallel=<span class="keyword">True</span>, fastmath=<span class="keyword">True</span>)
+<span class="keyword">def</span> <span class="function">parallel_sum</span>(arr):
+    total = <span class="number">0.0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> prange(arr.shape[<span class="number">0</span>]):
+        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(arr.shape[<span class="number">1</span>]):
+            total += arr[i, j]
+    <span class="keyword">return</span> total</pre>
+
+    <h3>10.3 When Numba Fails</h3>
+    <p>Numba's <code>@njit</code> requires:</p>
+    <ul>
+      <li>NumPy arrays and scalars only (no Pandas DataFrames)</li>
+      <li>No arbitrary Python objects or C extensions</li>
+      <li>No string manipulation (limited support)</li>
+    </ul>
+    <p>If Numba cannot compile a function, it falls back to object mode (slow). Use <code>@njit</code> (not <code>@jit</code>) to force an error instead of silent fallback.</p>
+
+    <h3>10.4 Cython Intro</h3>
+    <p>Cython is a static compiler. You write <code>.pyx</code> files with type declarations, compile them to C, and import as Python modules. It is more powerful than Numba but has a steeper learning curve.</p>
+    <div class="code-header">Cython example (conceptual)</div>
+    <pre><span class="comment"># In a .pyx file:</span>
+<span class="keyword">cimport</span> numpy <span class="keyword">as</span> np
+<span class="keyword">def</span> <span class="function">cython_sum</span>(<span class="keyword">double</span>[:] arr):
+    <span class="keyword">cdef</span> <span class="keyword">double</span> total = <span class="number">0</span>
+    <span class="keyword">cdef</span> <span class="keyword">int</span> i
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(arr.shape[<span class="number">0</span>]):
+        total += arr[i]
+    <span class="keyword">return</span> total</pre>
+  </div>
+
+  <div class="card">
+    <h3>10.5 Colab Experiment: Numba Speedup</h3>
+    <div class="code-header">Experiment 10.1: The Impossible Loop</div>
+    <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+<span class="keyword">from</span> numba <span class="keyword">import</span> njit
+
+<span class="comment"># A path-dependent function that CANNOT be vectorized easily</span>
+<span class="keyword">def</span> <span class="function">python_ema</span>(prices, alpha):
+    ema = np.empty_like(prices)
+    ema[<span class="number">0</span>] = prices[<span class="number">0</span>]
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="function">len</span>(prices)):
+        ema[i] = alpha * prices[i] + (<span class="number">1</span>-alpha) * ema[i-<span class="number">1</span>]
+    <span class="keyword">return</span> ema
+
+<span class="decorator">@njit</span>
+<span class="keyword">def</span> <span class="function">numba_ema</span>(prices, alpha):
+    ema = np.empty_like(prices)
+    ema[<span class="number">0</span>] = prices[<span class="number">0</span>]
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="function">len</span>(prices)):
+        ema[i] = alpha * prices[i] + (<span class="number">1</span>-alpha) * ema[i-<span class="number">1</span>]
+    <span class="keyword">return</span> ema
+
+prices = np.random.randn(<span class="number">10_000_000</span>)
+
+<span class="comment"># Warmup</span>
+numba_ema(prices[:<span class="number">100</span>], <span class="number">0.1</span>)
+
+<span class="keyword">for</span> name, func <span class="keyword">in</span> [(<span class="string">'Python'</span>, python_ema), (<span class="string">'Numba'</span>, numba_ema)]:
+    start = time.perf_counter()
+    r = func(prices, <span class="number">0.1</span>)
+    <span class="function">print</span>(<span class="string">f"{name}: {(time.perf_counter()-start)*1000:.1f} ms"</span>)</pre>
+    <p><strong>Expected:</strong> Python ~2,000 ms. Numba ~20 ms. <strong>100x speedup</strong> on a loop that cannot be vectorized.</p>
+  </div>
+
+  <div class="card">
+    <h3>10.6 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. What does JIT stand for? How does it differ from an ahead-of-time compiler like GCC?</p>
+      <p>2. What happens if <code>@njit</code> encounters a Pandas DataFrame?</p>
+      <p>3. What is the purpose of <code>prange</code> in Numba?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Implement a <strong>pairwise Euclidean distance</strong> function using Numba <code>@njit</code>. It should take two 2D arrays and return a distance matrix. Benchmark it against SciPy's <code>cdist</code> and a naive Python triple-loop version for 500 points in 10D space.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Write a <strong>custom backtest engine</strong> in Numba. It should simulate a simple moving average crossover strategy on 1 million price points. The engine must track cash, position, and equity curve using only Numba-compatible operations (no Pandas inside the loop). Benchmark against an equivalent Pandas implementation. Your Numba version should be >50x faster.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>10.7 Resources</h3>
+    <a class="resource-link" href="https://numba.pydata.org/numba-doc/latest/user/5minguide.html" target="_blank">📚 Numba 5-Minute Guide</a>
+    <a class="resource-link" href="https://cython.readthedocs.io/" target="_blank">📚 Cython Documentation</a>
+  </div>
+</div>
+
+<!-- SECTION 11: I/O & DATA FORMATS -->
+<div class="section" id="section-11">
+  <div class="card">
+    <h2>11. I/O Optimization & Data Formats</h2>
+    <p>You can have the fastest algorithm in the world, but if reading data takes 99% of your runtime, you have an I/O bottleneck. Quant workflows are often data-bound, not compute-bound.</p>
+    
+    <h3>11.1 The I/O Bottleneck</h3>
+    <p>Reading a 1 GB CSV file can take 30-60 seconds in Pandas. The same data in Parquet format takes 2-5 seconds. Why?</p>
+    <ul>
+      <li><strong>CSV</strong> is text. Every number must be parsed from ASCII to binary. There is no type information.</li>
+      <li><strong>Parquet</strong> is binary and columnar. It stores data in compressed, typed columns. You can read only the columns you need.</li>
+      <li><strong>Feather</strong> is binary and optimized for fast I/O between Python and R.</li>
+      <li><strong>HDF5</strong> is hierarchical, good for random access to large datasets.</li>
+    </ul>
+
+    <table>
+      <tr><th>Format</th><th>Type</th><th>Read Speed</th><th>Write Speed</th><th>Column Selection</th><th>Best For</th></tr>
+      <tr><td>CSV</td><td>Text</td><td>Very Slow</td><td>Very Slow</td><td>No</td><td>Interoperability</td></tr>
+      <tr><td>Parquet</td><td>Binary</td><td>Fast</td><td>Fast</td><td>Yes</td><td>Analytics, storage</td></tr>
+      <tr><td>Feather</td><td>Binary</td><td>Very Fast</td><td>Very Fast</td><td>No</td><td>Temp files, Python↔R</td></tr>
+      <tr><td>HDF5</td><td>Binary</td><td>Fast</td><td>Fast</td><td>Partial</td><td>Large arrays, random access</td></tr>
+      <tr><td>Pickle</td><td>Binary</td><td>Fast</td><td>Fast</td><td>No</td><td>Python objects only</td></tr>
+    </table>
+
+    <h3>11.2 Memory Mapping</h3>
+    <p>Memory mapping (<code>np.memmap</code>) allows you to treat a file on disk as if it were in RAM. The OS loads pages on demand and evicts them when memory is tight. This lets you work with files larger than your physical RAM.</p>
+    <div class="code-header">Memory-mapped array</div>
+    <pre><span class="comment"># Create a memory-mapped array</span>
+fp = np.memmap(<span class="string">'data.bin'</span>, dtype=<span class="string">'float64'</span>, mode=<span class="string">'w+'</span>, shape=(<span class="number">1000000</span>, <span class="number">100</span>))
+fp[:] = np.random.rand(<span class="number">1000000</span>, <span class="number">100</span>)
+<span class="keyword">del</span> fp  <span class="comment"># Flush to disk</span>
+
+<span class="comment"># Later, read only a slice without loading everything</span>
+fp = np.memmap(<span class="string">'data.bin'</span>, dtype=<span class="string">'float64'</span>, mode=<span class="string">'r'</span>, shape=(<span class="number">1000000</span>, <span class="number">100</span>))
+subset = fp[<span class="number">1000</span>:<span class="number">2000</span>, :]  <span class="comment"># Only these pages are loaded from disk</span></pre>
+
+    <h3>11.3 Caching Strategies</h3>
+    <p>If you compute the same thing repeatedly, cache it:</p>
+    <ul>
+      <li><strong>functools.lru_cache:</strong> Memoize function results in memory.</li>
+      <li><strong>Disk caching:</strong> Use <code>joblib.Memory</code> or <code>diskcache</code> to persist results across runs.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>11.4 Colab Experiment: Format Shootout</h3>
+    <div class="code-header">Experiment 11.1: CSV vs Parquet vs Feather</div>
+    <pre><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time, os
+
+df = pd.DataFrame(np.random.randn(<span class="number">1_000_000</span>, <span class="number">10</span>), columns=[<span class="string">f'col_{i}'</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10</span>)])
+df[<span class="string">'category'</span>] = np.random.choice([<span class="string">'A'</span>,<span class="string">'B'</span>,<span class="string">'C'</span>], <span class="number">1_000_000</span>)
+
+<span class="comment"># CSV</span>
+start = time.perf_counter()
+df.to_csv(<span class="string">'/tmp/data.csv'</span>, index=<span class="keyword">False</span>)
+t_csv_w = time.perf_counter() - start
+start = time.perf_counter()
+_ = pd.read_csv(<span class="string">'/tmp/data.csv'</span>)
+t_csv_r = time.perf_counter() - start
+
+<span class="comment"># Parquet</span>
+start = time.perf_counter()
+df.to_parquet(<span class="string">'/tmp/data.parquet'</span>)
+t_pq_w = time.perf_counter() - start
+start = time.perf_counter()
+_ = pd.read_parquet(<span class="string">'/tmp/data.parquet'</span>)
+t_pq_r = time.perf_counter() - start
+
+<span class="comment"># Feather</span>
+start = time.perf_counter()
+df.to_feather(<span class="string">'/tmp/data.feather'</span>)
+t_fe_w = time.perf_counter() - start
+start = time.perf_counter()
+_ = pd.read_feather(<span class="string">'/tmp/data.feather'</span>)
+t_fe_r = time.perf_counter() - start
+
+<span class="function">print</span>(<span class="string">f"{'Format':<12} {'Write (s)':<12} {'Read (s)':<12} {'Size (MB)':<12}"</span>)
+<span class="keyword">for</span> fmt, tw, tr, path <span class="keyword">in</span> [(<span class="string">'CSV'</span>, t_csv_w, t_csv_r, <span class="string">'/tmp/data.csv'</span>),
+                            (<span class="string">'Parquet'</span>, t_pq_w, t_pq_r, <span class="string">'/tmp/data.parquet'</span>),
+                            (<span class="string">'Feather'</span>, t_fe_w, t_fe_r, <span class="string">'/tmp/data.feather'</span>)]:
+    size = os.path.getsize(path) / (<span class="number">1024</span>*<span class="number">1024</span>)
+    <span class="function">print</span>(<span class="string">f"{fmt:<12} {tw:<12.3f} {tr:<12.3f} {size:<12.1f}"</span>)</pre>
+    <p><strong>Expected:</strong> Parquet is 5-10x faster to read and 3-5x smaller than CSV. Feather is fastest for raw speed but larger than Parquet.</p>
+  </div>
+
+  <div class="card">
+    <h3>11.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. Why is Parquet faster than CSV for analytics workloads?</p>
+      <p>2. What is memory mapping? When would you use it?</p>
+      <p>3. Name two situations where caching with <code>lru_cache</code> would help in a quant pipeline.</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Write a script that reads a 5 GB CSV in chunks of 100,000 rows, computes the mean of one column per chunk, and aggregates. Compare peak memory usage against reading the entire file at once using <code>tracemalloc</code>.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard</div>
+      <p>Design a <strong>columnar data cache</strong> for a tick database. Implement a class <code>TickCache</code> that stores price/volume data in memory-mapped NumPy arrays. It should support appending new ticks and querying recent N ticks efficiently. Benchmark append throughput and query latency against an equivalent SQLite implementation for 10 million ticks.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>11.6 Resources</h3>
+    <a class="resource-link" href="https://parquet.apache.org/documentation/latest/" target="_blank">📚 Apache Parquet Format</a>
+    <a class="resource-link" href="https://joblib.readthedocs.io/" target="_blank">📚 Joblib Memory Caching</a>
+  </div>
+</div>
+
+<!-- SECTION 12: CASE STUDY -->
+<div class="section" id="section-12">
+  <div class="card">
+    <h2>12. Case Study: Optimizing a Quant Pipeline</h2>
+    <p>This section ties everything together. We will take a realistic, slow quant pipeline and optimize it step-by-step using the techniques from this guide.</p>
+    
+    <h3>12.1 The Problem</h3>
+    <p>You have a CSV of 1 million historical trades. You need to:</p>
+    <ol>
+      <li>Load the data</li>
+      <li>Calculate a 20-period rolling VWAP per symbol</li>
+      <li>Generate signals when price crosses above VWAP</li>
+      <li>Backtest a simple strategy</li>
+      <li>Run parameter sweep over 3 window sizes and 5 symbols</li>
+    </ol>
+
+    <h3>12.2 Baseline (The Slow Version)</h3>
+    <div class="code-header">baseline.py — Before optimization</div>
+    <pre><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+
+<span class="keyword">def</span> <span class="function">baseline_pipeline</span>(file_path):
+    <span class="comment"># Step 1: Load</span>
+    df = pd.read_csv(file_path)
+    
+    <span class="comment"># Step 2: Calculate VWAP per symbol using loop</span>
+    results = []
+    <span class="keyword">for</span> symbol <span class="keyword">in</span> df[<span class="string">'symbol'</span>].unique():
+        sub = df[df[<span class="string">'symbol'</span>] == symbol].copy()
+        sub[<span class="string">'vwap'</span>] = <span class="number">0.0</span>
+        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="function">len</span>(sub)):
+            window = sub.iloc[max(<span class="number">0</span>, i-<span class="number">19</span>):i+<span class="number">1</span>]
+            sub.iloc[i, sub.columns.get_loc(<span class="string">'vwap'</span>)] = (window[<span class="string">'price'</span>] * window[<span class="string">'volume'</span>]).sum() / window[<span class="string">'volume'</span>].sum()
+        results.append(sub)
+    
+    <span class="comment"># Step 3: Concatenate</span>
+    df = pd.concat(results)
+    
+    <span class="comment"># Step 4: Signal</span>
+    df[<span class="string">'signal'</span>] = <span class="number">0</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="function">len</span>(df)):
+        <span class="keyword">if</span> df.iloc[i][<span class="string">'price'</span>] > df.iloc[i][<span class="string">'vwap'</span>]:
+            df.iloc[i, df.columns.get_loc(<span class="string">'signal'</span>)] = <span class="number">1</span>
+    
+    <span class="keyword">return</span> df
+
+<span class="comment"># This would take MINUTES to run on 1M rows</span></pre>
+
+    <h3>12.3 Optimization Walkthrough</h3>
+    <p><strong>Step 1: Profile</strong> — Run cProfile. The nested loops dominate.</p>
+    <p><strong>Step 2: Algorithm</strong> — VWAP can be computed with cumulative sums, not nested loops. O(n²) → O(n).</p>
+    <p><strong>Step 3: Vectorize</strong> — Use groupby + cumsum for VWAP. Use vectorized comparison for signals.</p>
+    <p><strong>Step 4: Format</strong> — Convert CSV to Parquet for faster loading.</p>
+    <p><strong>Step 5: Parallelize</strong> — Run parameter sweep with ProcessPoolExecutor.</p>
+    <p><strong>Step 6: Memory</strong> — Use categorical for symbol column. Delete intermediate DataFrames.</p>
+
+    <div class="code-header">optimized.py — After optimization</div>
+    <pre><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ProcessPoolExecutor
+
+<span class="keyword">def</span> <span class="function">fast_vwap</span>(df, window=<span class="number">20</span>):
+    df = df.copy()
+    df[<span class="string">'cum_pv'</span>] = (df[<span class="string">'price'</span>] * df[<span class="string">'volume'</span>]).groupby(df[<span class="string">'symbol'</span>]).cumsum()
+    df[<span class="string">'cum_vol'</span>] = df[<span class="string">'volume'</span>].groupby(df[<span class="string">'symbol'</span>]).cumsum()
+    
+    <span class="comment"># Subtract rolling window start using shift</span>
+    df[<span class="string">'pv_win'</span>] = df[<span class="string">'cum_pv'</span>] - df.groupby(<span class="string">'symbol'</span>)[<span class="string">'cum_pv'</span>].shift(window, fill_value=<span class="number">0</span>)
+    df[<span class="string">'vol_win'</span>] = df[<span class="string">'cum_vol'</span>] - df.groupby(<span class="string">'symbol'</span>)[<span class="string">'cum_vol'</span>].shift(window, fill_value=<span class="number">0</span>)
+    df[<span class="string">'vwap'</span>] = df[<span class="string">'pv_win'</span>] / df[<span class="string">'vol_win'</span>]
+    
+    df[<span class="string">'signal'</span>] = (df[<span class="string">'price'</span>] > df[<span class="string">'vwap'</span>]).astype(<span class="keyword">int</span>)
+    <span class="keyword">return</span> df
+
+<span class="keyword">def</span> <span class="function">run_sweep</span>(param_list):
+    <span class="keyword">with</span> ProcessPoolExecutor() <span class="keyword">as</span> ex:
+        results = <span class="function">list</span>(ex.map(fast_vwap, param_list))
+    <span class="keyword">return</span> results</pre>
+
+    <h3>12.4 Results</h3>
+    <table>
+      <tr><th>Version</th><th>Time</th><th>Memory</th><th>Key Change</th></tr>
+      <tr><td>Baseline</td><td>~300s</td><td>High</td><td>Naive loops</td></tr>
+      <tr><td>Algorithm fix</td><td>~10s</td><td>Medium</td><td>Cumulative sum VWAP</td></tr>
+      <tr><td>Vectorized</td><td>~1s</td><td>Medium</td><td>Groupby + vector ops</td></tr>
+      <tr><td>Parallel sweep</td><td>~0.3s</td><td>High (4x)</td><td>4 processes</td></tr>
+      <tr><td>Parquet input</td><td>~0.2s</td><td>Low</td><td>Binary format + categories</td></tr>
+    </table>
+    <p><strong>Total speedup: ~1500x</strong></p>
+  </div>
+
+  <div class="card">
+    <h3>12.5 Exercises</h3>
+    <div class="exercise-box">
+      <div class="exercise-title">🟢 Easy</div>
+      <p>1. Why is the baseline O(n²)? Which specific line causes this?</p>
+      <p>2. What is the time complexity of the optimized version?</p>
+      <p>3. Why did we use <code>groupby().cumsum()</code> instead of <code>.rolling().apply()</code>?</p>
+    </div>
+    <div class="exercise-box medium">
+      <div class="exercise-title">🟡 Medium</div>
+      <p>Take the optimized pipeline and add Numba to the signal generation step for a custom indicator that cannot be expressed in Pandas (e.g., a path-dependent trailing stop). Profile before and after.</p>
+    </div>
+    <div class="exercise-box hard">
+      <div class="exercise-title">🔴 Hard: Capstone Project</div>
+      <p>Build an end-to-end <strong>tick processing pipeline</strong> that:</p>
+      <ol>
+        <li>Reads 10 million ticks from Parquet</li>
+        <li>Computes a 1-minute OHLCV bar table using vectorized operations</li>
+        <li>Calculates a custom Numba-compiled indicator on the bars</li>
+        <li>Runs a backtest across 4 parameter sets in parallel</li>
+        <li>Reports total runtime, peak memory, and throughput (ticks/second)</li>
+      </ol>
+      <p>Target: >1 million ticks/second processed on a standard Colab CPU instance. Document each optimization decision with profiler output.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>12.6 Final Resources & Next Steps</h3>
+    <a class="resource-link" href="https://www.oreilly.com/library/view/high-performance-python/9781492055013/" target="_blank">📖 High Performance Python (O'Reilly) — The Bible</a>
+    <a class="resource-link" href="https://pydata.org/" target="_blank">🎥 PyData Conference Talks</a>
+    <a class="resource-link" href="https://github.com/wesm/vbench" target="_blank">🔧 vbench — Benchmarking Framework</a>
+    <a class="resource-link" href="https://docs.python.org/3/library/profile.html" target="_blank">📚 Python Profiling Docs</a>
+    <div class="tip"><strong>Remember:</strong> Performance engineering is a cycle—Measure, Profile, Optimize, Verify. Never optimize blindly. Good luck on your quant journey!</div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+function showSection(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+n).classList.add('active');
+  document.querySelectorAll('.nav-item')[n].classList.add('active');
+  document.getElementById('progressBar').style.width = ((n+1)/13*100) + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  const items = document.querySelectorAll('.nav-item');
+  let current = 0;
+  items.forEach((item, idx) => { if(item.classList.contains('active')) current = idx; });
+  if(e.key === 'ArrowDown' && current < items.length-1) showSection(current+1);
+  if(e.key === 'ArrowUp' && current > 0) showSection(current-1);
+});
+</script>
+</body>
+</html>

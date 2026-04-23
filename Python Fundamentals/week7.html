@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data APIs & ETL — Complete Study Guide for Quant Engineers</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #7c3aed;
+            --accent: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --code-bg: #0f172a;
+            --muted: #f1f5f9;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+        
+        /* Navigation */
+        .top-nav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .nav-inner { max-width: 1400px; margin: 0 auto; display: flex; overflow-x: auto; scrollbar-width: none; }
+        .nav-inner::-webkit-scrollbar { display: none; }
+        .tab-btn { padding: 1.1rem 1.4rem; background: none; border: none; cursor: pointer; font-weight: 600; color: var(--text-secondary); white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.25s; font-size: 0.95rem; }
+        .tab-btn:hover { color: var(--primary); background: var(--muted); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #eff6ff; }
+        
+        /* Layout */
+        .container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Typography */
+        h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text); letter-spacing: -0.02em; }
+        h2 { font-size: 1.6rem; font-weight: 700; margin: 2.5rem 0 1rem; color: var(--primary-dark); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        h3 { font-size: 1.25rem; font-weight: 650; margin: 1.8rem 0 0.75rem; color: var(--secondary); }
+        h4 { font-size: 1.1rem; font-weight: 600; margin: 1.4rem 0 0.5rem; color: var(--text); }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        ul, ol { margin: 0.75rem 0 1.25rem 1.5rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.4rem; }
+        strong { color: var(--text); font-weight: 600; }
+        
+        /* Cards */
+        .card { background: var(--surface); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+        .card-compact { padding: 1.25rem; }
+        .highlight { background: linear-gradient(120deg, #dbeafe 0%, #dbeafe 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 2px; }
+        .callout { background: #eff6ff; border-left: 4px solid var(--primary); padding: 1rem 1.25rem; border-radius: 0 8px 8px 0; margin: 1rem 0; }
+        .callout.warning { background: #fffbeb; border-left-color: var(--warning); }
+        .callout.danger { background: #fef2f2; border-left-color: var(--danger); }
+        .callout.success { background: #ecfdf5; border-left-color: var(--accent); }
+        
+        /* Code */
+        pre { background: var(--code-bg); color: #e2e8f0; padding: 1.25rem; border-radius: 10px; overflow-x: auto; font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.88rem; line-height: 1.6; margin: 1rem 0; border: 1px solid #1e293b; }
+        code { font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 5px; font-size: 0.88em; color: #be185d; border: 1px solid #e2e8f0; }
+        pre code { background: none; padding: 0; color: inherit; border: none; font-size: inherit; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 0.5rem 1.25rem; border-radius: 10px 10px 0 0; border: 1px solid #334155; border-bottom: none; margin-top: 1rem; font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+        .code-header + pre { margin-top: 0; border-radius: 0 0 10px 10px; }
+        
+        /* Diagrams */
+        .diagram { background: var(--muted); border: 2px solid var(--border); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; overflow-x: auto; }
+        .diagram-title { text-align: center; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; font-size: 1.1rem; }
+        .flow-container { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }
+        .flow-box { background: var(--primary); color: white; padding: 0.75rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
+        .flow-box.secondary { background: var(--secondary); }
+        .flow-box.accent { background: var(--accent); }
+        .flow-box.danger { background: var(--danger); }
+        .flow-box.warning { background: var(--warning); }
+        .flow-arrow { color: var(--text-secondary); font-size: 1.5rem; font-weight: 700; padding: 0 0.5rem; }
+        .flow-label { font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: 0.25rem; font-style: italic; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--muted); font-weight: 600; color: var(--text); }
+        tr:hover { background: #f8fafc; }
+        
+        /* Exercises */
+        .exercise { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin: 1rem 0; border-left: 5px solid var(--accent); }
+        .exercise.medium { border-left-color: var(--warning); }
+        .exercise.hard { border-left-color: var(--danger); }
+        .tier-badge { display: inline-block; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .tier-badge.easy { background: #d1fae5; color: #065f46; }
+        .tier-badge.medium { background: #fef3c7; color: #92400e; }
+        .tier-badge.hard { background: #fee2e2; color: #991b1b; }
+        
+        /* Resources */
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .resource-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+        .resource-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(37,99,235,0.08); transform: translateY(-2px); }
+        .resource-card .title { color: var(--primary); font-weight: 600; margin-bottom: 0.25rem; }
+        .resource-card .desc { font-size: 0.9rem; color: var(--text-secondary); }
+        
+        /* SVG Diagrams */
+        .svg-diagram { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        
+        /* Two column */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { 
+            .two-col { grid-template-columns: 1fr; } 
+            .flow-container { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+            h1 { font-size: 1.6rem; }
+            .container { padding: 1.5rem 1rem; }
+        }
+        
+        /* Print */
+        @media print {
+            .top-nav { display: none; }
+            .tab-content { display: block !important; page-break-before: always; }
+            .tab-content:first-of-type { page-break-before: auto; }
+        }
+        
+        /* Step numbers */
+        .step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; font-weight: 700; font-size: 0.85rem; margin-right: 0.75rem; flex-shrink: 0; }
+        .step-row { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+        
+        /* Checklist */
+        .checklist { list-style: none; margin-left: 0; }
+        .checklist li { padding-left: 1.75rem; position: relative; }
+        .checklist li::before { content: "☐"; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<nav class="top-nav">
+    <div class="nav-inner">
+        <button class="tab-btn active" onclick="showTab(0)">📚 Prerequisites</button>
+        <button class="tab-btn" onclick="showTab(1)">🔌 APIs Deep Dive</button>
+        <button class="tab-btn" onclick="showTab(2)">📥 Extract Phase</button>
+        <button class="tab-btn" onclick="showTab(3)">⚙️ Transform Phase</button>
+        <button class="tab-btn" onclick="showTab(4)">📤 Load Phase</button>
+        <button class="tab-btn" onclick="showTab(5)">🔄 Pipelines</button>
+        <button class="tab-btn" onclick="showTab(6)">📈 Quant Engineering</button>
+        <button class="tab-btn" onclick="showTab(7)">🧪 Practice Labs</button>
+    </div>
+</nav>
+
+<!-- ==================== TAB 0: PREREQUISITES ==================== -->
+<div class="tab-content active">
+    <div class="container">
+        <h1>📚 Prerequisites & Foundations</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Before diving into Data APIs and ETL, you need a solid foundation. Think of these as the tools in your toolbox. 
+            We cover them briefly here with quant-focused examples so you can reference back anytime.
+        </p>
+
+        <div class="card">
+            <h2>1. Python Essentials for Data Engineering</h2>
+            <p>Python is the lingua franca of quantitative finance and data engineering. You don't need to be a software architect, but you must be comfortable with these patterns.</p>
+            
+            <h4>Variables, Collections & Comprehensions</h4>
+            <div class="code-header">Python</div>
+            <pre><code># Variables and types
+price = 150.75          # float
+ticker = "AAPL"         # string
+is_active = True        # boolean
+
+# Lists (ordered, mutable)
+prices = [150.75, 151.20, 149.80, 152.00]
+
+# Dictionaries (key-value stores)
+stock = {
+    "ticker": "AAPL",
+    "price": 150.75,
+    "volume": 45000000
+}
+
+# List comprehension: filter + transform in one line
+high_prices = [p for p in prices if p > 150.0]
+
+# Dictionary comprehension
+price_dict = {f"day_{i}": p for i, p in enumerate(prices)}</code></pre>
+
+            <h4>Functions & Error Handling</h4>
+            <div class="code-header">Python</div>
+            <pre><code>def fetch_price(ticker: str) -> float:
+    """Fetch latest price with basic error handling."""
+    try:
+        # Simulated API call
+        if not ticker:
+            raise ValueError("Ticker cannot be empty")
+        return 150.75
+    except ValueError as e:
+        print(f"Input error: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None</code></pre>
+
+            <div class="callout">
+                <strong>💡 Quant Tip:</strong> Always use <code>try/except</code> when dealing with external data. Markets are open 6.5 hours a day — your code runs 24/7. A single unhandled exception at 3 AM can break an entire pipeline.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Data Formats: JSON, CSV, Parquet</h2>
+            <p>Data APIs and ETL pipelines shuffle data between systems. These are the containers that data travels in.</p>
+            
+            <h3>JSON (JavaScript Object Notation)</h3>
+            <p>The universal API language. Human-readable, nested, and supported everywhere.</p>
+            <div class="code-header">JSON</div>
+            <pre><code>{
+  "ticker": "AAPL",
+  "price": 150.75,
+  "metadata": {
+    "exchange": "NASDAQ",
+    "currency": "USD"
+  },
+  "trades": [
+    {"time": "09:30:00", "price": 150.20, "size": 100},
+    {"time": "09:30:01", "price": 150.75, "size": 250}
+  ]
+}</code></pre>
+            <p>In Python: <code>json.loads()</code> converts JSON string → Python dict. <code>json.dumps()</code> does the reverse.</p>
+
+            <h3>CSV (Comma-Separated Values)</h3>
+            <p>The simplest tabular format. Great for human inspection, poor for nested data.</p>
+            <div class="code-header">CSV</div>
+            <pre><code>date,ticker,open,high,low,close,volume
+2024-01-15,AAPL,150.00,152.50,149.80,151.20,45000000
+2024-01-16,AAPL,151.20,153.00,150.50,152.80,38000000</code></pre>
+
+            <h3>Parquet</h3>
+            <p>The columnar storage champion. Compressed, schema-enforced, and lightning-fast for analytics. In quant workflows, historical tick data is often stored in Parquet.</p>
+            <div class="callout success">
+                <strong>Rule of Thumb:</strong> API responses come as <strong>JSON</strong>. You analyze with <strong>Pandas</strong>. You archive with <strong>Parquet</strong>.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. HTTP & The Web</h2>
+            <p>APIs speak over HTTP. Understanding this protocol is non-negotiable.</p>
+            
+            <div class="diagram">
+                <div class="diagram-title">HTTP Request/Response Cycle</div>
+                <svg class="svg-diagram" viewBox="0 0 700 200" width="700" height="200">
+                    <rect x="20" y="60" width="140" height="80" rx="8" fill="#2563eb" opacity="0.1" stroke="#2563eb" stroke-width="2"/>
+                    <text x="90" y="105" text-anchor="middle" fill="#2563eb" font-weight="bold" font-size="14">Client</text>
+                    <text x="90" y="125" text-anchor="middle" fill="#475569" font-size="12">(Your Python Script)</text>
+                    
+                    <rect x="540" y="60" width="140" height="80" rx="8" fill="#7c3aed" opacity="0.1" stroke="#7c3aed" stroke-width="2"/>
+                    <text x="610" y="105" text-anchor="middle" fill="#7c3aed" font-weight="bold" font-size="14">Server</text>
+                    <text x="610" y="125" text-anchor="middle" fill="#475569" font-size="12">(API Provider)</text>
+                    
+                    <line x1="170" y1="85" x2="530" y2="85" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,5"/>
+                    <polygon points="520,80 530,85 520,90" fill="#cbd5e1"/>
+                    <text x="350" y="75" text-anchor="middle" fill="#475569" font-size="12">Request: GET /api/v1/price</text>
+                    
+                    <line x1="530" y1="115" x2="170" y2="115" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,5"/>
+                    <polygon points="180,110 170,115 180,120" fill="#cbd5e1"/>
+                    <text x="350" y="140" text-anchor="middle" fill="#475569" font-size="12">Response: 200 OK + JSON</text>
+                </svg>
+            </div>
+
+            <h4>HTTP Methods</h4>
+            <table>
+                <tr><th>Method</th><th>Action</th><th>Quant Example</th></tr>
+                <tr><td><code>GET</code></td><td>Retrieve data</td><td>Fetch historical prices</td></tr>
+                <tr><td><code>POST</code></td><td>Create/Submit data</td><td>Submit a backtest job</td></tr>
+                <tr><td><code>PUT</code></td><td>Update (full replacement)</td><td>Update a portfolio configuration</td></tr>
+                <tr><td><code>DELETE</code></td><td>Remove data</td><td>Delete a cached result</td></tr>
+            </table>
+
+            <h4>Status Codes</h4>
+            <table>
+                <tr><th>Code</th><th>Meaning</th><th>What To Do</th></tr>
+                <tr><td><code>200</code></td><td>OK</td><td>Process the response</td></tr>
+                <tr><td><code>401</code></td><td>Unauthorized</td><td>Check your API key</td></tr>
+                <tr><td><code>429</code></td><td>Too Many Requests</td><td>Back off — you're rate limited</td></tr>
+                <tr><td><code>500</code></td><td>Server Error</td><td>Retry with exponential backoff</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>4. SQL & Database Basics</h2>
+            <p>ETL almost always involves a database at either end. You need to speak SQL.</p>
+            
+            <h4>Core Operations (CRUD)</h4>
+            <div class="code-header">SQL</div>
+            <pre><code>-- CREATE: Insert new price data
+INSERT INTO prices (ticker, date, close_price, volume)
+VALUES ('AAPL', '2024-01-15', 151.20, 45000000);
+
+-- READ: Query last 30 days of prices
+SELECT date, close_price, volume 
+FROM prices 
+WHERE ticker = 'AAPL' 
+ORDER BY date DESC 
+LIMIT 30;
+
+-- UPDATE: Correct a bad tick
+UPDATE prices 
+SET close_price = 151.25 
+WHERE ticker = 'AAPL' AND date = '2024-01-15';
+
+-- DELETE: Remove test data
+DELETE FROM prices WHERE ticker = 'TEST';</code></pre>
+
+            <h4>JOINs: Combining Tables</h4>
+            <p>In quant workflows, you often merge price data with fundamental data or corporate actions.</p>
+            <div class="code-header">SQL</div>
+            <pre><code>-- Get prices with company sector info
+SELECT p.ticker, p.date, p.close_price, c.sector
+FROM prices p
+LEFT JOIN companies c ON p.ticker = c.ticker
+WHERE p.date >= '2024-01-01';</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>5. Pandas: The Quant Engine</h2>
+            <p>Pandas is the bridge between raw data and analysis. Master these five operations and you can build 80% of ETL transforms.</p>
+            
+            <div class="code-header">Python</div>
+            <pre><code>import pandas as pd
+
+# 1. READ data (Extract)
+df = pd.read_csv("prices.csv")        # From CSV
+df = pd.read_parquet("prices.parquet") # From Parquet
+df = pd.read_json("prices.json")       # From JSON
+
+# 2. INSPECT
+print(df.head())      # First 5 rows
+print(df.info())      # Column types and nulls
+print(df.describe())  # Statistics
+
+# 3. SELECT & FILTER (Transform)
+aapl = df[df['ticker'] == 'AAPL']                    # Filter rows
+recent = df[df['date'] >= '2024-01-01']              # Date filter
+subset = df[['ticker', 'date', 'close_price']]       # Select columns
+
+# 4. AGGREGATE (Transform)
+daily_avg = df.groupby('date')['close_price'].mean()
+
+# 5. WRITE (Load)
+df.to_csv("output.csv", index=False)
+df.to_parquet("output.parquet")</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Prerequisites Check</h2>
+            <p>Open <a href="https://colab.research.google.com" target="_blank">Google Colab</a> and run this to verify your environment.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Verify imports
+import pandas as pd
+import numpy as np
+import requests
+import json
+from datetime import datetime, timedelta
+
+print(f"Pandas: {pd.__version__}")
+print(f"NumPy: {np.__version__}")
+print(f"Requests: {requests.__version__}")
+
+# Cell 2: Create a synthetic price DataFrame
+dates = pd.date_range('2024-01-01', periods=10, freq='D')
+np.random.seed(42)
+df = pd.DataFrame({
+    'date': dates,
+    'ticker': 'AAPL',
+    'price': 150 + np.random.randn(10).cumsum()
+})
+print(df.head())
+
+# Cell 3: Convert to JSON (API simulation)
+json_payload = df.head(3).to_json(orient='records', date_format='iso')
+parsed = json.loads(json_payload)
+print(json.dumps(parsed, indent=2))</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://docs.python.org/3/tutorial/" target="_blank">
+                    <div class="title">Python Official Tutorial</div>
+                    <div class="desc">The definitive starting point for Python syntax and concepts.</div>
+                </a>
+                <a class="resource-card" href="https://pandas.pydata.org/docs/getting_started/index.html" target="_blank">
+                    <div class="title">Pandas Getting Started</div>
+                    <div class="desc">10-minute guide to the most important data manipulation operations.</div>
+                </a>
+                <a class="resource-card" href="https://www.w3schools.com/sql/" target="_blank">
+                    <div class="title">W3Schools SQL Tutorial</div>
+                    <div class="desc">Interactive SQL lessons with a built-in practice database.</div>
+                </a>
+                <a class="resource-card" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview" target="_blank">
+                    <div class="title">MDN HTTP Overview</div>
+                    <div class="desc">Deep but accessible explanation of how HTTP works.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 1: APIs DEEP DIVE ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>🔌 APIs: The Data Lifeline</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            APIs (Application Programming Interfaces) are how your code talks to the world. For a quant engineer, 
+            APIs are the primary mechanism for ingesting market data, fundamentals, alternative data, and executing trades.
+        </p>
+
+        <div class="card">
+            <h2>What is an API? (The Restaurant Analogy)</h2>
+            <p>Imagine a restaurant kitchen. You can't walk in and cook your own meal. Instead, you:</p>
+            <ol>
+                <li><strong>Look at the menu</strong> (API Documentation)</li>
+                <li><strong>Place an order</strong> (Send a Request)</li>
+                <li><strong>The kitchen prepares it</strong> (Server processes)</li>
+                <li><strong>A waiter brings your food</strong> (Response returned)</li>
+            </ol>
+            <p>The API is the menu + waiter + kitchen protocol. It defines <em>what you can ask for</em> and <em>how to ask for it</em>.</p>
+            
+            <div class="diagram">
+                <div class="diagram-title">API Architecture Flow</div>
+                <svg class="svg-diagram" viewBox="0 0 800 220" width="800" height="220">
+                    <rect x="30" y="70" width="160" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                    <text x="110" y="110" text-anchor="middle" fill="#1e40af" font-weight="bold" font-size="14">Your Script</text>
+                    <text x="110" y="130" text-anchor="middle" fill="#475569" font-size="12">Python + Requests</text>
+                    
+                    <rect x="320" y="70" width="160" height="80" rx="10" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+                    <text x="400" y="110" text-anchor="middle" fill="#5b21b6" font-weight="bold" font-size="14">API Gateway</text>
+                    <text x="400" y="130" text-anchor="middle" fill="#475569" font-size="12">Auth + Rate Limit</text>
+                    
+                    <rect x="610" y="70" width="160" height="80" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+                    <text x="690" y="110" text-anchor="middle" fill="#065f46" font-weight="bold" font-size="14">Data Source</text>
+                    <text x="690" y="130" text-anchor="middle" fill="#475569" font-size="12">Database / Exchange</text>
+                    
+                    <path d="M 190 100 L 310 100" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <text x="250" y="90" text-anchor="middle" fill="#475569" font-size="11">HTTPS Request</text>
+                    
+                    <path d="M 480 100 L 600 100" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <text x="540" y="90" text-anchor="middle" fill="#475569" font-size="11">Query</text>
+                    
+                    <path d="M 600 120 L 480 120" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <text x="540" y="145" text-anchor="middle" fill="#475569" font-size="11">Raw Data</text>
+                    
+                    <path d="M 310 120 L 190 120" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <text x="250" y="145" text-anchor="middle" fill="#475569" font-size="11">JSON Response</text>
+                    
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>REST API Anatomy</h2>
+            <p>A REST API request has four key components. Think of them as the address, method, ID card, and envelope of your data request.</p>
+            
+            <h4>1. Endpoint (The Address)</h4>
+            <div class="code-header">URL Structure</div>
+            <pre><code>https://api.example.com/v1/market-data/price?symbol=AAPL&date=2024-01-15
+|------- Base URL -------|--Version--|--Resource--|--Path--|---Query Parameters---|</code></pre>
+
+            <h4>2. HTTP Method (The Action)</h4>
+            <p>We covered these in Prerequisites, but in API context:</p>
+            <ul>
+                <li><code>GET /prices</code> → Retrieve all prices</li>
+                <li><code>GET /prices/AAPL</code> → Retrieve AAPL price</li>
+                <li><code>POST /prices</code> → Add a new price record</li>
+                <li><code>PUT /prices/AAPL</code> → Update AAPL price entirely</li>
+                <li><code>PATCH /prices/AAPL</code> → Partial update</li>
+            </ul>
+
+            <h4>3. Headers (The Metadata)</h4>
+            <div class="code-header">HTTP Headers</div>
+            <pre><code>Content-Type: application/json        # What we're sending
+Accept: application/json              # What we want back
+Authorization: Bearer sk_live_abc123  # Who we are
+X-RateLimit-Limit: 100                # Max requests allowed</code></pre>
+
+            <h4>4. Body (The Payload)</h4>
+            <p>Used with POST/PUT. Contains the actual data.</p>
+            <div class="code-header">JSON Body</div>
+            <pre><code>{
+  "ticker": "AAPL",
+  "price": 151.20,
+  "timestamp": "2024-01-15T09:30:00Z"
+}</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Python Requests in Depth</h2>
+            <p>The <code>requests</code> library is your primary tool. Here's how to use it professionally.</p>
+            
+            <div class="code-header">Python</div>
+            <pre><code>import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Professional session setup with retries
+session = requests.Session()
+retries = Retry(
+    total=5,
+    backoff_factor=1,      # Wait 1s, 2s, 4s, 8s...
+    status_forcelist=[429, 500, 502, 503, 504]
+)
+session.mount('https://', HTTPAdapter(max_retries=retries))
+
+# GET request with parameters
+url = "https://api.example.com/v1/prices"
+params = {
+    "symbol": "AAPL",
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31"
+}
+headers = {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Accept": "application/json"
+}
+
+response = session.get(url, params=params, headers=headers, timeout=10)
+
+# Always check status before parsing
+if response.status_code == 200:
+    data = response.json()  # Convert JSON to Python dict/list
+    print(f"Retrieved {len(data)} records")
+elif response.status_code == 429:
+    print("Rate limited. Backing off...")
+else:
+    print(f"Error {response.status_code}: {response.text}")</code></pre>
+
+            <div class="callout warning">
+                <strong>⚠️ Never hardcode API keys!</strong> Use environment variables: <code>os.environ.get("API_KEY")</code>. In Colab, use <code>from google.colab import userdata</code> or input widgets.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Authentication Patterns</h2>
+            <p>Financial data is valuable. APIs protect it. Here are the four patterns you'll encounter.</p>
+            
+            <table>
+                <tr><th>Method</th><th>How It Works</th><th>Quant Example</th></tr>
+                <tr>
+                    <td><strong>API Key</strong></td>
+                    <td>Simple string passed in header or URL. Like a password.</td>
+                    <td>Alpha Vantage, FRED, Polygon.io</td>
+                </tr>
+                <tr>
+                    <td><strong>Bearer Token</strong></td>
+                    <td>Short-lived token obtained via login. Sent as <code>Authorization: Bearer &lt;token&gt;</code>.</td>
+                    <td>Interactive Brokers API, Bloomberg BPIPE</td>
+                </tr>
+                <tr>
+                    <td><strong>OAuth 2.0</strong></td>
+                    <td>Industry standard. You get a temporary "access token" via a handshake. Supports scopes/permissions.</td>
+                    <td>Plaid (banking data), Twitter/X API</td>
+                </tr>
+                <tr>
+                    <td><strong>JWT (JSON Web Token)</strong></td>
+                    <td>Self-contained token with encoded user info and signature. No server session needed.</td>
+                    <td>Modern fintech platforms</td>
+                </tr>
+            </table>
+
+            <h4>API Key Example (Alpha Vantage)</h4>
+            <div class="code-header">Python</div>
+            <pre><code>import os
+API_KEY = os.environ.get("ALPHA_VANTAGE_KEY")
+
+url = "https://www.alphavantage.co/query"
+params = {
+    "function": "TIME_SERIES_DAILY",
+    "symbol": "IBM",
+    "apikey": API_KEY,
+    "outputsize": "compact",
+    "datatype": "json"
+}
+
+response = requests.get(url, params=params)
+data = response.json()</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Pagination: When Data Doesn't Fit in One Call</h2>
+            <p>Asking for "all historical prices since 1990" in one request will crash or timeout. APIs paginate — they return data in chunks.</p>
+            
+            <div class="diagram">
+                <div class="diagram-title">Pagination Strategies</div>
+                <div class="two-col">
+                    <div style="text-align:center;">
+                        <div style="font-weight:600; margin-bottom:0.5rem;">Offset Pagination</div>
+                        <div style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary);">
+                            Page 1: offset=0, limit=100<br>
+                            Page 2: offset=100, limit=100<br>
+                            Page 3: offset=200, limit=100
+                        </div>
+                        <div class="flow-label">Simple but slow at deep pages</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-weight:600; margin-bottom:0.5rem;">Cursor Pagination</div>
+                        <div style="font-family:monospace; font-size:0.85rem; color:var(--text-secondary);">
+                            Page 1: cursor=abc123<br>
+                            Page 2: cursor=def456 (from prev)<br>
+                            Page 3: cursor=ghi789 (from prev)
+                        </div>
+                        <div class="flow-label">Fast & consistent, preferred</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-header">Python: Offset Pagination Loop</div>
+            <pre><code>def fetch_all_prices(symbol, api_key):
+    all_data = []
+    page = 1
+    while True:
+        response = requests.get(
+            "https://api.example.com/prices",
+            params={"symbol": symbol, "page": page, "per_page": 100},
+            headers={"Authorization": f"Bearer {api_key}"}
+        )
+        batch = response.json()
+        if not batch:
+            break
+        all_data.extend(batch)
+        page += 1
+    return all_data</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Rate Limiting: The API Speed Bump</h2>
+            <p>APIs cost money to run. Providers limit how often you can call them. Violating limits gets you blocked (HTTP 429).</p>
+            
+            <h4>Strategies to Handle Rate Limits</h4>
+            <div class="code-header">Python</div>
+            <pre><code>import time
+
+def rate_limited_request(url, params, headers, max_per_minute=5):
+    """Simple rate limiter using sleep."""
+    time.sleep(60 / max_per_minute)  # Sleep before request
+    return requests.get(url, params=params, headers=headers)
+
+# Better: Token bucket or using a library
+from ratelimit import limits, sleep_and_retry
+
+@sleep_and_retry
+@limits(calls=5, period=60)  # 5 calls per minute
+def call_api(url, params, headers):
+    return requests.get(url, params=params, headers=headers)</code></pre>
+
+            <div class="callout">
+                <strong>💡 Pro Tip:</strong> Always check <code>X-RateLimit-Remaining</code> and <code>X-RateLimit-Reset</code> headers in responses. Sleep proactively, not just after getting 429.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Financial Data APIs Landscape</h2>
+            <p>Not all market data is created equal. Here's the landscape for quant engineers.</p>
+            
+            <table>
+                <tr><th>Provider</th><th>Data Type</th><th>Cost</th><th>Best For</th></tr>
+                <tr><td><strong>yfinance</strong></td><td>EOD prices, fundamentals</td><td>Free</td><td>Prototyping, backtesting</td></tr>
+                <tr><td><strong>Alpha Vantage</strong></td><td>EOD, intraday, forex, crypto</td><td>Free tier</td><td>Beginners, low-frequency</td></tr>
+                <tr><td><strong>Polygon.io</strong></td><td>Tick, aggregates, fundamentals</td><td>Paid</td><td>Serious quant research</td></tr>
+                <tr><td><strong>FRED</strong></td><td>Macroeconomic data</td><td>Free</td><td>Factor models, regime detection</td></tr>
+                <tr><td><strong>Quandl/NASDAQ Data Link</strong></td><td>Alternative data</td><td>Mixed</td><td>Alternative alpha</td></tr>
+            </table>
+
+            <h4>Real-Time Data: WebSockets</h4>
+            <p>REST APIs are "pull" — you ask, they answer. For high-frequency data, you need "push" via WebSockets.</p>
+            <div class="code-header">Python (WebSocket Concept)</div>
+            <pre><code>import websocket
+import json
+
+def on_message(ws, message):
+    tick = json.loads(message)
+    print(f"Price update: {tick['price']} at {tick['timestamp']}")
+
+ws = websocket.WebSocketApp(
+    "wss://stream.data.provider.com/realtime",
+    header={"Authorization": "Bearer TOKEN"},
+    on_message=on_message
+)
+ws.run_forever()  # Keeps connection open, pushes data as it arrives</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Fetch Real Market Data</h2>
+            <p>This experiment uses <code>yfinance</code> (no API key needed) and demonstrates a professional extraction pattern.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Install and import
+!pip install yfinance pandas --quiet
+import yfinance as yf
+import pandas as pd
+from datetime import datetime
+
+# Cell 2: Download historical data
+ticker = yf.Ticker("AAPL")
+hist = ticker.history(period="3mo")  # Last 3 months
+print(hist.head())
+print(f"\nShape: {hist.shape}")
+print(f"Columns: {list(hist.columns)}")
+
+# Cell 3: Inspect the raw API-like structure
+info = ticker.info
+print(f"Sector: {info.get('sector')}")
+print(f"Market Cap: ${info.get('marketCap'):,}")
+
+# Cell 4: Handle missing data (common in APIs)
+print(f"Null values:\n{hist.isnull().sum()}")
+
+# Cell 5: Export to different formats (simulating ETL output)
+hist.to_csv("aapl_prices.csv")
+hist.to_parquet("aapl_prices.parquet")
+print("Files saved!")</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://docs.python-requests.org/" target="_blank">
+                    <div class="title">Requests Documentation</div>
+                    <div class="desc">The definitive guide to HTTP requests in Python.</div>
+                </a>
+                <a class="resource-card" href="https://www.alphavantage.co/documentation/" target="_blank">
+                    <div class="title">Alpha Vantage API Docs</div>
+                    <div class="desc">Free stock API with comprehensive examples.</div>
+                </a>
+                <a class="resource-card" href="https://polygon.io/docs/stocks" target="_blank">
+                    <div class="title">Polygon.io Stock API</div>
+                    <div class="desc">Professional-grade market data API documentation.</div>
+                </a>
+                <a class="resource-card" href="https://realpython.com/python-api/" target="_blank">
+                    <div class="title">Real Python: API Tutorial</div>
+                    <div class="desc">Step-by-step guide to APIs in Python.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 2: EXTRACT ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>📥 The Extract Phase</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Extraction is where your pipeline begins. "Garbage in, garbage out" — if you extract poorly, 
+            nothing downstream can save you. This phase is about reliably pulling data from APIs, databases, and files.
+        </p>
+
+        <div class="card">
+            <h2>ETL Overview: Where Extract Fits</h2>
+            <div class="diagram">
+                <div class="diagram-title">The ETL Pipeline</div>
+                <div class="flow-container">
+                    <div class="flow-box danger">Sources<br><span style="font-size:0.8rem; opacity:0.9;">APIs, DBs, Files</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">EXTRACT<br><span style="font-size:0.8rem; opacity:0.9;">Pull & Validate</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box secondary">TRANSFORM<br><span style="font-size:0.8rem; opacity:0.9;">Clean & Enrich</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box accent">LOAD<br><span style="font-size:0.8rem; opacity:0.9;">Store & Index</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box warning">Warehouse<br><span style="font-size:0.8rem; opacity:0.9;">Analytics Ready</span></div>
+                </div>
+            </div>
+            <p>The <strong>Extract</strong> phase is responsible for:</p>
+            <ul class="checklist">
+                <li>Connecting to data sources reliably</li>
+                <li>Handling network failures and retries</li>
+                <li>Respecting rate limits and source constraints</li>
+                <li>Capturing metadata (extraction timestamp, source version)</li>
+                <li>Validating schema before passing downstream</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>API Extraction Patterns</h2>
+            
+            <h3>Pattern 1: Full Extraction</h3>
+            <p>Pull everything, every time. Simple but slow. Best for small reference data (company info, sector mappings).</p>
+            <div class="code-header">Python</div>
+            <pre><code>def extract_full(url, headers):
+    """Extract entire dataset. Use only for small tables."""
+    response = requests.get(url, headers=headers, timeout=30)
+    response.raise_for_status()
+    return response.json()</code></pre>
+
+            <h3>Pattern 2: Incremental Extraction</h3>
+            <p>Pull only what changed since last run. Uses a "watermark" (timestamp or ID). Essential for large datasets like daily prices.</p>
+            <div class="code-header">Python</div>
+            <pre><code>def extract_incremental(url, headers, last_watermark):
+    """
+    Extract only records updated since last_watermark.
+    last_watermark is stored from previous run (e.g., in a file or DB).
+    """
+    params = {"updated_after": last_watermark}
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
+    
+    # Update watermark for next run
+    new_watermark = max(record["updated_at"] for record in data)
+    save_watermark(new_watermark)
+    
+    return data</code></pre>
+
+            <h3>Pattern 3: Change Data Capture (CDC)</h3>
+            <p>Database-specific. Uses transaction logs or triggers to capture changes. Common in enterprise quant systems.</p>
+            <div class="callout">
+                <strong>Quant Example:</strong> Your portfolio management system has a PostgreSQL database. CDC captures every INSERT/UPDATE to the <code>trades</code> table and streams it to your analytics warehouse in real-time.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Robust Extraction: The Professional Template</h2>
+            <p>This is a battle-tested extraction function you can adapt for any API source.</p>
+            <div class="code-header">Python: production_extractor.py</div>
+            <pre><code>import requests
+import logging
+import time
+from datetime import datetime
+from typing import Dict, List, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class APIExtractor:
+    def __init__(self, base_url: str, api_key: str, rate_limit_per_sec: float = 5.0):
+        self.base_url = base_url
+        self.session = requests.Session()
+        self.session.headers.update({
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        })
+        self.min_interval = 1.0 / rate_limit_per_sec
+        self.last_request_time = 0
+        
+    def _rate_limit(self):
+        """Ensure we don't exceed rate limits."""
+        elapsed = time.time() - self.last_request_time
+        if elapsed < self.min_interval:
+            time.sleep(self.min_interval - elapsed)
+        self.last_request_time = time.time()
+    
+    def extract(self, endpoint: str, params: Optional[Dict] = None) -> Dict:
+        """
+        Extract data with automatic retries, rate limiting, and logging.
+        """
+        url = f"{self.base_url}/{endpoint}"
+        self._rate_limit()
+        
+        try:
+            response = self.session.get(url, params=params, timeout=30)
+            
+            # Log metadata
+            logger.info(f"Extracted {url} | Status: {response.status_code} | "
+                       f"Remaining: {response.headers.get('X-RateLimit-Remaining', 'N/A')}")
+            
+            response.raise_for_status()
+            return {
+                "data": response.json(),
+                "extracted_at": datetime.utcnow().isoformat(),
+                "status_code": response.status_code,
+                "url": url
+            }
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Extraction failed for {url}: {e}")
+            raise
+
+# Usage
+extractor = APIExtractor("https://api.polygon.io", "YOUR_KEY", rate_limit_per_sec=5)
+result = extractor.extract("v2/aggs/ticker/AAPL/range/1/day/2024-01-01/2024-01-31")</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Database Extraction</h2>
+            <p>Often, your source isn't an API but a database — perhaps an internal risk system or a vendor's read replica.</p>
+            
+            <h4>Using SQLAlchemy + Pandas</h4>
+            <div class="code-header">Python</div>
+            <pre><code>from sqlalchemy import create_engine
+import pandas as pd
+
+# Connection string format: dialect+driver://user:pass@host:port/db
+engine = create_engine("postgresql://user:pass@localhost:5432/market_data")
+
+# Extract with a SQL query
+query = """
+SELECT ticker, date, close_price, volume
+FROM daily_prices
+WHERE date >= CURRENT_DATE - INTERVAL '30 days'
+  AND ticker IN ('AAPL', 'MSFT', 'GOOGL')
+ORDER BY ticker, date
+"""
+
+df = pd.read_sql(query, engine, parse_dates=["date"])
+print(f"Extracted {len(df)} rows")
+
+# Always close connections
+engine.dispose()</code></pre>
+
+            <h4>Chunked Extraction for Large Tables</h4>
+            <p>Don't load 10 years of tick data into memory at once. Use chunks.</p>
+            <div class="code-header">Python</div>
+            <pre><code>chunks = []
+for chunk in pd.read_sql(query, engine, chunksize=10000):
+    # Process each chunk (e.g., filter, light transform)
+    chunk = chunk[chunk['volume'] > 0]
+    chunks.append(chunk)
+
+df = pd.concat(chunks, ignore_index=True)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>File Extraction</h2>
+            <p>Data often arrives as files — CSV dumps from vendors, Parquet archives, or JSON logs.</p>
+            
+            <div class="code-header">Python</div>
+            <pre><code>import pandas as pd
+
+# CSV with parsing options
+df_csv = pd.read_csv(
+    "prices.csv",
+    parse_dates=["date"],
+    dtype={"ticker": "string", "volume": "Int64"},  # Nullable integer
+    na_values=["", "NULL", "N/A"]
+)
+
+# Parquet (preferred for large datasets)
+df_parquet = pd.read_parquet(
+    "prices.parquet",
+    columns=["ticker", "date", "close"]  # Column pruning = faster
+)
+
+# JSON Lines (one JSON object per line — common in APIs)
+df_jsonl = pd.read_json("trades.jsonl", lines=True)</code></pre>
+
+            <div class="callout success">
+                <strong>Parquet vs CSV for Quants:</strong> A 10GB CSV of tick data might be 2GB in Parquet with Snappy compression. Parquet also stores column statistics (min/max), so queries like <code>WHERE date = '2024-01-01'</code> can skip entire row groups.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Data Validation at Extract Time</h2>
+            <p>Validate early. Catch schema changes, nulls, and type mismatches before they corrupt your warehouse.</p>
+            
+            <div class="code-header">Python</div>
+            <pre><code>import pandas as pd
+from typing import Dict, Any
+
+class ExtractValidator:
+    def __init__(self, schema: Dict[str, str]):
+        """
+        schema: {"column_name": "dtype", ...}
+        e.g., {"ticker": "string", "price": "float64", "date": "datetime64[ns]"}
+        """
+        self.schema = schema
+    
+    def validate(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Check required columns
+        missing = set(self.schema.keys()) - set(df.columns)
+        if missing:
+            raise ValueError(f"Missing columns: {missing}")
+        
+        # Check types
+        for col, dtype in self.schema.items():
+            if not pd.api.types.is_dtype_equal(df[col].dtype, dtype):
+                try:
+                    df[col] = df[col].astype(dtype)
+                except Exception as e:
+                    raise TypeError(f"Column {col} cannot cast to {dtype}: {e}")
+        
+        # Check for nulls in critical columns
+        null_counts = df[list(self.schema.keys())].isnull().sum()
+        if null_counts.any():
+            print(f"⚠️ Nulls detected:\n{null_counts[null_counts > 0]}")
+        
+        return df
+
+# Usage
+validator = ExtractValidator({
+    "ticker": "string",
+    "date": "datetime64[ns]",
+    "close": "float64",
+    "volume": "Int64"
+})
+clean_df = validator.validate(raw_df)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Multi-Source Extractor</h2>
+            <p>Build an extractor that pulls from an API (yfinance), a simulated database (SQLite in-memory), and a CSV file, then validates everything.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Setup
+!pip install yfinance --quiet
+import yfinance as yf
+import pandas as pd
+import sqlite3
+from datetime import datetime, timedelta
+
+# Cell 2: Extract from API
+ticker = yf.Ticker("SPY")
+api_data = ticker.history(period="5d")
+api_data.reset_index(inplace=True)
+api_data['source'] = 'api'
+print("API Data:", api_data.shape)
+
+# Cell 3: Create simulated database source
+conn = sqlite3.connect(":memory:")
+db_data = api_data.head(3).copy()
+db_data['source'] = 'database'
+db_data.to_sql("prices", conn, index=False)
+
+# Cell 4: Extract from DB
+db_extracted = pd.read_sql("SELECT * FROM prices", conn)
+print("DB Data:", db_extracted.shape)
+
+# Cell 5: Create CSV source
+csv_data = api_data.tail(3).copy()
+csv_data['source'] = 'csv'
+csv_data.to_csv("prices.csv", index=False)
+csv_extracted = pd.read_csv("prices.csv", parse_dates=["Date"])
+print("CSV Data:", csv_extracted.shape)
+
+# Cell 6: Validate and merge
+required = ["Date", "Open", "High", "Low", "Close", "Volume", "source"]
+for df in [api_data, db_extracted, csv_extracted]:
+    assert all(col in df.columns for col in required), "Schema mismatch!"
+    
+combined = pd.concat([api_data, db_extracted, csv_extracted], ignore_index=True)
+print(f"\nCombined: {combined.shape}")
+print(combined.groupby('source').size())</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://docs.sqlalchemy.org/en/20/core/engines.html" target="_blank">
+                    <div class="title">SQLAlchemy Engine Docs</div>
+                    <div class="desc">How to connect to any database from Python.</div>
+                </a>
+                <a class="resource-card" href="https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html" target="_blank">
+                    <div class="title">Pandas read_sql Reference</div>
+                    <div class="desc">Database extraction with Pandas.</div>
+                </a>
+                <a class="resource-card" href="https://docs.python.org/3/library/logging.html" target="_blank">
+                    <div class="title">Python Logging HOWTO</div>
+                    <div class="desc">Professional logging for production pipelines.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 3: TRANSFORM ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>⚙️ The Transform Phase</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Raw data is messy. Prices might be strings. Dates might be in 3 formats. Volumes might be negative (data error). 
+            Transform is where you turn chaotic inputs into structured, analysis-ready outputs.
+        </p>
+
+        <div class="card">
+            <h2>What Happens in Transform?</h2>
+            <div class="diagram">
+                <div class="diagram-title">Transform Operations Pipeline</div>
+                <div class="flow-container">
+                    <div class="flow-box danger">Raw Data<br><span style="font-size:0.75rem;">Nulls, wrong types, duplicates</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Clean<br><span style="font-size:0.75rem;">Handle nulls, fix types</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box secondary">Normalize<br><span style="font-size:0.75rem;">Structure & relations</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box accent">Enrich<br><span style="font-size:0.75rem;">Features, aggregates</span></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box warning">Analytics Ready<br><span style="font-size:0.75rem;">Clean, validated, useful</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>1. Data Cleaning</h2>
+            
+            <h3>Handling Missing Values</h3>
+            <p>Missing data in financial time series is common (weekends, holidays, delisted stocks). You have three strategies:</p>
+            <ul>
+                <li><strong>Drop:</strong> Remove rows with nulls. Safe for large datasets, dangerous for time series.</li>
+                <li><strong>Forward Fill:</strong> Use last known value. Standard for prices (Friday's close carries to Monday).</li>
+                <li><strong>Interpolation:</strong> Estimate missing values. Useful for sparse fundamental data.</li>
+            </ul>
+            <div class="code-header">Python</div>
+            <pre><code>import pandas as pd
+import numpy as np
+
+# Sample with missing values
+df = pd.DataFrame({
+    'date': pd.date_range('2024-01-01', periods=5, freq='D'),
+    'price': [150.0, np.nan, np.nan, 153.0, 154.0]
+})
+
+# Strategy 1: Forward fill (ffill) — standard for prices
+df['price_ffill'] = df['price'].ffill()
+
+# Strategy 2: Linear interpolation
+df['price_interp'] = df['price'].interpolate(method='linear')
+
+# Strategy 3: Fill with specific value (e.g., 0 for volume)
+df['volume'] = [1000, 2000, np.nan, 1500, 1800]
+df['volume_filled'] = df['volume'].fillna(0)
+
+print(df)</code></pre>
+
+            <h3>Removing Duplicates</h3>
+            <div class="code-header">Python</div>
+            <pre><code># Check for duplicates
+print(f"Duplicates: {df.duplicated().sum()}")
+
+# Remove exact duplicates
+df = df.drop_duplicates()
+
+# Remove duplicates based on subset (keep last)
+df = df.drop_duplicates(subset=['ticker', 'date'], keep='last')</code></pre>
+
+            <h3>Outlier Detection</h3>
+            <p>A stock price jumping 50% in one minute is either a corporate action or bad data. You must detect and handle outliers.</p>
+            <div class="code-header">Python</div>
+            <pre><code># Z-score method: flag values > 3 standard deviations
+from scipy import stats
+df['z_score'] = np.abs(stats.zscore(df['price'].dropna()))
+df['is_outlier'] = df['z_score'] > 3
+
+# IQR method: more robust to extreme values
+Q1 = df['price'].quantile(0.25)
+Q3 = df['price'].quantile(0.75)
+IQR = Q3 - Q1
+df['is_outlier_iqr'] = (df['price'] < (Q1 - 1.5 * IQR)) | (df['price'] > (Q3 + 1.5 * IQR))</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>2. Data Type Conversion</h2>
+            <p>APIs return everything as strings or mixed types. You must cast correctly.</p>
+            <div class="code-header">Python</div>
+            <pre><code>df = pd.DataFrame({
+    'ticker': ['AAPL', 'MSFT'],
+    'price': ['150.75', '250.50'],        # String!
+    'date': ['2024-01-15', '2024-01-16'], # String!
+    'volume': ['45000000', '38000000']    # String!
+})
+
+# Convert types
+df['price'] = df['price'].astype('float64')
+df['date'] = pd.to_datetime(df['date'])
+df['volume'] = df['volume'].astype('Int64')  # Nullable integer
+df['ticker'] = df['ticker'].astype('string')  # Pandas string type
+
+# Verify
+print(df.dtypes)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>3. Structuring: Normalization vs Denormalization</h2>
+            
+            <h4>Normalization (Database Form)</h4>
+            <p>Split data into related tables to avoid redundancy. Good for storage, bad for analysis.</p>
+            <div class="code-header">Conceptual Schema</div>
+            <pre><code>Table: companies
+  ticker (PK) | name       | sector     | market_cap
+  AAPL        | Apple Inc. | Technology | 3000000000000
+
+Table: prices
+  id (PK) | ticker (FK) | date       | close | volume
+  1       | AAPL        | 2024-01-15 | 151.2 | 45000000</code></pre>
+
+            <h4>Denormalization (Analytics Form)</h4>
+            <p>Join everything into one flat table. Redundant but fast to query. This is what quants usually want.</p>
+            <div class="code-header">Python: Denormalize with Pandas</div>
+            <pre><code># companies and prices DataFrames
+companies = pd.DataFrame({
+    'ticker': ['AAPL', 'MSFT'],
+    'sector': ['Technology', 'Technology'],
+    'market_cap': [3e12, 2.8e12]
+})
+
+prices = pd.DataFrame({
+    'ticker': ['AAPL', 'AAPL', 'MSFT'],
+    'date': ['2024-01-15', '2024-01-16', '2024-01-15'],
+    'close': [151.2, 152.8, 380.5]
+})
+
+# Denormalize: one big flat table
+flat = prices.merge(companies, on='ticker', how='left')
+print(flat)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>4. Feature Engineering for Quants</h2>
+            <p>This is where raw prices become signals. These transformations are the bread and butter of quantitative analysis.</p>
+            
+            <h4>Returns</h4>
+            <div class="code-header">Python</div>
+            <pre><code># Simple returns: (P_t / P_{t-1}) - 1
+df['simple_return'] = df['close'].pct_change()
+
+# Log returns: ln(P_t / P_{t-1})
+df['log_return'] = np.log(df['close'] / df['close'].shift(1))
+
+# Cumulative returns
+df['cum_return'] = (1 + df['simple_return']).cumprod() - 1</code></pre>
+
+            <h4>Moving Averages & Rolling Statistics</h4>
+            <div class="code-header">Python</div>
+            <pre><code># Simple Moving Average (SMA)
+df['sma_20'] = df['close'].rolling(window=20).mean()
+
+# Exponential Moving Average (EMA)
+df['ema_20'] = df['close'].ewm(span=20, adjust=False).mean()
+
+# Rolling volatility (standard deviation of returns)
+df['volatility_20'] = df['log_return'].rolling(window=20).std() * np.sqrt(252)
+
+# Rolling max/min
+df['rolling_high_20'] = df['high'].rolling(window=20).max()</code></pre>
+
+            <h4>Technical Indicators (RSI)</h4>
+            <div class="code-header">Python</div>
+            <pre><code># Relative Strength Index (RSI)
+delta = df['close'].diff()
+gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+rs = gain / loss
+df['rsi_14'] = 100 - (100 / (1 + rs))</code></pre>
+
+            <div class="callout">
+                <strong>💡 Quant Tip:</strong> Always use <code>.shift(1)</code> to ensure you're not using future data. A common bug is calculating returns without shifting, which creates <strong>look-ahead bias</strong> — your backtest will look amazing and fail in production.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>5. Window Functions & Grouped Operations</h2>
+            <p>Window functions let you calculate metrics "relative to" each row — e.g., "rank this stock's return within its sector."</p>
+            <div class="code-header">Python</div>
+            <pre><code># Rank stocks by daily return within their sector
+df['return_rank'] = df.groupby('date')['simple_return'].rank(ascending=False)
+
+# Percentile rank (0 to 1)
+df['return_pctile'] = df.groupby('date')['simple_return'].rank(pct=True)
+
+# Cumulative sum within group
+df['cumulative_volume'] = df.groupby('ticker')['volume'].cumsum()
+
+# Expanding window (all history up to current row)
+df['expanding_mean'] = df.groupby('ticker')['close'].expanding().mean().reset_index(0, drop=True)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>6. Validation in Transform</h2>
+            <p>After transforming, verify your assumptions before loading.</p>
+            <div class="code-header">Python</div>
+            <pre><code>def validate_transformed(df: pd.DataFrame) -> bool:
+    checks = []
+    
+    # 1. No nulls in critical columns
+    checks.append(df[['ticker', 'date', 'close']].isnull().sum().sum() == 0)
+    
+    # 2. Prices are positive
+    checks.append((df['close'] > 0).all())
+    
+    # 3. Dates are within expected range
+    checks.append(df['date'].max() <= pd.Timestamp.now())
+    
+    # 4. No duplicate ticker-date pairs
+    checks.append(df.duplicated(subset=['ticker', 'date']).sum() == 0)
+    
+    # 5. Returns are reasonable (not ±1000%)
+    checks.append(df['simple_return'].abs().max() < 10)
+    
+    if all(checks):
+        print("✅ All validation checks passed")
+        return True
+    else:
+        failed = [i for i, c in enumerate(checks) if not c]
+        raise ValueError(f"Validation failed for checks: {failed}")
+
+validate_transformed(df)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Full Transform Pipeline</h2>
+            <p>Take raw yfinance data and transform it into a quant-ready dataset with features.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Extract
+!pip install yfinance --quiet
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+df = yf.Ticker("AAPL").history(period="1y")
+df.reset_index(inplace=True)
+df.columns = [c.lower().replace(' ', '_') for c in df.columns]
+df['ticker'] = 'AAPL'
+
+# Cell 2: Clean
+df = df.drop_duplicates(subset=['date'], keep='last')
+df['volume'] = df['volume'].fillna(0).astype('Int64')
+
+# Cell 3: Feature Engineering
+df = df.sort_values('date')
+df['simple_return'] = df['close'].pct_change()
+df['log_return'] = np.log(df['close'] / df['close'].shift(1))
+df['sma_20'] = df['close'].rolling(20).mean()
+df['volatility_20'] = df['log_return'].rolling(20).std() * np.sqrt(252)
+
+# Cell 4: Add regime feature (above/below SMA)
+df['above_sma'] = df['close'] > df['sma_20']
+
+# Cell 5: Validate
+assert df['close'].isnull().sum() == 0, "Null prices!"
+assert (df['volume'] >= 0).all(), "Negative volume!"
+assert df.duplicated(subset=['ticker', 'date']).sum() == 0, "Duplicates!"
+
+print(df.tail(10)[['date', 'close', 'simple_return', 'sma_20', 'volatility_20', 'above_sma']])</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://pandas.pydata.org/docs/user_guide/missing_data.html" target="_blank">
+                    <div class="title">Pandas: Working with Missing Data</div>
+                    <div class="desc">Official guide to fillna, dropna, and interpolation.</div>
+                </a>
+                <a class="resource-card" href="https://www.investopedia.com/terms/t/technicalindicator.asp" target="_blank">
+                    <div class="title">Investopedia: Technical Indicators</div>
+                    <div class="desc">Conceptual explanations of RSI, MACD, moving averages.</div>
+                </a>
+                <a class="resource-card" href="https://towardsdatascience.com/feature-engineering-for-time-series-5d4efca6d0b5" target="_blank">
+                    <div class="title">Feature Engineering for Time Series</div>
+                    <div class="desc">Advanced transforms for financial time series.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 4: LOAD ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>📤 The Load Phase</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Loading is the final handoff. Your clean, transformed data must land in a storage system where analysts, 
+            portfolio managers, and trading algorithms can access it reliably and quickly.
+        </p>
+
+        <div class="card">
+            <h2>Loading Targets: Where Data Lives</h2>
+            <div class="diagram">
+                <div class="diagram-title">Data Storage Hierarchy</div>
+                <svg class="svg-diagram" viewBox="0 0 800 280" width="800" height="280">
+                    <rect x="50" y="30" width="200" height="60" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                    <text x="150" y="55" text-anchor="middle" fill="#991b1b" font-weight="bold" font-size="13">Source Systems</text>
+                    <text x="150" y="75" text-anchor="middle" fill="#7f1d1d" font-size="11">APIs, OLTP Databases</text>
+                    
+                    <rect x="300" y="30" width="200" height="60" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                    <text x="400" y="55" text-anchor="middle" fill="#1e40af" font-weight="bold" font-size="13">Data Lake</text>
+                    <text x="400" y="75" text-anchor="middle" fill="#1e3a8a" font-size="11">Raw files (S3, Parquet)</text>
+                    
+                    <rect x="550" y="30" width="200" height="60" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+                    <text x="650" y="55" text-anchor="middle" fill="#065f46" font-weight="bold" font-size="13">Data Warehouse</text>
+                    <text x="650" y="75" text-anchor="middle" fill="#064e3b" font-size="11">Analytics-ready tables</text>
+                    
+                    <line x1="250" y1="60" x2="290" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="500" y1="60" x2="540" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    
+                    <rect x="50" y="130" width="700" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="400" y="155" text-anchor="middle" fill="#475569" font-weight="bold" font-size="13">Access Patterns</text>
+                    
+                    <rect x="80" y="175" width="150" height="55" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="155" y="200" text-anchor="middle" fill="#334155" font-size="12">BI Tools</text>
+                    <text x="155" y="218" text-anchor="middle" fill="#64748b" font-size="10">Tableau, Looker</text>
+                    
+                    <rect x="260" y="175" width="150" height="55" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="335" y="200" text-anchor="middle" fill="#334155" font-size="12">Jupyter/Colab</text>
+                    <text x="335" y="218" text-anchor="middle" fill="#64748b" font-size="10">Research & Backtests</text>
+                    
+                    <rect x="440" y="175" width="150" height="55" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="515" y="200" text-anchor="middle" fill="#334155" font-size="12">Trading Systems</text>
+                    <text x="515" y="218" text-anchor="middle" fill="#64748b" font-size="10">Live strategies</text>
+                    
+                    <rect x="620" y="175" width="100" height="55" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="670" y="200" text-anchor="middle" fill="#334155" font-size="12">ML Pipelines</text>
+                    <text x="670" y="218" text-anchor="middle" fill="#64748b" font-size="10">Features</text>
+                </svg>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Loading Patterns</h2>
+            
+            <h3>Full Load (Truncate + Insert)</h3>
+            <p>Delete all existing data, insert fresh data. Simple but disruptive. Use only for small reference tables.</p>
+            <div class="code-header">SQL</div>
+            <pre><code>BEGIN TRANSACTION;
+    TRUNCATE TABLE daily_prices;
+    INSERT INTO daily_prices SELECT * FROM staging_daily_prices;
+COMMIT;</code></pre>
+
+            <h3>Incremental Load (Append New Data)</h3>
+            <p>Only insert new records. Fast and safe. Requires a reliable watermark (date, ID, timestamp).</p>
+            <div class="code-header">SQL</div>
+            <pre><code>INSERT INTO daily_prices
+SELECT * FROM staging_daily_prices s
+WHERE s.date > (SELECT MAX(date) FROM daily_prices);</code></pre>
+
+            <h3>Upsert (Merge): Insert or Update</h3>
+            <p>If record exists, update it. If not, insert it. Critical for corrections and late-arriving data.</p>
+            <div class="code-header">PostgreSQL</div>
+            <pre><code>INSERT INTO daily_prices (ticker, date, close, volume)
+VALUES ('AAPL', '2024-01-15', 151.25, 45000000)
+ON CONFLICT (ticker, date) 
+DO UPDATE SET 
+    close = EXCLUDED.close,
+    volume = EXCLUDED.volume,
+    updated_at = NOW();</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Loading to Databases with Pandas</h2>
+            <p>Pandas can write directly to SQL, but for production pipelines, you need more control.</p>
+            
+            <div class="code-header">Python: Safe Bulk Loading</div>
+            <pre><code>from sqlalchemy import create_engine, text
+import pandas as pd
+
+engine = create_engine("postgresql://user:pass@localhost:5432/quantdb")
+
+def load_to_warehouse(df: pd.DataFrame, table_name: str, if_exists: str = 'append'):
+    """
+    Load DataFrame to warehouse with transaction safety.
+    if_exists: 'fail', 'replace', 'append'
+    """
+    with engine.begin() as connection:  # Auto-commit or rollback
+        df.to_sql(
+            name=table_name,
+            con=connection,
+            if_exists=if_exists,
+            index=False,
+            method='multi',       # Batch inserts
+            chunksize=1000      # Insert 1000 rows at a time
+        )
+        print(f"Loaded {len(df)} rows to {table_name}")
+
+# Usage
+load_to_warehouse(transformed_df, "fact_daily_prices", if_exists="append")</code></pre>
+
+            <div class="callout warning">
+                <strong>⚠️ Never use <code>if_exists='replace'</code> in production!</strong> It drops and recreates the table, destroying indexes and permissions. Use it only in development.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Loading to Parquet Files (Data Lake)</h2>
+            <p>For massive historical datasets (tick data, alternative data), files beat databases.</p>
+            <div class="code-header">Python</div>
+            <pre><code># Partition by date for efficient querying
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+
+# Write partitioned dataset
+df.to_parquet(
+    "s3://bucket/prices/",           # or local path
+    partition_cols=['year', 'month'],
+    engine='pyarrow',
+    compression='snappy',
+    index=False
+)
+
+# Reading back: only loads needed partitions
+import dask.dataframe as dd
+ddf = dd.read_parquet(
+    "s3://bucket/prices/",
+    filters=[('year', '=', 2024), ('month', '=', 1)]
+)</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>SCD: Slowly Changing Dimensions</h2>
+            <p>Company attributes change over time (sector, CEO, market cap). How do you track history?</p>
+            <ul>
+                <li><strong>SCD Type 1:</strong> Overwrite old value. Simple, loses history.</li>
+                <li><strong>SCD Type 2:</strong> Keep history with date ranges. Gold standard for quant research.</li>
+            </ul>
+            <div class="code-header">SCD Type 2 Example</div>
+            <pre><code>Table: dim_company (SCD Type 2)
+ticker | sector     | effective_date | expiry_date  | is_current
+AAPL   | Technology | 2020-01-01     | 2024-06-10   | 0
+AAPL   | AI/ML      | 2024-06-11     | 9999-12-31   | 1   &lt;-- Apple pivoted to AI</code></pre>
+            <p>This lets you run point-in-time queries: "What sector was AAPL in on March 15, 2024?"</p>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Full Load Pipeline</h2>
+            <p>Extract AAPL data, transform it, and load it into an SQLite database with upsert logic.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Extract & Transform
+!pip install yfinance --quiet
+import yfinance as yf
+import pandas as pd
+import sqlite3
+
+df = yf.Ticker("AAPL").history(period="1mo").reset_index()
+df.columns = [c.lower().replace(' ', '_') for c in df.columns]
+df['ticker'] = 'AAPL'
+df['date'] = pd.to_datetime(df['date']).dt.date
+df = df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume']]
+
+# Cell 2: Create DB with unique constraint
+conn = sqlite3.connect("quant.db")
+conn.execute("""
+    CREATE TABLE IF NOT EXISTS prices (
+        ticker TEXT,
+        date DATE,
+        open REAL,
+        high REAL,
+        low REAL,
+        close REAL,
+        volume INTEGER,
+        PRIMARY KEY (ticker, date)
+    )
+""")
+
+# Cell 3: Upsert (SQLite syntax)
+for _, row in df.iterrows():
+    conn.execute("""
+        INSERT INTO prices (ticker, date, open, high, low, close, volume)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(ticker, date) DO UPDATE SET
+            open=excluded.open,
+            high=excluded.high,
+            low=excluded.low,
+            close=excluded.close,
+            volume=excluded.volume
+    """, tuple(row))
+conn.commit()
+
+# Cell 4: Verify
+result = pd.read_sql("SELECT * FROM prices ORDER BY date DESC LIMIT 5", conn)
+print(result)
+
+# Cell 5: Simulate incremental load (run again with same data)
+print(f"\nRows in table: {pd.read_sql('SELECT COUNT(*) as cnt FROM prices', conn)['cnt'].iloc[0]}")
+# Should still be ~22 rows, not 44!</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://docs.sqlalchemy.org/en/20/orm/session_basics.html" target="_blank">
+                    <div class="title">SQLAlchemy Session Basics</div>
+                    <div class="desc">Understanding transactions and safe loading.</div>
+                </a>
+                <a class="resource-card" href="https://arrow.apache.org/docs/python/parquet.html" target="_blank">
+                    <div class="title">PyArrow Parquet Guide</div>
+                    <div class="desc">How to read and write partitioned Parquet datasets.</div>
+                </a>
+                <a class="resource-card" href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/" target="_blank">
+                    <div class="title">Kimball Dimensional Modeling</div>
+                    <div class="desc">The bible of data warehouse design (SCD types, star schema).</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 5: PIPELINES ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>🔄 ETL Pipeline Orchestration</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Individual scripts are fine for research. Production quant systems need <strong>pipelines</strong> — automated, 
+            monitored, fault-tolerant workflows that run Extract, Transform, and Load in sequence, with proper error handling.
+        </p>
+
+        <div class="card">
+            <h2>What is a Pipeline?</h2>
+            <p>A pipeline is a directed graph of tasks where the output of one task becomes the input of the next. In quant systems, this might look like:</p>
+            
+            <div class="diagram">
+                <div class="diagram-title">Quant Data Pipeline DAG</div>
+                <svg class="svg-diagram" viewBox="0 0 900 300" width="900" height="300">
+                    <!-- Nodes -->
+                    <rect x="30" y="120" width="120" height="50" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                    <text x="90" y="150" text-anchor="middle" fill="#991b1b" font-weight="bold" font-size="12">Fetch Prices</text>
+                    
+                    <rect x="220" y="60" width="120" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                    <text x="280" y="85" text-anchor="middle" fill="#1e40af" font-weight="bold" font-size="12">Fetch Fundamentals</text>
+                    <text x="280" y="100" text-anchor="middle" fill="#475569" font-size="10">(Parallel)</text>
+                    
+                    <rect x="220" y="180" width="120" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                    <text x="280" y="205" text-anchor="middle" fill="#1e40af" font-weight="bold" font-size="12">Fetch Macro</text>
+                    <text x="280" y="220" text-anchor="middle" fill="#475569" font-size="10">(Parallel)</text>
+                    
+                    <rect x="410" y="120" width="120" height="50" rx="6" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+                    <text x="470" y="145" text-anchor="middle" fill="#5b21b6" font-weight="bold" font-size="12">Join & Transform</text>
+                    <text x="470" y="160" text-anchor="middle" fill="#475569" font-size="10">(Depends on all)</text>
+                    
+                    <rect x="600" y="120" width="120" height="50" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+                    <text x="660" y="145" text-anchor="middle" fill="#065f46" font-weight="bold" font-size="12">Load to Warehouse</text>
+                    
+                    <rect x="790" y="120" width="100" height="50" rx="6" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+                    <text x="840" y="145" text-anchor="middle" fill="#92400e" font-weight="bold" font-size="12">Quality Check</text>
+                    
+                    <!-- Arrows -->
+                    <line x1="150" y1="135" x2="210" y2="90" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="150" y1="155" x2="210" y2="200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="340" y1="90" x2="400" y2="135" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="340" y1="200" x2="400" y2="155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="530" y1="145" x2="590" y2="145" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    <line x1="720" y1="145" x2="780" y2="145" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+                    
+                    <!-- Legend -->
+                    <text x="450" y="260" text-anchor="middle" fill="#475569" font-size="11">Arrows show dependencies. "Join" waits for all three extracts to finish.</text>
+                </svg>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Apache Airflow: The Industry Standard</h2>
+            <p>Airflow is an open-source platform to programmatically author, schedule, and monitor workflows. It uses Python to define pipelines as DAGs (Directed Acyclic Graphs).</p>
+            
+            <h4>Core Concepts</h4>
+            <table>
+                <tr><th>Concept</th><th>Analogy</th><th>Role</th></tr>
+                <tr><td><strong>DAG</strong></td><td>The recipe</td><td>Defines the workflow structure and schedule</td></tr>
+                <tr><td><strong>Operator</strong></td><td>A kitchen tool</td><td>What actually runs (Python function, SQL query, bash command)</td></tr>
+                <tr><td><strong>Task</strong></td><td>A step in the recipe</td><td>An instantiated operator</td></tr>
+                <tr><td><strong>Sensor</strong></td><td>A timer</td><td>Waits for a condition (file exists, API ready)</td></tr>
+                <tr><td><strong>Hook</strong></td><td>A connector</td><td>Connection to external systems (DBs, APIs, cloud)</td></tr>
+            </table>
+
+            <h4>Minimal DAG Example</h4>
+            <div class="code-header">Python: quant_pipeline.py</div>
+            <pre><code>from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'quant_team',
+    'depends_on_past': False,
+    'email_on_failure': True,
+    'email': ['alerts@fund.com'],
+    'retries': 3,
+    'retry_delay': timedelta(minutes=5)
+}
+
+with DAG(
+    'daily_market_data_pipeline',
+    default_args=default_args,
+    description='Ingest daily prices and fundamentals',
+    schedule_interval='0 18 * * 1-5',  # 6 PM on weekdays
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    tags=['market_data', 'production']
+) as dag:
+
+    # Task 1: Extract prices from API
+    extract_prices = PythonOperator(
+        task_id='extract_prices',
+        python_callable=extract_from_polygon,
+        op_kwargs={'symbol': 'AAPL'}
+    )
+
+    # Task 2: Transform
+    transform = PythonOperator(
+        task_id='transform_data',
+        python_callable=transform_prices
+    )
+
+    # Task 3: Load to warehouse
+    load = PostgresOperator(
+        task_id='load_to_warehouse',
+        sql='sql/upsert_prices.sql',
+        postgres_conn_id='warehouse_conn'
+    )
+
+    # Task 4: Data quality check
+    quality_check = PythonOperator(
+        task_id='check_data_quality',
+        python_callable=validate_warehouse_data
+    )
+
+    # Define dependencies
+    extract_prices >> transform >> load >> quality_check</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Scheduling with Cron Expressions</h2>
+            <p>Airflow uses cron syntax. For quant pipelines, you often need market-close schedules.</p>
+            <table>
+                <tr><th>Expression</th><th>Meaning</th><th>Use Case</th></tr>
+                <tr><td><code>0 18 * * 1-5</code></td><td>6 PM, Mon-Fri</td><td>After US market close (4 PM ET + buffer)</td></tr>
+                <tr><td><code>0 9 * * 1-5</code></td><td>9 AM, Mon-Fri</td><td>Before market open (pre-market data)</td></tr>
+                <tr><td><code>0 */6 * * *</code></td><td>Every 6 hours</td><td>Crypto (24/7 markets)</td></tr>
+                <tr><td><code>0 0 * * 0</code></td><td>Midnight Sunday</td><td>Weekly batch (fundamental data)</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Error Handling & Resilience</h2>
+            
+            <h4>Idempotency</h4>
+            <p>A task is <strong>idempotent</strong> if running it twice produces the same result as running it once. This is critical for retries.</p>
+            <div class="callout">
+                <strong>Example:</strong> An upsert SQL query is idempotent. A simple <code>INSERT</code> without conflict handling is not — running it twice creates duplicates.
+            </div>
+
+            <h4>Retry Strategies</h4>
+            <div class="code-header">Python</div>
+            <pre><code>from tenacity import retry, stop_after_attempt, wait_exponential
+
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=4, max=60),
+    retry=retry_if_exception_type(requests.exceptions.RequestException)
+)
+def fetch_with_backoff(url):
+    """Retry with exponential backoff: 4s, 8s, 16s, 32s, 60s"""
+    return requests.get(url, timeout=10)</code></pre>
+
+            <h4>Dead Letter Queues (DLQ)</h4>
+            <p>When a record fails processing after all retries, send it to a DLQ instead of crashing the pipeline. Review DLQs manually.</p>
+            <div class="code-header">Python</div>
+            <pre><code>def process_record(record):
+    try:
+        transform(record)
+        load(record)
+    except Exception as e:
+        logger.error(f"Failed record: {record}, Error: {e}")
+        send_to_dlq(record, error=str(e))  # Save to file/DB for manual review</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Monitoring & Alerting</h2>
+            <p>You cannot improve what you don't measure. Production pipelines need observability.</p>
+            <ul>
+                <li><strong>SLA (Service Level Agreement):</strong> "Pipeline must finish by 7 PM ET." Airflow can alert if breached.</li>
+                <li><strong>Data Freshness:</strong> Alert if the latest record in the warehouse is > 24 hours old.</li>
+                <li><strong>Volume Anomalies:</strong> Alert if today's row count is ±30% from average (possible source issue).</li>
+                <li><strong>Schema Drift:</strong> Alert if new columns appear or expected columns disappear.</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Build a Mini Pipeline</h2>
+            <p>Since we can't run Airflow in Colab, we'll build a pure-Python DAG executor that demonstrates the concepts.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code>import time
+from datetime import datetime
+from typing import Callable, List, Dict
+
+class MiniPipeline:
+    def __init__(self, name: str):
+        self.name = name
+        self.tasks: Dict[str, Callable] = {}
+        self.dependencies: Dict[str, List[str]] = {}
+        self.results: Dict[str, any] = {}
+    
+    def add_task(self, name: str, func: Callable, depends_on: List[str] = None):
+        self.tasks[name] = func
+        self.dependencies[name] = depends_on or []
+    
+    def run(self):
+        print(f"🚀 Starting pipeline: {self.name}")
+        completed = set()
+        
+        while len(completed) < len(self.tasks):
+            ready = [
+                name for name in self.tasks 
+                if name not in completed 
+                and all(dep in completed for dep in self.dependencies[name])
+            ]
+            
+            for name in ready:
+                print(f"  ▶️ Running: {name}")
+                try:
+                    self.results[name] = self.tasks[name](self.results)
+                    completed.add(name)
+                    print(f"  ✅ Completed: {name}")
+                except Exception as e:
+                    print(f"  ❌ Failed: {name} — {e}")
+                    raise
+            
+            if not ready and len(completed) < len(self.tasks):
+                raise ValueError("Circular dependency detected!")
+        
+        print(f"🏁 Pipeline complete!")
+        return self.results
+
+# Define tasks
+def extract_prices(results):
+    time.sleep(1)
+    return {"prices": [150, 151, 152], "ticker": "AAPL"}
+
+def extract_fundamentals(results):
+    time.sleep(1)
+    return {"pe_ratio": 25.5, "sector": "Technology"}
+
+def transform(results):
+    time.sleep(0.5)
+    prices = results["extract_prices"]["prices"]
+    pe = results["extract_fundamentals"]["pe_ratio"]
+    return {"avg_price": sum(prices)/len(prices), "pe": pe}
+
+def load(results):
+    time.sleep(0.5)
+    print(f"    Loading: avg_price={results['transform']['avg_price']}, pe={results['transform']['pe']}")
+    return "loaded"
+
+# Build and run
+pipeline = MiniPipeline("daily_quant_etl")
+pipeline.add_task("extract_prices", extract_prices)
+pipeline.add_task("extract_fundamentals", extract_fundamentals)
+pipeline.add_task("transform", transform, depends_on=["extract_prices", "extract_fundamentals"])
+pipeline.add_task("load", load, depends_on=["transform"])
+
+pipeline.run()</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://airflow.apache.org/docs/apache-airflow/stable/tutorial/index.html" target="_blank">
+                    <div class="title">Airflow Tutorial</div>
+                    <div class="desc">Official tutorial for building your first DAG.</div>
+                </a>
+                <a class="resource-card" href="https://crontab.guru/" target="_blank">
+                    <div class="title">Crontab Guru</div>
+                    <div class="desc">Interactive cron expression editor.</div>
+                </a>
+                <a class="resource-card" href="https://docs.python.org/3/library/concurrent.futures.html" target="_blank">
+                    <div class="title">Python Concurrent Futures</div>
+                    <div class="desc">Parallel task execution without Airflow.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 6: QUANT ENGINEERING ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>📈 Quant Engineering: Production Data Systems</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Quantitative engineering is where data pipelines meet finance. This section bridges ETL concepts with 
+            the specific challenges of market data: survivorship bias, look-ahead bias, corporate actions, and real-time ingestion.
+        </p>
+
+        <div class="card">
+            <h2>Financial Data Specifics</h2>
+            
+            <h3>OHLCV: The Universal Bar Format</h3>
+            <p>Most price data arrives as OHLCV bars (Open, High, Low, Close, Volume). This is the atomic unit of market data.</p>
+            <div class="code-header">Schema</div>
+            <pre><code>timestamp (datetime) | open (float) | high (float) | low (float) | close (float) | volume (int)
+2024-01-15 09:30:00  | 150.00       | 152.50       | 149.80      | 151.20        | 45000000</code></pre>
+
+            <h3>Tick Data vs Aggregated Bars</h3>
+            <table>
+                <tr><th>Type</th><th>Granularity</th><th>Volume</th><th>Use Case</th></tr>
+                <tr><td>Tick/Trade</td><td>Individual trades</td><td>Massive (TBs)</td><td>Microstructure, HFT</td></tr>
+                <tr><td>1-minute</td><td>1-min OHLCV</td><td>Large (GBs)</td><td>Intraday strategies</td></tr>
+                <tr><td>Daily EOD</td><td>Daily OHLCV</td><td>Moderate (MBs)</td><td>Swing trading, factors</td></tr>
+                <tr><td>Weekly/Monthly</td><td>Aggregated</td><td>Small</td><td>Long-term models</td></tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>The Two Deadly Sins of Quant Data</h2>
+            
+            <h3>1. Look-Ahead Bias</h3>
+            <p>Using information that wasn't available at the time of the decision. This makes backtests unrealistically profitable.</p>
+            <div class="callout danger">
+                <strong>Example:</strong> You calculate today's return using today's close, then use that return as a feature to predict whether to buy at today's open. <strong>Impossible.</strong> You don't know the close until 4 PM.
+            </div>
+            <div class="code-header">Python: The Wrong Way</div>
+            <pre><code># WRONG: Using today's close to predict today's action
+df['return'] = df['close'].pct_change()
+df['signal'] = df['return'] > 0  # Uses future info!</code></pre>
+            <div class="code-header">Python: The Right Way</div>
+            <pre><code># CORRECT: Use yesterday's close for today's decision
+df['return'] = df['close'].pct_change()
+df['signal'] = df['return'].shift(1) > 0  # Lag by 1 period</code></pre>
+
+            <h3>2. Survivorship Bias</h3>
+            <p>Only analyzing stocks that still exist. Delisted companies (Enron, Lehman Brothers) are excluded, inflating historical performance.</p>
+            <div class="callout danger">
+                <strong>Example:</strong> You backtest a strategy on current S&P 500 constituents over the last 20 years. But the current S&P 500 companies are the winners. The losers were removed. Your strategy looks amazing because it only "traded" winners.
+            </div>
+            <div class="code-header">Solution: Point-in-Time Universe</div>
+            <pre><code># Maintain a historical membership table
+membership = pd.read_sql("""
+    SELECT ticker, date, is_member 
+    FROM sp500_membership 
+    WHERE date = '{as_of_date}'
+""", engine)
+
+# Only trade stocks that were in the index AT THAT TIME
+tradable = prices.merge(membership[membership['is_member']], on=['ticker', 'date'])</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>Corporate Actions & Adjustments</h2>
+            <p>Stock splits and dividends change the price but not the value. Raw prices are misleading for historical analysis.</p>
+            
+            <h4>Split Example</h4>
+            <p>AAPL did a 4:1 split in Aug 2020. The price dropped from ~$500 to ~$125. Without adjustment, it looks like a 75% crash.</p>
+            
+            <h4>Dividend Adjustment</h4>
+            <p>When a $1 dividend is paid, the stock drops by $1 at open. Adjusted prices subtract dividends to show true total return.</p>
+            
+            <div class="code-header">Python: Using Adjusted Close</div>
+            <pre><code>import yfinance as yf
+
+# Always use adjusted prices for backtests
+df = yf.Ticker("AAPL").history(period="5y")
+
+# 'Close' = raw price (unadjusted)
+# 'Adj Close' = adjusted for splits and dividends
+df['return'] = df['Adj Close'].pct_change()  # Correct for total return</code></pre>
+
+            <div class="callout warning">
+                <strong>Important:</strong> Adjusted prices are backward-adjusted. A split today changes all historical prices. If you save prices daily, you must <strong>re-adjust historical data</strong> after every corporate action.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Real-Time vs Batch Pipelines</h2>
+            
+            <div class="two-col">
+                <div>
+                    <h4>Batch Pipelines</h4>
+                    <ul>
+                        <li>Run on schedule (hourly, daily)</li>
+                        <li>Process large chunks</li>
+                        <li>Higher latency acceptable</li>
+                        <li>Example: End-of-day factor calculation</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Streaming/Real-Time</h4>
+                    <ul>
+                        <li>Process events as they arrive</li>
+                        <li>Low latency (milliseconds)</li>
+                        <li>Complex state management</li>
+                        <li>Example: Live trading signal generation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Streaming Architecture (Conceptual)</h4>
+            <div class="diagram">
+                <div class="flow-container">
+                    <div class="flow-box danger">Exchange<br>Feed</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Kafka<br>Topic</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box secondary">Stream<br>Processor</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box accent">Time-Series<br>DB</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box warning">Trading<br>Engine</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Data Quality for Quantitative Analysis</h2>
+            <p>Bad data is worse than no data. It gives you false confidence.</p>
+            
+            <h4>Automated Quality Checks</h4>
+            <div class="code-header">Python</div>
+            <pre><code>def quant_data_quality_checks(df: pd.DataFrame) -> Dict[str, bool]:
+    results = {}
+    
+    # 1. No gaps in trading days (for daily data)
+    trading_days = pd.bdate_range(df['date'].min(), df['date'].max())
+    missing_days = set(trading_days) - set(df['date'])
+    results['no_gaps'] = len(missing_days) <= 3  # Allow some holidays
+    
+    # 2. Price consistency: high >= low, close in range
+    results['ohl_consistency'] = (
+        (df['high'] >= df['low']).all() and
+        (df['close'] <= df['high']).all() and
+        (df['close'] >= df['low']).all()
+    )
+    
+    # 3. Volume is positive
+    results['positive_volume'] = (df['volume'] > 0).all()
+    
+    # 4. No duplicate timestamps
+    results['unique_timestamps'] = df['date'].is_unique
+    
+    # 5. Returns within reasonable bounds (±50% daily is suspicious)
+    returns = df['close'].pct_change().abs()
+    results['reasonable_returns'] = returns.max() < 0.50
+    
+    # 6. Price > 0 (stocks can't have zero/negative price)
+    results['positive_prices'] = (df[['open','high','low','close']] > 0).all().all()
+    
+    return results</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Colab Experiment: Point-in-Time Backtest Data</h2>
+            <p>Build a pipeline that simulates a point-in-time dataset — the gold standard for quant research.</p>
+            <div class="code-header">Google Colab</div>
+            <pre><code># Cell 1: Setup
+!pip install yfinance --quiet
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+# Cell 2: Fetch multiple tickers
+tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
+all_data = []
+
+for t in tickers:
+    df = yf.Ticker(t).history(period="2y").reset_index()
+    df['ticker'] = t
+    df.columns = [c.lower().replace(' ', '_') for c in df.columns]
+    all_data.append(df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume']])
+
+prices = pd.concat(all_data, ignore_index=True)
+prices['date'] = pd.to_datetime(prices['date']).dt.tz_localize(None)
+
+# Cell 3: Create a point-in-time signal (momentum)
+# CRITICAL: shift(1) prevents look-ahead bias!
+prices = prices.sort_values(['ticker', 'date'])
+prices['return_20d'] = prices.groupby('ticker')['close'].pct_change(20)
+prices['momentum_signal'] = prices.groupby('ticker')['return_20d'].shift(1)
+
+# Cell 4: Simulate monthly rebalancing
+prices['year_month'] = prices['date'].dt.to_period('M')
+monthly = prices.groupby(['ticker', 'year_month']).last().reset_index()
+
+# Cell 5: Rank by momentum each month (point-in-time!)
+monthly['rank'] = monthly.groupby('year_month')['momentum_signal'].rank(ascending=False)
+
+# Cell 6: Select top 2 stocks each month
+portfolio = monthly[monthly['rank'] <= 2][['year_month', 'ticker', 'rank', 'momentum_signal']]
+print(portfolio.tail(10))
+
+# Cell 7: Verify no look-ahead
+# The signal should be NaN for the first month (no history)
+print(f"\nNaN signals (expected): {portfolio['momentum_signal'].isna().sum()}")
+print(f"Look-ahead check passed: {(portfolio.groupby('year_month')['rank'].nunique() <= 5).all()}")</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>📖 External Resources</h2>
+            <div class="resource-grid">
+                <a class="resource-card" href="https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-I/" target="_blank">
+                    <div class="title">QuantStart: Backtesting</div>
+                    <div class="desc">Deep dive into look-ahead bias, survivorship bias, and execution.</div>
+                </a>
+                <a class="resource-card" href="https://www.investopedia.com/terms/s/stocksplit.asp" target="_blank">
+                    <div class="title">Investopedia: Stock Splits</div>
+                    <div class="desc">How splits work and why adjusted prices matter.</div>
+                </a>
+                <a class="resource-card" href="https://docs.timescale.com/" target="_blank">
+                    <div class="title">TimescaleDB Docs</div>
+                    <div class="desc">Time-series database optimized for financial data.</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TAB 7: PRACTICE LABS ==================== -->
+<div class="tab-content">
+    <div class="container">
+        <h1>🧪 Practice Labs</h1>
+        <p style="font-size:1.1rem; color:var(--text-secondary); margin-bottom:2rem;">
+            Theory without practice is useless. These exercises progress from "hello world" to production-grade challenges. 
+            Do them in Google Colab. Solutions are not provided — struggle is part of learning.
+        </p>
+
+        <!-- APIs EXERCISES -->
+        <div class="card">
+            <h2>🔌 APIs: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: Basic API Fetch</h4>
+                <p>Use <code>requests</code> to fetch the current price of Bitcoin from the CoinGecko API (free, no key needed). Parse the JSON and print the price in USD.</p>
+                <p><strong>Hint:</strong> Endpoint is <code>https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd</code></p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: Error Handling</h4>
+                <p>Write a function <code>safe_get(url)</code> that returns the JSON response if status is 200, returns <code>None</code> for 404, and retries up to 3 times for 500 errors with a 2-second sleep between retries.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Paginated Extractor</h4>
+                <p>Using the JSONPlaceholder API (<code>https://jsonplaceholder.typicode.com/posts</code>), write a function that fetches ALL posts using query parameter <code>_page</code> and <code>_limit=10</code>. Stop when a page returns empty. Return a single list of all posts.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Rate-Limited Multi-Ticker Fetch</h4>
+                <p>Fetch 1 year of daily data for 5 tickers (AAPL, MSFT, GOOGL, AMZN, META) using <code>yfinance</code>. Add a 1-second sleep between each ticker request to simulate rate limiting. Combine into one DataFrame with a 'ticker' column.</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: Resilient API Client Class</h4>
+                <p>Build a class <code>ResilientAPIClient</code> with:</p>
+                <ul>
+                    <li>Configurable base URL and API key</li>
+                    <li>Automatic retry with exponential backoff (max 5 retries)</li>
+                    <li>Rate limiting (configurable requests per second)</li>
+                    <li>Logging of every request (URL, status, duration)</li>
+                    <li>A <code>get_prices(symbol, start, end)</code> method that returns a DataFrame</li>
+                </ul>
+                <p>Test it against Alpha Vantage or Polygon.io free tier.</p>
+            </div>
+        </div>
+
+        <!-- EXTRACT EXERCISES -->
+        <div class="card">
+            <h2>📥 Extract: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: CSV to DataFrame</h4>
+                <p>Create a CSV file with columns <code>date,ticker,price</code> containing 5 rows of fake stock data. Read it with Pandas, parse dates, and print the DataFrame info.</p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: SQLite Extract</h4>
+                <p>Create an in-memory SQLite database, insert 10 rows into a <code>prices</code> table, then extract them back into a Pandas DataFrame using <code>pd.read_sql</code>.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Incremental Extract Simulator</h4>
+                <p>Simulate an incremental extract. Create a DataFrame with dates from Jan 1-15. Save a "watermark" file containing the max date. Now simulate new data (Jan 16-20). Write a function that reads the watermark, only extracts dates > watermark, appends to existing data, and updates the watermark.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Multi-Format Extractor</h4>
+                <p>Write a function <code>universal_extract(path)</code> that detects the file type (.csv, .json, .parquet, .xlsx) and returns a DataFrame. Handle errors gracefully for unsupported formats.</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: Parallel API Extractor</h4>
+                <p>Fetch daily prices for 20 tickers using <code>concurrent.futures.ThreadPoolExecutor</code> with a max of 5 concurrent workers. Combine all results into one DataFrame. Add a global rate limit of 5 requests per second across all workers.</p>
+            </div>
+        </div>
+
+        <!-- TRANSFORM EXERCISES -->
+        <div class="card">
+            <h2>⚙️ Transform: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: Clean a Messy Dataset</h4>
+                <p>Create a DataFrame with nulls, duplicate rows, and a 'price' column stored as strings with '$' symbols (e.g., '$150.75'). Clean it: remove duplicates, handle nulls with forward fill, strip '$' and convert to float.</p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: Calculate Returns</h4>
+                <p>Given a DataFrame with a 'close' price column, add columns for: simple daily return, log return, and cumulative return. Ensure no look-ahead bias.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Sector-Neutral Ranking</h4>
+                <p>Using a DataFrame with columns <code>ticker, sector, date, return_20d</code>, create a new column <code>sector_rank</code> that ranks each stock within its sector by 20-day return (1 = best in sector). Use <code>groupby</code> and <code>rank</code>.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Technical Indicator Pipeline</h4>
+                <p>Write a function <code>add_technicals(df)</code> that adds: 20-day SMA, 14-day RSI, and 20-day Bollinger Bands (upper/lower = SMA ± 2*std). The function should handle the first 20 rows gracefully (NaN is acceptable).</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: Corporate Action Adjuster</h4>
+                <p>Given a DataFrame of raw prices and a separate DataFrame of corporate actions (columns: <code>ticker, date, action_type, ratio</code> where action_type is 'split' or 'dividend'), write a function that returns adjusted prices. For splits, divide pre-split prices by ratio. For dividends, subtract dividend from pre-dividend closes.</p>
+            </div>
+        </div>
+
+        <!-- LOAD EXERCISES -->
+        <div class="card">
+            <h2>📤 Load: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: DataFrame to SQL</h4>
+                <p>Create a DataFrame with 5 rows of price data. Load it into an SQLite in-memory database table called <code>prices</code>. Then read it back and verify the row count matches.</p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: Partitioned Parquet</h4>
+                <p>Create a DataFrame with 30 days of data for 2 tickers. Write it to Parquet partitioned by <code>ticker</code> and <code>year_month</code>. Verify the directory structure was created correctly.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Upsert Implementation</h4>
+                <p>Implement an upsert function for SQLite that takes a DataFrame and table name. If a row with the same primary key (ticker, date) exists, update it. If not, insert it. Do not use <code>to_sql</code> with <code>if_exists='replace'</code>.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Batch Loading with Progress</h4>
+                <p>Write a function that loads a large DataFrame (100,000 rows) into SQLite in batches of 1,000 rows. Print progress every batch. Measure and print total time taken.</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: SCD Type 2 Loader</h4>
+                <p>Implement a Slowly Changing Dimension Type 2 loader. Given a DataFrame of current company attributes and an existing SCD table with <code>effective_date</code> and <code>expiry_date</code>, write a function that:</p>
+                <ul>
+                    <li>Expires current records that changed</li>
+                    <li>Inserts new records with <code>effective_date = today</code> and <code>expiry_date = 9999-12-31</code></li>
+                    <li>Leaves unchanged records alone</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- PIPELINE EXERCISES -->
+        <div class="card">
+            <h2>🔄 Pipelines: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: Simple DAG</h4>
+                <p>Using the <code>MiniPipeline</code> class from the Colab experiment (or write your own), create a DAG with 3 tasks: <code>extract</code> → <code>transform</code> → <code>load</code>. Each task should print its name and sleep for 1 second. Run it and verify execution order.</p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: Cron Parser</h4>
+                <p>Write a function <code>is_market_hours(cron_expr)</code> that returns True if the cron expression represents a time between 9:30 AM and 4:00 PM on weekdays. Test with <code>0 10 * * 1-5</code> (True) and <code>0 17 * * 1-5</code> (False).</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Retry Decorator</h4>
+                <p>Write a Python decorator <code>@retry_on_error(max_retries=3, delay=2)</code> that wraps any function. If the function raises an exception, it should retry up to <code>max_retries</code> times with <code>delay</code> seconds between attempts. If all retries fail, raise the last exception.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Idempotency Check</h4>
+                <p>Write a data loading function that is idempotent. Given a DataFrame and a SQLite connection, the function should load data such that running it twice produces the exact same table state as running it once. Use a unique constraint and appropriate SQL logic.</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: Mini Airflow</h4>
+                <p>Extend the <code>MiniPipeline</code> class to support:</p>
+                <ul>
+                    <li>Parallel execution of independent tasks (use <code>ThreadPoolExecutor</code>)</li>
+                    <li>Task timeouts (cancel if running > 30 seconds)</li>
+                    <li>Failure handling: if a task fails, don't run downstream tasks</li>
+                    <li>Result passing: tasks can access results of upstream tasks</li>
+                </ul>
+                <p>Test with a DAG that has 2 parallel extracts feeding into 1 transform.</p>
+            </div>
+        </div>
+
+        <!-- QUANT EXERCISES -->
+        <div class="card">
+            <h2>📈 Quant Engineering: Exercises</h2>
+            
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E1: Look-Ahead Detector</h4>
+                <p>Given a DataFrame with 'date' and 'close', write a function that detects look-ahead bias in a 'signal' column. A signal has look-ahead bias if it uses data from the same row or future rows (e.g., signal = close > open uses same-day close). Return True/False.</p>
+            </div>
+
+            <div class="exercise">
+                <span class="tier-badge easy">Easy</span>
+                <h4>E2: Data Gap Detector</h4>
+                <p>Write a function that takes a daily price DataFrame and returns a list of missing trading dates. Use <code>pd.bdate_range</code> to generate expected dates. Exclude known holidays (New Year's, July 4th, Christmas).</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M1: Survivorship-Free Backtest Dataset</h4>
+                <p>Fetch 2 years of data for current S&P 500 constituents using yfinance. Now simulate survivorship bias by only keeping tickers that are currently in the S&P 500. Calculate the average return of this "biased" universe. Then research and list 3 companies that were in the S&P 500 2 years ago but aren't now.</p>
+            </div>
+
+            <div class="exercise medium">
+                <span class="tier-badge medium">Medium</span>
+                <h4>M2: Real-Time Stream Simulator</h4>
+                <p>Write a generator function <code>tick_stream()</code> that yields one fake tick every 0.1 seconds: <code>{'timestamp': ..., 'price': ..., 'volume': ...}</code>. Write a consumer that maintains a running 1-minute VWAP (Volume Weighted Average Price) and prints it every 10 ticks.</p>
+            </div>
+
+            <div class="exercise hard">
+                <span class="tier-badge hard">Hard</span>
+                <h4>H1: Production-Grade Quant ETL</h4>
+                <p>Build a complete ETL pipeline in a single Colab notebook that:</p>
+                <ul>
+                    <li><strong>Extracts:</strong> 1 year of daily data for 10 tickers from yfinance</li>
+                    <li><strong>Transforms:</strong> Calculates adjusted returns, 20-day momentum, volatility, and a simple RSI</li>
+                    <li><strong>Loads:</strong> Stores in SQLite with proper schema, indexes, and SCD Type 2 for ticker metadata</li>
+                    <li><strong>Validates:</strong> Runs all quant data quality checks (no gaps, positive prices, reasonable returns)</li>
+                    <li><strong>Reports:</strong> Generates a summary: total rows, date range, null counts, and top 5 momentum stocks as of last date</li>
+                </ul>
+                <p>The entire pipeline should be idempotent and log every step.</p>
+            </div>
+        </div>
+
+        <div class="card" style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);">
+            <h2>🏁 Final Project: Capstone</h2>
+            <p style="font-size:1.05rem;">Combine everything. Build a <strong>Daily Market Data Pipeline</strong> that:</p>
+            <ol>
+                <li>Runs automatically (simulate with a loop or scheduler)</li>
+                <li>Fetches prices for a universe of 50 stocks</li>
+                <li>Handles API failures gracefully</li>
+                <li>Transforms into analytics-ready features</li>
+                <li>Loads into a local database with upsert logic</li>
+                <li>Emails/SMS alerts if data quality checks fail</li>
+                <li>Produces a daily report: market overview, top movers, volatility regime</li>
+            </ol>
+            <p>This is your portfolio piece. Document it, put it on GitHub, and explain your design decisions in the README.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(n) {
+    document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === n));
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>
