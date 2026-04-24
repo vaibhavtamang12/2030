@@ -1,0 +1,2846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Study Guide: Backtesting & Strategy Development</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --text: #212529;
+    --text-muted: #6c757d;
+    --primary: #0056b3;
+    --primary-light: #e7f1ff;
+    --secondary: #6c757d;
+    --accent: #198754;
+    --accent-light: #d1e7dd;
+    --warning: #ffc107;
+    --warning-light: #fff3cd;
+    --danger: #dc3545;
+    --danger-light: #f8d7da;
+    --border: #dee2e6;
+    --code-bg: #f4f4f4;
+    --font-body: Georgia, "Times New Roman", serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  header {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+    color: white;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    border-bottom: 4px solid var(--primary);
+  }
+  header h1 { margin: 0; font-size: 2.2rem; letter-spacing: -0.5px; }
+  header p { margin: 0.5rem 0 0; opacity: 0.9; font-size: 1.1rem; }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 1rem 0.5rem;
+    background: #fff;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .tab-btn:hover { background: var(--primary-light); color: var(--primary); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .tab-content { display: none; animation: fadeIn 0.4s; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+  h2 { color: var(--primary); font-size: 1.8rem; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { color: #1b263b; font-size: 1.4rem; margin-top: 2rem; }
+  h4 { color: #34495e; font-size: 1.15rem; margin-top: 1.5rem; }
+  .card {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid var(--border);
+  }
+  .definition {
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .warning {
+    background: var(--warning-light);
+    border-left: 4px solid var(--warning);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .danger {
+    background: var(--danger-light);
+    border-left: 4px solid var(--danger);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .tip {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  code {
+    font-family: var(--font-mono);
+    background: var(--code-bg);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #c7254e;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  .formula {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    margin: 0.5rem 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .tabs { position: relative; }
+  }
+  .exercise-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+  }
+  .exercise-box.easy { border-top: 4px solid var(--accent); }
+  .exercise-box.medium { border-top: 4px solid var(--warning); }
+  .exercise-box.hard { border-top: 4px solid var(--danger); }
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+  .tag.easy { background: var(--accent-light); color: var(--accent); }
+  .tag.medium { background: var(--warning-light); color: #856404; }
+  .tag.hard { background: var(--danger-light); color: var(--danger); }
+  ul, ol { padding-left: 1.5rem; }
+  li { margin: 0.4rem 0; }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .svg-center { display: block; margin: 1.5rem auto; max-width: 100%; }
+  .resource-link { display: block; padding: 0.4rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: left; }
+  th { background: var(--primary-light); }
+  .roadmap-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .roadmap-num {
+    background: var(--primary);
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; flex-shrink: 0;
+  }
+  .roadmap-content h4 { margin: 0 0 0.3rem; }
+  .roadmap-content p { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>Quant Engineer Study Guide</h1>
+  <p>Backtesting & Strategy Development — A Complete Offline Reference for First-Time Learners</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab(event, 'tab-roadmap')">🏁 Start Here</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-data')">📊 Data & Returns</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-indicators')">📈 Indicators</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-strategy')">🎯 Strategy Design</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-vectorized')">🔄 Vectorized BT</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-event')">⚡ Event-Driven BT</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-metrics')">📉 Performance</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-risk')">🛡️ Risk Management</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-bias')">🧪 Bias & Overfitting</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-walkforward')">🔬 Optimization</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-execution')">⚙️ Execution</button>
+  <button class="tab-btn" onclick="openTab(event, 'tab-colab')">🧪 Colab Labs</button>
+</div>
+
+<div class="container">
+
+<!-- ==================== TAB: START HERE ==================== -->
+<div id="tab-roadmap" class="tab-content active">
+  <h2>🏁 Start Here: Prerequisites & Roadmap</h2>
+  <p>Before you write your first backtest, you need a foundation. This section explains the <strong>prerequisite knowledge</strong> in plain English. Each concept below is required for at least one later topic, so do not skip.</p>
+
+  <div class="roadmap-item">
+    <div class="roadmap-num">1</div>
+    <div class="roadmap-content">
+      <h4>Python Programming Basics</h4>
+      <p>Python is the standard language of quantitative finance. You need variables, loops, functions, and basic object-oriented programming (classes). You do not need to be a software engineer, but you must be comfortable reading and writing code.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Key Concepts</h4>
+    <ul>
+      <li><strong>Variables & Types:</strong> <code>price = 100.5</code> (float), <code>symbol = "AAPL"</code> (string), <code>is_long = True</code> (boolean).</li>
+      <li><strong>Lists & Dictionaries:</strong> Lists store ordered data. Dictionaries store key-value pairs (e.g., <code>{"AAPL": 150.0, "TSLA": 200.0}</code>).</li>
+      <li><strong>Functions:</strong> Reusable blocks of code. <code>def calculate_return(p1, p2): return (p2-p1)/p1</code></li>
+      <li><strong>Classes:</strong> Templates for objects. In event-driven backtesting, everything is an object (Strategy, Portfolio, Execution).</li>
+    </ul>
+    <div class="definition">
+      <strong>Analogy:</strong> A Python <em>class</em> is like a blueprint for a house. The <em>object</em> is the actual house built from that blueprint. You build many houses (objects) from one blueprint (class).
+    </div>
+  </div>
+
+  <div class="roadmap-item">
+    <div class="roadmap-num">2</div>
+    <div class="roadmap-content">
+      <h4>NumPy & Pandas</h4>
+      <p>These libraries are the Excel of Python. NumPy handles fast numerical arrays. Pandas handles tabular data with row labels (dates) and column labels (Open, High, Low, Close).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>What You Must Know</h4>
+    <ul>
+      <li><strong>NumPy Array:</strong> A grid of numbers. Operations happen on the entire grid at once (vectorization). <code>prices = np.array([100, 101, 102]); returns = prices[1:] / prices[:-1] - 1</code></li>
+      <li><strong>Pandas DataFrame:</strong> A table. Each column is a Series. <code>df["Close"]</code> gives you the closing prices.</li>
+      <li><strong>Indexing:</strong> <code>.loc["2023-01-01"]</code> selects by label. <code>.iloc[0]</code> selects by position.</li>
+      <li><strong>Time Index:</strong> Financial data is always ordered by time. <code>pd.to_datetime()</code> converts strings to dates.</li>
+    </ul>
+    <div class="tip">
+      <strong>Pro Tip:</strong> In quant finance, <em>vectorization</em> means performing an operation on an entire array at once instead of looping row-by-row. It is 10-100x faster and essential for backtesting.
+    </div>
+  </div>
+
+  <div class="roadmap-item">
+    <div class="roadmap-num">3</div>
+    <div class="roadmap-content">
+      <h4>Basic Statistics & Probability</h4>
+      <p>Trading is about making decisions under uncertainty. Statistics gives you the language to describe uncertainty.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Core Statistical Ideas</h4>
+    <ul>
+      <li><strong>Mean (Average):</strong> The central tendency. <code>mean_return = returns.mean()</code></li>
+      <li><strong>Standard Deviation (Volatility):</strong> How much values spread around the mean. This is the most common measure of risk.</li>
+      <li><strong>Normal Distribution:</strong> The bell curve. Many models assume returns are normally distributed, though real returns have "fat tails" (extreme events are more likely than the bell curve predicts).</li>
+      <li><strong>Correlation:</strong> A number between -1 and 1 describing how two assets move together. Diversification works because correlations are less than 1.</li>
+      <li><strong>Percentiles:</strong> The 95th percentile of losses is used in Value-at-Risk (VaR).</li>
+    </ul>
+    <div class="formula">
+      Standard Deviation: σ = sqrt( Σ(xᵢ - μ)² / (N-1) )
+    </div>
+    <div class="definition">
+      <strong>Analogy:</strong> If the mean return is your "expected destination," standard deviation is the "average wrongness" of your GPS. A high standard deviation means your actual path wanders far from the expected path.
+    </div>
+  </div>
+
+  <div class="roadmap-item">
+    <div class="roadmap-num">4</div>
+    <div class="roadmap-content">
+      <h4>Financial Market Basics</h4>
+      <p>You cannot backtest what you do not understand. Learn how markets are structured and what data looks like.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Market Structure & Data</h4>
+    <ul>
+      <li><strong>Stock / Equity:</strong> A share of ownership in a company.</li>
+      <li><strong>Long Position:</strong> You profit if the price goes up. You buy first, sell later.</li>
+      <li><strong>Short Position:</strong> You profit if the price goes down. You borrow and sell first, buy back later.</li>
+      <li><strong>OHLCV:</strong> Every bar of market data contains <strong>O</strong>pen (first trade price), <strong>H</strong>igh (highest price), <strong>L</strong>ow (lowest price), <strong>C</strong>lose (last trade price), and <strong>V</strong>olume (number of shares traded).</li>
+      <li><strong>Bid-Ask Spread:</strong> The gap between what buyers are willing to pay (bid) and what sellers demand (ask). This is a hidden transaction cost.</li>
+      <li><strong>Adjusted Close:</strong> The closing price corrected for stock splits and dividends. Always use Adjusted Close for total return calculations.</li>
+    </ul>
+
+    <svg class="svg-center" width="320" height="220" viewBox="0 0 320 220">
+      <rect x="20" y="20" width="280" height="180" rx="8" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+      <text x="160" y="45" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">OHLC Candlestick Anatomy</text>
+      <!-- Wick -->
+      <line x1="160" y1="70" x2="160" y2="170" stroke="#333" stroke-width="2"/>
+      <!-- Body -->
+      <rect x="145" y="90" width="30" height="60" fill="#198754" stroke="#333" stroke-width="1.5"/>
+      <!-- Labels -->
+      <text x="130" y="75" text-anchor="end" font-size="12" fill="#333">High</text>
+      <line x1="132" y1="72" x2="145" y2="72" stroke="#999" stroke-width="1"/>
+      <text x="130" y="95" text-anchor="end" font-size="12" fill="#333">Open</text>
+      <line x1="132" y1="92" x2="145" y2="92" stroke="#999" stroke-width="1"/>
+      <text x="190" y="155" text-anchor="start" font-size="12" fill="#333">Close</text>
+      <line x1="175" y1="152" x2="188" y2="152" stroke="#999" stroke-width="1"/>
+      <text x="190" y="175" text-anchor="start" font-size="12" fill="#333">Low</text>
+      <line x1="175" y1="172" x2="188" y2="172" stroke="#999" stroke-width="1"/>
+      <text x="160" y="200" text-anchor="middle" font-size="11" fill="#6c757d">Green = Close &gt; Open (Bullish)</text>
+    </svg>
+  </div>
+
+  <div class="roadmap-item">
+    <div class="roadmap-num">5</div>
+    <div class="roadmap-content">
+      <h4>Returns & Time Value</h4>
+      <p>The building block of every strategy is the <em>return</em>—how much money you made or lost.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Simple vs. Log Returns</h4>
+    <p><strong>Simple Return:</strong> The percentage change in price. This is intuitive.</p>
+    <div class="formula">Rₜ = (Pₜ − Pₜ₋₁) / Pₜ₋₁</div>
+    <p><strong>Log Return (Continuously Compounded):</strong> The natural log of the price ratio. This is mathematically convenient.</p>
+    <div class="formula">rₜ = ln(Pₜ / Pₜ₋₁)</div>
+    <div class="tip">
+      <strong>Why Log Returns?</strong> Log returns are <em>time-additive</em>. If you know 10 daily log returns, you can sum them to get the 10-day log return. You cannot do this with simple returns. This makes portfolio math and backtesting much cleaner.
+    </div>
+    <p><strong>Annualization:</strong> To compare strategies, we annualize metrics.</p>
+    <ul>
+      <li>Annualized Return = Daily Return × 252 (trading days per year)</li>
+      <li>Annualized Volatility = Daily Volatility × √252</li>
+    </ul>
+  </div>
+
+  <h3>🗺️ Learning Roadmap</h3>
+  <p>Follow the tabs in order from left to right. Each tab depends on the previous ones:</p>
+  <ol>
+    <li><strong>Data & Returns</strong> → Understand the raw material.</li>
+    <li><strong>Indicators</strong> → Transform price into actionable signals.</li>
+    <li><strong>Strategy Design</strong> → Combine indicators into rules.</li>
+    <li><strong>Vectorized Backtesting</strong> → Test rules quickly on history.</li>
+    <li><strong>Event-Driven Backtesting</strong> → Test rules realistically.</li>
+    <li><strong>Performance Metrics</strong> → Measure if the strategy is good.</li>
+    <li><strong>Risk Management</strong> → Prevent ruin.</li>
+    <li><strong>Bias & Overfitting</strong> → Ensure your result is real, not luck.</li>
+    <li><strong>Optimization</strong> → Find parameters without curve-fitting.</li>
+    <li><strong>Execution</strong> → Model real-world costs and frictions.</li>
+  </ol>
+
+  <h3>📚 External Resources (Prerequisites)</h3>
+  <div class="card">
+    <a class="resource-link" href="https://docs.python.org/3/tutorial/" target="_blank">📖 Python Official Tutorial — Learn the language syntax</a>
+    <a class="resource-link" href="https://pandas.pydata.org/docs/getting_started/index.html" target="_blank">📖 Pandas Getting Started — Master DataFrames</a>
+    <a class="resource-link" href="https://www.khanacademy.org/math/statistics-probability" target="_blank">📖 Khan Academy: Statistics & Probability — Free, visual, and thorough</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/o/ohlc.asp" target="_blank">📖 Investopedia: OHLC Definition — Market data basics</a>
+    <a class="resource-link" href="https://seeing-theory.brown.edu/" target="_blank">🌐 Seeing Theory (Brown University) — Interactive probability visualizations</a>
+  </div>
+
+  <h3>📝 Exercises: Prerequisites</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Write a Python function that takes two prices and returns the simple percentage return.</li>
+      <li>Create a Pandas DataFrame with columns "Open", "High", "Low", "Close" and 5 rows of fake stock data.</li>
+      <li>Calculate the mean and standard deviation of this list: <code>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</code> using NumPy.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Generate 252 random returns from a normal distribution (mean=0.0005, std=0.02). Convert them into a price series starting at $100.</li>
+      <li>Write a function that calculates both simple and log returns from a price Series. Verify that the sum of log returns approximately equals the log of the total simple return.</li>
+      <li>Create a dictionary mapping 5 stock tickers to random prices. Write a loop that prints each ticker and its price.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Implement a mini-class <code>StockData</code> that stores OHLCV data and has methods <code>get_returns()</code> and <code>get_volatility(window)</code>.</li>
+      <li>Simulate two correlated price series using Cholesky decomposition. Plot their paths.</li>
+      <li>Write a function that detects missing dates in a daily time series and fills them using forward-fill.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: DATA & RETURNS ==================== -->
+<div id="tab-data" class="tab-content">
+  <h2>📊 Financial Data & Returns</h2>
+  <p>Every backtest begins with data. Garbage in, garbage out. This section teaches you how financial data is structured, how to clean it, and how to compute the returns that every strategy depends on.</p>
+
+  <h3>The Structure of Market Data</h3>
+  <p>Market data comes in <strong>bars</strong> (also called candles or OHLCV). A daily bar summarizes one trading day. A 1-minute bar summarizes one minute.</p>
+
+  <div class="card">
+    <h4>OHLCV Deep Dive</h4>
+    <table>
+      <tr><th>Field</th><th>Meaning</th><th>Why It Matters</th></tr>
+      <tr><td><strong>Open</strong></td><td>First traded price of the period</td><td>Often used as the execution price in backtests because you cannot trade at the prior close without lookahead bias.</td></tr>
+      <tr><td><strong>High</strong></td><td>Highest price during the period</td><td>Used for stop-loss and limit order simulations.</td></tr>
+      <tr><td><strong>Low</strong></td><td>Lowest price during the period</td><td>Used for stop-loss and limit order simulations.</td></tr>
+      <tr><td><strong>Close</strong></td><td>Last traded price of the period</td><td>Most commonly used for signal generation.</td></tr>
+      <tr><td><strong>Volume</strong></td><td>Number of shares/contracts traded</td><td>Liquidity proxy. Low volume means higher slippage.</td></tr>
+    </table>
+    <div class="warning">
+      <strong>Adjusted Close vs. Close:</strong> <em>Close</em> is the raw last price. <em>Adjusted Close</em> corrects for stock splits and dividends. If a stock splits 2-for-1, the price drops by half, but you now own twice as many shares. Using unadjusted Close will show a fake 50% crash. <strong>Always use Adjusted Close for total return calculations.</strong>
+    </div>
+  </div>
+
+  <svg class="svg-center" width="600" height="280" viewBox="0 0 600 280">
+    <rect x="10" y="10" width="580" height="260" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Daily Bar Data Flow</text>
+    <!-- Timeline -->
+    <line x1="50" y1="220" x2="550" y2="220" stroke="#333" stroke-width="2"/>
+    <!-- Day 1 -->
+    <line x1="100" y1="180" x2="100" y2="80" stroke="#333" stroke-width="2"/>
+    <rect x="90" y="120" width="20" height="40" fill="#dc3545" stroke="#333" stroke-width="1.5"/>
+    <text x="100" y="240" text-anchor="middle" font-size="11" fill="#333">Day 1</text>
+    <text x="70" y="100" text-anchor="middle" font-size="10" fill="#333">High</text>
+    <text x="70" y="170" text-anchor="middle" font-size="10" fill="#333">Low</text>
+    <!-- Day 2 -->
+    <line x1="200" y1="190" x2="200" y2="70" stroke="#333" stroke-width="2"/>
+    <rect x="190" y="100" width="20" height="50" fill="#198754" stroke="#333" stroke-width="1.5"/>
+    <text x="200" y="240" text-anchor="middle" font-size="11" fill="#333">Day 2</text>
+    <!-- Day 3 -->
+    <line x1="300" y1="185" x2="300" y2="90" stroke="#333" stroke-width="2"/>
+    <rect x="290" y="130" width="20" height="30" fill="#198754" stroke="#333" stroke-width="1.5"/>
+    <text x="300" y="240" text-anchor="middle" font-size="11" fill="#333">Day 3</text>
+    <!-- Day 4 -->
+    <line x1="400" y1="195" x2="400" y2="60" stroke="#333" stroke-width="2"/>
+    <rect x="390" y="80" width="20" height="60" fill="#dc3545" stroke="#333" stroke-width="1.5"/>
+    <text x="400" y="240" text-anchor="middle" font-size="11" fill="#333">Day 4</text>
+    <!-- Day 5 -->
+    <line x1="500" y1="175" x2="500" y2="85" stroke="#333" stroke-width="2"/>
+    <rect x="490" y="110" width="20" height="45" fill="#198754" stroke="#333" stroke-width="1.5"/>
+    <text x="500" y="240" text-anchor="middle" font-size="11" fill="#333">Day 5</text>
+    <text x="300" y="265" text-anchor="middle" font-size="11" fill="#6c757d">Time →</text>
+  </svg>
+
+  <h3>Computing Returns</h3>
+  <p>Returns are the raw material of every backtest. There are two types you must master.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Simple Returns</h4>
+      <div class="formula">Rₜ = (Pₜ − Pₜ₋₁) / Pₜ₋₁</div>
+      <p>Intuitive and easy to understand. If you bought at $100 and sold at $105, your simple return is 5%.</p>
+      <p><strong>Use case:</strong> Reporting performance to humans.</p>
+      <pre><code># Simple returns in Pandas
+returns = df["Adj Close"].pct_change()</code></pre>
+    </div>
+    <div class="card">
+      <h4>Log Returns</h4>
+      <div class="formula">rₜ = ln(Pₜ / Pₜ₋₁)</div>
+      <p>Less intuitive but mathematically superior. Log returns assume continuous compounding.</p>
+      <p><strong>Use case:</strong> Statistical modeling, portfolio math, and backtesting engines.</p>
+      <pre><code># Log returns in Pandas
+import numpy as np
+log_returns = np.log(df["Adj Close"] / df["Adj Close"].shift(1))</code></pre>
+    </div>
+  </div>
+
+  <div class="tip">
+    <strong>Key Property:</strong> Log returns are additive across time. The log return over 10 days is the <em>sum</em> of the 10 daily log returns. Simple returns are not additive—you must multiply <code>(1+R)</code> terms.
+  </div>
+
+  <h3>Volatility: The Measure of Risk</h3>
+  <p>Volatility is simply the <strong>standard deviation of returns</strong>. It measures how much the price "bounces around."</p>
+  <div class="formula">σ = std(returns) &nbsp;&nbsp;→&nbsp;&nbsp; Annualized σ = σ_daily × √252</div>
+  <p>We use 252 because there are approximately 252 trading days in a year. We use the square root because volatility scales with the square root of time (this comes from the mathematics of random walks).</p>
+
+  <div class="card">
+    <h4>Risk-Free Rate</h4>
+    <p>The return you could earn with zero risk, usually proxied by the 3-month U.S. Treasury Bill. It is essential for computing the <strong>Sharpe Ratio</strong> later.</p>
+    <p>In backtesting, we often assume a constant risk-free rate (e.g., 2% per year, or 0.02/252 per day) for simplicity.</p>
+  </div>
+
+  <h3>Data Quality Issues</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Missing Data:</strong> Markets are closed on weekends and holidays. Some stocks do not trade every day. Use <code>df.fillna(method="ffill")</code> with caution—forward-filling is standard, but never backward-fill (that is lookahead bias).</li>
+      <li><strong>Survivorship Bias:</strong> If you only test on companies that are alive today, you ignore all the bankrupt companies. Your backtest will be artificially optimistic. (Covered in depth later.)</li>
+      <li><strong>Corporate Actions:</strong> Splits, dividends, and spin-offs change the price. Use Adjusted Close to account for these.</li>
+      <li><strong>Look-Ahead Bias:</strong> Using information you would not have had at the time. Example: using quarterly earnings released after market close to trade at that day's close. (Covered in depth later.)</li>
+    </ul>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/r/risk-freerate.asp" target="_blank">📖 Investopedia: Risk-Free Rate</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/v/volatility.asp" target="_blank">📖 Investopedia: Volatility</a>
+    <a class="resource-link" href="https://pyquantnews.com/why-log-returns/" target="_blank">📖 PyQuant News: Why Log Returns?</a>
+    <a class="resource-link" href="https://www.kaggle.com/code/jacksoncrow/stock-market-data-ohlcv/notebook" target="_blank">🌐 Kaggle: OHLCV Data Exploration (Interactive Notebook)</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Data & Returns</h3>
+  <div class="card">
+    <h4>Experiment 1: Download, Clean, and Analyze</h4>
+    <p><strong>Goal:</strong> Load real data, compute returns, and visualize volatility.</p>
+    <pre><code># Step 1: Install and import
+!pip install yfinance pandas numpy matplotlib
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Step 2: Download 5 years of S&P 500 data
+ticker = "SPY"
+df = yf.download(ticker, start="2019-01-01", end="2024-01-01")
+
+# Step 3: Inspect
+print(df.head())
+print(df.tail())
+
+# Step 4: Compute returns
+df["Simple_Return"] = df["Adj Close"].pct_change()
+df["Log_Return"] = np.log(df["Adj Close"] / df["Adj Close"].shift(1))
+
+# Step 5: Basic statistics
+print(f"Mean daily return: {df['Simple_Return'].mean():.6f}")
+print(f"Daily volatility: {df['Simple_Return'].std():.6f}")
+print(f"Annualized volatility: {df['Simple_Return'].std() * np.sqrt(252):.4f}")
+
+# Step 6: Plot price and returns
+fig, axes = plt.subplots(3, 1, figsize=(10, 10))
+df["Adj Close"].plot(ax=axes[0], title=f"{ticker} Adjusted Close")
+df["Simple_Return"].plot(ax=axes[1], title="Daily Simple Returns", color="purple")
+df["Simple_Return"].rolling(30).std().plot(ax=axes[2], title="30-Day Rolling Volatility", color="red")
+plt.tight_layout()
+plt.show()
+
+# Step 7: Distribution histogram
+df["Simple_Return"].hist(bins=100, figsize=(8,4))
+plt.title("Distribution of Daily Returns")
+plt.show()</code></pre>
+    <div class="tip">
+      <strong>Observation Questions:</strong> Are returns normally distributed? Do you see "fat tails" (more extreme events than a bell curve)? Does volatility cluster (periods of high volatility followed by high volatility)?
+    </div>
+  </div>
+
+  <h3>📝 Exercises: Data & Returns</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Download AAPL data for 2020-2024. Calculate daily simple returns and print the first 5.</li>
+      <li>Compute the mean daily return and annualized volatility for AAPL.</li>
+      <li>Plot a histogram of AAPL daily returns with 50 bins.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Calculate rolling 30-day volatility for SPY. Plot it alongside the price. What do you notice during the COVID crash (March 2020)?</li>
+      <li>Compute log returns for AAPL. Verify that the sum of daily log returns over one year approximately equals the log of the price ratio (end/start).</li>
+      <li>Compare the annualized volatility of AAPL, MSFT, and TSLA on the same plot.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Write a function <code>annualize_metrics(returns, freq="daily")</code> that correctly annualizes returns and volatility for daily, weekly, and monthly inputs.</li>
+      <li>Detect outliers in SPY returns using a z-score threshold of 3. How many outliers exist? Plot them as red dots on the price chart.</li>
+      <li>Download data for a stock that underwent a split (e.g., NVDA in 2021). Compare Close vs Adjusted Close around the split date to understand the adjustment.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: INDICATORS ==================== -->
+<div id="tab-indicators" class="tab-content">
+  <h2>📈 Technical Indicators</h2>
+  <p>Indicators are mathematical transformations of price and volume. They reduce noise and highlight patterns. A strategy is simply a set of rules applied to indicators.</p>
+
+  <h3>Moving Averages: Smoothing Price</h3>
+  <p>Prices are noisy. A moving average smooths price to reveal the underlying trend.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Simple Moving Average (SMA)</h4>
+      <p>The arithmetic mean of the last <code>N</code> prices. Every day is weighted equally.</p>
+      <div class="formula">SMA₂₀ = (Pₜ + Pₜ₋₁ + ... + Pₜ₋₁₉) / 20</div>
+      <pre><code>df["SMA_20"] = df["Adj Close"].rolling(20).mean()</code></pre>
+      <p><strong>Trait:</strong> Slow to react. Lots of lag.</p>
+    </div>
+    <div class="card">
+      <h4>Exponential Moving Average (EMA)</h4>
+      <p>Weights recent prices more heavily. Reacts faster to new information.</p>
+      <div class="formula">EMAₜ = α × Pₜ + (1−α) × EMAₜ₋₁ &nbsp; where α = 2/(N+1)</div>
+      <pre><code>df["EMA_20"] = df["Adj Close"].ewm(span=20, adjust=False).mean()</code></pre>
+      <p><strong>Trait:</strong> Less lag, but more whipsaws (false signals).</p>
+    </div>
+  </div>
+
+  <svg class="svg-center" width="600" height="300" viewBox="0 0 600 300">
+    <rect x="10" y="10" width="580" height="280" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">SMA vs EMA Reaction Speed</text>
+    <!-- Price line (jagged) -->
+    <polyline points="50,200 80,180 110,190 140,150 170,160 200,120 230,130 260,90 290,100 320,70 350,80 380,60 410,70 440,50 470,60 500,40 530,50 560,30" 
+      fill="none" stroke="#6c757d" stroke-width="2"/>
+    <!-- SMA (smoother, lagging) -->
+    <polyline points="140,175 170,170 200,155 230,145 260,125 290,115 320,95 350,85 380,75 410,70 440,60 470,58 500,48 530,50 560,40" 
+      fill="none" stroke="#0056b3" stroke-width="2.5"/>
+    <!-- EMA (closer to price) -->
+    <polyline points="110,185 140,165 170,158 200,138 230,128 260,105 290,98 320,78 350,72 380,65 410,68 440,55 470,56 500,42 530,48 560,35" 
+      fill="none" stroke="#198754" stroke-width="2.5"/>
+    <!-- Legend -->
+    <line x1="420" y1="250" x2="450" y2="250" stroke="#6c757d" stroke-width="2"/><text x="455" y="254" font-size="11" fill="#333">Price</text>
+    <line x1="420" y1="265" x2="450" y2="265" stroke="#0056b3" stroke-width="2.5"/><text x="455" y="269" font-size="11" fill="#333">SMA (Lagging)</text>
+    <line x1="420" y1="280" x2="450" y2="280" stroke="#198754" stroke-width="2.5"/><text x="455" y="284" font-size="11" fill="#333">EMA (Responsive)</text>
+  </svg>
+
+  <h3>Momentum Indicators</h3>
+  <div class="card">
+    <h4>Relative Strength Index (RSI)</h4>
+    <p>RSI measures the speed and magnitude of recent price changes. It oscillates between 0 and 100.</p>
+    <div class="formula">RSI = 100 − [100 / (1 + RS)] &nbsp; where RS = Avg Gain / Avg Loss over N periods</div>
+    <ul>
+      <li><strong>RSI &gt; 70:</strong> Potentially overbought (price may fall).</li>
+      <li><strong>RSI &lt; 30:</strong> Potentially oversold (price may rise).</li>
+    </ul>
+    <pre><code>delta = df["Adj Close"].diff()
+gain = (delta.where(delta > 0, 0)).rolling(14).mean()
+loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+rs = gain / loss
+df["RSI"] = 100 - (100 / (1 + rs))</code></pre>
+    <div class="warning">
+      <strong>Trap:</strong> In a strong uptrend, RSI can stay above 70 for weeks. It is not a pure "sell" signal—it is a warning that the move is extended.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>MACD (Moving Average Convergence Divergence)</h4>
+    <p>MACD tracks the relationship between two EMAs of a price.</p>
+    <ul>
+      <li><strong>MACD Line:</strong> EMA(12) − EMA(26)</li>
+      <li><strong>Signal Line:</strong> EMA(9) of the MACD Line</li>
+      <li><strong>Histogram:</strong> MACD Line − Signal Line</li>
+    </ul>
+    <p>A <strong>bullish crossover</strong> occurs when MACD crosses above Signal. A <strong>bearish crossover</strong> occurs when MACD crosses below Signal.</p>
+    <pre><code>ema_12 = df["Adj Close"].ewm(span=12, adjust=False).mean()
+ema_26 = df["Adj Close"].ewm(span=26, adjust=False).mean()
+df["MACD"] = ema_12 - ema_26
+df["Signal"] = df["MACD"].ewm(span=9, adjust=False).mean()
+df["Histogram"] = df["MACD"] - df["Signal"]</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Bollinger Bands</h4>
+    <p>A volatility envelope around a moving average.</p>
+    <ul>
+      <li><strong>Middle Band:</strong> SMA(20)</li>
+      <li><strong>Upper Band:</strong> SMA(20) + 2 × StdDev(20)</li>
+      <li><strong>Lower Band:</strong> SMA(20) − 2 × StdDev(20)</li>
+    </ul>
+    <p>The logic: Prices tend to stay within 2 standard deviations of the mean. If price touches the upper band, it may be overextended. If it touches the lower band, it may be cheap.</p>
+    <pre><code>df["BB_Middle"] = df["Adj Close"].rolling(20).mean()
+df["BB_Std"] = df["Adj Close"].rolling(20).std()
+df["BB_Upper"] = df["BB_Middle"] + 2 * df["BB_Std"]
+df["BB_Lower"] = df["BB_Middle"] - 2 * df["BB_Std"]</code></pre>
+  </div>
+
+  <h3>From Indicators to Signals</h3>
+  <p>An indicator is just a number. A <strong>signal</strong> is a trading decision derived from that number.</p>
+  <div class="definition">
+    <strong>Signal Mapping:</strong> You define a rule that converts the indicator value into an action: <code>+1</code> (Buy/Long), <code>0</code> (Hold/Neutral), or <code>-1</code> (Sell/Short).
+  </div>
+  <p>Example rules:</p>
+  <ul>
+    <li><strong>SMA Crossover:</strong> Signal = +1 if Price &gt; SMA(50), else 0.</li>
+    <li><strong>RSI Reversal:</strong> Signal = +1 if RSI &lt; 30, Signal = -1 if RSI &gt; 70.</li>
+    <li><strong>Bollinger Bounce:</strong> Signal = +1 if Price &lt; Lower Band, Signal = -1 if Price &gt; Upper Band.</li>
+  </ul>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/s/sma.asp" target="_blank">📖 Investopedia: Simple Moving Average</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/r/rsi.asp" target="_blank">📖 Investopedia: RSI</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/m/macd.asp" target="_blank">📖 Investopedia: MACD</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/b/bollingerbands.asp" target="_blank">📖 Investopedia: Bollinger Bands</a>
+    <a class="resource-link" href="https://www.tradingview.com/chart/" target="_blank">🌐 TradingView — Free interactive charting to visualize indicators in real-time</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Indicators</h3>
+  <div class="card">
+    <h4>Experiment 2: Build a Dashboard of Indicators</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Download data
+df = yf.download("AAPL", start="2022-01-01", end="2024-01-01")
+
+# Indicators
+df["SMA_20"] = df["Adj Close"].rolling(20).mean()
+df["SMA_50"] = df["Adj Close"].rolling(50).mean()
+df["EMA_20"] = df["Adj Close"].ewm(span=20, adjust=False).mean()
+
+# RSI
+delta = df["Adj Close"].diff()
+gain = delta.where(delta > 0, 0).rolling(14).mean()
+loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+rs = gain / loss
+df["RSI"] = 100 - (100 / (1 + rs))
+
+# Bollinger Bands
+df["BB_Mid"] = df["Adj Close"].rolling(20).mean()
+df["BB_Upper"] = df["BB_Mid"] + 2 * df["Adj Close"].rolling(20).std()
+df["BB_Lower"] = df["BB_Mid"] - 2 * df["Adj Close"].rolling(20).std()
+
+# Plot
+fig, axes = plt.subplots(3, 1, figsize=(12, 10), gridspec_kw={"height_ratios": [3,1,1]})
+
+# Price + MAs + BB
+df["Adj Close"].plot(ax=axes[0], label="Price", color="black")
+df["SMA_20"].plot(ax=axes[0], label="SMA 20", color="blue")
+df["SMA_50"].plot(ax=axes[0], label="SMA 50", color="orange")
+df["BB_Upper"].plot(ax=axes[0], label="BB Upper", color="gray", linestyle="--")
+df["BB_Lower"].plot(ax=axes[0], label="BB Lower", color="gray", linestyle="--")
+axes[0].fill_between(df.index, df["BB_Lower"], df["BB_Upper"], color="gray", alpha=0.1)
+axes[0].legend()
+axes[0].set_title("AAPL Price with Indicators")
+
+# RSI
+df["RSI"].plot(ax=axes[1], color="purple")
+axes[1].axhline(70, color="red", linestyle="--")
+axes[1].axhline(30, color="green", linestyle="--")
+axes[1].set_title("RSI")
+axes[1].set_ylim(0, 100)
+
+# Volume
+df["Volume"].plot(ax=axes[2], color="gray")
+axes[2].set_title("Volume")
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Indicators</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Calculate the 10-day and 50-day SMA for SPY. Plot both on the same chart as the price.</li>
+      <li>Compute RSI(14) for TSLA. Count how many days RSI was above 70 and below 30.</li>
+      <li>Calculate Bollinger Bands for MSFT. Highlight days where the price closed outside the bands.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Build a MACD indicator for AAPL and identify all bullish/bearish crossover dates.</li>
+      <li>Create a composite signal: Buy only when RSI &lt; 30 AND price is below the lower Bollinger Band. How many signals occur in 3 years?</li>
+      <li>Compare the lag of SMA(20) vs EMA(20) by calculating the average absolute difference between each moving average and the actual price.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Implement the <strong>Relative Vigor Index (RVI)</strong> from scratch using only Pandas operations.</li>
+      <li>Build a custom indicator: "Distance from 50-day SMA in volatility units" = (Price − SMA₅₀) / RollingStd₅₀. Backtest a strategy that goes long when this distance &lt; -2 and short when &gt; +2.</li>
+      <li>Download intraday (1-hour) data for a forex pair and apply the same indicators. Do the optimal parameters change?</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: STRATEGY DESIGN ==================== -->
+<div id="tab-strategy" class="tab-content">
+  <h2>🎯 Strategy Design</h2>
+  <p>A trading strategy is a <strong>rule-based system</strong> that converts market data into trading decisions. Without strict rules, you are not a quant—you are a gambler with a spreadsheet.</p>
+
+  <h3>The Anatomy of a Strategy</h3>
+  <p>Every strategy, no matter how complex, answers three questions:</p>
+  <ol>
+    <li><strong>When do I enter?</strong> (The Entry Rule)</li>
+    <li><strong>When do I exit?</strong> (The Exit Rule)</li>
+    <li><strong>How much do I trade?</strong> (Position Sizing — covered later)</li>
+  </ol>
+
+  <svg class="svg-center" width="600" height="320" viewBox="0 0 600 320">
+    <rect x="10" y="10" width="580" height="300" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Strategy Decision Flow</text>
+    <!-- Boxes -->
+    <rect x="220" y="50" width="160" height="40" rx="6" fill="#e7f1ff" stroke="#0056b3" stroke-width="2"/>
+    <text x="300" y="75" text-anchor="middle" font-size="13" fill="#0056b3">Market Data (OHLCV)</text>
+    <line x1="300" y1="90" x2="300" y2="110" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="220" y="110" width="160" height="40" rx="6" fill="#e7f1ff" stroke="#0056b3" stroke-width="2"/>
+    <text x="300" y="135" text-anchor="middle" font-size="13" fill="#0056b3">Calculate Indicators</text>
+    <line x1="300" y1="150" x2="300" y2="170" stroke="#333" stroke-width="2"/>
+
+    <rect x="220" y="170" width="160" height="40" rx="6" fill="#fff3cd" stroke="#856404" stroke-width="2"/>
+    <text x="300" y="195" text-anchor="middle" font-size="13" fill="#856404">Apply Entry / Exit Rules</text>
+    <line x1="300" y1="210" x2="300" y2="230" stroke="#333" stroke-width="2"/>
+
+    <rect x="220" y="230" width="160" height="40" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="300" y="255" text-anchor="middle" font-size="13" fill="#198754">Generate Signal (-1, 0, +1)</text>
+
+    <!-- Diamond for decision -->
+    <polygon points="300,280 340,300 300,320 260,300" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="300" y="303" text-anchor="middle" font-size="11" fill="#dc3545">Execute?</text>
+
+    <!-- Side labels -->
+    <text x="100" y="200" text-anchor="middle" font-size="11" fill="#6c757d">Example: SMA Cross</text>
+    <line x1="160" y1="190" x2="215" y2="190" stroke="#999" stroke-width="1"/>
+    <text x="480" y="200" text-anchor="middle" font-size="11" fill="#6c757d">Example: RSI Threshold</text>
+    <line x1="385" y1="190" x2="430" y2="190" stroke="#999" stroke-width="1"/>
+  </svg>
+
+  <h3>Signal Generation</h3>
+  <p>A <strong>signal</strong> is a time series of integers representing your desired market position:</p>
+  <ul>
+    <li><code>+1</code> = Long (you want to own the asset)</li>
+    <li><code>0</code> = Flat/Neutral (no position)</li>
+    <li><code>-1</code> = Short (you want to bet against the asset)</li>
+  </ul>
+  <div class="definition">
+    <strong>Signal vs. Position:</strong> A <em>signal</em> is what your brain (the strategy) wants to do. A <em>position</em> is what your portfolio actually holds. They differ because of lag, fills, and risk limits.
+  </div>
+
+  <div class="card">
+    <h4>Example: SMA Crossover Strategy</h4>
+    <p><strong>Rule:</strong> Go long when the fast SMA crosses above the slow SMA. Go short when it crosses below.</p>
+    <pre><code># Generate raw signal
+df["Signal"] = 0
+df.loc[df["SMA_Fast"] > df["SMA_Slow"], "Signal"] = 1
+df.loc[df["SMA_Fast"] < df["SMA_Slow"], "Signal"] = -1
+
+# Detect changes (crossovers)
+df["Position"] = df["Signal"].diff().fillna(0)
+entry_dates = df[df["Position"] != 0].index</code></pre>
+    <div class="warning">
+      <strong>Look-Ahead Bias Alert:</strong> If you use <code>.loc[df["SMA_Fast"] > df["SMA_Slow"]]</code> and trade at the <em>same day's close</em>, you are cheating. You do not know the closing price until the market closes. We will fix this in the Backtesting section.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Example: Mean Reversion Strategy</h4>
+    <p><strong>Rule:</strong> Buy when price deviates significantly below its moving average (it will "revert" to the mean). Sell when it deviates above.</p>
+    <pre><code>df["Z_Score"] = (df["Adj Close"] - df["SMA_20"]) / df["Adj Close"].rolling(20).std()
+df["Signal"] = 0
+df.loc[df["Z_Score"] < -2.0, "Signal"] = 1   # Far below mean → Buy
+df.loc[df["Z_Score"] > +2.0, "Signal"] = -1  # Far above mean → Sell</code></pre>
+    <p>This is the core idea behind Bollinger Band strategies.</p>
+  </div>
+
+  <div class="card">
+    <h4>Example: Momentum Strategy</h4>
+    <p><strong>Rule:</strong> Buy when the trend is strong and rising. The trend is your friend.</p>
+    <pre><code>df["Return_20d"] = df["Adj Close"].pct_change(20)
+df["Signal"] = 0
+df.loc[df["Return_20d"] > 0.05, "Signal"] = 1   # Up &gt;5% in 20 days
+df.loc[df["Return_20d"] < -0.05, "Signal"] = -1 # Down &gt;5% in 20 days</code></pre>
+  </div>
+
+  <h3>Types of Strategies</h3>
+  <table>
+    <tr><th>Type</th><th>Logic</th><th>Market Regime</th><th>Example</th></tr>
+    <tr><td>Trend Following</td><td>Buy when going up, sell when going down</td><td>Strong directional markets</td><td>SMA Crossover, Donchian Channels</td></tr>
+    <tr><td>Mean Reversion</td><td>Buy when too low, sell when too high</td><td>Range-bound, choppy markets</td><td>Bollinger Bands, RSI</td></tr>
+    <tr><td>Momentum</td><td>Buy winners, sell losers</td><td>Post-earnings, news-driven</td><td>12-Month Momentum (Jegadeesh & Titman)</td></tr>
+    <tr><td>Statistical Arbitrage</td><td>Profit from relative mispricing</td><td>Any (requires pairs)</td><td>Pairs Trading, Cointegration</td></tr>
+  </table>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/trading/introduction-to-trading-strategies/" target="_blank">📖 Investopedia: Introduction to Trading Strategies</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/Basics-of-Mean-Reversion/" target="_blank">📖 QuantStart: Basics of Mean Reversion</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/Basics-of-Trend-Following/" target="_blank">📖 QuantStart: Basics of Trend Following</a>
+    <a class="resource-link" href="https://www.portfoliovisualizer.com/" target="_blank">🌐 Portfolio Visualizer — Test simple tactical strategies interactively</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Strategy Design</h3>
+  <div class="card">
+    <h4>Experiment 3: Build Three Signal Generators</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = yf.download("SPY", start="2020-01-01", end="2024-01-01")
+
+# --- Strategy 1: SMA Crossover ---
+df["SMA_50"] = df["Adj Close"].rolling(50).mean()
+df["SMA_200"] = df["Adj Close"].rolling(200).mean()
+df["Signal_SMA"] = np.where(df["SMA_50"] > df["SMA_200"], 1, -1)
+
+# --- Strategy 2: RSI Mean Reversion ---
+delta = df["Adj Close"].diff()
+rs = delta.where(delta>0,0).rolling(14).mean() / (-delta.where(delta<0,0)).rolling(14).mean()
+df["RSI"] = 100 - (100/(1+rs))
+df["Signal_RSI"] = 0
+df.loc[df["RSI"] < 30, "Signal_RSI"] = 1
+df.loc[df["RSI"] > 70, "Signal_RSI"] = -1
+
+# --- Strategy 3: Bollinger Band Reversion ---
+df["BB_Mid"] = df["Adj Close"].rolling(20).mean()
+df["BB_Std"] = df["Adj Close"].rolling(20).std()
+df["Z"] = (df["Adj Close"] - df["BB_Mid"]) / df["BB_Std"]
+df["Signal_BB"] = np.where(df["Z"] < -2, 1, np.where(df["Z"] > 2, -1, 0))
+
+# Plot signals
+fig, axes = plt.subplots(4, 1, figsize=(12, 12), sharex=True)
+df["Adj Close"].plot(ax=axes[0], title="Price")
+df["Signal_SMA"].plot(ax=axes[1], title="SMA Cross Signal", drawstyle="steps-post")
+df["Signal_RSI"].plot(ax=axes[2], title="RSI Signal", drawstyle="steps-post")
+df["Signal_BB"].plot(ax=axes[3], title="Bollinger Signal", drawstyle="steps-post")
+for ax in axes[1:]:
+    ax.axhline(0, color="black", linestyle="--", linewidth=0.8)
+    ax.set_ylim(-1.5, 1.5)
+plt.tight_layout()
+plt.show()
+
+# Count trades
+print("SMA trades:", (df["Signal_SMA"].diff() != 0).sum())
+print("RSI trades:", (df["Signal_RSI"].diff() != 0).sum())
+print("BB trades:", (df["Signal_BB"].diff() != 0).sum())</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Strategy Design</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Write a function that generates a +1/-1 signal based on price being above/below its 50-day SMA.</li>
+      <li>Create an RSI strategy that is neutral (0) when RSI is between 30 and 70, long below 30, and short above 70.</li>
+      <li>Plot the signal time series for a MACD crossover strategy on AAPL.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Build a dual-indicator strategy: Long only when Price &gt; SMA(50) AND RSI &lt; 40 (pullback in uptrend).</li>
+      <li>Implement a strategy that switches between trend-following and mean-reversion based on whether the 20-day volatility is above or below its 1-year median.</li>
+      <li>Backtest a "Golden Cross / Death Cross" strategy (SMA 50 vs SMA 200) and count the number of whipsaws (false signals) in a sideways market.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Design a regime-switching strategy using a Hidden Markov Model (use <code>hmmlearn</code>) to detect high/low volatility regimes and apply different rules in each.</li>
+      <li>Build a long-short equity strategy that ranks 10 stocks by 12-month momentum and goes long the top 3 and short the bottom 3.</li>
+      <li>Create a statistical arbitrage signal for a pair of stocks (e.g., PEP and KO) using the z-score of their price ratio.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: VECTORIZED BACKTESTING ==================== -->
+<div id="tab-vectorized" class="tab-content">
+  <h2>🔄 Vectorized Backtesting</h2>
+  <p>Vectorized backtesting is the fastest way to test a strategy. Instead of simulating day-by-day, you compute everything at once using Pandas/NumPy. It is ideal for prototyping but makes simplifying assumptions about execution.</p>
+
+  <h3>The Core Concept</h3>
+  <p>In a vectorized backtest, you assume you can trade at the closing price of the day <em>after</em> the signal is generated. This avoids <strong>look-ahead bias</strong>.</p>
+
+  <svg class="svg-center" width="650" height="380" viewBox="0 0 650 380">
+    <rect x="10" y="10" width="630" height="360" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="325" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Vectorized Backtest Pipeline</text>
+    <!-- Steps -->
+    <rect x="30" y="55" width="110" height="50" rx="6" fill="#e7f1ff" stroke="#0056b3" stroke-width="2"/>
+    <text x="85" y="85" text-anchor="middle" font-size="12" fill="#0056b3">1. Load Data</text>
+    <line x1="140" y1="80" x2="170" y2="80" stroke="#333" stroke-width="2"/>
+
+    <rect x="170" y="55" width="110" height="50" rx="6" fill="#e7f1ff" stroke="#0056b3" stroke-width="2"/>
+    <text x="225" y="85" text-anchor="middle" font-size="12" fill="#0056b3">2. Indicators</text>
+    <line x1="280" y1="80" x2="310" y2="80" stroke="#333" stroke-width="2"/>
+
+    <rect x="310" y="55" width="110" height="50" rx="6" fill="#fff3cd" stroke="#856404" stroke-width="2"/>
+    <text x="365" y="85" text-anchor="middle" font-size="12" fill="#856404">3. Signals</text>
+    <line x1="420" y1="80" x2="450" y2="80" stroke="#333" stroke-width="2"/>
+
+    <rect x="450" y="55" width="110" height="50" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="505" y="85" text-anchor="middle" font-size="12" fill="#198754">4. Shift(1)</text>
+    <line x1="560" y1="80" x2="590" y2="80" stroke="#333" stroke-width="2"/>
+
+    <rect x="590" y="55" width="50" height="50" rx="6" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="615" y="85" text-anchor="middle" font-size="12" fill="#dc3545">5. ×</text>
+
+    <!-- Return calculation detail -->
+    <rect x="30" y="130" width="590" height="80" rx="6" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+    <text x="325" y="155" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">The Math</text>
+    <text x="325" y="180" text-anchor="middle" font-size="13" fill="#333">Strategy Returnₜ = Signalₜ₋₁ × Asset Returnₜ</text>
+    <text x="325" y="200" text-anchor="middle" font-size="12" fill="#6c757d">You use yesterday's signal to determine today's position, avoiding look-ahead bias.</text>
+
+    <!-- Equity curve -->
+    <rect x="30" y="230" width="590" height="120" rx="6" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+    <text x="325" y="255" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">Equity Curve</text>
+    <polyline points="50,330 100,325 150,310 200,315 250,290 300,295 350,260 400,270 450,240 500,250 550,220 600,230" 
+      fill="none" stroke="#198754" stroke-width="2.5"/>
+    <text x="325" y="345" text-anchor="middle" font-size="11" fill="#6c757d">Cumulative Product of (1 + Strategy Returns)</text>
+  </svg>
+
+  <h3>Step-by-Step Implementation</h3>
+
+  <div class="card">
+    <h4>Step 1: Load Data & Calculate Indicators</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+
+df = yf.download("SPY", start="2018-01-01", end="2024-01-01")
+df["SMA_50"] = df["Adj Close"].rolling(50).mean()
+df["SMA_200"] = df["Adj Close"].rolling(200).mean()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Step 2: Generate Raw Signal</h4>
+    <pre><code># +1 when fast > slow, -1 otherwise
+df["Signal"] = np.where(df["SMA_50"] > df["SMA_200"], 1, -1)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Step 3: Eliminate Look-Ahead Bias</h4>
+    <p>The signal at time <code>t</code> is computed using the close at time <code>t</code>. You cannot trade at time <code>t</code>'s close using time <code>t</code>'s close. You must trade at the <em>next</em> available price.</p>
+    <pre><code># Shift signal by 1 day so we trade on the next day's return
+df["Position"] = df["Signal"].shift(1)</code></pre>
+    <div class="danger">
+      <strong>Critical:</strong> Forgetting <code>.shift(1)</code> is the #1 mistake beginners make. Your backtest will show impossible returns because you are trading with future knowledge.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Step 4: Calculate Strategy Returns</h4>
+    <pre><code># Asset returns
+df["Asset_Return"] = df["Adj Close"].pct_change()
+
+# Strategy returns: position × next day's asset return
+df["Strategy_Return"] = df["Position"] * df["Asset_Return"]
+
+# Drop NaN rows
+df = df.dropna()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Step 5: Build the Equity Curve</h4>
+    <pre><code># Cumulative returns
+df["Cumulative_Asset"] = (1 + df["Asset_Return"]).cumprod()
+df["Cumulative_Strategy"] = (1 + df["Strategy_Return"]).cumprod()
+
+# Plot
+import matplotlib.pyplot as plt
+df[["Cumulative_Asset", "Cumulative_Strategy"]].plot(figsize=(10,6))
+plt.title("SMA Crossover Strategy vs Buy & Hold")
+plt.ylabel("Growth of $1")
+plt.show()</code></pre>
+  </div>
+
+  <h3>Handling Transaction Costs</h3>
+  <p>Real trading is not free. You pay commissions and suffer slippage. A realistic backtest must subtract these.</p>
+  <div class="card">
+    <pre><code># Assume 0.1% commission per trade (round-trip = 0.2%)
+commission = 0.001
+
+# Detect trades (position changes)
+df["Trades"] = df["Position"].diff().abs()
+
+# Subtract commission from returns on trade days
+df["Strategy_Return_Net"] = df["Strategy_Return"] - (df["Trades"] * commission)
+
+# Recalculate equity curve
+df["Cumulative_Net"] = (1 + df["Strategy_Return_Net"]).cumprod()</code></pre>
+    <div class="tip">
+      <strong>Why multiply by abs(diff)?</strong> If your position changes from 0 to 1, or 1 to -1, or 1 to 0, you traded. The absolute difference captures all these cases. A position change of 2 (long to short) costs twice as much as a change of 1.
+    </div>
+  </div>
+
+  <h3>Limitations of Vectorized Backtesting</h3>
+  <div class="warning">
+    <ul>
+      <li><strong>Execution Assumption:</strong> Assumes you get the closing price. In reality, you get a price near the close, and large orders move the market.</li>
+      <li><strong>No Intraday Detail:</strong> Cannot model stop-losses that trigger intraday based on the High or Low.</li>
+      <li><strong>No Complex Logic:</strong> Hard to implement rules like "cancel order if not filled in 5 minutes."</li>
+      <li><strong>All-at-Once:</strong> You must have all data in memory. Cannot stream from a live feed.</li>
+    </ul>
+    <p>For these reasons, vectorized backtesting is for <strong>research and prototyping</strong>. Event-driven backtesting is for <strong>realism and production</strong>.</p>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.quantstart.com/articles/Backtesting-Systematic-Trading-Strategies-in-Python-Considerations-and-Open-Source-Frameworks/" target="_blank">📖 QuantStart: Backtesting Considerations & Frameworks</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=xfzGZB4HhEE" target="_blank">🎥 YouTube: Vectorized vs Event-Driven Backtesting Explained</a>
+    <a class="resource-link" href="https://github.com/quantopian/zipline" target="_blank">💻 GitHub: Zipline (Quantopian's backtester — study the source code)</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Vectorized Backtest</h3>
+  <div class="card">
+    <h4>Experiment 4: Complete Vectorized Backtest Engine</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+def vectorized_backtest(ticker, start, end, fast=50, slow=200, commission=0.001):
+    df = yf.download(ticker, start=start, end=end)
+
+    # Indicators
+    df["SMA_Fast"] = df["Adj Close"].rolling(fast).mean()
+    df["SMA_Slow"] = df["Adj Close"].rolling(slow).mean()
+
+    # Signal and Position (shifted!)
+    df["Signal"] = np.where(df["SMA_Fast"] > df["SMA_Slow"], 1, -1)
+    df["Position"] = df["Signal"].shift(1)
+
+    # Returns
+    df["Asset_Return"] = df["Adj Close"].pct_change()
+    df["Strategy_Return"] = df["Position"] * df["Asset_Return"]
+
+    # Costs
+    df["Trades"] = df["Position"].diff().abs()
+    df["Strategy_Net"] = df["Strategy_Return"] - (df["Trades"] * commission)
+
+    # Equity curves
+    df["Cum_BuyHold"] = (1 + df["Asset_Return"]).cumprod()
+    df["Cum_Strategy"] = (1 + df["Strategy_Net"]).cumprod()
+
+    # Metrics
+    total_return = df["Cum_Strategy"].iloc[-1] - 1
+    volatility = df["Strategy_Net"].std() * np.sqrt(252)
+    sharpe = (df["Strategy_Net"].mean() * 252) / (df["Strategy_Net"].std() * np.sqrt(252))
+
+    # Max Drawdown
+    rolling_max = df["Cum_Strategy"].cummax()
+    drawdown = (df["Cum_Strategy"] - rolling_max) / rolling_max
+    max_dd = drawdown.min()
+
+    print(f"Total Return: {total_return:.2%}")
+    print(f"Annualized Vol: {volatility:.2%}")
+    print(f"Sharpe Ratio: {sharpe:.3f}")
+    print(f"Max Drawdown: {max_dd:.2%}")
+
+    # Plot
+    fig, axes = plt.subplots(2, 1, figsize=(11, 8), gridspec_kw={"height_ratios": [3,1]})
+    df[["Cum_BuyHold", "Cum_Strategy"]].plot(ax=axes[0], title=f"{ticker} Backtest")
+    axes[0].set_ylabel("Growth of $1")
+    drawdown.plot(ax=axes[1], title="Drawdown", color="red")
+    axes[1].fill_between(drawdown.index, drawdown, 0, color="red", alpha=0.3)
+    axes[1].set_ylabel("Drawdown")
+    plt.tight_layout()
+    plt.show()
+
+    return df
+
+# Run it
+results = vectorized_backtest("SPY", "2010-01-01", "2024-01-01", fast=50, slow=200)</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Vectorized Backtesting</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Run a vectorized backtest of a 20-day vs 50-day SMA crossover on QQQ. Plot the equity curve.</li>
+      <li>Add a 0.05% commission per trade to the backtest above. How much does total return decrease?</li>
+      <li>Backtest a "Buy and Hold" strategy (always position = 1) and compare its Sharpe ratio to the SMA strategy.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Implement a vectorized backtest for an RSI mean-reversion strategy (buy RSI&lt;30, sell RSI&gt;70). Use <code>.shift(1)</code> correctly.</li>
+      <li>Create a function that accepts any signal Series and returns a full performance report (return, volatility, Sharpe, max drawdown, number of trades).</li>
+      <li>Backtest a long-only strategy (signal can only be 0 or 1, never -1) and compare it to the long-short version.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Build a multi-asset vectorized backtest that trades 5 ETFs with equal weighting. Rebalance monthly.</li>
+      <li>Implement pyramiding: add to the position (up to a max of 3 units) every time the trend strengthens. Track average entry price.</li>
+      <li>Model variable slippage: slippage = 0.01% + (0.05% / volume_ratio) where volume_ratio is today's volume / 20-day average volume.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: EVENT-DRIVEN BACKTESTING ==================== -->
+<div id="tab-event" class="tab-content">
+  <h2>⚡ Event-Driven Backtesting</h2>
+  <p>Event-driven backtesting simulates the live trading loop. It is slower than vectorized backtesting but far more realistic. It is the bridge between research and production.</p>
+
+  <h3>Why Event-Driven?</h3>
+  <div class="card">
+    <ul>
+      <li><strong>Realism:</strong> Models order types (market, limit), partial fills, and slippage precisely.</li>
+      <li><strong>Intraday:</strong> Can process tick-by-tick or minute-by-minute data.</li>
+      <li><strong>Complex Logic:</strong> Supports bracket orders, stop-losses, and dynamic position sizing that depends on portfolio state.</li>
+      <li><strong>Production Similarity:</strong> The same code can be reused for live trading with minimal changes.</li>
+    </ul>
+  </div>
+
+  <h3>The Architecture</h3>
+  <p>An event-driven backtester is composed of independent modules that communicate through an <strong>event queue</strong>.</p>
+
+  <svg class="svg-center" width="700" height="420" viewBox="0 0 700 420">
+    <rect x="10" y="10" width="680" height="400" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="350" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Event-Driven Architecture</text>
+
+    <!-- Data Handler -->
+    <rect x="30" y="60" width="140" height="60" rx="6" fill="#e7f1ff" stroke="#0056b3" stroke-width="2"/>
+    <text x="100" y="85" text-anchor="middle" font-size="12" fill="#0056b3">DataHandler</text>
+    <text x="100" y="105" text-anchor="middle" font-size="10" fill="#333">Streams bars/ticks</text>
+
+    <!-- Arrow to Queue -->
+    <line x1="170" y1="90" x2="220" y2="90" stroke="#333" stroke-width="2"/>
+    <polygon points="220,90 210,85 210,95" fill="#333"/>
+
+    <!-- Event Queue -->
+    <rect x="220" y="55" width="120" height="70" rx="6" fill="#fff3cd" stroke="#856404" stroke-width="2"/>
+    <text x="280" y="80" text-anchor="middle" font-size="12" fill="#856404">Event Queue</text>
+    <text x="280" y="100" text-anchor="middle" font-size="10" fill="#333">Market / Signal /</text>
+    <text x="280" y="115" text-anchor="middle" font-size="10" fill="#333">Order / Fill</text>
+
+    <!-- Arrows from Queue -->
+    <line x1="340" y1="75" x2="390" y2="75" stroke="#333" stroke-width="2"/>
+    <polygon points="390,75 380,70 380,80" fill="#333"/>
+    <line x1="340" y1="105" x2="390" y2="105" stroke="#333" stroke-width="2"/>
+    <polygon points="390,105 380,100 380,110" fill="#333"/>
+
+    <!-- Strategy -->
+    <rect x="390" y="50" width="130" height="50" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="455" y="72" text-anchor="middle" font-size="12" fill="#198754">Strategy</text>
+    <text x="455" y="88" text-anchor="middle" font-size="10" fill="#333">Generates Signals</text>
+
+    <!-- Portfolio -->
+    <rect x="390" y="110" width="130" height="50" rx="6" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="455" y="132" text-anchor="middle" font-size="12" fill="#198754">Portfolio</text>
+    <text x="455" y="148" text-anchor="middle" font-size="10" fill="#333">Generates Orders</text>
+
+    <!-- Arrow to Execution -->
+    <line x1="520" y1="135" x2="560" y2="135" stroke="#333" stroke-width="2"/>
+    <polygon points="560,135 550,130 550,140" fill="#333"/>
+
+    <!-- Execution Handler -->
+    <rect x="560" y="105" width="130" height="60" rx="6" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="625" y="130" text-anchor="middle" font-size="12" fill="#dc3545">ExecutionHandler</text>
+    <text x="625" y="150" text-anchor="middle" font-size="10" fill="#333">Simulates fills</text>
+
+    <!-- Loop back -->
+    <path d="M 625 165 L 625 380 L 100 380 L 100 120" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+    <polygon points="100,120 95,130 105,130" fill="#999"/>
+    <text x="350" y="395" text-anchor="middle" font-size="11" fill="#6c757d">Fill events update Portfolio & Statistics</text>
+
+    <!-- Broker -->
+    <rect x="560" y="200" width="130" height="50" rx="6" fill="#e2e3e5" stroke="#6c757d" stroke-width="2"/>
+    <text x="625" y="222" text-anchor="middle" font-size="12" fill="#6c757d">Broker / Exchange</text>
+    <text x="625" y="238" text-anchor="middle" font-size="10" fill="#333">Tracks cash, margin</text>
+
+    <!-- Statistics -->
+    <rect x="30" y="200" width="140" height="50" rx="6" fill="#e2e3e5" stroke="#6c757d" stroke-width="2"/>
+    <text x="100" y="222" text-anchor="middle" font-size="12" fill="#6c757d">Statistics</text>
+    <text x="100" y="238" text-anchor="middle" font-size="10" fill="#333">Records equity, trades</text>
+  </svg>
+
+  <h3>The Event Loop</h3>
+  <p>The heart of the system is a <code>while</code> loop that processes events until the data stream ends.</p>
+  <pre><code>while True:
+    if event_queue.is_empty():
+        # Get next market data bar
+        if data_handler.continue_backtest:
+            data_handler.update_bars()
+        else:
+            break  # End of data
+
+    # Process all events in queue
+    while not event_queue.is_empty():
+        event = event_queue.get()
+
+        if event.type == "MARKET":
+            strategy.calculate_signals(event)
+            portfolio.update_timeindex(event)
+
+        elif event.type == "SIGNAL":
+            portfolio.generate_order(event)
+
+        elif event.type == "ORDER":
+            execution_handler.execute_order(event)
+
+        elif event.type == "FILL":
+            portfolio.update_fill(event)
+            statistics.record_trade(event)</code></pre>
+
+  <h3>Core Classes</h3>
+
+  <div class="card">
+    <h4>1. Event Classes</h4>
+    <pre><code>from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+
+class EventType(Enum):
+    MARKET = 1
+    SIGNAL = 2
+    ORDER = 3
+    FILL = 4
+
+@dataclass
+class MarketEvent:
+    type: EventType = EventType.MARKET
+    timestamp: datetime = None
+    symbol: str = ""
+    open: float = 0.0
+    high: float = 0.0
+    low: float = 0.0
+    close: float = 0.0
+    volume: int = 0
+
+@dataclass
+class SignalEvent:
+    type: EventType = EventType.SIGNAL
+    timestamp: datetime = None
+    symbol: str = ""
+    signal: int = 0  # +1 long, -1 short, 0 neutral
+    strength: float = 1.0
+
+@dataclass
+class OrderEvent:
+    type: EventType = EventType.ORDER
+    timestamp: datetime = None
+    symbol: str = ""
+    order_type: str = "MARKET"  # or "LIMIT"
+    quantity: int = 0
+    direction: str = "BUY"  # or "SELL"
+
+@dataclass
+class FillEvent:
+    type: EventType = EventType.FILL
+    timestamp: datetime = None
+    symbol: str = ""
+    quantity: int = 0
+    direction: str = ""
+    fill_price: float = 0.0
+    commission: float = 0.0</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>2. Data Handler</h4>
+    <p>Responsible for streaming historical data into the system one bar at a time.</p>
+    <pre><code>class HistoricDataHandler:
+    def __init__(self, events, data):
+        self.events = events  # Queue
+        self.data = data      # DataFrame
+        self.bars = data.iterrows()
+        self.continue_backtest = True
+
+    def update_bars(self):
+        try:
+            idx, row = next(self.bars)
+            event = MarketEvent(
+                timestamp=idx,
+                symbol="SPY",
+                open=row["Open"],
+                high=row["High"],
+                low=row["Low"],
+                close=row["Close"],
+                volume=row["Volume"]
+            )
+            self.events.put(event)
+        except StopIteration:
+            self.continue_backtest = False</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>3. Strategy</h4>
+    <pre><code>class SMAStrategy:
+    def __init__(self, events, data_handler, fast=50, slow=200):
+        self.events = events
+        self.data_handler = data_handler
+        self.fast = fast
+        self.slow = slow
+        self.prices = []
+
+    def calculate_signals(self, event):
+        if event.type != EventType.MARKET:
+            return
+
+        self.prices.append(event.close)
+        if len(self.prices) < self.slow:
+            return
+
+        sma_fast = sum(self.prices[-self.fast:]) / self.fast
+        sma_slow = sum(self.prices[-self.slow:]) / self.slow
+
+        if sma_fast > sma_slow:
+            signal = SignalEvent(
+                timestamp=event.timestamp,
+                symbol=event.symbol,
+                signal=1
+            )
+            self.events.put(signal)
+        elif sma_fast < sma_slow:
+            signal = SignalEvent(
+                timestamp=event.timestamp,
+                symbol=event.symbol,
+                signal=-1
+            )
+            self.events.put(signal)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>4. Portfolio</h4>
+    <pre><code>class NaivePortfolio:
+    def __init__(self, events, initial_capital=100000.0):
+        self.events = events
+        self.initial_capital = initial_capital
+        self.cash = initial_capital
+        self.positions = {}  # symbol -> quantity
+        self.current_holdings = {}  # symbol -> market value
+
+    def update_timeindex(self, event):
+        # Update current market value of holdings
+        if event.symbol in self.positions:
+            self.current_holdings[event.symbol] =                 self.positions[event.symbol] * event.close
+
+    def generate_order(self, signal_event):
+        symbol = signal_event.symbol
+        direction = signal_event.signal
+
+        # Naive sizing: invest 10% of cash per signal
+        target_value = self.cash * 0.10
+        quantity = int(target_value / signal_event.strength)
+
+        if direction == 1:
+            order = OrderEvent(
+                timestamp=signal_event.timestamp,
+                symbol=symbol,
+                quantity=quantity,
+                direction="BUY"
+            )
+        elif direction == -1:
+            order = OrderEvent(
+                timestamp=signal_event.timestamp,
+                symbol=symbol,
+                quantity=quantity,
+                direction="SELL"
+            )
+        else:
+            return
+
+        self.events.put(order)
+
+    def update_fill(self, fill_event):
+        if fill_event.direction == "BUY":
+            self.positions[fill_event.symbol] =                 self.positions.get(fill_event.symbol, 0) + fill_event.quantity
+            self.cash -= (fill_event.fill_price * fill_event.quantity + fill_event.commission)
+        else:
+            self.positions[fill_event.symbol] =                 self.positions.get(fill_event.symbol, 0) - fill_event.quantity
+            self.cash += (fill_event.fill_price * fill_event.quantity - fill_event.commission)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>5. Execution Handler</h4>
+    <pre><code>class SimulatedExecutionHandler:
+    def __init__(self, events, slippage=0.001):
+        self.events = events
+        self.slippage = slippage
+
+    def execute_order(self, order_event):
+        if order_event.order_type == "MARKET":
+            # Assume fill at close + random slippage
+            fill_price = order_event.close * (1 + self.slippage)
+            commission = max(1.0, 0.001 * fill_price * order_event.quantity)
+
+            fill = FillEvent(
+                timestamp=order_event.timestamp,
+                symbol=order_event.symbol,
+                quantity=order_event.quantity,
+                direction=order_event.direction,
+                fill_price=fill_price,
+                commission=commission
+            )
+            self.events.put(fill)</code></pre>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.quantstart.com/articles/Event-Driven-Backtesting-with-Python-Part-I/" target="_blank">📖 QuantStart: Event-Driven Backtesting Series (Parts I-VI)</a>
+    <a class="resource-link" href="https://github.com/mhallsmoore/qstrader" target="_blank">💻 GitHub: QSTrader — Production-quality event-driven backtester</a>
+    <a class="resource-link" href="https://www.backtrader.com/" target="_blank">🌐 Backtrader Documentation — Popular Python event-driven framework</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Event-Driven</h3>
+  <div class="card">
+    <h4>Experiment 5: Build a Minimal Event-Driven Loop</h4>
+    <pre><code>import queue
+import pandas as pd
+import numpy as np
+import yfinance as yf
+
+# Download data
+df = yf.download("SPY", start="2022-01-01", end="2024-01-01")
+
+# Simple Queue wrapper
+events = queue.Queue()
+
+# Data Handler (simplified)
+class SimpleDataHandler:
+    def __init__(self, events, df):
+        self.events = events
+        self.df = df
+        self.iter = df.iterrows()
+        self.continue_backtest = True
+    def update_bars(self):
+        try:
+            date, row = next(self.iter)
+            event = {"type": "MARKET", "date": date, "close": row["Adj Close"]}
+            self.events.put(event)
+        except StopIteration:
+            self.continue_backtest = False
+
+# Strategy (SMA 20/50)
+class SimpleStrategy:
+    def __init__(self, events):
+        self.events = events
+        self.prices = []
+        self.position = 0
+    def on_market(self, event):
+        self.prices.append(event["close"])
+        if len(self.prices) < 50:
+            return
+        sma20 = np.mean(self.prices[-20:])
+        sma50 = np.mean(self.prices[-50:])
+
+        if sma20 > sma50 and self.position <= 0:
+            self.events.put({"type": "SIGNAL", "direction": "BUY", "price": event["close"]})
+            self.position = 1
+        elif sma20 < sma50 and self.position >= 0:
+            self.events.put({"type": "SIGNAL", "direction": "SELL", "price": event["close"]})
+            self.position = -1
+
+# Portfolio tracker
+class SimplePortfolio:
+    def __init__(self, initial=10000):
+        self.cash = initial
+        self.equity = [initial]
+        self.position = 0
+        self.entry_price = 0
+    def on_signal(self, event):
+        if event["direction"] == "BUY":
+            self.position = 1
+            self.entry_price = event["price"]
+        else:
+            if self.position == 1:
+                pnl = event["price"] - self.entry_price
+                self.cash += pnl * (self.cash / self.entry_price)  # simplified
+            self.position = -1 if event["direction"] == "SELL" else 0
+    def on_market(self, event):
+        if self.position == 1:
+            mtm = self.cash * (event["close"] / self.entry_price)
+        else:
+            mtm = self.cash
+        self.equity.append(mtm)
+
+# Run loop
+data = SimpleDataHandler(events, df)
+strategy = SimpleStrategy(events)
+portfolio = SimplePortfolio()
+
+while data.continue_backtest or not events.empty():
+    if events.empty():
+        data.update_bars()
+
+    if not events.empty():
+        event = events.get()
+        if event["type"] == "MARKET":
+            strategy.on_market(event)
+            portfolio.on_market(event)
+        elif event["type"] == "SIGNAL":
+            portfolio.on_signal(event)
+
+# Plot equity
+import matplotlib.pyplot as plt
+plt.plot(portfolio.equity)
+plt.title("Event-Driven Equity Curve")
+plt.show()
+print(f"Final equity: ${portfolio.equity[-1]:,.2f}")</code></pre>
+    <div class="tip">
+      <strong>Challenge:</strong> Extend this skeleton by adding a real OrderEvent and FillEvent class. Model commission and slippage explicitly.
+    </div>
+  </div>
+
+  <h3>📝 Exercises: Event-Driven</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Create a <code>MarketEvent</code> dataclass with fields: timestamp, symbol, open, high, low, close, volume.</li>
+      <li>Write a simple event loop that reads a CSV row-by-row and prints the close price.</li>
+      <li>Implement a <code>SignalEvent</code> that stores direction (+1/-1) and symbol.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Build a <code>NaivePortfolio</code> class that tracks cash and positions. It should reject orders that exceed available cash.</li>
+      <li>Implement an <code>ExecutionHandler</code> with fixed slippage ($0.01 per share) and fixed commission ($5 per trade).</li>
+      <li>Connect Strategy → Portfolio → Execution in a full loop. Print every fill event.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Build a complete event-driven backtester from scratch with all 5 components. Test it on 10 years of SPY data.</li>
+      <li>Add support for limit orders: an order is only filled if the price crosses the limit. Track un-filled orders.</li>
+      <li>Implement a live data feed simulator that introduces random gaps (missing bars) and out-of-order timestamps. Ensure the backtester handles them gracefully.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: PERFORMANCE METRICS ==================== -->
+<div id="tab-metrics" class="tab-content">
+  <h2>📉 Performance Metrics</h2>
+  <p>A strategy that returns 50% is not necessarily better than one that returns 10%. You must measure <strong>return per unit of risk</strong> and <strong>worst-case pain</strong>. This section covers the essential metrics every quant must know.</p>
+
+  <h3>Return Metrics</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Total Return</h4>
+      <div class="formula">Total Return = (Final Value / Initial Value) − 1</div>
+      <p>The simplest measure. Tells you how much money you made overall.</p>
+    </div>
+    <div class="card">
+      <h4>CAGR (Compound Annual Growth Rate)</h4>
+      <div class="formula">CAGR = (Final / Initial)^(1/Years) − 1</div>
+      <p>Smooths returns into an annual figure. Allows comparison across different time horizons.</p>
+    </div>
+  </div>
+
+  <h3>Risk-Adjusted Return Metrics</h3>
+
+  <div class="card">
+    <h4>Sharpe Ratio</h4>
+    <p>The most famous metric in finance. Measures excess return per unit of total volatility.</p>
+    <div class="formula">Sharpe = (Rₚ − Rբ) / σₚ</div>
+    <p>Where <code>Rₚ</code> is strategy return, <code>Rբ</code> is risk-free rate, and <code>σₚ</code> is strategy volatility.</p>
+    <ul>
+      <li><strong>Sharpe &gt; 1.0:</strong> Good</li>
+      <li><strong>Sharpe &gt; 2.0:</strong> Excellent</li>
+      <li><strong>Sharpe &lt; 0:</strong> Worse than risk-free rate</li>
+    </ul>
+    <div class="warning">
+      <strong>Limitation:</strong> Sharpe penalizes upside volatility equally with downside volatility. A strategy with massive positive jumps will have a lower Sharpe than a boring strategy with the same return.
+    </div>
+    <pre><code>def sharpe_ratio(returns, risk_free=0.02, periods=252):
+    excess = returns - risk_free/periods
+    return excess.mean() / excess.std() * np.sqrt(periods)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Sortino Ratio</h4>
+    <p>Like Sharpe, but only penalizes <strong>downside</strong> volatility.</p>
+    <div class="formula">Sortino = (Rₚ − Rբ) / σ₋</div>
+    <p>Where <code>σ₋</code> is the standard deviation of <em>negative</em> returns only.</p>
+    <pre><code>def sortino_ratio(returns, risk_free=0.02, periods=252):
+    excess = returns - risk_free/periods
+    downside = returns[returns < 0].std() * np.sqrt(periods)
+    return excess.mean() * periods / downside</code></pre>
+  </div>
+
+  <h3>Drawdown Metrics</h3>
+  <p>A <strong>drawdown</strong> is the decline from a peak to a trough. It measures the pain of holding the strategy.</p>
+
+  <svg class="svg-center" width="600" height="280" viewBox="0 0 600 280">
+    <rect x="10" y="10" width="580" height="260" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Drawdown Visualization</text>
+    <!-- Equity curve -->
+    <polyline points="50,200 100,180 150,190 200,150 250,160 300,130 350,140 400,100 450,110 500,80 550,90" 
+      fill="none" stroke="#198754" stroke-width="2.5"/>
+    <!-- Peaks -->
+    <polyline points="50,200 100,180 150,190 200,150 250,160 300,130 350,140 400,100 450,110 500,80 550,90" 
+      fill="none" stroke="#0056b3" stroke-width="1" stroke-dasharray="3,3"/>
+    <!-- Drawdown fills -->
+    <polygon points="100,180 150,190 150,180 100,180" fill="#dc3545" opacity="0.3"/>
+    <polygon points="200,150 250,160 250,150 200,150" fill="#dc3545" opacity="0.3"/>
+    <polygon points="400,100 450,110 450,100 400,100" fill="#dc3545" opacity="0.3"/>
+    <!-- Max DD annotation -->
+    <line x1="400" y1="100" x2="500" y2="80" stroke="#dc3545" stroke-width="2"/>
+    <text x="450" y="70" text-anchor="middle" font-size="12" fill="#dc3545" font-weight="bold">Max Drawdown</text>
+    <!-- Labels -->
+    <text x="300" y="245" text-anchor="middle" font-size="12" fill="#333">Time →</text>
+    <text x="30" y="150" text-anchor="middle" font-size="12" fill="#333" transform="rotate(-90 30,150)">Equity</text>
+  </svg>
+
+  <div class="card">
+    <h4>Maximum Drawdown (MDD)</h4>
+    <div class="formula">MDD = min( (Peak − Trough) / Peak )</div>
+    <p>The worst peak-to-trough decline during the period. A strategy with 50% return but 40% max drawdown is very painful to hold.</p>
+    <pre><code>def max_drawdown(equity_curve):
+    rolling_max = equity_curve.cummax()
+    drawdown = (equity_curve - rolling_max) / rolling_max
+    return drawdown.min()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Calmar Ratio</h4>
+    <p>CAGR divided by Max Drawdown. Measures return per unit of worst-case pain.</p>
+    <div class="formula">Calmar = CAGR / |MDD|</div>
+    <p>A Calmar &gt; 1.0 is considered excellent. It means your annual return exceeds your worst drawdown.</p>
+  </div>
+
+  <h3>Trade-Level Metrics</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Win Rate</h4>
+      <div class="formula">Win Rate = Winning Trades / Total Trades</div>
+      <p>How often you are right. A high win rate (&gt;60%) is common in mean-reversion. Trend-following often has win rates &lt;40% but wins are large.</p>
+    </div>
+    <div class="card">
+      <h4>Profit Factor</h4>
+      <div class="formula">Profit Factor = Gross Profit / Gross Loss</div>
+      <p>How many dollars you make for every dollar you lose. &gt;1.5 is good. &gt;2.0 is excellent.</p>
+    </div>
+  </div>
+
+  <h3>Benchmark Relative Metrics</h3>
+  <div class="card">
+    <h4>Alpha & Beta</h4>
+    <p>These measure performance <em>relative to a benchmark</em> (usually the S&P 500).</p>
+    <ul>
+      <li><strong>Beta (β):</strong> Measures market sensitivity. β=1 means you move with the market. β=0 means market-neutral.</li>
+      <li><strong>Alpha (α):</strong> Excess return after accounting for market exposure. α &gt; 0 means you beat the market on a risk-adjusted basis.</li>
+    </ul>
+    <div class="formula">Strategy_Return = α + β × Benchmark_Return + ε</div>
+    <pre><code>import numpy as np
+
+def alpha_beta(strategy_returns, benchmark_returns):
+    covariance = np.cov(strategy_returns, benchmark_returns)[0,1]
+    benchmark_var = np.var(benchmark_returns)
+    beta = covariance / benchmark_var
+    alpha = strategy_returns.mean() - beta * benchmark_returns.mean()
+    return alpha, beta</code></pre>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/s/sharperatio.asp" target="_blank">📖 Investopedia: Sharpe Ratio</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp" target="_blank">📖 Investopedia: Maximum Drawdown</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/c/calmarratio.asp" target="_blank">📖 Investopedia: Calmar Ratio</a>
+    <a class="resource-link" href="https://www.portfoliovisualizer.com/" target="_blank">🌐 Portfolio Visualizer — Interactive risk/return analysis</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Metrics</h3>
+  <div class="card">
+    <h4>Experiment 6: The Complete Metrics Suite</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def full_metrics(returns, equity_curve, risk_free=0.02, periods=252):
+    metrics = {}
+
+    # Return
+    metrics["Total Return"] = equity_curve.iloc[-1] / equity_curve.iloc[0] - 1
+    years = len(returns) / periods
+    metrics["CAGR"] = (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (1/years) - 1
+
+    # Risk
+    metrics["Annualized Vol"] = returns.std() * np.sqrt(periods)
+
+    # Ratios
+    excess = returns - risk_free/periods
+    metrics["Sharpe"] = excess.mean() / excess.std() * np.sqrt(periods)
+    downside = returns[returns < 0].std() * np.sqrt(periods)
+    metrics["Sortino"] = excess.mean() * periods / downside if downside > 0 else np.inf
+
+    # Drawdown
+    rolling_max = equity_curve.cummax()
+    drawdown = (equity_curve - rolling_max) / rolling_max
+    metrics["Max Drawdown"] = drawdown.min()
+    metrics["Calmar"] = metrics["CAGR"] / abs(metrics["Max Drawdown"]) if metrics["Max Drawdown"] != 0 else np.inf
+
+    # Trade metrics (approximate from returns)
+    metrics["Win Rate"] = (returns > 0).mean()
+    metrics["Profit Factor"] = abs(returns[returns > 0].sum() / returns[returns < 0].sum())
+
+    return metrics, drawdown
+
+# Test on random strategy
+np.random.seed(42)
+returns = np.random.normal(0.0005, 0.01, 252*5)
+equity = (1 + returns).cumprod()
+metrics, dd = full_metrics(pd.Series(returns), pd.Series(equity))
+
+for k, v in metrics.items():
+    print(f"{k}: {v:.4f}")
+
+# Plot underwater
+fig, ax = plt.subplots(figsize=(10,4))
+ax.fill_between(range(len(dd)), dd, 0, color="red", alpha=0.3)
+ax.plot(dd, color="red")
+ax.set_title("Underwater Plot (Drawdown)")
+ax.set_ylabel("Drawdown %")
+plt.show()</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Performance Metrics</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Given a daily return series, calculate total return, CAGR, and annualized volatility.</li>
+      <li>Calculate the Sharpe ratio for a strategy with mean daily return 0.001 and daily std 0.02. Assume risk-free = 2%.</li>
+      <li>Find the date and depth of the maximum drawdown for SPY during 2020.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Write a function that computes rolling 90-day Sharpe ratio and plots it.</li>
+      <li>Calculate Sortino ratio and Calmar ratio for your SMA crossover backtest.</li>
+      <li>Compute alpha and beta of your strategy against SPY as the benchmark.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Implement the <strong>Information Ratio</strong> (active return / tracking error) and <strong>Sterling Ratio</strong>.</li>
+      <li>Build a function that generates a full "tear sheet": return, risk, ratios, monthly returns heatmap, and underwater plot.</li>
+      <li>Calculate the <strong>Omega Ratio</strong> (probability-weighted ratio of gains vs losses relative to a threshold).</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: RISK MANAGEMENT ==================== -->
+<div id="tab-risk" class="tab-content">
+  <h2>🛡️ Risk Management</h2>
+  <p>A good strategy without risk management will eventually blow up. Risk management is not about avoiding losses—it is about ensuring that no single loss (or string of losses) can destroy your capital.</p>
+
+  <h3>Position Sizing</h3>
+  <p>Position sizing answers: "How many shares do I buy?" It is more important than entry timing.</p>
+
+  <div class="card">
+    <h4>Fixed Dollar Sizing</h4>
+    <p>Invest a fixed amount (e.g., $10,000) per trade. Simple but does not scale with account growth.</p>
+    <div class="formula">Shares = FixedDollar / Price</div>
+  </div>
+
+  <div class="card">
+    <h4>Fixed Fractional Sizing</h4>
+    <p>Risk a fixed percentage of your current equity on each trade. This compounds gains and reduces risk after losses.</p>
+    <div class="formula">Shares = (Equity × Fraction) / Price</div>
+    <pre><code>position_value = portfolio.equity * 0.10  # Risk 10% of equity
+shares = int(position_value / current_price)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Volatility Targeting</h4>
+    <p>Scale your position so that the expected volatility of your portfolio matches a target (e.g., 10% annualized).</p>
+    <div class="formula">Position Size ∝ Target Volatility / Asset Volatility</div>
+    <pre><code>target_vol = 0.10  # 10% annualized
+asset_vol = returns.rolling(20).std().iloc[-1] * np.sqrt(252)
+weight = target_vol / asset_vol  # Leverage factor
+shares = int((equity * weight) / price)</code></pre>
+    <div class="tip">
+      <strong>Insight:</strong> In high-volatility periods (like March 2020), volatility targeting automatically reduces your exposure. In calm periods, it increases it. This is a form of dynamic risk management.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Kelly Criterion (Simplified)</h4>
+    <p>The Kelly Criterion tells you the optimal fraction of your bankroll to bet given your edge.</p>
+    <div class="formula">f* = (bp − q) / b</div>
+    <p>Where <code>b</code> is average win/average loss, <code>p</code> is win probability, <code>q = 1−p</code>.</p>
+    <div class="danger">
+      <strong>Warning:</strong> Full Kelly is extremely aggressive and leads to massive drawdowns. Professional quants use <strong>Half Kelly</strong> or <strong>Quarter Kelly</strong> (divide f* by 2 or 4).
+    </div>
+    <pre><code>def kelly_fraction(win_rate, avg_win, avg_loss):
+    b = avg_win / avg_loss
+    p = win_rate
+    q = 1 - p
+    return (b * p - q) / b</code></pre>
+  </div>
+
+  <h3>Stop Losses</h3>
+  <p>A stop loss is a pre-defined price at which you exit a losing trade. It limits the damage from being wrong.</p>
+
+  <svg class="svg-center" width="600" height="260" viewBox="0 0 600 260">
+    <rect x="10" y="10" width="580" height="240" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Stop Loss Mechanism</text>
+    <!-- Price path -->
+    <polyline points="50,80 100,75 150,85 200,70 250,90 300,100 350,120 400,140 450,180 500,200" 
+      fill="none" stroke="#333" stroke-width="2"/>
+    <!-- Entry -->
+    <circle cx="50" cy="80" r="4" fill="#198754"/>
+    <text x="50" y="65" text-anchor="middle" font-size="11" fill="#198754">Entry @ $100</text>
+    <!-- Stop level -->
+    <line x1="50" y1="150" x2="550" y2="150" stroke="#dc3545" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="520" y="145" text-anchor="end" font-size="11" fill="#dc3545">Stop @ $95 (-5%)</text>
+    <!-- Exit -->
+    <circle cx="300" cy="100" r="4" fill="#dc3545"/>
+    <text x="300" y="170" text-anchor="middle" font-size="11" fill="#dc3545">Exit triggered</text>
+    <line x1="300" y1="100" x2="300" y2="150" stroke="#dc3545" stroke-width="1"/>
+  </svg>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Fixed Stop Loss</h4>
+      <p>Exit if the price moves against you by X%.</p>
+      <pre><code>stop_price = entry_price * (1 - 0.05)  # 5% stop</code></pre>
+    </div>
+    <div class="card">
+      <h4>Trailing Stop</h4>
+      <p>The stop price moves up with the asset. Locks in profits while limiting downside.</p>
+      <pre><code>trailing_stop = highest_price_since_entry * (1 - 0.05)</code></pre>
+    </div>
+  </div>
+
+  <h3>Drawdown Control</h3>
+  <div class="card">
+    <h4>Equity Curve Trading</h4>
+    <p>Reduce position size (or stop trading entirely) when your account is in drawdown beyond a threshold.</p>
+    <pre><code>current_dd = (equity - equity_peak) / equity_peak
+if current_dd < -0.10:  # In 10% drawdown
+    position_size *= 0.5  # Halve size
+if current_dd < -0.20:  # In 20% drawdown
+    position_size = 0  # Stop trading</code></pre>
+    <div class="definition">
+      <strong>Analogy:</strong> Drawdown control is like a circuit breaker in your house. When the current (risk) gets too high, the breaker trips to prevent a fire (ruin).
+    </div>
+  </div>
+
+  <h3>Correlation & Diversification</h3>
+  <p>Risk is not just about one asset—it is about how assets move together.</p>
+  <div class="card">
+    <ul>
+      <li><strong>Diversification:</strong> Spread capital across uncorrelated strategies or assets.</li>
+      <li><strong>Correlation Breakdown:</strong> During crises (2008, 2020), correlations often spike to +1.0. Your diversification disappears when you need it most.</li>
+      <li><strong>Risk Parity:</strong> Allocate capital so that each asset contributes equally to portfolio risk (not equal dollar amounts).</li>
+    </ul>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/k/kellycriterion.asp" target="_blank">📖 Investopedia: Kelly Criterion</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/s/stop-lossorder.asp" target="_blank">📖 Investopedia: Stop-Loss Order</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/Advanced-Trading-Strategies-Risk-Management/" target="_blank">📖 QuantStart: Risk Management</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=vfqRBO4j-dc" target="_blank">🎥 YouTube: Position Sizing & Risk Management for Quants</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Risk Management</h3>
+  <div class="card">
+    <h4>Experiment 7: Volatility Targeting & Stop Losses</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = yf.download("TSLA", start="2020-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+
+# --- Volatility Targeting ---
+target_vol = 0.20  # 20% annualized
+df["Rolling_Vol"] = df["Returns"].rolling(20).std() * np.sqrt(252)
+df["Weight"] = target_vol / df["Rolling_Vol"]
+df["Weight"] = df["Weight"].clip(0, 1.5)  # Cap leverage at 1.5x
+
+# Strategy returns with vol targeting
+df["Signal"] = np.where(df["Adj Close"] > df["Adj Close"].rolling(50).mean(), 1, -1)
+df["Position"] = df["Signal"].shift(1)
+df["Strategy_Return"] = df["Position"] * df["Returns"] * df["Weight"].shift(1)
+
+# --- Stop Loss Simulation ---
+# If daily loss exceeds -3%, exit next day (simplified)
+df["Strategy_Return_Stop"] = df["Strategy_Return"].copy()
+df.loc[df["Strategy_Return"] < -0.03, "Strategy_Return_Stop"] = -0.03
+
+# Equity curves
+df["Cum_Strategy"] = (1 + df["Strategy_Return"]).cumprod()
+df["Cum_Stop"] = (1 + df["Strategy_Return_Stop"]).cumprod()
+df["Cum_BuyHold"] = (1 + df["Returns"]).cumprod()
+
+# Plot
+fig, axes = plt.subplots(2, 1, figsize=(11, 8), gridspec_kw={"height_ratios": [3,1]})
+df[["Cum_BuyHold", "Cum_Strategy", "Cum_Stop"]].plot(ax=axes[0])
+axes[0].set_title("TSLA: Buy & Hold vs Vol-Targeted Strategy vs With Stop Loss")
+axes[0].set_ylabel("Growth of $1")
+
+df["Weight"].plot(ax=axes[1], color="purple")
+axes[1].set_title("Dynamic Position Weight (Vol Targeting)")
+axes[1].set_ylabel("Weight")
+axes[1].axhline(1.0, color="gray", linestyle="--")
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Risk Management</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Implement fixed fractional position sizing: invest exactly 5% of equity per trade.</li>
+      <li>Add a simple stop-loss to your vectorized backtest: if the daily return is &lt; -2%, cap the loss at -2% and go flat the next day.</li>
+      <li>Calculate the Kelly fraction for a strategy with 55% win rate, avg win $200, avg loss $100.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Implement volatility targeting in your SMA backtest. Target 15% annualized volatility. Plot the dynamic leverage over time.</li>
+      <li>Build a trailing stop-loss: track the highest equity since entry, and exit if equity falls 10% from that peak.</li>
+      <li>Apply the Kelly Criterion to size positions, but cap leverage at 2x and floor at 0.1x.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Build a dynamic position sizer that reduces exposure by 20% for every 5% of drawdown from peak equity.</li>
+      <li>Implement correlation-based position sizing for a 5-asset portfolio. Compute the minimum variance portfolio weights.</li>
+      <li>Calculate historical Value-at-Risk (VaR) at 95% and 99% confidence using both parametric and bootstrap methods.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: BIAS & OVERFITTING ==================== -->
+<div id="tab-bias" class="tab-content">
+  <h2>🧪 Bias, Overfitting & Robustness</h2>
+  <p>The difference between a good quant and a bad quant is not finding strategies—it is avoiding <strong>false strategies</strong> that look good due to luck or bias. This section teaches you to be skeptical of your own results.</p>
+
+  <h3>The Four Horsemen of Bad Backtests</h3>
+
+  <div class="card">
+    <h4>1. Look-Ahead Bias</h4>
+    <p>Using information that was not available at the time of the trade.</p>
+    <ul>
+      <li><strong>Example:</strong> Trading at today's close based on today's close. You only know the close after the market closes.</li>
+      <li><strong>Example:</strong> Using quarterly earnings announced after market close to trade at that day's close.</li>
+      <li><strong>Fix:</strong> Always shift signals by at least 1 period. Use <code>.shift(1)</code> or trade at next open.</li>
+    </ul>
+    <div class="danger">
+      <strong>Test:</strong> If your backtest returns 500% per year, you probably have look-ahead bias. No real strategy does that.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>2. Survivorship Bias</h4>
+    <p>Testing only on companies that are still alive today. Dead companies (delisted, bankrupt) are excluded.</p>
+    <ul>
+      <li><strong>Effect:</strong> Your backtest only sees winners. It ignores all the stocks that went to zero.</li>
+      <li><strong>Fix:</strong> Use datasets that include delisted stocks (e.g., CRSP, Norgate Data). If using free data, be aware your results are optimistic.</li>
+    </ul>
+    <div class="definition">
+      <strong>Analogy:</strong> Survivorship bias is like interviewing millionaires and asking their secrets, while ignoring all the people who tried the same things and went bankrupt. You only see the survivors.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>3. Data Snooping (Overfitting)</h4>
+    <p>Testing so many strategies, parameters, or indicators that one is bound to look good by random chance.</p>
+    <ul>
+      <li><strong>Example:</strong> Testing 1000 parameter combinations and picking the best one. The best one is optimized for noise, not signal.</li>
+      <li><strong>Example:</strong> Adding rules until the backtest looks good. "If it rains on Tuesday and the RSI is prime, buy."</li>
+      <li><strong>Fix:</strong> Out-of-sample testing, walk-forward analysis, and adjusting for multiple comparisons (Bonferroni, False Discovery Rate).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>4. Overfitting</h4>
+    <p>The strategy fits the noise in the historical data rather than the underlying signal.</p>
+    <ul>
+      <li><strong>Symptoms:</strong> Too many parameters, perfect in-sample performance, terrible out-of-sample performance.</li>
+      <li><strong>Rule of Thumb:</strong> You need at least 100 observations per parameter. A strategy with 5 parameters needs 500+ trades to be trustworthy.</li>
+    </ul>
+  </div>
+
+  <svg class="svg-center" width="600" height="300" viewBox="0 0 600 300">
+    <rect x="10" y="10" width="580" height="280" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">In-Sample vs Out-of-Sample</text>
+    <!-- Timeline -->
+    <line x1="50" y1="150" x2="550" y2="150" stroke="#333" stroke-width="2"/>
+    <!-- In-sample -->
+    <rect x="50" y="120" width="300" height="60" rx="4" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="200" y="145" text-anchor="middle" font-size="13" fill="#198754" font-weight="bold">In-Sample (Train)</text>
+    <text x="200" y="165" text-anchor="middle" font-size="11" fill="#333">Optimize parameters here</text>
+    <!-- Out-of-sample -->
+    <rect x="350" y="120" width="200" height="60" rx="4" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="450" y="145" text-anchor="middle" font-size="13" fill="#dc3545" font-weight="bold">Out-of-Sample (Test)</text>
+    <text x="450" y="165" text-anchor="middle" font-size="11" fill="#333">Validate parameters here</text>
+    <!-- Arrow -->
+    <polygon points="350,150 340,145 340,155" fill="#333"/>
+    <!-- Warning -->
+    <text x="300" y="220" text-anchor="middle" font-size="12" fill="#856404">Never optimize on the test set!</text>
+    <text x="300" y="240" text-anchor="middle" font-size="12" fill="#856404">If OOS performance &lt;&lt; IS, you overfitted.</text>
+    <text x="300" y="270" text-anchor="middle" font-size="11" fill="#6c757d">Time →</text>
+  </svg>
+
+  <h3>Robustness Checks</h3>
+  <div class="card">
+    <h4>Monte Carlo Simulation</h4>
+    <p>Shuffle the order of your returns 1000 times and recompute metrics. If your strategy relies on a specific sequence of trades, it is fragile.</p>
+    <pre><code>def monte_carlo(returns, n_sims=1000):
+    final_values = []
+    for _ in range(n_sims):
+        shuffled = np.random.permutation(returns)
+        equity = (1 + shuffled).cumprod()
+        final_values.append(equity[-1])
+    return np.percentile(final_values, [5, 50, 95])</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Parameter Sensitivity Analysis</h4>
+    <p>A robust strategy should perform well across a <em>range</em> of parameters, not just one magic number.</p>
+    <pre><code># Test SMA crossover for fast = 10 to 100
+results = []
+for fast in range(10, 101, 10):
+    for slow in range(fast+20, 301, 20):
+        sharpe = backtest_sma(fast, slow)
+        results.append((fast, slow, sharpe))
+
+# Plot heatmap: if only one square is green, it's overfitted</code></pre>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/s/survivorship-bias.asp" target="_blank">📖 Investopedia: Survivorship Bias</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/o/overfitting.asp" target="_blank">📖 Investopedia: Overfitting</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/The-Dangers-of-Overfitting/" target="_blank">📖 QuantStart: The Dangers of Overfitting</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=EuBBz3bI-aA" target="_blank">🎥 YouTube: Marcos Lopez de Prado on Overfitting</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Bias Detection</h3>
+  <div class="card">
+    <h4>Experiment 8: Detect Overfitting with Monte Carlo</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Simulate a "too good to be true" strategy
+np.random.seed(42)
+returns = np.random.normal(0.001, 0.02, 1000)
+# Artificially add a pattern (overfitting)
+returns[::10] += 0.05  # Every 10th day is a big win
+
+# Monte Carlo: shuffle returns
+n_sims = 1000
+final_sharpes = []
+for i in range(n_sims):
+    shuffled = np.random.permutation(returns)
+    sharpe = np.mean(shuffled) / np.std(shuffled) * np.sqrt(252)
+    final_sharpes.append(sharpe)
+
+# Plot distribution
+plt.hist(final_sharpes, bins=50, edgecolor="black", alpha=0.7)
+plt.axvline(np.mean(final_sharpes), color="red", linestyle="--", label="Mean")
+plt.title("Monte Carlo Sharpe Distribution")
+plt.xlabel("Sharpe Ratio")
+plt.ylabel("Frequency")
+plt.legend()
+plt.show()
+
+print(f"Mean simulated Sharpe: {np.mean(final_sharpes):.3f}")
+print(f"5th percentile: {np.percentile(final_sharpes, 5):.3f}")
+print(f"95th percentile: {np.percentile(final_sharpes, 95):.3f}")</code></pre>
+    <div class="tip">
+      <strong>Interpretation:</strong> If your backtest Sharpe is far outside the 95th percentile of random permutations, it may be overfitted to a specific path.
+    </div>
+  </div>
+
+  <h3>📝 Exercises: Bias & Overfitting</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Identify look-ahead bias in this code: <code>df["Signal"] = np.where(df["Close"] > df["SMA"], 1, -1); df["Return"] = df["Signal"] * df["Close"].pct_change()</code>. Fix it.</li>
+      <li>Explain survivorship bias in your own words. Give a real-world example.</li>
+      <li>List three ways to reduce overfitting in a backtest.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Implement a train/test split for time series (first 70% train, last 30% test). Optimize SMA periods on train, evaluate on test.</li>
+      <li>Run a permutation test: shuffle your strategy returns 500 times. Is your observed Sharpe ratio statistically significant (p &lt; 0.05)?</li>
+      <li>Test parameter sensitivity: backtest SMA crossovers for all combinations of fast=[10,20,30,40,50] and slow=[100,150,200,250]. Plot a heatmap of Sharpe ratios.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Implement <strong>Combinatorial Purged Cross-Validation</strong> (Lopez de Prado): split data into N groups, train on all but one, test on the held-out group, with a purge gap between train and test to prevent leakage.</li>
+      <li>Calculate the <strong>Deflated Sharpe Ratio</strong> to account for multiple trials (testing many strategies).</li>
+      <li>Build a function that detects look-ahead bias automatically by checking if any signal uses data from the same timestamp or future timestamps.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: OPTIMIZATION & WALK-FORWARD ==================== -->
+<div id="tab-walkforward" class="tab-content">
+  <h2>🔬 Optimization & Walk-Forward Analysis</h2>
+  <p>Finding good parameters is necessary, but optimizing them naively leads to overfitting. Walk-Forward Analysis (WFA) is the gold standard for robust parameter selection.</p>
+
+  <h3>Naive Optimization: Grid Search</h3>
+  <p>Test every combination of parameters and pick the best. This is fast but dangerous.</p>
+  <div class="card">
+    <pre><code>best_sharpe = -np.inf
+best_params = None
+
+for fast in range(10, 101, 10):
+    for slow in range(fast+20, 301, 20):
+        sharpe = backtest(fast, slow)
+        if sharpe > best_sharpe:
+            best_sharpe = sharpe
+            best_params = (fast, slow)
+
+print(f"Best: {best_params} with Sharpe {best_sharpe}")</code></pre>
+    <div class="danger">
+      <strong>Problem:</strong> With 10×10 = 100 combinations, you have a high chance that the "best" one is lucky. This is data snooping.
+    </div>
+  </div>
+
+  <h3>Walk-Forward Analysis (WFA)</h3>
+  <p>WFA simulates how you would actually trade: optimize on recent history, trade for a short period, then repeat.</p>
+
+  <svg class="svg-center" width="650" height="320" viewBox="0 0 650 320">
+    <rect x="10" y="10" width="630" height="300" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="325" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Walk-Forward Analysis</text>
+
+    <!-- Window 1 -->
+    <rect x="40" y="60" width="200" height="50" rx="4" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="140" y="80" text-anchor="middle" font-size="12" fill="#198754" font-weight="bold">Train 1</text>
+    <text x="140" y="98" text-anchor="middle" font-size="10" fill="#333">Optimize params</text>
+    <rect x="240" y="60" width="100" height="50" rx="4" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="290" y="80" text-anchor="middle" font-size="12" fill="#dc3545" font-weight="bold">Test 1</text>
+    <text x="290" y="98" text-anchor="middle" font-size="10" fill="#333">Trade fixed params</text>
+
+    <!-- Window 2 -->
+    <rect x="140" y="130" width="200" height="50" rx="4" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="240" y="150" text-anchor="middle" font-size="12" fill="#198754" font-weight="bold">Train 2</text>
+    <text x="240" y="168" text-anchor="middle" font-size="10" fill="#333">Optimize params</text>
+    <rect x="340" y="130" width="100" height="50" rx="4" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="390" y="150" text-anchor="middle" font-size="12" fill="#dc3545" font-weight="bold">Test 2</text>
+    <text x="390" y="168" text-anchor="middle" font-size="10" fill="#333">Trade fixed params</text>
+
+    <!-- Window 3 -->
+    <rect x="240" y="200" width="200" height="50" rx="4" fill="#d1e7dd" stroke="#198754" stroke-width="2"/>
+    <text x="340" y="220" text-anchor="middle" font-size="12" fill="#198754" font-weight="bold">Train 3</text>
+    <text x="340" y="238" text-anchor="middle" font-size="10" fill="#333">Optimize params</text>
+    <rect x="440" y="200" width="100" height="50" rx="4" fill="#f8d7da" stroke="#dc3545" stroke-width="2"/>
+    <text x="490" y="220" text-anchor="middle" font-size="12" fill="#dc3545" font-weight="bold">Test 3</text>
+    <text x="490" y="238" text-anchor="middle" font-size="10" fill="#333">Trade fixed params</text>
+
+    <!-- Arrow -->
+    <line x1="325" y1="270" x2="325" y2="290" stroke="#333" stroke-width="2"/>
+    <polygon points="325,290 320,280 330,280" fill="#333"/>
+    <text x="325" y="305" text-anchor="middle" font-size="12" fill="#333">Concatenate all Test periods for final equity curve</text>
+  </svg>
+
+  <div class="card">
+    <h4>WFA Algorithm</h4>
+    <ol>
+      <li>Split data into <code>N</code> windows.</li>
+      <li>For each window <code>i</code>:
+        <ul>
+          <li>Optimize parameters on the <strong>Train</strong> portion.</li>
+          <li>Run the strategy with those parameters on the <strong>Test</strong> portion. <strong>Do not re-optimize during the test.</strong></li>
+        </ul>
+      </li>
+      <li>Concatenate all Test portions to form the final out-of-sample equity curve.</li>
+    </ol>
+    <div class="tip">
+      <strong>Key Insight:</strong> WFA mimics reality. You optimize on the past, trade for a while, then re-optimize. If the strategy fails WFA, it will fail in live trading.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Implementation</h4>
+    <pre><code>def walk_forward(df, train_size=252*3, test_size=252, fast_range=range(10,101,10), slow_range=range(100,301,20)):
+    n = len(df)
+    test_returns = []
+
+    for start in range(0, n - train_size - test_size, test_size):
+        train = df.iloc[start : start+train_size]
+        test = df.iloc[start+train_size : start+train_size+test_size]
+
+        # Optimize on train
+        best_sharpe = -np.inf
+        best_fast, best_slow = 50, 200
+        for fast in fast_range:
+            for slow in slow_range:
+                if fast >= slow: continue
+                sharpe = backtest(train, fast, slow)
+                if sharpe > best_sharpe:
+                    best_sharpe = sharpe
+                    best_fast, best_slow = fast, slow
+
+        # Test with best params (fixed!)
+        test_ret = backtest_returns(test, best_fast, best_slow)
+        test_returns.extend(test_ret)
+
+    return pd.Series(test_returns)</code></pre>
+  </div>
+
+  <h3>Parameter Stability</h3>
+  <p>A robust strategy should have optimal parameters that are <strong>stable</strong> across windows. If the best fast SMA jumps from 10 to 90 between windows, the strategy is fragile.</p>
+  <div class="card">
+    <pre><code># Track optimal params per window
+param_history = []
+for ...:
+    best_fast, best_slow = optimize(train)
+    param_history.append((best_fast, best_slow))
+
+# Plot param history
+pd.DataFrame(param_history, columns=["Fast","Slow"]).plot()
+plt.title("Parameter Stability Over Time")
+plt.show()</code></pre>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/w/walk-forward-optimization.asp" target="_blank">📖 Investopedia: Walk-Forward Optimization</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/Walk-Forward-Analysis-For-Trading-Strategies/" target="_blank">📖 QuantStart: Walk-Forward Analysis</a>
+    <a class="resource-link" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678" target="_blank">📄 SSRN: The Deflated Sharpe Ratio (Lopez de Prado)</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Walk-Forward</h3>
+  <div class="card">
+    <h4>Experiment 9: Walk-Forward SMA Optimization</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = yf.download("SPY", start="2010-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+
+def backtest_sharpe(data, fast, slow):
+    data = data.copy()
+    data["SMA_F"] = data["Adj Close"].rolling(fast).mean()
+    data["SMA_S"] = data["Adj Close"].rolling(slow).mean()
+    data["Signal"] = np.where(data["SMA_F"] > data["SMA_S"], 1, -1)
+    data["Position"] = data["Signal"].shift(1)
+    data["Strat"] = data["Position"] * data["Returns"]
+    data = data.dropna()
+    if data["Strat"].std() == 0:
+        return -999
+    return (data["Strat"].mean() / data["Strat"].std()) * np.sqrt(252)
+
+# Walk-forward
+train_size = 252 * 3
+test_size = 252
+n = len(df)
+all_test_returns = []
+param_history = []
+
+for start in range(0, n - train_size - test_size, test_size):
+    train = df.iloc[start:start+train_size]
+    test = df.iloc[start+train_size:start+train_size+test_size]
+
+    best_sharpe = -np.inf
+    best_f, best_s = 50, 200
+    for f in range(20, 101, 20):
+        for s in range(150, 301, 50):
+            if f >= s: continue
+            sharpe = backtest_sharpe(train, f, s)
+            if sharpe > best_sharpe:
+                best_sharpe = sharpe
+                best_f, best_s = f, s
+
+    param_history.append((train.index[-1], best_f, best_s))
+
+    # Run on test
+    test_sharpe = backtest_sharpe(test, best_f, best_s)
+    test["SMA_F"] = test["Adj Close"].rolling(best_f).mean()
+    test["SMA_S"] = test["Adj Close"].rolling(best_s).mean()
+    test["Signal"] = np.where(test["SMA_F"] > test["SMA_S"], 1, -1)
+    test["Position"] = test["Signal"].shift(1)
+    test["Strat"] = test["Position"] * test["Returns"]
+    all_test_returns.extend(test["Strat"].dropna().tolist())
+
+# Equity curve
+wfa_equity = (1 + pd.Series(all_test_returns)).cumprod()
+buyhold = (1 + df["Returns"].iloc[-len(wfa_equity):]).cumprod()
+
+plt.figure(figsize=(10,5))
+plt.plot(wfa_equity.values, label="Walk-Forward Strategy")
+plt.plot(buyhold.values, label="Buy & Hold (same period)")
+plt.title("Walk-Forward Analysis: Out-of-Sample Equity Curve")
+plt.legend()
+plt.show()
+
+# Param stability
+ph = pd.DataFrame(param_history, columns=["Date","Fast","Slow"])
+print(ph.head(10))</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Optimization</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Run a grid search over SMA periods (fast=[10,20,30], slow=[100,150,200]). Find the combination with the highest Sharpe ratio.</li>
+      <li>Plot a heatmap of Sharpe ratios for the grid search above.</li>
+      <li>Explain why the "best" in-sample parameters often fail out-of-sample.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Implement walk-forward analysis with 5 windows on QQQ data. Use 3 years train, 1 year test.</li>
+      <li>Compare in-sample optimal Sharpe vs out-of-sample Sharpe. Calculate the degradation ratio.</li>
+      <li>Test parameter stability: calculate the standard deviation of optimal fast and slow periods across windows.</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Implement a genetic algorithm (using <code>DEAP</code> library) to optimize strategy parameters. Compare speed vs grid search.</li>
+      <li>Build a regime-switching optimizer: select parameters based on whether the current volatility regime is high or low.</li>
+      <li>Perform multi-objective optimization maximizing Sharpe while minimizing Max Drawdown using a Pareto frontier.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: EXECUTION ==================== -->
+<div id="tab-execution" class="tab-content">
+  <h2>⚙️ Execution, Slippage & Costs</h2>
+  <p>A backtest that ignores costs is a fantasy. In reality, every trade costs you money. This section teaches you to model the difference between theoretical P&L and realized P&L.</p>
+
+  <h3>Types of Orders</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Market Order</h4>
+      <p>Execute immediately at the best available price. Guaranteed fill, uncertain price.</p>
+      <ul>
+        <li><strong>Pros:</strong> Always filled.</li>
+        <li><strong>Cons:</strong> Subject to slippage, especially in low-volume periods.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Limit Order</h4>
+      <p>Execute only at a specified price or better. Guaranteed price, uncertain fill.</p>
+      <ul>
+        <li><strong>Pros:</strong> No slippage (if filled).</li>
+        <li><strong>Cons:</strong> May never be filled. In fast markets, price may run away from you.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>The Cost Trinity</h3>
+  <p>Every trade has three costs:</p>
+  <ol>
+    <li><strong>Commission:</strong> The broker's fee. Often fixed per trade or per share.</li>
+    <li><strong>Slippage:</strong> The difference between expected fill price and actual fill price.</li>
+    <li><strong>Market Impact:</strong> Your own order moves the price. Significant for large orders.</li>
+  </ol>
+
+  <svg class="svg-center" width="600" height="260" viewBox="0 0 600 260">
+    <rect x="10" y="10" width="580" height="240" rx="10" fill="#fff" stroke="#dee2e6" stroke-width="2"/>
+    <text x="300" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1b263b">Order Book & Slippage</text>
+    <!-- Bid side -->
+    <rect x="50" y="60" width="200" height="30" rx="3" fill="#d1e7dd" stroke="#198754" stroke-width="1"/>
+    <text x="150" y="80" text-anchor="middle" font-size="12" fill="#198754">Bid $99.95 (100 shares)</text>
+    <rect x="50" y="95" width="200" height="30" rx="3" fill="#d1e7dd" stroke="#198754" stroke-width="1" opacity="0.7"/>
+    <text x="150" y="115" text-anchor="middle" font-size="12" fill="#198754">Bid $99.90 (200 shares)</text>
+    <rect x="50" y="130" width="200" height="30" rx="3" fill="#d1e7dd" stroke="#198754" stroke-width="1" opacity="0.5"/>
+    <text x="150" y="150" text-anchor="middle" font-size="12" fill="#198754">Bid $99.85 (500 shares)</text>
+    <!-- Ask side -->
+    <rect x="350" y="60" width="200" height="30" rx="3" fill="#f8d7da" stroke="#dc3545" stroke-width="1"/>
+    <text x="450" y="80" text-anchor="middle" font-size="12" fill="#dc3545">Ask $100.05 (100 shares)</text>
+    <rect x="350" y="95" width="200" height="30" rx="3" fill="#f8d7da" stroke="#dc3545" stroke-width="1" opacity="0.7"/>
+    <text x="450" y="115" text-anchor="middle" font-size="12" fill="#dc3545">Ask $100.10 (200 shares)</text>
+    <rect x="350" y="130" width="200" height="30" rx="3" fill="#f8d7da" stroke="#dc3545" stroke-width="1" opacity="0.5"/>
+    <text x="450" y="150" text-anchor="middle" font-size="12" fill="#dc3545">Ask $100.15 (500 shares)</text>
+    <!-- Spread -->
+    <line x1="250" y1="75" x2="350" y2="75" stroke="#333" stroke-width="2"/>
+    <text x="300" y="70" text-anchor="middle" font-size="11" fill="#333">Spread = $0.10</text>
+    <!-- Market order impact -->
+    <text x="300" y="200" text-anchor="middle" font-size="12" fill="#856404">Market Buy 300 shares → Fills @ $100.05 and $100.10</text>
+    <text x="300" y="220" text-anchor="middle" font-size="12" fill="#856404">Average fill = $100.083 → Slippage vs mid = $0.033</text>
+  </svg>
+
+  <h3>Modeling Slippage</h3>
+  <div class="card">
+    <h4>Fixed Slippage</h4>
+    <p>Add a fixed percentage to every trade. Simple but unrealistic.</p>
+    <pre><code>fill_price = close_price * (1 + 0.001)  # 0.1% slippage</code></pre>
+  </div>
+  <div class="card">
+    <h4>Volume-Weighted Slippage</h4>
+    <p>More realistic. Slippage increases when your order size is large relative to market volume.</p>
+    <pre><code>volume_ratio = order_size / daily_volume
+slippage = 0.0001 + 0.001 * volume_ratio  # Base + variable
+fill_price = close_price * (1 + slippage)</code></pre>
+  </div>
+  <div class="card">
+    <h4>Market Impact (Square-Root Law)</h4>
+    <p>For large institutional orders, market impact follows a square-root relationship with order size.</p>
+    <div class="formula">Impact = σ × √(Order Size / Daily Volume)</div>
+    <p>Where <code>σ</code> is daily volatility. This is used by execution algorithms (TWAP, VWAP) to minimize impact.</p>
+  </div>
+
+  <h3>Commission Models</h3>
+  <table>
+    <tr><th>Model</th><th>Structure</th><th>Best For</th></tr>
+    <tr><td>Fixed per trade</td><td>$5 per trade regardless of size</td><td>Retail investors, large trades</td></tr>
+    <tr><td>Per share</td><td>$0.005 per share</td><td>Small trades, high frequency</td></tr>
+    <tr><td>Percentage</td><td>0.1% of trade value</td><td>International brokers, crypto</td></tr>
+    <tr><td>Zero commission</td><td>$0 (but payment for order flow)</td><td>Robinhood, etc. (hidden costs exist)</td></tr>
+  </table>
+
+  <h3>Execution Algorithms</h3>
+  <div class="card">
+    <ul>
+      <li><strong>TWAP (Time-Weighted Average Price):</strong> Slice the order evenly over time. Simple, predictable.</li>
+      <li><strong>VWAP (Volume-Weighted Average Price):</strong> Slice the order proportionally to historical volume profile. Harder to detect.</li>
+      <li><strong>Implementation Shortfall:</strong> Balance market impact vs. timing risk. More aggressive early, then passive.</li>
+    </ul>
+  </div>
+
+  <h3>📚 External Resources</h3>
+  <div class="card">
+    <a class="resource-link" href="https://www.investopedia.com/terms/s/slippage.asp" target="_blank">📖 Investopedia: Slippage</a>
+    <a class="resource-link" href="https://www.investopedia.com/terms/m/marketimpact.asp" target="_blank">📖 Investopedia: Market Impact</a>
+    <a class="resource-link" href="https://www.quantstart.com/articles/Execution-Systems/" target="_blank">📖 QuantStart: Execution Systems</a>
+    <a class="resource-link" href="https://www.youtube.com/watch?v=2u007Msq1qo" target="_blank">🎥 YouTube: Market Microstructure for Quants</a>
+  </div>
+
+  <h3>🧪 Colab Experiment: Execution</h3>
+  <div class="card">
+    <h4>Experiment 10: Cost Impact Analysis</h4>
+    <pre><code>import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = yf.download("SPY", start="2020-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+df["Signal"] = np.where(df["Adj Close"] > df["Adj Close"].rolling(50).mean(), 1, -1)
+df["Position"] = df["Signal"].shift(1)
+
+# Base strategy (no costs)
+df["Strat_Base"] = df["Position"] * df["Returns"]
+
+# With commission (0.1% round trip) and slippage
+df["Trades"] = df["Position"].diff().abs()
+commission = 0.001  # 0.1% per trade
+slippage = 0.0005   # 0.05% per trade
+df["Costs"] = df["Trades"] * (commission + slippage)
+df["Strat_Costly"] = df["Strat_Base"] - df["Costs"]
+
+# Equity curves
+df["Cum_Base"] = (1 + df["Strat_Base"]).cumprod()
+df["Cum_Costly"] = (1 + df["Strat_Costly"]).cumprod()
+
+# Plot
+fig, axes = plt.subplots(2, 1, figsize=(11, 8))
+df[["Cum_Base", "Cum_Costly"]].plot(ax=axes[0])
+axes[0].set_title("Impact of Costs on Strategy Performance")
+axes[0].set_ylabel("Growth of $1")
+
+df["Costs"].cumsum().plot(ax=axes[1], color="red")
+axes[1].set_title("Cumulative Costs Paid")
+axes[1].set_ylabel("Cost as % of Equity")
+plt.tight_layout()
+plt.show()
+
+print(f"Total trades: {int(df['Trades'].sum())}")
+print(f"Total cost: {df['Costs'].sum():.4f}")
+print(f"Return without costs: {df['Cum_Base'].iloc[-1]-1:.2%}")
+print(f"Return with costs: {df['Cum_Costly'].iloc[-1]-1:.2%}")</code></pre>
+  </div>
+
+  <h3>📝 Exercises: Execution</h3>
+  <div class="exercise-box easy">
+    <span class="tag easy">Easy</span>
+    <ol>
+      <li>Model a fixed commission of $5 per trade in your backtest. How does it affect a high-frequency strategy vs a low-frequency one?</li>
+      <li>Calculate total slippage assuming 0.05% per trade. Compare gross Sharpe vs net Sharpe.</li>
+      <li>Explain the difference between a market order and a limit order in your own words.</li>
+    </ol>
+  </div>
+  <div class="exercise-box medium">
+    <span class="tag medium">Medium</span>
+    <ol>
+      <li>Implement a volume-weighted slippage model: slippage increases when today's volume is below the 20-day average.</li>
+      <li>Build a realistic cost model: commission ($0.005/share) + slippage (0.02%) + borrow fee (0.3% annually for short positions).</li>
+      <li>Simulate the impact of doubling your trading frequency. At what point do costs make the strategy unprofitable?</li>
+    </ol>
+  </div>
+  <div class="exercise-box hard">
+    <span class="tag hard">Hard</span>
+    <ol>
+      <li>Model market impact using the square-root law. Compare fill prices for order sizes of 1%, 5%, and 10% of daily volume.</li>
+      <li>Build a TWAP execution simulator: slice a 10,000-share order into 10 chunks executed over the day. Compare average fill price vs market-on-close.</li>
+      <li>Optimize execution timing: use historical volume profiles to determine the best hours to execute large orders.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ==================== TAB: COLAB EXPERIMENTS ==================== -->
+<div id="tab-colab" class="tab-content">
+  <h2>🧪 Complete Colab Experiments</h2>
+  <p>This tab consolidates all experiments into copy-paste-ready blocks. Open <a href="https://colab.research.google.com/" target="_blank">Google Colab</a>, create a new notebook, and run these cells sequentially.</p>
+
+  <div class="card">
+    <h4>🔧 Setup Cell (Run First)</h4>
+    <pre><code>!pip install yfinance pandas numpy matplotlib
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore')
+plt.style.use('seaborn-v0_8-whitegrid')</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 1: Data Exploration & Returns</h4>
+    <pre><code># Download and analyze
+ticker = "SPY"
+df = yf.download(ticker, start="2019-01-01", end="2024-01-01")
+df["Simple_Return"] = df["Adj Close"].pct_change()
+df["Log_Return"] = np.log(df["Adj Close"] / df["Adj Close"].shift(1))
+
+print("=== BASIC STATS ===")
+print(f"Mean daily return: {df['Simple_Return'].mean():.6f}")
+print(f"Daily volatility: {df['Simple_Return'].std():.6f}")
+print(f"Annualized vol: {df['Simple_Return'].std() * np.sqrt(252):.4f}")
+
+fig, axes = plt.subplots(3, 1, figsize=(10, 10))
+df["Adj Close"].plot(ax=axes[0], title=f"{ticker} Price")
+df["Simple_Return"].plot(ax=axes[1], title="Daily Returns", color="purple")
+df["Simple_Return"].rolling(30).std().plot(ax=axes[2], title="30-Day Rolling Vol", color="red")
+plt.tight_layout(); plt.show()
+
+df["Simple_Return"].hist(bins=100, figsize=(8,4))
+plt.title("Return Distribution"); plt.show()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 2: Indicator Dashboard</h4>
+    <pre><code>df = yf.download("AAPL", start="2022-01-01", end="2024-01-01")
+
+# Moving averages
+df["SMA_20"] = df["Adj Close"].rolling(20).mean()
+df["SMA_50"] = df["Adj Close"].rolling(50).mean()
+df["EMA_20"] = df["Adj Close"].ewm(span=20, adjust=False).mean()
+
+# RSI
+delta = df["Adj Close"].diff()
+rs = delta.where(delta>0,0).rolling(14).mean() / (-delta.where(delta<0,0)).rolling(14).mean()
+df["RSI"] = 100 - (100/(1+rs))
+
+# Bollinger Bands
+df["BB_Mid"] = df["Adj Close"].rolling(20).mean()
+df["BB_Std"] = df["Adj Close"].rolling(20).std()
+df["BB_Upper"] = df["BB_Mid"] + 2*df["BB_Std"]
+df["BB_Lower"] = df["BB_Mid"] - 2*df["BB_Std"]
+
+# Plot
+fig, axes = plt.subplots(3, 1, figsize=(12, 10), gridspec_kw={"height_ratios": [3,1,1]})
+df["Adj Close"].plot(ax=axes[0], label="Price", color="black")
+df["SMA_20"].plot(ax=axes[0], label="SMA20", color="blue")
+df["SMA_50"].plot(ax=axes[0], label="SMA50", color="orange")
+df["BB_Upper"].plot(ax=axes[0], color="gray", linestyle="--")
+df["BB_Lower"].plot(ax=axes[0], color="gray", linestyle="--")
+axes[0].fill_between(df.index, df["BB_Lower"], df["BB_Upper"], color="gray", alpha=0.1)
+axes[0].legend(); axes[0].set_title("AAPL with Indicators")
+
+df["RSI"].plot(ax=axes[1], color="purple")
+axes[1].axhline(70, color="red", linestyle="--"); axes[1].axhline(30, color="green", linestyle="--")
+axes[1].set_title("RSI"); axes[1].set_ylim(0,100)
+
+df["Volume"].plot(ax=axes[2], color="gray"); axes[2].set_title("Volume")
+plt.tight_layout(); plt.show()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 3: Vectorized Backtest Engine</h4>
+    <pre><code>def backtest(ticker, start, end, fast=50, slow=200, commission=0.001):
+    df = yf.download(ticker, start=start, end=end)
+    df["SMA_F"] = df["Adj Close"].rolling(fast).mean()
+    df["SMA_S"] = df["Adj Close"].rolling(slow).mean()
+    df["Signal"] = np.where(df["SMA_F"] > df["SMA_S"], 1, -1)
+    df["Position"] = df["Signal"].shift(1)
+    df["AssetRet"] = df["Adj Close"].pct_change()
+    df["StratRet"] = df["Position"] * df["AssetRet"]
+    df["Trades"] = df["Position"].diff().abs()
+    df["NetRet"] = df["StratRet"] - df["Trades"] * commission
+    df["Cum_BH"] = (1 + df["AssetRet"]).cumprod()
+    df["Cum_Strat"] = (1 + df["NetRet"]).cumprod()
+
+    # Metrics
+    total = df["Cum_Strat"].iloc[-1] - 1
+    vol = df["NetRet"].std() * np.sqrt(252)
+    sharpe = (df["NetRet"].mean() * 252) / vol
+    dd = (df["Cum_Strat"] - df["Cum_Strat"].cummax()) / df["Cum_Strat"].cummax()
+    max_dd = dd.min()
+
+    print(f"Total Return: {total:.2%}")
+    print(f"Volatility: {vol:.2%}")
+    print(f"Sharpe: {sharpe:.3f}")
+    print(f"Max DD: {max_dd:.2%}")
+
+    fig, axes = plt.subplots(2, 1, figsize=(11, 8), gridspec_kw={"height_ratios": [3,1]})
+    df[["Cum_BH", "Cum_Strat"]].plot(ax=axes[0])
+    axes[0].set_title(f"{ticker} Backtest: {fast}/{slow} SMA")
+    dd.plot(ax=axes[1], color="red")
+    axes[1].fill_between(dd.index, dd, 0, color="red", alpha=0.3)
+    axes[1].set_title("Drawdown")
+    plt.tight_layout(); plt.show()
+    return df
+
+results = backtest("SPY", "2010-01-01", "2024-01-01", fast=50, slow=200)</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 4: Risk Management</h4>
+    <pre><code>df = yf.download("TSLA", start="2020-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+df["Signal"] = np.where(df["Adj Close"] > df["Adj Close"].rolling(50).mean(), 1, -1)
+df["Position"] = df["Signal"].shift(1)
+
+# Volatility targeting
+target_vol = 0.25
+df["RollVol"] = df["Returns"].rolling(20).std() * np.sqrt(252)
+df["Weight"] = (target_vol / df["RollVol"]).clip(0, 1.5)
+df["StratRet"] = df["Position"] * df["Returns"] * df["Weight"].shift(1)
+
+# Stop loss: cap daily loss at -3%
+df["StratRet_Stop"] = df["StratRet"].copy()
+df.loc[df["StratRet"] < -0.03, "StratRet_Stop"] = -0.03
+
+# Equity curves
+df["Cum_Strat"] = (1 + df["StratRet"]).cumprod()
+df["Cum_Stop"] = (1 + df["StratRet_Stop"]).cumprod()
+df["Cum_BH"] = (1 + df["Returns"]).cumprod()
+
+fig, axes = plt.subplots(2, 1, figsize=(11, 8), gridspec_kw={"height_ratios": [3,1]})
+df[["Cum_BH", "Cum_Strat", "Cum_Stop"]].plot(ax=axes[0])
+axes[0].set_title("TSLA: Buy & Hold vs Vol-Target vs Stop-Loss")
+df["Weight"].plot(ax=axes[1], color="purple")
+axes[1].set_title("Dynamic Weight"); axes[1].axhline(1, color="gray", linestyle="--")
+plt.tight_layout(); plt.show()</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 5: Walk-Forward Analysis</h4>
+    <pre><code>df = yf.download("SPY", start="2010-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+
+def bt_sharpe(data, f, s):
+    data = data.copy()
+    data["SF"] = data["Adj Close"].rolling(f).mean()
+    data["SS"] = data["Adj Close"].rolling(s).mean()
+    data["Sig"] = np.where(data["SF"] > data["SS"], 1, -1)
+    data["Pos"] = data["Sig"].shift(1)
+    data["SR"] = data["Pos"] * data["Returns"]
+    data = data.dropna()
+    if data["SR"].std() == 0: return -999
+    return (data["SR"].mean() / data["SR"].std()) * np.sqrt(252)
+
+train_sz, test_sz = 252*3, 252
+n = len(df)
+test_rets = []
+
+for start in range(0, n - train_sz - test_sz, test_sz):
+    train = df.iloc[start:start+train_sz]
+    test = df.iloc[start+train_sz:start+train_sz+test_sz]
+    best_s, best_f = -999, (50,200)
+    for f in range(20, 101, 20):
+        for s in range(150, 301, 50):
+            if f >= s: continue
+            sh = bt_sharpe(train, f, s)
+            if sh > best_s: best_s, best_f = sh, (f,s)
+    test["SF"] = test["Adj Close"].rolling(best_f[0]).mean()
+    test["SS"] = test["Adj Close"].rolling(best_f[1]).mean()
+    test["Sig"] = np.where(test["SF"] > test["SS"], 1, -1)
+    test["Pos"] = test["Sig"].shift(1)
+    test_rets.extend((test["Pos"] * test["Returns"]).dropna().tolist())
+
+wfa = (1 + pd.Series(test_rets)).cumprod()
+plt.figure(figsize=(10,5))
+plt.plot(wfa.values, label="Walk-Forward OOS")
+plt.title("Walk-Forward Equity Curve"); plt.legend(); plt.show()
+print(f"WFA Sharpe: {np.mean(test_rets)/np.std(test_rets)*np.sqrt(252):.3f}")</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>Lab 6: Cost Impact Study</h4>
+    <pre><code>df = yf.download("SPY", start="2020-01-01", end="2024-01-01")
+df["Returns"] = df["Adj Close"].pct_change()
+df["Signal"] = np.where(df["Adj Close"] > df["Adj Close"].rolling(20).mean(), 1, -1)
+df["Position"] = df["Signal"].shift(1)
+df["Base"] = df["Position"] * df["Returns"]
+
+# Vary commission and see impact
+commissions = [0.0, 0.0005, 0.001, 0.002, 0.005]
+results = []
+for comm in commissions:
+    trades = df["Position"].diff().abs()
+    net = df["Base"] - trades * comm
+    cum = (1 + net).cumprod()
+    results.append({"Commission": comm, "Final": cum.iloc[-1]-1})
+
+pd.DataFrame(results).plot(x="Commission", y="Final", kind="bar", legend=False)
+plt.title("Impact of Commission on Final Return")
+plt.ylabel("Total Return"); plt.show()</code></pre>
+  </div>
+</div>
+
+</div> <!-- end container -->
+
+<script>
+function openTab(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tab-content");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].classList.remove("active");
+  }
+  tablinks = document.getElementsByClassName("tab-btn");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].classList.remove("active");
+  }
+  document.getElementById(tabName).classList.add("active");
+  evt.currentTarget.classList.add("active");
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>

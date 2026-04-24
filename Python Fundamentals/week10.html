@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quant Engineer Study Guide: Testing & Code Quality</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-2: #818cf8;
+            --easy: #4ade80;
+            --medium: #facc15;
+            --hard: #f87171;
+            --code-bg: #020617;
+            --border: #334155;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* Tabs */
+        .tab-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            position: sticky;
+            top: 80px;
+            background: var(--bg);
+            z-index: 90;
+            padding-top: 1rem;
+        }
+        
+        .tab-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .tab-btn:hover {
+            background: var(--surface-light);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards & Layout */
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section h2 {
+            color: var(--accent);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section h3 {
+            color: var(--accent-2);
+            font-size: 1.3rem;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .section h4 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.5rem;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1.5rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .tab-nav { overflow-x: auto; flex-wrap: nowrap; }
+        }
+        
+        /* Diagrams */
+        .diagram-box {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .diagram-box svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Code Blocks */
+        .code-header {
+            background: var(--surface-light);
+            padding: 0.5rem 1rem;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+        
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0 0 8px 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #e2e8f0;
+        }
+        
+        .keyword { color: #c678dd; }
+        .string { color: #98c379; }
+        .function { color: #61afef; }
+        .comment { color: #5c6370; font-style: italic; }
+        .number { color: #d19a66; }
+        .decorator { color: #e5c07b; }
+        
+        /* Exercises */
+        .exercise-tier {
+            margin: 1rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .tier-header {
+            padding: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+        
+        .tier-header:hover { filter: brightness(1.1); }
+        
+        .tier-easy { background: rgba(74, 222, 128, 0.1); border-left: 4px solid var(--easy); }
+        .tier-easy .tier-header { color: var(--easy); }
+        
+        .tier-medium { background: rgba(250, 204, 21, 0.1); border-left: 4px solid var(--medium); }
+        .tier-medium .tier-header { color: var(--medium); }
+        
+        .tier-hard { background: rgba(248, 113, 113, 0.1); border-left: 4px solid var(--hard); }
+        .tier-hard .tier-header { color: var(--hard); }
+        
+        .tier-content {
+            padding: 1.5rem;
+            background: var(--surface);
+            display: none;
+        }
+        
+        .tier-content.show { display: block; }
+        
+        .exercise-list {
+            list-style: none;
+            counter-reset: exercise;
+        }
+        
+        .exercise-list li {
+            margin: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+        
+        .exercise-list li::before {
+            counter-increment: exercise;
+            content: counter(exercise);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--surface-light);
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        /* Resources */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .resource-card {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            transition: transform 0.2s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+        
+        .resource-card a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .resource-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Callouts */
+        .callout {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1.2rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        
+        .callout strong { color: var(--accent); }
+        
+        .warning {
+            background: rgba(248, 113, 113, 0.1);
+            border-left-color: var(--hard);
+        }
+        
+        .warning strong { color: var(--hard); }
+        
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        li { margin: 0.5rem 0; }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--surface-light);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Print */
+        @media print {
+            .tab-nav { display: none; }
+            .tab-content { display: block !important; }
+            body { background: white; color: black; }
+            .section { break-inside: avoid; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--surface-light); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .badge-quant { background: rgba(129, 140, 248, 0.2); color: var(--accent-2); }
+        .badge-core { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="header">
+    <h1>Quant Engineer Study Guide</h1>
+    <p>Testing & Code Quality — From First Principles to Production</p>
+</div>
+
+<div class="tab-container">
+    <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" onclick="showTab('prereq')">Prerequisites</button>
+        <button class="tab-btn" onclick="showTab('mindset')">1. Testing Mindset</button>
+        <button class="tab-btn" onclick="showTab('unittest')">2. Unit Testing</button>
+        <button class="tab-btn" onclick="showTab('tdd')">3. TDD</button>
+        <button class="tab-btn" onclick="showTab('mocking')">4. Mocking</button>
+        <button class="tab-btn" onclick="showTab('coverage')">5. Coverage</button>
+        <button class="tab-btn" onclick="showTab('property')">6. Property Testing</button>
+        <button class="tab-btn" onclick="showTab('integration')">7. Integration</button>
+        <button class="tab-btn" onclick="showTab('static')">8. Static Analysis</button>
+        <button class="tab-btn" onclick="showTab('performance')">9. Performance</button>
+        <button class="tab-btn" onclick="showTab('quant')">10. Quant Patterns</button>
+    </div>
+
+    <!-- PREREQUISITES -->
+    <div id="prereq" class="tab-content active">
+        <div class="section">
+            <h2>Prerequisites <span class="badge badge-core">Foundation</span></h2>
+            <p>Before diving into testing, you need a solid foundation. Think of these as the "alphabet" before writing sentences. For quant engineering, the prerequisites blend software engineering with mathematical maturity.</p>
+            
+            <h3>The Roadmap</h3>
+            <div class="diagram-box">
+                <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#38bdf8"/>
+                        </marker>
+                    </defs>
+                    <rect x="20" y="60" width="140" height="80" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                    <text x="90" y="95" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">Python</text>
+                    <text x="90" y="115" text-anchor="middle" fill="#94a3b8" font-size="11">Functions, OOP</text>
+                    
+                    <line x1="160" y1="100" x2="210" y2="100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="210" y="60" width="140" height="80" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                    <text x="280" y="95" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">CLI & Git</text>
+                    <text x="280" y="115" text-anchor="middle" fill="#94a3b8" font-size="11">Version Control</text>
+                    
+                    <line x1="350" y1="100" x2="400" y2="100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="400" y="60" width="140" height="80" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="2"/>
+                    <text x="470" y="95" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">NumPy/Pandas</text>
+                    <text x="470" y="115" text-anchor="middle" fill="#94a3b8" font-size="11">Arrays, DataFrames</text>
+                    
+                    <line x1="540" y1="100" x2="590" y2="100" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="590" y="60" width="140" height="80" rx="8" fill="#1e293b" stroke="#818cf8" stroke-width="2"/>
+                    <text x="660" y="95" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">Basic Stats</text>
+                    <text x="660" y="115" text-anchor="middle" fill="#94a3b8" font-size="11">Mean, Std, Distributions</text>
+                    
+                    <line x1="730" y1="100" x2="780" y2="100" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="780" y="60" width="140" height="80" rx="8" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+                    <text x="850" y="95" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">Testing</text>
+                    <text x="850" y="115" text-anchor="middle" fill="#94a3b8" font-size="11">You are here</text>
+                </svg>
+            </div>
+
+            <h3>1. Python Essentials</h3>
+            <p>You must be comfortable writing <strong>functions</strong>, <strong>classes</strong>, and organizing code into <strong>modules</strong>. In quant work, you'll write mathematical models as Python classes.</p>
+            
+            <div class="code-header">Python: Functions, Classes, Modules</div>
+            <pre><code><span class="comment"># A simple quant-style class you should be able to write</span>
+<span class="keyword">class</span> <span class="function">MovingAverage</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, window):
+        self.window = window
+    
+    <span class="keyword">def</span> <span class="function">calculate</span>(self, prices):
+        <span class="keyword">if</span> <span class="function">len</span>(prices) < self.window:
+            <span class="keyword">raise</span> <span class="function">ValueError</span>(<span class="string">"Not enough data"</span>)
+        <span class="keyword">return</span> <span class="function">sum</span>(prices[-self.window:]) / self.window</code></pre>
+
+            <h3>2. Command Line & Git</h3>
+            <p>Testing is automated. Automation runs in terminals. You need to navigate directories, run scripts, and use Git to track changes.</p>
+            <ul>
+                <li><code>cd</code>, <code>ls</code>, <code>mkdir</code>, <code>python script.py</code></li>
+                <li><code>git init</code>, <code>git add</code>, <code>git commit</code>, <code>git branch</code></li>
+                <li><code>pip install</code> for package management</li>
+            </ul>
+
+            <h3>3. NumPy & Numerical Computing</h3>
+            <p>Quant code is numerical code. Testing quant systems means asserting on arrays, matrices, and floating-point numbers.</p>
+            
+            <div class="code-header">NumPy Basics</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+prices = np.array([100.0, 101.5, 99.0, 102.3, 105.1])
+returns = np.diff(prices) / prices[:-1]  <span class="comment"># Vectorized returns</span>
+mean_return = np.mean(returns)</code></pre>
+
+            <h3>4. Basic Statistics</h3>
+            <p>Understand <strong>mean</strong>, <strong>standard deviation</strong>, <strong>variance</strong>, <strong>normal distribution</strong>, and <strong>correlation</strong>. These concepts appear in every test you'll write for financial models.</p>
+
+            <div class="callout">
+                <strong>Quant Context:</strong> A trading strategy backtester is just a Python program that loops over historical price data. Before you can test that backtester, you need to understand how the data flows through your code.
+            </div>
+
+            <h3>Colab Experiment: Prerequisites Check</h3>
+            <p>Open <a href="https://colab.research.google.com" target="_blank" style="color: var(--accent);">Google Colab</a> and run this to verify your foundations:</p>
+            
+            <div class="code-header">colab_prerequisites.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Verify imports</span>
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> typing <span class="keyword">import</span> List
+
+<span class="comment"># Cell 2: Write a function + class</span>
+<span class="keyword">def</span> <span class="function">compute_volatility</span>(returns: List[<span class="function">float</span>]) -> <span class="function">float</span>:
+    <span class="string">"""Annualized volatility from daily returns"""</span>
+    arr = np.array(returns)
+    <span class="keyword">return</span> np.std(arr) * np.sqrt(252)
+
+<span class="keyword">class</span> <span class="function">Portfolio</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(self, weights: dict):
+        self.weights = weights
+    
+    <span class="keyword">def</span> <span class="function">total_weight</span>(self):
+        <span class="keyword">return</span> <span class="function">sum</span>(self.weights.values())
+
+<span class="comment"># Cell 3: Test manually (we'll automate this soon!)</span>
+p = Portfolio({<span class="string">"AAPL"</span>: 0.6, <span class="string">"GOOGL"</span>: 0.4})
+<span class="function">print</span>(p.total_weight())  <span class="comment"># Should be 1.0</span></code></pre>
+
+            <h3>Practice Exercises</h3>
+            
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy — Click to Expand</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a function <code>celsius_to_fahrenheit(c)</code> and test it manually with 0°C and 100°C.</li>
+                        <li>Create a Git repository and make your first commit with the message "Initial commit".</li>
+                        <li>Use NumPy to create a 5×5 identity matrix and calculate its trace.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium — Click to Expand</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a <code>Stock</code> class with attributes <code>ticker</code>, <code>price</code>, <code>shares</code>. Add a <code>market_value()</code> method.</li>
+                        <li>Generate 1000 random returns from a normal distribution (μ=0.001, σ=0.02). Calculate skewness and kurtosis.</li>
+                        <li>Write a module <code>utils.py</code> and import a function from it into another notebook cell.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard — Click to Expand</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Implement a simple event-driven backtester skeleton with <code>Strategy</code>, <code>Portfolio</code>, and <code>Execution</code> classes.</li>
+                        <li>Vectorize a Monte Carlo simulation for stock prices using geometric Brownian motion with 10,000 paths.</li>
+                        <li>Set up a virtual environment, install pytest, and run <code>pytest --version</code> from the terminal.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>External Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.python.org/3/tutorial/" target="_blank">Python Official Tutorial</a>
+                    <p>The definitive starting point for Python fundamentals.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://numpy.org/doc/stable/user/quickstart.html" target="_blank">NumPy Quickstart</a>
+                    <p>Essential for understanding array operations in quant code.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://git-scm.com/doc" target="_blank">Git Documentation</a>
+                    <p>Version control is non-negotiable for professional quant development.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://www.khanacademy.org/math/statistics-probability" target="_blank">Khan Academy: Statistics</a>
+                    <p>Free, comprehensive statistics primer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 1: TESTING MINDSET -->
+    <div id="mindset" class="tab-content">
+        <div class="section">
+            <h2>Module 1: The Testing Mindset <span class="badge badge-core">Core</span></h2>
+            <p>Testing is not about finding bugs. <strong>Testing is about confidence.</strong> In quantitative finance, a bug doesn't just crash a server—it can lose millions of dollars, violate regulations, or destroy client trust.</p>
+
+            <h3>Why Testing Matters for Quants</h3>
+            <div class="grid-2">
+                <div>
+                    <h4>Traditional Software Bug</h4>
+                    <p>A website shows the wrong profile picture. Annoying, but fixable.</p>
+                </div>
+                <div>
+                    <h4>Quant Finance Bug</h4>
+                    <p>A risk model underestimates VaR by 2%. The firm takes too much leverage. Market moves. <strong>Firm collapses.</strong></p>
+                </div>
+            </div>
+
+            <div class="callout warning">
+                <strong>Real World:</strong> Knight Capital lost $440 million in 45 minutes due to a software deployment error. Testing and deployment discipline could have prevented it.
+            </div>
+
+            <h3>The Testing Pyramid</h3>
+            <p>The pyramid shows the ideal distribution of tests. For quant systems, the base (unit tests) is even more critical because mathematical functions must be correct in isolation before combining them.</p>
+            
+            <div class="diagram-box">
+                <svg viewBox="0 0 500 350" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="250,20 480,330 20,330" fill="#1e293b" stroke="#38bdf8" stroke-width="3"/>
+                    
+                    <text x="250" y="100" text-anchor="middle" fill="#38bdf8" font-size="16" font-weight="bold">UNIT TESTS</text>
+                    <text x="250" y="120" text-anchor="middle" fill="#94a3b8" font-size="12">Fast, Isolated, Many</text>
+                    <text x="250" y="135" text-anchor="middle" fill="#94a3b8" font-size="12">Test one function at a time</text>
+                    
+                    <text x="250" y="200" text-anchor="middle" fill="#818cf8" font-size="16" font-weight="bold">INTEGRATION TESTS</text>
+                    <text x="250" y="220" text-anchor="middle" fill="#94a3b8" font-size="12">Medium Speed, Fewer</text>
+                    <text x="250" y="235" text-anchor="middle" fill="#94a3b8" font-size="12">Test components together</text>
+                    
+                    <text x="250" y="290" text-anchor="middle" fill="#4ade80" font-size="16" font-weight="bold">E2E / SYSTEM TESTS</text>
+                    <text x="250" y="310" text-anchor="middle" fill="#94a3b8" font-size="12">Slow, Complex, Very Few</text>
+                </svg>
+            </div>
+
+            <h3>Manual vs Automated Testing</h3>
+            <table>
+                <tr><th>Aspect</th><th>Manual Testing</th><th>Automated Testing</th></tr>
+                <tr><td>Speed</td><td>Human-paced</td><td>Thousands per second</td></tr>
+                <tr><td>Repeatability</td><td>Inconsistent</td><td>Identical every time</td></tr>
+                <tr><td>Regression</td><td>Impossible at scale</td><td>Catch breaking changes instantly</td></tr>
+                <tr><td>Quant Fit</td><td>Checking a chart</td><td>Validating 10,000 backtests</td></tr>
+            </table>
+
+            <h3>Your First Automated Test</h3>
+            <p>We use <strong>pytest</strong>, the industry standard. Install it with <code>pip install pytest</code>.</p>
+            
+            <div class="code-header">test_basics.py</div>
+            <pre><code><span class="comment"># A test is just a function that starts with test_</span>
+<span class="keyword">def</span> <span class="function">test_simple_math</span>():
+    <span class="keyword">assert</span> 2 + 2 == 4
+
+<span class="keyword">def</span> <span class="function">test_string_contains</span>():
+    <span class="keyword">assert</span> <span class="string">"volatility"</span> <span class="keyword">in</span> <span class="string">"implied_volatility_surface"</span>
+
+<span class="comment"># Run with: pytest test_basics.py -v</span></code></pre>
+
+            <div class="callout">
+                <strong>The <code>assert</code> keyword:</strong> In pytest, <code>assert</code> is magic. If the condition is True, nothing happens. If False, pytest gives you a beautiful error report. No need to learn special assertion methods (unlike older frameworks).
+            </div>
+
+            <h3>Colab Experiment: First Test Suite</h3>
+            <p>In Colab, create a new cell and run:</p>
+            
+            <div class="code-header">colab_mindset.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install pytest</span>
+!pip install pytest -q
+
+<span class="comment"># Cell 2: Write tests in a file</span>
+test_code = <span class="string">'''
+def test_portfolio_weights_sum_to_one():
+    weights = {"AAPL": 0.5, "GOOGL": 0.3, "MSFT": 0.2}
+    total = sum(weights.values())
+    assert total == 1.0, f"Weights sum to {total}, not 1.0"
+
+def test_return_calculation():
+    price_yesterday = 100.0
+    price_today = 105.0
+    ret = (price_today - price_yesterday) / price_yesterday
+    assert abs(ret - 0.05) < 1e-10  # Floating point safe!
+'''</span>
+
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_mindset.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(test_code)
+
+<span class="comment"># Cell 3: Run tests</span>
+!pytest test_mindset.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a test that checks if <code>abs(-5)</code> equals <code>5</code>.</li>
+                        <li>Write a test that verifies a list <code>[1,2,3]</code> has length 3.</li>
+                        <li>Run pytest with the <code>-v</code> flag and observe the output format.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a test for a function <code>annualize_return(daily_return, days=252)</code> that multiplies by 252.</li>
+                        <li>Write a failing test intentionally and observe the traceback. Fix it.</li>
+                        <li>Test that a dictionary of stock prices contains the key <code>"AAPL"</code>.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Research the Knight Capital bug. Write a 1-page analysis of how automated integration testing could have caught the issue.</li>
+                        <li>Design a test strategy for a live trading system. What must you test that a backtester doesn't need?</li>
+                        <li>Write a test that verifies the mathematical property: <code>std(X + c) == std(X)</code> for any constant <code>c</code>.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.pytest.org/en/7.4.x/" target="_blank">pytest Documentation</a>
+                    <p>The official guide to Python's most popular testing framework.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://testing.googleblog.com/" target="_blank">Google Testing Blog</a>
+                    <p>Industry insights on large-scale testing from Google engineers.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 2: UNIT TESTING -->
+    <div id="unittest" class="tab-content">
+        <div class="section">
+            <h2>Module 2: Deep Dive — Unit Testing <span class="badge badge-core">Core</span></h2>
+            <p>A <strong>unit test</strong> verifies the smallest testable part of your code—usually a single function or method—in complete isolation. In quant work, this means testing your Black-Scholes formula, your covariance matrix estimator, or your signal generator independently.</p>
+
+            <h3>The Anatomy of a Unit Test</h3>
+            <div class="diagram-box">
+                <svg viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="50" y="50" width="120" height="60" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                    <text x="110" y="75" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">ARRANGE</text>
+                    <text x="110" y="92" text-anchor="middle" fill="#94a3b8" font-size="11">Set up data</text>
+                    <text x="110" y="105" text-anchor="middle" fill="#94a3b8" font-size="11">and inputs</text>
+                    
+                    <line x1="170" y1="80" x2="230" y2="80" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="230" y="50" width="120" height="60" rx="6" fill="#1e293b" stroke="#818cf8" stroke-width="2"/>
+                    <text x="290" y="75" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">ACT</text>
+                    <text x="290" y="92" text-anchor="middle" fill="#94a3b8" font-size="11">Call the</text>
+                    <text x="290" y="105" text-anchor="middle" fill="#94a3b8" font-size="11">function</text>
+                    
+                    <line x1="350" y1="80" x2="410" y2="80" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="410" y="50" width="120" height="60" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+                    <text x="470" y="75" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">ASSERT</text>
+                    <text x="470" y="92" text-anchor="middle" fill="#94a3b8" font-size="11">Verify the</text>
+                    <text x="470" y="105" text-anchor="middle" fill="#94a3b8" font-size="11">output</text>
+                    
+                    <text x="300" y="180" text-anchor="middle" fill="#94a3b8" font-size="13" font-style="italic">"Arrange one thing. Act on it. Assert one expectation."</text>
+                </svg>
+            </div>
+
+            <h3>Fixtures: Reusable Test Setup</h3>
+            <p>When multiple tests need the same data (e.g., a sample price series), use <strong>fixtures</strong> to avoid repetition.</p>
+            
+            <div class="code-header">test_with_fixtures.py</div>
+            <pre><code><span class="keyword">import</span> pytest
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="decorator">@pytest.fixture</span>
+<span class="keyword">def</span> <span class="function">sample_prices</span>():
+    <span class="string">"""Provides a realistic price series for multiple tests"""</span>
+    <span class="keyword">return</span> np.array([100.0, 102.0, 101.0, 105.0, 103.0, 108.0])
+
+<span class="keyword">def</span> <span class="function">test_returns_are_correct_length</span>(sample_prices):
+    <span class="comment"># Arrange is handled by fixture</span>
+    <span class="comment"># Act</span>
+    returns = np.diff(sample_prices) / sample_prices[:-1]
+    <span class="comment"># Assert</span>
+    <span class="keyword">assert</span> <span class="function">len</span>(returns) == <span class="function">len</span>(sample_prices) - 1
+
+<span class="keyword">def</span> <span class="function">test_mean_return_is_reasonable</span>(sample_prices):
+    returns = np.diff(sample_prices) / sample_prices[:-1]
+    mean_ret = np.mean(returns)
+    <span class="keyword">assert</span> -0.5 < mean_ret < 0.5  <span class="comment"># Sanity check</span></code></pre>
+
+            <h3>Parametrization: One Test, Many Cases</h3>
+            <p>Instead of writing 5 similar tests, write one parametrized test. This is crucial for quant code where you must test edge cases (empty arrays, single values, negative prices).</p>
+            
+            <div class="code-header">test_parametrized.py</div>
+            <pre><code><span class="decorator">@pytest.mark.parametrize</span>(<span class="string">"prices,expected_vol"</span>, [
+    ([100.0, 100.0, 100.0], 0.0),           <span class="comment"># Zero volatility</span>
+    ([100.0, 110.0, 120.0], 14.142),        <span class="comment"># Trending</span>
+    ([100.0, 90.0, 80.0], 14.142),          <span class="comment"># Declining</span>
+])
+<span class="keyword">def</span> <span class="function">test_volatility_calculation</span>(prices, expected_vol):
+    <span class="keyword">import</span> numpy <span class="keyword">as</span> np
+    arr = np.array(prices)
+    returns = np.diff(arr) / arr[:-1]
+    vol = np.std(returns, ddof=1)
+    <span class="keyword">assert</span> abs(vol - expected_vol) < 0.01</code></pre>
+
+            <h3>Quant Example: Testing Black-Scholes</h3>
+            <p>Here is a realistic quant unit test. We test that as volatility → 0, a call option's price converges to its intrinsic value.</p>
+            
+            <div class="code-header">test_black_scholes_edge.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm
+
+<span class="keyword">def</span> <span class="function">black_scholes_call</span>(S, K, T, r, sigma):
+    d1 = (np.log(S/K) + (r + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="keyword">return</span> S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+
+<span class="keyword">def</span> <span class="function">test_call_converges_to_intrinsic_at_zero_vol</span>():
+    <span class="comment"># Arrange</span>
+    S, K, T, r = 100.0, 100.0, 1.0, 0.05
+    <span class="comment"># Act</span>
+    price = black_scholes_call(S, K, T, r, sigma=0.0001)
+    intrinsic = <span class="function">max</span>(S - K, 0)
+    <span class="comment"># Assert</span>
+    <span class="keyword">assert</span> abs(price - intrinsic) < 0.01</code></pre>
+
+            <h3>Colab Experiment: Complete Unit Test Lab</h3>
+            
+            <div class="code-header">colab_unit_testing.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install and import</span>
+!pip install pytest -q
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Cell 2: Implement + Test a Sharpe Ratio calculator</span>
+test_code = <span class="string">'''
+import numpy as np
+import pytest
+
+def sharpe_ratio(returns, risk_free_rate=0.0):
+    """Calculate annualized Sharpe ratio from daily returns."""
+    if len(returns) < 2:
+        raise ValueError("Need at least 2 returns")
+    excess = np.array(returns) - risk_free_rate
+    return np.mean(excess) / np.std(excess, ddof=1) * np.sqrt(252)
+
+# --- TESTS ---
+
+def test_sharpe_of_constant_returns_is_infinite():
+    returns = [0.001] * 100  # Same return every day
+    assert sharpe_ratio(returns) > 1000  # Effectively infinite
+
+def test_sharpe_of_zero_returns_is_zero():
+    returns = [0.0] * 50
+    assert abs(sharpe_ratio(returns)) < 0.001
+
+def test_sharpe_raises_on_insufficient_data():
+    with pytest.raises(ValueError):
+        sharpe_ratio([0.01])
+
+@pytest.mark.parametrize("rf,expected_sign", [
+    (0.0, 1),    # Positive returns, zero rf -> positive Sharpe
+    (0.1, -1),   # High rf makes Sharpe negative
+])
+def test_sharpe_sign(rf, expected_sign):
+    returns = [0.001] * 100
+    sr = sharpe_ratio(returns, risk_free_rate=rf)
+    assert sr * expected_sign > 0
+'''</span>
+
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_sharpe.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(test_code)
+
+<span class="comment"># Cell 3: Run with coverage</span>
+!pytest test_sharpe.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a fixture that returns a dictionary of stock prices. Use it in 3 different tests.</li>
+                        <li>Parametrize a test for <code>is_even(n)</code> with inputs [2, 4, 6] expecting True.</li>
+                        <li>Test that <code>np.mean([1,2,3])</code> equals exactly <code>2.0</code>.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a fixture providing a DataFrame of OHLC data. Test that the 'Close' column has no NaNs.</li>
+                        <li>Parametrize tests for a <code>simple_moving_average(prices, window)</code> function with window sizes 3, 5, and 10.</li>
+                        <li>Test the mathematical property: <code>corr(X, X) == 1.0</code> for any non-constant array X.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Implement and test a GARCH(1,1) variance estimator. Test against known analytical solutions for specific parameter sets.</li>
+                        <li>Create a custom pytest fixture that automatically seeds numpy's random number generator before each test.</li>
+                        <li>Write a test that verifies put-call parity holds for your Black-Scholes implementation across 50 random parameter combinations.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.pytest.org/en/7.4.x/how-to/fixtures.html" target="_blank">pytest Fixtures</a>
+                    <p>Master the most powerful feature of pytest.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://docs.pytest.org/en/7.4.x/how-to/parametrize.html" target="_blank">Parametrization</a>
+                    <p>Write DRY tests for multiple inputs.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://numpy.org/doc/stable/reference/routines.testing.html" target="_blank">NumPy Testing</a>
+                    <p>Specialized assertions for numerical code.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 3: TDD -->
+    <div id="tdd" class="tab-content">
+        <div class="section">
+            <h2>Module 3: Test-Driven Development <span class="badge badge-core">Methodology</span></h2>
+            <p><strong>TDD</strong> flips the traditional workflow: you write the test <em>before</em> you write the code. For quant engineers, TDD is transformative because it forces you to define the expected mathematical behavior before implementation.</p>
+
+            <h3>The TDD Cycle</h3>
+            <div class="diagram-box">
+                <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="250" cy="200" r="150" fill="none" stroke="#334155" stroke-width="2"/>
+                    
+                    <path d="M 250,50 A 150,150 0 0,1 400,125" fill="rgba(248,113,113,0.15)" stroke="#f87171" stroke-width="3"/>
+                    <text x="360" y="90" text-anchor="middle" fill="#f87171" font-size="18" font-weight="bold">RED</text>
+                    <text x="360" y="108" text-anchor="middle" fill="#94a3b8" font-size="11">Write a failing test</text>
+                    
+                    <path d="M 400,125 A 150,150 0 0,1 400,275" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="3"/>
+                    <text x="390" y="220" text-anchor="middle" fill="#4ade80" font-size="18" font-weight="bold">GREEN</text>
+                    <text x="390" y="238" text-anchor="middle" fill="#94a3b8" font-size="11">Write minimum code</text>
+                    <text x="390" y="252" text-anchor="middle" fill="#94a3b8" font-size="11">to pass</text>
+                    
+                    <path d="M 400,275 A 150,150 0 0,1 250,350" fill="rgba(250,204,21,0.15)" stroke="#facc15" stroke-width="3"/>
+                    <text x="250" y="330" text-anchor="middle" fill="#facc15" font-size="18" font-weight="bold">REFACTOR</text>
+                    <text x="250" y="348" text-anchor="middle" fill="#94a3b8" font-size="11">Clean up. Keep tests green.</text>
+                    
+                    <path d="M 250,350 A 150,150 0 0,1 100,275" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5,5"/>
+                    <path d="M 100,275 A 150,150 0 0,1 100,125" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5,5"/>
+                    <path d="M 100,125 A 150,150 0 0,1 250,50" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="5,5"/>
+                    
+                    <text x="250" y="200" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold">TDD CYCLE</text>
+                </svg>
+            </div>
+
+            <h3>The Three Laws of TDD</h3>
+            <ol>
+                <li><strong>You may not write production code until you have written a failing unit test.</strong></li>
+                <li><strong>You may not write more of a unit test than is sufficient to fail.</strong></li>
+                <li><strong>You may not write more production code than is sufficient to pass the currently failing test.</strong></li>
+            </ol>
+
+            <h3>TDD Example: A Volatility Calculator</h3>
+            <p>Let's build a <code>realized_volatility</code> function using strict TDD.</p>
+            
+            <div class="code-header">Step 1: RED — Write the failing test</div>
+            <pre><code><span class="keyword">def</span> <span class="function">test_realized_vol_of_constant_series_is_zero</span>():
+    prices = [100.0, 100.0, 100.0, 100.0]
+    <span class="keyword">assert</span> realized_volatility(prices) == 0.0</code></pre>
+            
+            <div class="code-header">Step 2: GREEN — Minimum code to pass</div>
+            <pre><code><span class="keyword">def</span> <span class="function">realized_volatility</span>(prices):
+    <span class="keyword">return</span> 0.0  <span class="comment"># Cheating? No. The test forces the next test.</span></code></pre>
+            
+            <div class="code-header">Step 3: RED — Next test forces real implementation</div>
+            <pre><code><span class="keyword">def</span> <span class="function">test_realized_vol_of_known_series</span>():
+    <span class="comment"># Prices: 100 -> 110 -> 121 (10% return each period)</span>
+    prices = [100.0, 110.0, 121.0]
+    vol = realized_volatility(prices)
+    <span class="keyword">assert</span> vol > 0</code></pre>
+            
+            <div class="code-header">Step 4: GREEN — Real implementation</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">realized_volatility</span>(prices):
+    <span class="string">"""Annualized realized volatility from price series"""</span>
+    returns = np.diff(prices) / prices[:-1]
+    <span class="keyword">return</span> np.std(returns, ddof=1) * np.sqrt(252)</code></pre>
+
+            <div class="callout">
+                <strong>Why TDD for Quants?</strong> When building a pricing model, TDD ensures you understand the boundary conditions (e.g., zero volatility, zero time to expiry) before getting lost in implementation details.
+            </div>
+
+            <h3>Colab Experiment: Full TDD Walkthrough</h3>
+            
+            <div class="code-header">colab_tdd.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Setup</span>
+!pip install pytest -q
+
+<span class="comment"># Cell 2: RED — Write test first</span>
+red_test = <span class="string">'''
+import pytest
+import numpy as np
+
+def test_bollinger_band_width():
+    """BB width should be zero when all prices are equal"""
+    from bollinger import bollinger_width
+    prices = [100.0] * 20
+    assert bollinger_width(prices, window=20) == 0.0
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_bollinger.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(red_test)
+
+<span class="comment"># Cell 3: Run and watch it FAIL (RED)</span>
+!pytest test_bollinger.py -v
+
+<span class="comment"># Cell 4: GREEN — Create minimal module</span>
+module_code = <span class="string">'''
+import numpy as np
+
+def bollinger_width(prices, window):
+    return 0.0
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'bollinger.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(module_code)
+
+<span class="comment"># Cell 5: Run and watch it PASS (GREEN)</span>
+!pytest test_bollinger.py -v
+
+<span class="comment"># Cell 6: REFACTOR — Add more tests, then improve code</span>
+full_tests = <span class="string">'''
+import pytest
+import numpy as np
+from bollinger import bollinger_width
+
+def test_width_zero_for_flat_prices():
+    assert bollinger_width([100.0]*20, 20) == 0.0
+
+def test_width_positive_for_moving_prices():
+    prices = list(range(100, 120))  # Trending
+    width = bollinger_width(prices, window=20)
+    assert width > 0.0
+
+def test_window_cannot_exceed_data():
+    with pytest.raises(ValueError):
+        bollinger_width([100.0]*5, window=10)
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_bollinger.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(full_tests)
+
+<span class="comment"># Cell 7: Implement properly</span>
+impl = <span class="string">'''
+import numpy as np
+
+def bollinger_width(prices, window):
+    if len(prices) < window:
+        raise ValueError("Window exceeds data length")
+    ma = np.mean(prices[-window:])
+    std = np.std(prices[-window:], ddof=1)
+    return 2 * std / ma  # Normalized width
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'bollinger.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(impl)
+
+!pytest test_bollinger.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>TDD a function <code>max_drawdown(returns)</code> that returns 0 for all-positive returns.</li>
+                        <li>TDD a function that converts decimal returns to percentages. Start with the test.</li>
+                        <li>Practice the Red-Green-Refactor cycle on a <code>sign(x)</code> function.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>TDD a <code>Portfolio.rebalance(target_weights)</code> method that returns the required trades.</li>
+                        <li>TDD a correlation matrix validator that ensures the matrix is symmetric and positive semi-definite.</li>
+                        <li>Build a simple moving average crossover signal generator using strict TDD.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>TDD an entire options Greek calculator (Delta, Gamma, Theta, Vega, Rho) one Greek at a time.</li>
+                        <li>TDD a Kalman filter for pairs trading. Each test should enforce a specific statistical property.</li>
+                        <li>Implement TDD for a Monte Carlo VaR engine. Start with tests for deterministic cases before stochastic ones.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://www.obeythetestinggoat.com/" target="_blank">Test-Driven Development with Python</a>
+                    <p>Free online book by Harry Percival.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://martinfowler.com/bliki/TestDrivenDevelopment.html" target="_blank">Martin Fowler on TDD</a>
+                    <p>Essential reading on TDD philosophy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 4: MOCKING -->
+    <div id="mocking" class="tab-content">
+        <div class="section">
+            <h2>Module 4: Mocking & Patching <span class="badge badge-core">Isolation</span></h2>
+            <p>A <strong>unit test</strong> must test one thing in isolation. But real quant systems depend on market data APIs, databases, and file systems. <strong>Mocking</strong> lets you replace these dependencies with fake objects that behave predictably.</p>
+
+            <h3>The Concept: Test Doubles</h3>
+            <div class="diagram-box">
+                <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="50" y="100" width="120" height="80" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                    <text x="110" y="130" text-anchor="middle" fill="#f8fafc" font-size="13" font-weight="bold">YOUR CODE</text>
+                    <text x="110" y="148" text-anchor="middle" fill="#94a3b8" font-size="11">Strategy</text>
+                    <text x="110" y="162" text-anchor="middle" fill="#94a3b8" font-size="11">Engine</text>
+                    
+                    <line x1="170" y1="140" x2="240" y2="140" stroke="#38bdf8" stroke-width="2"/>
+                    
+                    <rect x="240" y="100" width="120" height="80" rx="6" fill="#1e293b" stroke="#f87171" stroke-width="2" stroke-dasharray="4,2"/>
+                    <text x="300" y="130" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">MOCK</text>
+                    <text x="300" y="148" text-anchor="middle" fill="#94a3b8" font-size="11">Fake Market</text>
+                    <text x="300" y="162" text-anchor="middle" fill="#94a3b8" font-size="11">Data API</text>
+                    
+                    <line x1="360" y1="140" x2="430" y2="140" stroke="#334155" stroke-width="2" stroke-dasharray="4,4"/>
+                    
+                    <rect x="430" y="100" width="120" height="80" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                    <text x="490" y="130" text-anchor="middle" fill="#64748b" font-size="13" font-weight="bold">REAL API</text>
+                    <text x="490" y="148" text-anchor="middle" fill="#64748b" font-size="11">Bloomberg</text>
+                    <text x="490" y="162" text-anchor="middle" fill="#64748b" font-size="11">(Not Used)</text>
+                    
+                    <text x="300" y="240" text-anchor="middle" fill="#94a3b8" font-size="13" font-style="italic">"Mock the boundary. Test the logic."</text>
+                </svg>
+            </div>
+
+            <h3>Mocking with unittest.mock</h3>
+            <p>Python's standard library provides <code>unittest.mock</code>. In pytest, use the <code>mocker</code> fixture (via <code>pytest-mock</code>) or <code>unittest.mock.patch</code>.</p>
+            
+            <div class="code-header">test_with_mock.py</div>
+            <pre><code><span class="keyword">from</span> unittest.mock <span class="keyword">import</span> patch, MagicMock
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">fetch_prices</span>(ticker):
+    <span class="string">"""In production, this calls an expensive API"""</span>
+    <span class="keyword">import</span> requests
+    response = requests.get(<span class="string">f"https://api.example.com/{ticker}"</span>)
+    <span class="keyword">return</span> response.json()[<span class="string">'prices'</span>]
+
+<span class="keyword">def</span> <span class="function">calculate_signal</span>(ticker):
+    prices = fetch_prices(ticker)
+    <span class="keyword">return</span> np.mean(prices) > np.median(prices)
+
+<span class="comment"># Test without hitting the real API</span>
+<span class="decorator">@patch</span>(<span class="string">'__main__.fetch_prices'</span>)
+<span class="keyword">def</span> <span class="function">test_bullish_signal</span>(mock_fetch):
+    <span class="comment"># Arrange: Define what the mock returns</span>
+    mock_fetch.return_value = [100, 101, 102, 103, 104, 105]
+    <span class="comment"># Act</span>
+    signal = calculate_signal(<span class="string">"AAPL"</span>)
+    <span class="comment"># Assert</span>
+    <span class="keyword">assert</span> signal <span class="keyword">is</span> <span class="keyword">True</span>
+    mock_fetch.assert_called_once_with(<span class="string">"AAPL"</span>)</code></pre>
+
+            <h3>Mocking External Libraries</h3>
+            <p>Patch where the object is <strong>used</strong>, not where it is defined.</p>
+            
+            <div class="code-header">Patching yfinance</div>
+            <pre><code><span class="comment"># my_module.py</span>
+<span class="keyword">import</span> yfinance <span class="keyword">as</span> yf
+
+<span class="keyword">def</span> <span class="function">get_current_price</span>(ticker):
+    stock = yf.Ticker(ticker)
+    <span class="keyword">return</span> stock.history(period=<span class="string">"1d"</span>)[<span class="string">"Close"</span>].iloc[-1]
+
+<span class="comment"># test_my_module.py</span>
+<span class="keyword">from</span> unittest.mock <span class="keyword">import</span> patch, MagicMock
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="decorator">@patch</span>(<span class="string">'my_module.yf.Ticker'</span>)
+<span class="keyword">def</span> <span class="function">test_get_current_price</span>(MockTicker):
+    <span class="comment"># Setup fake return</span>
+    mock_instance = MagicMock()
+    mock_instance.history.return_value = pd.DataFrame({<span class="string">"Close"</span>: [150.25]})
+    MockTicker.return_value = mock_instance
+    
+    <span class="keyword">from</span> my_module <span class="keyword">import</span> get_current_price
+    price = get_current_price(<span class="string">"AAPL"</span>)
+    <span class="keyword">assert</span> price == 150.25</code></pre>
+
+            <div class="callout">
+                <strong>Quant Context:</strong> Never test with live market data. Prices change, APIs rate-limit, and tests become flaky. Mock the data layer; test the alpha logic.
+            </div>
+
+            <h3>Colab Experiment: Mocking Lab</h3>
+            
+            <div class="code-header">colab_mocking.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Setup</span>
+!pip install pytest pytest-mock pandas -q
+
+<span class="comment"># Cell 2: Create module to test</span>
+module = <span class="string">'''
+import pandas as pd
+
+class MarketDataProvider:
+    def fetch_ohlc(self, ticker, days=30):
+        """In production: connects to Bloomberg/Reuters"""
+        raise NotImplementedError("Network call")
+
+class SignalGenerator:
+    def __init__(self, provider):
+        self.provider = provider
+    
+    def generate(self, ticker):
+        df = self.provider.fetch_ohlc(ticker, days=30)
+        sma_10 = df['Close'].rolling(10).mean().iloc[-1]
+        sma_30 = df['Close'].rolling(30).mean().iloc[-1]
+        return "BUY" if sma_10 > sma_30 else "SELL"
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'signals.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(module)
+
+<span class="comment"># Cell 3: Write tests using mocks</span>
+tests = <span class="string">'''
+import pytest
+import pandas as pd
+from unittest.mock import MagicMock
+from signals import SignalGenerator, MarketDataProvider
+
+def test_buy_signal_when_short_above_long():
+    # Arrange
+    mock_provider = MagicMock(spec=MarketDataProvider)
+    dates = pd.date_range('2023-01-01', periods=30)
+    prices = list(range(100, 130))  # Strong uptrend
+    mock_provider.fetch_ohlc.return_value = pd.DataFrame({
+        'Close': prices
+    }, index=dates)
+    
+    gen = SignalGenerator(mock_provider)
+    
+    # Act
+    signal = gen.generate("AAPL")
+    
+    # Assert
+    assert signal == "BUY"
+    mock_provider.fetch_ohlc.assert_called_once_with("AAPL", days=30)
+
+def test_sell_signal_when_short_below_long():
+    mock_provider = MagicMock(spec=MarketDataProvider)
+    dates = pd.date_range('2023-01-01', periods=30)
+    prices = list(range(130, 100, -1))  # Downtrend
+    mock_provider.fetch_ohlc.return_value = pd.DataFrame({
+        'Close': prices
+    }, index=dates)
+    
+    gen = SignalGenerator(mock_provider)
+    assert gen.generate("AAPL") == "SELL"
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_signals.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(tests)
+
+<span class="comment"># Cell 4: Run</span>
+!pytest test_signals.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Mock <code>requests.get</code> to return a fake JSON response without making a network call.</li>
+                        <li>Use <code>MagicMock</code> to create a fake database connection that returns a fixed list of trades.</li>
+                        <li>Verify that your mocked function was called exactly twice using <code>assert_called</code> methods.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Patch <code>datetime.datetime.now</code> to return a fixed date. Test a function that behaves differently on weekends.</li>
+                        <li>Mock a pandas DataFrame reader and test a function that calculates rolling correlations.</li>
+                        <li>Create a mock for a Redis cache. Test that your quant engine caches computed Greeks correctly.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Mock an entire exchange order book WebSocket feed. Test your execution algorithm's reaction to a flash crash.</li>
+                        <li>Build a mock for a SQLAlchemy session. Test that your portfolio rebalancer issues the correct UPDATE statements.</li>
+                        <li>Use <code>side_effect</code> to simulate an API that fails 3 times then succeeds (retry logic testing).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.python.org/3/library/unittest.mock.html" target="_blank">unittest.mock Docs</a>
+                    <p>Official Python documentation for mocking.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://pytest-mock.readthedocs.io/" target="_blank">pytest-mock</a>
+                    <p>Convenient mocker fixture for pytest.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 5: COVERAGE -->
+    <div id="coverage" class="tab-content">
+        <div class="section">
+            <h2>Module 5: Code Coverage <span class="badge badge-core">Metrics</span></h2>
+            <p><strong>Coverage</strong> measures how much of your code is executed by your tests. It does <em>not</em> measure test quality—but it reveals untested code, which is quant code that could hide silent bugs.</p>
+
+            <h3>Types of Coverage</h3>
+            <table>
+                <tr><th>Type</th><th>Measures</th><th>Quant Example</th></tr>
+                <tr><td>Line Coverage</td><td>% of lines executed</td><td>Did we test the early return for zero volatility?</td></tr>
+                <tr><td>Branch Coverage</td><td>% of if/else paths taken</td><td>Did we test both the buy AND sell signal branches?</td></tr>
+                <tr><td>Path Coverage</td><td>% of all possible paths</td><td>All combinations of market regimes (rarely achievable)</td></tr>
+            </table>
+
+            <h3>Using pytest-cov</h3>
+            
+            <div class="code-header">Terminal</div>
+            <pre><code>pip install pytest-cov
+pytest --cov=my_project --cov-report=html --cov-report=term-missing</code></pre>
+
+            <div class="callout">
+                <strong>Target:</strong> Aim for 80%+ line coverage on research code and 95%+ on production trading infrastructure. Never chase 100% blindly—test what matters.
+            </div>
+
+            <h3>Reading Coverage Reports</h3>
+            <p>The HTML report shows green lines (tested) and red lines (untested). In quant code, pay special attention to:</p>
+            <ul>
+                <li>Exception handlers (<code>except</code> blocks for divide-by-zero in volatility calc)</li>
+                <li>Edge case branches (empty portfolios, zero variance)</li>
+                <li>Logging and monitoring paths</li>
+            </ul>
+
+            <h3>Colab Experiment: Coverage Analysis</h3>
+            
+            <div class="code-header">colab_coverage.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install</span>
+!pip install pytest pytest-cov -q
+
+<span class="comment"># Cell 2: Create module with intentional gaps</span>
+module = <span class="string">'''
+import numpy as np
+
+def portfolio_variance(weights, cov_matrix):
+    """Calculate portfolio variance from weights and covariance"""
+    if len(weights) != len(cov_matrix):
+        raise ValueError("Dimension mismatch")
+    if np.sum(weights) == 0:
+        return 0.0  # UNTSTED BRANCH
+    w = np.array(weights)
+    return float(w.T @ cov_matrix @ w)
+
+def sharpe(returns, rf=0.0):
+    """Sharpe ratio - missing tests for empty input!"""
+    excess = np.array(returns) - rf
+    return np.mean(excess) / np.std(excess) * np.sqrt(252)
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'risk.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(module)
+
+<span class="comment"># Cell 3: Tests (incomplete on purpose)</span>
+tests = <span class="string">'''
+import numpy as np
+from risk import portfolio_variance
+
+def test_variance_basic():
+    w = [0.5, 0.5]
+    cov = np.array([[0.04, 0.01], [0.01, 0.03]])
+    var = portfolio_variance(w, cov)
+    assert var > 0
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_risk.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(tests)
+
+<span class="comment"># Cell 4: Run with coverage</span>
+!pytest test_risk.py --cov=risk --cov-report=term-missing -v
+
+<span class="comment"># Cell 5: Observe the red lines. Write tests to cover them!</span></code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Run pytest-cov on a simple module and identify which lines are untested.</li>
+                        <li>Achieve 100% line coverage on a 3-function calculator module.</li>
+                        <li>Generate an HTML coverage report and open it in your browser.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Achieve 100% branch coverage on a function with 3 nested if-statements.</li>
+                        <li>Configure <code>.coveragerc</code> to exclude test files and __pycache__ from the report.</li>
+                        <li>Write a test that covers the exception path of a file parser.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Integrate coverage reporting into a CI pipeline (GitHub Actions) and fail builds below 90%.</li>
+                        <li>Use <code>coverage.py</code> API to programmatically generate a coverage diff between two commits.</li>
+                        <li>Design a coverage strategy for a stochastic Monte Carlo engine where paths are randomized.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://coverage.readthedocs.io/" target="_blank">coverage.py</a>
+                    <p>The standard tool for measuring Python code coverage.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://pytest-cov.readthedocs.io/" target="_blank">pytest-cov</a>
+                    <p>pytest plugin for coverage reporting.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 6: PROPERTY TESTING -->
+    <div id="property" class="tab-content">
+        <div class="section">
+            <h2>Module 6: Property-Based Testing <span class="badge badge-quant">Advanced</span></h2>
+            <p>Instead of testing specific examples, <strong>property-based testing</strong> verifies that certain <em>properties</em> or <em>invariants</em> always hold. Hypothesis generates hundreds of random inputs to try to break your code.</p>
+
+            <h3>What is a Property?</h3>
+            <p>A property is a universal truth about your function. Examples:</p>
+            <ul>
+                <li><code>sort(X)</code> should always return a list of the same length as <code>X</code></li>
+                <li><code>portfolio_variance(w, cov)</code> should always be ≥ 0</li>
+                <li><code>corr(X, Y)</code> should always be between -1 and 1</li>
+            </ul>
+
+            <h3>Hypothesis Basics</h3>
+            
+            <div class="code-header">test_properties.py</div>
+            <pre><code><span class="keyword">from</span> hypothesis <span class="keyword">import</span> given, strategies <span class="keyword">as</span> st
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="decorator">@given</span>(st.lists(st.floats(min_value=1.0, max_value=1000.0), min_size=2))
+<span class="keyword">def</span> <span class="function">test_returns_mean_between_min_and_max</span>(prices):
+    <span class="string">"""Mean return must lie between min and max individual returns"""</span>
+    returns = np.diff(prices) / prices[:-1]
+    mean_ret = np.mean(returns)
+    <span class="keyword">assert</span> np.min(returns) <= mean_ret <= np.max(returns)
+
+<span class="decorator">@given</span>(st.lists(st.floats(min_value=0.01), min_size=2, max_size=100))
+<span class="keyword">def</span> <span class="function">test_variance_is_non_negative</span>(prices):
+    <span class="string">"""Variance can never be negative"""</span>
+    returns = np.diff(prices) / prices[:-1]
+    var = np.var(returns)
+    <span class="keyword">assert</span> var >= 0</code></pre>
+
+            <h3>Quant Invariant: Put-Call Parity</h3>
+            <p>Put-Call Parity is a fundamental no-arbitrage relationship: <code>C - P = S - K·e^(-rT)</code>. This is a perfect property test.</p>
+            
+            <div class="code-header">test_put_call_parity.py</div>
+            <pre><code><span class="keyword">from</span> hypothesis <span class="keyword">import</span> given, settings, strategies <span class="keyword">as</span> st
+<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">bs_call</span>(S, K, T, r, sigma):
+    d1 = (np.log(S/K) + (r+0.5*sigma**2)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="keyword">return</span> S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+
+<span class="keyword">def</span> <span class="function">bs_put</span>(S, K, T, r, sigma):
+    d1 = (np.log(S/K) + (r+0.5*sigma**2)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    <span class="keyword">return</span> K*np.exp(-r*T)*norm.cdf(-d2) - S*norm.cdf(-d1)
+
+<span class="decorator">@given</span>(
+    S=st.floats(min_value=1.0, max_value=1000.0),
+    K=st.floats(min_value=1.0, max_value=1000.0),
+    T=st.floats(min_value=0.01, max_value=5.0),
+    r=st.floats(min_value=0.0, max_value=0.2),
+    sigma=st.floats(min_value=0.01, max_value=2.0)
+)
+<span class="decorator">@settings</span>(max_examples=500)
+<span class="keyword">def</span> <span class="function">test_put_call_parity</span>(S, K, T, r, sigma):
+    call = bs_call(S, K, T, r, sigma)
+    put = bs_put(S, K, T, r, sigma)
+    lhs = call - put
+    rhs = S - K * np.exp(-r * T)
+    <span class="keyword">assert</span> abs(lhs - rhs) < 1e-6</code></pre>
+
+            <div class="callout">
+                <strong>Why this matters:</strong> Hypothesis found a bug in my code where <code>T=0</code> caused a division by zero. I added <code>min_value=0.01</code>—but even better, I fixed the function to handle T=0 as a limit case.
+            </div>
+
+            <h3>Colab Experiment: Property Testing Lab</h3>
+            
+            <div class="code-header">colab_properties.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install</span>
+!pip install pytest hypothesis -q
+
+<span class="comment"># Cell 2: Test portfolio math properties</span>
+code = <span class="string">'''
+import numpy as np
+from hypothesis import given, strategies as st
+
+def portfolio_return(weights, returns):
+    return np.dot(weights, returns)
+
+# Property 1: Weights sum to 1 -> return is weighted average
+@given(
+    weights=st.lists(st.floats(min_value=0.0, max_value=1.0), min_size=3, max_size=10)
+        .map(lambda w: [x/sum(w) for x in w] if sum(w) > 0 else [1/len(w)]*len(w)),
+    returns=st.lists(st.floats(min_value=-0.5, max_value=0.5), min_size=3, max_size=10)
+)
+def test_weighted_return_between_extremes(weights, returns):
+    # Ensure same length
+    n = min(len(weights), len(returns))
+    w = np.array(weights[:n])
+    r = np.array(returns[:n])
+    w = w / w.sum()  # Normalize
+    
+    port_ret = portfolio_return(w, r)
+    assert np.min(r) <= port_ret <= np.max(r)
+
+# Property 2: Doubling all weights (before normalization) doesn't change return
+@given(
+    weights=st.lists(st.floats(min_value=0.1, max_value=1.0), min_size=3, max_size=5),
+    returns=st.lists(st.floats(min_value=-0.1, max_value=0.1), min_size=3, max_size=5)
+)
+def test_scale_invariance(weights, returns):
+    n = min(len(weights), len(returns))
+    w = np.array(weights[:n])
+    w = w / w.sum()
+    r = np.array(returns[:n])
+    
+    ret1 = portfolio_return(w, r)
+    ret2 = portfolio_return(w * 2, r)  # Should be identical since we normalize... wait!
+    # Actually this tests normalization! Let's check:
+    w2 = (w * 2) / (w * 2).sum()
+    ret2 = portfolio_return(w2, r)
+    assert abs(ret1 - ret2) < 1e-10
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_properties.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(code)
+
+<span class="comment"># Cell 3: Run (Hypothesis will generate 100+ examples per test)</span>
+!pytest test_properties.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a property test that <code>sorted(X)</code> is always ascending.</li>
+                        <li>Test that <code>abs(x)</code> is always non-negative for any float x.</li>
+                        <li>Verify that reversing a list twice returns the original list.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Property-test that a correlation matrix is always positive semi-definite.</li>
+                        <li>Test that annualizing daily volatility by √252 preserves ordering (if σ₁ > σ₂ daily, then annualized σ₁ > σ₂).</li>
+                        <li>Find a bug using Hypothesis in a function that calculates maximum drawdown.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Property-test arbitrage-free conditions for an implied volatility surface (no calendar spread arbitrage).</li>
+                        <li>Use Hypothesis stateful testing to model a portfolio as a state machine (buy/sell events).</li>
+                        <li>Prove via property tests that your optimization solver always produces weights that sum to 1.0.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://hypothesis.readthedocs.io/" target="_blank">Hypothesis Docs</a>
+                    <p>The definitive guide to property-based testing in Python.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://hypothesis.works/articles/what-is-property-based-testing/" target="_blank">What is Property Testing?</a>
+                    <p>Excellent conceptual introduction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 7: INTEGRATION TESTING -->
+    <div id="integration" class="tab-content">
+        <div class="section">
+            <h2>Module 7: Integration Testing <span class="badge badge-quant">System</span></h2>
+            <p>Unit tests verify components. <strong>Integration tests</strong> verify that components work together. In a quant stack, this means testing the flow: <em>Data → Feature Engineering → Signal → Risk Check → Execution</em>.</p>
+
+            <h3>The Quant Pipeline</h3>
+            <div class="diagram-box">
+                <svg viewBox="0 0 700 150" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="40" width="100" height="70" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                    <text x="70" y="70" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold">Market</text>
+                    <text x="70" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Data API</text>
+                    
+                    <line x1="120" y1="75" x2="160" y2="75" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="160" y="40" width="100" height="70" rx="6" fill="#1e293b" stroke="#818cf8" stroke-width="2"/>
+                    <text x="210" y="70" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold">Feature</text>
+                    <text x="210" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Engine</text>
+                    
+                    <line x1="260" y1="75" x2="300" y2="75" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="300" y="40" width="100" height="70" rx="6" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+                    <text x="350" y="70" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold">Alpha</text>
+                    <text x="350" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Model</text>
+                    
+                    <line x1="400" y1="75" x2="440" y2="75" stroke="#4ade80" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="440" y="40" width="100" height="70" rx="6" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                    <text x="490" y="70" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold">Risk</text>
+                    <text x="490" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Manager</text>
+                    
+                    <line x1="540" y1="75" x2="580" y2="75" stroke="#facc15" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <rect x="580" y="40" width="100" height="70" rx="6" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+                    <text x="630" y="70" text-anchor="middle" fill="#f8fafc" font-size="12" font-weight="bold">Execution</font></text>
+                    <text x="630" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Engine</text>
+                </svg>
+            </div>
+
+            <h3>Integration vs Unit Tests</h3>
+            <table>
+                <tr><th>Unit Test</th><th>Integration Test</th></tr>
+                <tr><td>Mock the database</td><td>Use a real test database (SQLite in-memory)</td></tr>
+                <tr><td>Mock the API</td><td>Spin up a local test server</td></tr>
+                <tr><td>Test one function</td><td>Test the entire backtest pipeline</td></tr>
+                <tr><td>Runs in milliseconds</td><td>Runs in seconds</td></tr>
+            </table>
+
+            <h3>Testing with SQLite (In-Memory)</h3>
+            
+            <div class="code-header">test_integration_db.py</div>
+            <pre><code><span class="keyword">import</span> sqlite3
+<span class="keyword">import</span> pytest
+
+<span class="decorator">@pytest.fixture</span>
+<span class="keyword">def</span> <span class="function">db</span>():
+    <span class="string">"""Fresh in-memory database for each test"""</span>
+    conn = sqlite3.connect(<span class="string">":memory:"</span>)
+    conn.execute(<span class="string">"CREATE TABLE trades (ticker TEXT, qty INT, price REAL)"</span>)
+    <span class="keyword">yield</span> conn
+    conn.close()
+
+<span class="keyword">def</span> <span class="function">record_trade</span>(db, ticker, qty, price):
+    db.execute(<span class="string">"INSERT INTO trades VALUES (?, ?, ?)"</span>, (ticker, qty, price))
+    db.commit()
+
+<span class="keyword">def</span> <span class="function">get_position</span>(db, ticker):
+    cursor = db.execute(<span class="string">"SELECT SUM(qty) FROM trades WHERE ticker=?"</span>, (ticker,))
+    <span class="keyword">return</span> cursor.fetchone()[0] <span class="keyword">or</span> 0
+
+<span class="keyword">def</span> <span class="function">test_buy_and_sell_integration</span>(db):
+    record_trade(db, <span class="string">"AAPL"</span>, 100, 150.0)
+    record_trade(db, <span class="string">"AAPL"</span>, -50, 155.0)
+    pos = get_position(db, <span class="string">"AAPL"</span>)
+    <span class="keyword">assert</span> pos == 50</code></pre>
+
+            <h3>Colab Experiment: Pipeline Integration</h3>
+            
+            <div class="code-header">colab_integration.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Setup</span>
+!pip install pytest pandas -q
+
+<span class="comment"># Cell 2: Create a mini backtest pipeline</span>
+pipeline = <span class="string">'''
+import pandas as pd
+import numpy as np
+
+class DataLoader:
+    def load(self, ticker):
+        # In production: reads from DB/API
+        dates = pd.date_range("2023-01-01", periods=100)
+        prices = 100 + np.cumsum(np.random.randn(100))
+        return pd.DataFrame({"close": prices}, index=dates)
+
+class SignalEngine:
+    def generate(self, df):
+        sma_fast = df["close"].rolling(10).mean()
+        sma_slow = df["close"].rolling(30).mean()
+        return "BUY" if sma_fast.iloc[-1] > sma_slow.iloc[-1] else "SELL"
+
+class Backtester:
+    def __init__(self, loader, engine):
+        self.loader = loader
+        self.engine = engine
+    
+    def run(self, ticker):
+        data = self.loader.load(ticker)
+        signal = self.engine.generate(data)
+        return {"ticker": ticker, "signal": signal, "last_price": data["close"].iloc[-1]}
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'pipeline.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(pipeline)
+
+<span class="comment"># Cell 3: Integration test</span>
+tests = <span class="string">'''
+import pytest
+import pandas as pd
+import numpy as np
+from unittest.mock import MagicMock
+from pipeline import Backtester, SignalEngine, DataLoader
+
+def test_full_pipeline_with_trending_data():
+    # Arrange: Create deterministic trending data
+    mock_loader = MagicMock(spec=DataLoader)
+    dates = pd.date_range("2023-01-01", periods=50)
+    trending_prices = pd.DataFrame({
+        "close": np.linspace(100, 150, 50)  # Strong uptrend
+    }, index=dates)
+    mock_loader.load.return_value = trending_prices
+    
+    backtester = Backtester(mock_loader, SignalEngine())
+    result = backtester.run("TEST")
+    
+    # Assert: In a strong uptrend, fast SMA > slow SMA
+    assert result["signal"] == "BUY"
+    assert result["last_price"] == 150.0
+    assert result["ticker"] == "TEST"
+
+def test_full_pipeline_with_falling_data():
+    mock_loader = MagicMock(spec=DataLoader)
+    dates = pd.date_range("2023-01-01", periods=50)
+    falling_prices = pd.DataFrame({
+        "close": np.linspace(150, 100, 50)  # Downtrend
+    }, index=dates)
+    mock_loader.load.return_value = falling_prices
+    
+    backtester = Backtester(mock_loader, SignalEngine())
+    result = backtester.run("TEST")
+    
+    assert result["signal"] == "SELL"
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_pipeline.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(tests)
+
+!pytest test_pipeline.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write an integration test for a CSV reader + processor pipeline.</li>
+                        <li>Use an in-memory SQLite DB to test that trades are persisted correctly.</li>
+                        <li>Test that a config loader correctly passes settings to a strategy object.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Test a full ETL pipeline: download → clean → feature engineer → save.</li>
+                        <li>Write an integration test for a portfolio optimizer that reads from a database and writes allocations back.</li>
+                        <li>Use Docker (locally) to integration-test against a real Postgres instance.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Build a full backtest integration test that runs on 10 years of synthetic data and verifies known statistical properties.</li>
+                        <li>Test a multi-process execution engine that submits orders to a simulated exchange.</li>
+                        <li>Create a contract test (using Pact or similar) between your alpha generator and your risk system.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.pytest.org/en/7.4.x/how-to/fixtures.html#scope-sharing-fixtures-across-classes-modules-packages-or-session" target="_blank">Fixture Scopes</a>
+                    <p>Learn to share expensive setup (DB connections) across tests.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://www.docker.com/" target="_blank">Docker</a>
+                    <p>Essential for integration testing with real databases/services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 8: STATIC ANALYSIS -->
+    <div id="static" class="tab-content">
+        <div class="section">
+            <h2>Module 8: Static Analysis & Code Quality <span class="badge badge-core">Quality</span></h2>
+            <p><strong>Static analysis</strong> examines code without executing it. It catches style violations, potential bugs, type mismatches, and complexity issues before your tests even run.</p>
+
+            <h3>The Toolchain</h3>
+            <div class="grid-2">
+                <div class="diagram-box">
+                    <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="50" y="20" width="200" height="40" rx="6" fill="#1e293b" stroke="#f87171" stroke-width="2"/>
+                        <text x="150" y="45" text-anchor="middle" fill="#f87171" font-size="14" font-weight="bold">flake8 / pylint</text>
+                        <text x="150" y="60" text-anchor="middle" fill="#94a3b8" font-size="10">Style & Errors</text>
+                        
+                        <rect x="50" y="80" width="200" height="40" rx="6" fill="#1e293b" stroke="#facc15" stroke-width="2"/>
+                        <text x="150" y="105" text-anchor="middle" fill="#facc15" font-size="14" font-weight="bold">black</text>
+                        <text x="150" y="120" text-anchor="middle" fill="#94a3b8" font-size="10">Auto-formatting</text>
+                        
+                        <rect x="50" y="140" width="200" height="40" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+                        <text x="150" y="165" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="bold">mypy</text>
+                        <text x="150" y="180" text-anchor="middle" fill="#94a3b8" font-size="10">Type Checking</text>
+                    </svg>
+                </div>
+                <div>
+                    <h4>Linters (flake8/pylint)</h4>
+                    <p>Enforce PEP 8, catch undefined variables, unused imports, and complexity.</p>
+                    <h4>Formatters (black)</h4>
+                    <p>Opinionated auto-formatter. Eliminates style debates.</p>
+                    <h4>Type Checkers (mypy)</h4>
+                    <p>Catches type errors in quant code (e.g., passing a list where an ndarray is expected).</p>
+                </div>
+            </div>
+
+            <h3>Type Hints for Quant Code</h3>
+            <p>Type hints make quant code self-documenting and catch mathematical dimension mismatches.</p>
+            
+            <div class="code-header">typed_quant_code.py</div>
+            <pre><code><span class="keyword">from</span> typing <span class="keyword">import</span> List, Tuple
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> numpy.typing <span class="keyword">import</span> NDArray
+
+<span class="keyword">def</span> <span class="function">portfolio_variance</span>(
+    weights: NDArray[np.float64], 
+    cov_matrix: NDArray[np.float64]
+) -> <span class="function">float</span>:
+    <span class="string">"""Calculate portfolio variance. mypy ensures dimensions match."""</span>
+    <span class="keyword">return</span> <span class="function">float</span>(weights.T @ cov_matrix @ weights)
+
+<span class="comment"># mypy catches this at check time, not runtime:</span>
+<span class="comment"># portfolio_variance([0.5, 0.5], [[0.1, 0.02], [0.02, 0.08]])  # Error: list, not ndarray</span></code></pre>
+
+            <h3>Pre-commit Hooks</h3>
+            <p>Run checks automatically before every Git commit. No more "oops, forgot to run black."</p>
+            
+            <div class="code-header">.pre-commit-config.yaml</div>
+            <pre><code>repos:
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.0.0
+    hooks:
+      - id: mypy</code></pre>
+
+            <h3>Colab Experiment: Static Analysis Lab</h3>
+            
+            <div class="code-header">colab_static.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install tools</span>
+!pip install flake8 black mypy -q
+
+<span class="comment"># Cell 2: Create messy code</span>
+messy = <span class="string">'''
+import numpy as np
+import pandas as pd  # unused!
+
+def calc(x,y):
+    z=x+y
+    return z
+
+def bad_function( a,b ):
+    if a==0:
+      return b
+    else:
+        return a+b
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'messy.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(messy)
+
+<span class="comment"># Cell 3: Run linter</span>
+!flake8 messy.py --max-line-length=88
+
+<span class="comment"># Cell 4: Auto-format with black</span>
+!black messy.py
+!cat messy.py
+
+<span class="comment"># Cell 5: Type check</span>
+typed = <span class="string">'''
+from typing import List
+
+def mean(x: List[float]) -> float:
+    return sum(x) / len(x)
+
+mean(["a", "b"])  # Type error!
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'typed.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(typed)
+!mypy typed.py</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Run flake8 on your code and fix all E501 (line too long) errors.</li>
+                        <li>Run black on a messy file and observe the changes.</li>
+                        <li>Add type hints to a simple <code>add(a, b)</code> function.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Type-hint a full <code>Backtester.run()</code> method including return type <code>Dict[str, Any]</code>.</li>
+                        <li>Configure flake8 to ignore certain rules in a <code>setup.cfg</code> file.</li>
+                        <li>Set up pre-commit hooks in a Git repository and make a test commit.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Create custom mypy plugins for numpy array shape checking (e.g., ensure matrix multiplication dimensions match).</li>
+                        <li>Write a pylint plugin that enforces quant-specific naming conventions (e.g., <code>vol</code> not <code>v</code>).</li>
+                        <li>Integrate SonarQube or similar for continuous code quality monitoring.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://black.readthedocs.io/" target="_blank">Black</a>
+                    <p>The uncompromising Python code formatter.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://mypy.readthedocs.io/" target="_blank">mypy</a>
+                    <p>Static type checker for Python.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://pre-commit.com/" target="_blank">pre-commit</a>
+                    <p>Framework for managing pre-commit hooks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 9: PERFORMANCE -->
+    <div id="performance" class="tab-content">
+        <div class="section">
+            <h2>Module 9: Performance Testing <span class="badge badge-quant">Quant-Critical</span></h2>
+            <p>In quant finance, <strong>performance is correctness</strong>. A backtester that takes 3 hours to run cannot be used for research. A trading system with 100ms latency misses the market. Performance testing ensures your code meets speed requirements.</p>
+
+            <h3>Profiling with cProfile</h3>
+            <p>Find where your code spends its time. Focus optimization efforts on the slowest 20%.</p>
+            
+            <div class="code-header">profile_backtest.py</div>
+            <pre><code><span class="keyword">import</span> cProfile
+<span class="keyword">import</span> pstats
+
+<span class="keyword">def</span> <span class="function">slow_backtest</span>(prices):
+    <span class="comment"># Intentionally slow: Python loop instead of vectorization</span>
+    returns = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(1, <span class="function">len</span>(prices)):
+        r = (prices[i] - prices[i-1]) / prices[i-1]
+        returns.append(r)
+    <span class="keyword">return</span> returns
+
+<span class="comment"># Profile it</span>
+profiler = cProfile.Profile()
+profiler.enable()
+result = slow_backtest([<span class="function">float</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> <span class="function">range</span>(100000)])
+profiler.disable()
+
+stats = pstats.Stats(profiler)
+stats.sort_stats(<span class="string">'cumtime'</span>)
+stats.print_stats(10)  <span class="comment"># Top 10 slowest functions</span></code></pre>
+
+            <h3>Benchmarking with pytest-benchmark</h3>
+            
+            <div class="code-header">test_benchmark.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pytest
+
+<span class="keyword">def</span> <span class="function">vectorized_returns</span>(prices):
+    <span class="keyword">return</span> np.diff(prices) / prices[:-1]
+
+<span class="keyword">def</span> <span class="function">test_vectorized_speed</span>(benchmark):
+    prices = np.random.randn(100000).cumsum() + 100
+    result = benchmark(vectorized_returns, prices)
+    <span class="keyword">assert</span> <span class="function">len</span>(result) == 99999</code></pre>
+
+            <h3>Memory Profiling</h3>
+            <p>Quant systems often load large datasets. Use <code>memory_profiler</code> to detect leaks.</p>
+            
+            <div class="code-header">memory_check.py</div>
+            <pre><code><span class="keyword">from</span> memory_profiler <span class="keyword">import</span> profile
+
+<span class="decorator">@profile</span>
+<span class="keyword">def</span> <span class="function">load_large_data</span>():
+    <span class="keyword">import</span> numpy <span class="keyword">as</span> np
+    data = np.random.randn(10000, 10000)  <span class="comment"># 800MB</span>
+    <span class="keyword">return</span> data.mean()</code></pre>
+
+            <h3>Colab Experiment: Performance Lab</h3>
+            
+            <div class="code-header">colab_performance.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Install</span>
+!pip install pytest-benchmark memory_profiler line_profiler -q
+
+<span class="comment"># Cell 2: Compare loop vs vectorized</span>
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> time
+
+prices = np.cumsum(np.random.randn(500000)) + 100
+
+<span class="comment"># Slow loop</span>
+start = time.time()
+ret_loop = []
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(1, <span class="function">len</span>(prices)):
+    ret_loop.append((prices[i]-prices[i-1])/prices[i-1])
+loop_time = time.time() - start
+
+<span class="comment"># Fast vectorized</span>
+start = time.time()
+ret_vec = np.diff(prices) / prices[:-1]
+vec_time = time.time() - start
+
+<span class="function">print</span>(<span class="string">f"Loop: {loop_time:.4f}s"</span>)
+<span class="function">print</span>(<span class="string">f"Vectorized: {vec_time:.4f}s"</span>)
+<span class="function">print</span>(<span class="string">f"Speedup: {loop_time/vec_time:.1f}x"</span>)
+
+<span class="comment"># Cell 3: Use %timeit magic</span>
+%timeit np.diff(prices) / prices[:-1]
+
+<span class="comment"># Cell 4: Profile a function</span>
+<span class="keyword">import</span> cProfile
+<span class="keyword">import</span> re
+
+<span class="keyword">def</span> <span class="function">compute_covariance</span>(returns):
+    <span class="keyword">return</span> np.cov(returns.T)
+
+returns = np.random.randn(1000, 50)
+cProfile.run(<span class="string">'compute_covariance(returns)'</span>, sort=<span class="string">'cumtime'</span>)</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Use <code>%timeit</code> to compare <code>sum()</code> vs <code>np.sum()</code> on a large list.</li>
+                        <li>Profile a function and identify the slowest line.</li>
+                        <li>Benchmark a pandas <code>.apply()</code> vs a vectorized alternative.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Optimize a rolling window calculation using Numba and measure the speedup.</li>
+                        <li>Memory-profile a function that loads a 1GB CSV. Reduce peak memory by 50%.</li>
+                        <li>Write a pytest-benchmark test that fails if a function takes longer than 100ms.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Profile a multi-threaded execution engine and identify lock contention.</li>
+                        <li>Benchmark a Cython-optimized vs pure-Python Monte Carlo pricer.</li>
+                        <li>Build a performance regression test suite that fails CI if latency increases by >5%.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://docs.python.org/3/library/profile.html" target="_blank">cProfile</a>
+                    <p>Python's built-in profiler.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://github.com/ionelmc/pytest-benchmark" target="_blank">pytest-benchmark</a>
+                    <p>Benchmarking plugin for pytest.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://github.com/pythonprofilers/memory_profiler" target="_blank">memory_profiler</a>
+                    <p>Line-by-line memory usage analysis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE 10: QUANT PATTERNS -->
+    <div id="quant" class="tab-content">
+        <div class="section">
+            <h2>Module 10: Quant-Specific Testing Patterns <span class="badge badge-quant">Domain Expert</span></h2>
+            <p>General testing principles apply everywhere, but quantitative finance has unique challenges: floating-point precision, stochastic outputs, time-series dependencies, and regulatory requirements. This module covers patterns you won't find in standard software testing books.</p>
+
+            <h3>Pattern 1: Floating-Point Precision</h3>
+            <p>Never use <code>==</code> for floats. Use <code>np.testing.assert_allclose</code> with appropriate tolerances.</p>
+            
+            <div class="code-header">test_precision.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">test_black_scholes_precision</span>():
+    <span class="comment"># Using assert_allclose with relative tolerance</span>
+    computed = 10.0000000001
+    expected = 10.0
+    np.testing.assert_allclose(computed, expected, rtol=1e-9)
+    
+    <span class="comment"># For very small numbers, use absolute tolerance</span>
+    computed_greek = 0.000001
+    expected_greek = 0.0000010001
+    np.testing.assert_allclose(computed_greek, expected_greek, atol=1e-12)
+
+<span class="keyword">def</span> <span class="function">test_variance_is_positive_semidefinite</span>():
+    cov = np.array([[0.04, 0.01], [0.01, 0.03]])
+    eigenvalues = np.linalg.eigvalsh(cov)
+    <span class="keyword">assert</span> np.all(eigenvalues >= -1e-10)  <span class="comment"># Allow tiny numerical noise</span></code></pre>
+
+            <h3>Pattern 2: Stochastic Testing</h3>
+            <p>When outputs are random (Monte Carlo), test distributions, not single values.</p>
+            
+            <div class="code-header">test_stochastic.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+
+<span class="keyword">def</span> <span class="function">monte_carlo_var</span>(returns, alpha=0.05, n_sims=10000):
+    <span class="string">"""Parametric Monte Carlo VaR assuming normal distribution"""</span>
+    mu, sigma = np.mean(returns), np.std(returns)
+    simulated = np.random.normal(mu, sigma, n_sims)
+    <span class="keyword">return</span> np.percentile(simulated, alpha * 100)
+
+<span class="keyword">def</span> <span class="function">test_var_hits_correct_quantile</span>():
+    np.random.seed(42)  <span class="comment"># Deterministic for this test</span>
+    returns = np.random.normal(0, 0.02, 1000)
+    var_5 = monte_carlo_var(returns, alpha=0.05)
+    
+    <span class="comment"># Test 1: VaR should be negative (loss)</span>
+    <span class="keyword">assert</span> var_5 < 0
+    
+    <span class="comment"># Test 2: With seed 42, we know the exact value</span>
+    <span class="keyword">assert</span> abs(var_5 - (-0.0328)) < 0.001
+    
+    <span class="comment"># Test 3: Statistical test over many seeds</span>
+    vars = []
+    <span class="keyword">for</span> seed <span class="keyword">in</span> <span class="function">range</span>(100):
+        np.random.seed(seed)
+        vars.append(monte_carlo_var(returns, alpha=0.05))
+    
+    <span class="comment"># The mean VaR should be close to the theoretical normal VaR</span>
+    theoretical = stats.norm.ppf(0.05, 0, 0.02)
+    np.testing.assert_allclose(np.mean(vars), theoretical, rtol=0.05)</code></pre>
+
+            <h3>Pattern 3: Time-Series Testing</h3>
+            <p>Financial data has temporal structure. Tests must respect lookahead bias and stationarity.</p>
+            
+            <div class="code-header">test_timeseries.py</div>
+            <pre><code><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">test_no_lookahead_bias</span>():
+    <span class="string">"""Ensure signal uses only past data"""</span>
+    dates = pd.date_range(<span class="string">"2023-01-01"</span>, periods=100)
+    prices = pd.Series(np.cumsum(np.random.randn(100)) + 100, index=dates)
+    
+    <span class="comment"># Calculate signal at each point using ONLY past data</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(50, <span class="function">len</span>(prices)):
+        past_data = prices.iloc[:i]
+        signal = calculate_signal(past_data)  <span class="comment"># Your function</span>
+        <span class="comment"># The signal must not reference prices.iloc[i] or future</span>
+        <span class="keyword">assert</span> signal <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span></code></pre>
+
+            <h3>Pattern 4: Regression Tests for Models</h3>
+            <p>When you update a model, ensure it still produces the same results on benchmark datasets.</p>
+            
+            <div class="code-header">test_regression.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> joblib
+
+<span class="keyword">def</span> <span class="function">test_model_regression</span>():
+    <span class="string">"""Load benchmark data and compare to saved expected outputs"""</span>
+    X_test = np.load(<span class="string">"tests/data/benchmark_X.npy"</span>)
+    expected_y = np.load(<span class="string">"tests/data/expected_y.npy"</span>)
+    
+    model = joblib.load(<span class="string">"models/production_model.pkl"</span>)
+    predicted_y = model.predict(X_test)
+    
+    np.testing.assert_allclose(predicted_y, expected_y, rtol=1e-6)
+    <span class="comment"># If this fails, your model change broke backward compatibility!</span></code></pre>
+
+            <h3>Pattern 5: Arbitrage-Free Condition Tests</h3>
+            <p>Enforce financial no-arbitrage conditions as invariant tests.</p>
+            
+            <div class="code-header">test_no_arbitrage.py</div>
+            <pre><code><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">test_call_price_monotonic_in_vol</span>():
+    <span class="string">"""A call option price must increase with volatility"""</span>
+    S, K, T, r = 100.0, 100.0, 1.0, 0.05
+    vols = [0.1, 0.2, 0.3, 0.4, 0.5]
+    prices = [bs_call(S, K, T, r, v) <span class="keyword">for</span> v <span class="keyword">in</span> vols]
+    
+    <span class="comment"># Check monotonicity</span>
+    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(1, <span class="function">len</span>(prices)):
+        <span class="keyword">assert</span> prices[i] > prices[i-1], <span class="string">f"Price not monotonic at vol={vols[i]}"</span>
+
+<span class="keyword">def</span> <span class="function">test_convexity_of_call_price</span>():
+    <span class="string">"""Call price must be convex in strike (butterfly spread >= 0)"""</span>
+    S, T, r, sigma = 100.0, 1.0, 0.05, 0.2
+    K1, K2, K3 = 90.0, 100.0, 110.0
+    
+    c1 = bs_call(S, K1, T, r, sigma)
+    c2 = bs_call(S, K2, T, r, sigma)
+    c3 = bs_call(S, K3, T, r, sigma)
+    
+    <span class="comment"># Convexity: (C(K1) + C(K3)) / 2 >= C(K2)</span>
+    butterfly = (c1 + c3) / 2 - c2
+    <span class="keyword">assert</span> butterfly >= -1e-10, <span class="string">"Arbitrage: Butterfly price negative!"</span></code></pre>
+
+            <h3>Colab Experiment: Quant Patterns Lab</h3>
+            
+            <div class="code-header">colab_quant_patterns.ipynb</div>
+            <pre><code><span class="comment"># Cell 1: Setup</span>
+!pip install pytest scipy -q
+
+<span class="comment"># Cell 2: Complete quant test suite</span>
+suite = <span class="string">'''
+import numpy as np
+import pytest
+from scipy.stats import norm
+
+def bs_call(S, K, T, r, sigma):
+    if T <= 0:
+        return max(S - K, 0)
+    d1 = (np.log(S/K) + (r + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
+    return S*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2)
+
+# Pattern 1: Precision
+def test_bs_at_the_money_approximate():
+    """ATM call approx S * sigma * sqrt(T/2pi) for small r"""
+    S, K, T, r, sigma = 100.0, 100.0, 1.0, 0.0, 0.2
+    price = bs_call(S, K, T, r, sigma)
+    approx = S * sigma * np.sqrt(T / (2 * np.pi))
+    np.testing.assert_allclose(price, approx, rtol=0.05)
+
+# Pattern 2: Stochastic with seed
+def test_mc_mean_converges():
+    np.random.seed(123)
+    samples = np.random.normal(0, 1, 100000)
+    assert abs(np.mean(samples)) < 0.01  # Should be close to 0
+
+# Pattern 3: Financial invariant
+def test_call_intrinsic_value_floor():
+    """Call price must always be >= max(S-K, 0)"""
+    for S in [80, 100, 120]:
+        for K in [80, 100, 120]:
+            for sigma in [0.01, 0.2, 0.5]:
+                price = bs_call(S, K, 1.0, 0.05, sigma)
+                intrinsic = max(S - K, 0)
+                assert price >= intrinsic - 1e-10, f"Violation at S={S}, K={K}"
+
+# Pattern 4: Boundary condition
+def test_call_expires_at_intrinsic():
+    """At T=0, call = max(S-K, 0) exactly"""
+    assert bs_call(110, 100, 0, 0.05, 0.2) == 10.0
+    assert bs_call(90, 100, 0, 0.05, 0.2) == 0.0
+'''</span>
+<span class="keyword">with</span> <span class="function">open</span>(<span class="string">'test_quant.py'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:
+    f.write(suite)
+
+!pytest test_quant.py -v</code></pre>
+
+            <h3>Practice Exercises</h3>
+            <div class="exercise-tier tier-easy">
+                <div class="tier-header" onclick="toggleTier(this)">🟢 Easy</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Write a test that verifies <code>np.std()</code> is always non-negative using <code>assert_allclose</code>.</li>
+                        <li>Fix a seed and test that a random walk's final position has expected variance = n·σ².</li>
+                        <li>Test that portfolio weights always sum to 1.0 within machine epsilon.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-medium">
+                <div class="tier-header" onclick="toggleTier(this)">🟡 Medium</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Test that an implied volatility surface has no calendar arbitrage (monotonic in T for ATM).</li>
+                        <li>Write a regression test for a PCA decomposition of a correlation matrix.</li>
+                        <li>Test that a mean-reversion strategy has zero correlation with a momentum strategy on random data.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="exercise-tier tier-hard">
+                <div class="tier-header" onclick="toggleTier(this)">🔴 Hard</div>
+                <div class="tier-content">
+                    <ol class="exercise-list">
+                        <li>Implement a full suite of no-arbitrage tests for a local volatility model.</li>
+                        <li>Test that a bootstrap resampling method preserves the first two moments of the original distribution.</li>
+                        <li>Build a property-based test that verifies your options portfolio Greeks sum correctly (additivity of Delta, Gamma).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3>Resources</h3>
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <a href="https://numpy.org/doc/stable/reference/routines.testing.html" target="_blank">NumPy Testing Utils</a>
+                    <p>assert_allclose, assert_array_equal, and more.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://www.amazon.com/Options-Futures-Other-Derivatives-Global/dp/1292410625" target="_blank">Hull's Options, Futures, and Other Derivatives</a>
+                    <p>The quant bible for understanding what to test.</p>
+                </div>
+                <div class="resource-card">
+                    <a href="https://arxiv.org/abs/1803.02312" target="_blank">Deep Learning for Limit Order Books</a>
+                    <p>Example of rigorous testing in quant ML research.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function showTab(tabId) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        // Show selected tab
+        document.getElementById(tabId).classList.add('active');
+        // Activate button
+        event.target.classList.add('active');
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function toggleTier(header) {
+        const content = header.nextElementSibling;
+        content.classList.toggle('show');
+        const isOpen = content.classList.contains('show');
+        header.textContent = header.textContent.replace(/[🟢🟡🔴].*$/, '').trim() + 
+            (isOpen ? ' — Click to Collapse' : ' — Click to Expand');
+        // Restore emoji
+        const emoji = header.parentElement.classList.contains('tier-easy') ? '🟢' : 
+                     header.parentElement.classList.contains('tier-medium') ? '🟡' : '🔴';
+        header.textContent = emoji + ' ' + header.textContent;
+    }
+    
+    // Initialize all tiers as collapsed (optional - remove if you want open by default)
+    document.querySelectorAll('.tier-content').forEach(el => el.classList.remove('show'));
+</script>
+
+</body>
+</html>
