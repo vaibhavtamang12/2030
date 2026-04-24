@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Engineer Study Guide: Foundations & Matrix Operations</title>
+<style>
+  :root {
+    --bg: #f8f9fa;
+    --fg: #1a1a2e;
+    --accent: #e94560;
+    --secondary: #0f3460;
+    --muted: #533483;
+    --card: #ffffff;
+    --border: #dee2e6;
+    --code-bg: #16213e;
+    --code-fg: #eaeaea;
+    --success: #2ecc71;
+    --warn: #f1c40f;
+    --shadow: 0 4px 6px rgba(0,0,0,0.07);
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--secondary), var(--muted));
+    color: white; padding: 2rem 1rem; text-align: center;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  header h1 { margin: 0; font-size: 1.6rem; letter-spacing: 0.5px; }
+  header p { margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; }
+  nav {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem;
+    background: var(--card); padding: 0.75rem; border-bottom: 1px solid var(--border);
+    position: sticky; top: calc(2rem + 60px); z-index: 99;
+  }
+  nav button {
+    border: none; background: transparent; color: var(--secondary);
+    padding: 0.5rem 1rem; border-radius: var(--radius); cursor: pointer;
+    font-weight: 600; font-size: 0.85rem; transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  nav button:hover { background: #eef; }
+  nav button.active { background: var(--accent); color: white; }
+  main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+  .tab-content { display: none; animation: fadeIn 0.3s; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+  .card {
+    background: var(--card); border-radius: var(--radius); padding: 1.5rem;
+    margin-bottom: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border);
+  }
+  h2 { color: var(--secondary); margin-top: 0; border-bottom: 2px solid var(--accent); padding-bottom: 0.3rem; display: inline-block; }
+  h3 { color: var(--muted); margin-top: 1.5rem; }
+  h4 { color: var(--fg); margin-top: 1.2rem; }
+  .math { font-family: "Georgia", serif; font-style: italic; letter-spacing: 0.3px; }
+  .math b { font-style: normal; }
+  .highlight { background: #fff3cd; padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 600; }
+  .def { border-left: 4px solid var(--accent); padding-left: 1rem; background: #fff5f5; padding: 1rem; border-radius: 0 var(--radius) var(--radius) 0; margin: 1rem 0; }
+  .note { border-left: 4px solid var(--secondary); padding-left: 1rem; background: #f0f4ff; padding: 1rem; border-radius: 0 var(--radius) var(--radius) 0; margin: 1rem 0; }
+  .quant { border-left: 4px solid var(--success); padding-left: 1rem; background: #f0fff4; padding: 1rem; border-radius: 0 var(--radius) var(--radius) 0; margin: 1rem 0; }
+  pre {
+    background: var(--code-bg); color: var(--code-fg); padding: 1rem; border-radius: var(--radius);
+    overflow-x: auto; font-size: 0.9rem; line-height: 1.4;
+  }
+  code { font-family: "Consolas", "Monaco", monospace; }
+  .inline-code { background: #eee; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9em; color: #c7254e; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: center; }
+  th { background: var(--secondary); color: white; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  svg { max-width: 100%; height: auto; display: block; margin: 1rem auto; }
+  .svg-caption { text-align: center; font-size: 0.85rem; color: #666; margin-top: -0.5rem; margin-bottom: 1rem; }
+  .exercise { background: #f1f3f5; padding: 1rem; border-radius: var(--radius); margin: 1rem 0; }
+  .tier { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-right: 0.5rem; }
+  .easy { background: #d4edda; color: #155724; }
+  .medium { background: #fff3cd; color: #856404; }
+  .hard { background: #f8d7da; color: #721c24; }
+  .collapsible { cursor: pointer; width: 100%; border: none; text-align: left; outline: none; padding: 0.8rem; background: #e9ecef; border-radius: var(--radius); font-weight: 600; margin-top: 0.5rem; }
+  .collapsible:after { content: "\002B"; float: right; }
+  .collapsible.active:after { content: "\2212"; }
+  .solution { max-height: 0; overflow: hidden; transition: max-height 0.2s ease-out; background: white; border-radius: 0 0 var(--radius) var(--radius); }
+  .solution-inner { padding: 1rem; border: 1px solid var(--border); border-top: none; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } nav { top: 0; position: relative; } header { position: relative; } }
+  .formula-box { text-align: center; padding: 1rem; background: #f8f9fa; border: 1px dashed var(--border); border-radius: var(--radius); margin: 1rem 0; font-size: 1.1rem; }
+  .step { display: flex; align-items: center; gap: 1rem; margin: 0.8rem 0; }
+  .step-num { min-width: 28px; height: 28px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+  ul.check { list-style: none; padding-left: 0; }
+  ul.check li:before { content: "✓ "; color: var(--success); font-weight: 700; margin-right: 0.3rem; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>Quant Engineer Study Guide</h1>
+  <p>Foundations & Matrix Operations — Scalars, Vectors, Matrices, Tensors & Their Financial Applications</p>
+</header>
+
+<nav id="tabNav">
+  <button class="active" onclick="showTab('prereq')">Prerequisites</button>
+  <button onclick="showTab('scalars')">Scalars</button>
+  <button onclick="showTab('vectors')">Vectors</button>
+  <button onclick="showTab('matrices')">Matrices</button>
+  <button onclick="showTab('ops1')">Ops I: Add/Scale/Transpose</button>
+  <button onclick="showTab('ops2')">Ops II: Multiplication</button>
+  <button onclick="showTab('products')">Dot & Cross Products</button>
+  <button onclick="showTab('tensors')">Tensors</button>
+  <button onclick="showTab('quant')">Quant Applications</button>
+  <button onclick="showTab('colab')">Colab Experiments</button>
+  <button onclick="showTab('practice')">Practice Problems</button>
+  <button onclick="showTab('cheatsheet')">Cheat Sheet</button>
+</nav>
+
+<main>
+
+<!-- ==================== PREREQUISITES ==================== -->
+<div id="prereq" class="tab-content active">
+  <div class="card">
+    <h2>Prerequisites</h2>
+    <p>Before diving into quant-specific linear algebra, you need a small toolkit of mathematical notation and concepts. We cover them here in plain English.</p>
+
+    <h3>1. Sets & Number Systems</h3>
+    <div class="def">
+      <b>Set:</b> A collection of distinct objects. We write <span class="math">x ∈ S</span> to mean "<span class="math">x</span> is an element of set <span class="math">S</span>".<br>
+      <b>Real Numbers (ℝ):</b> All numbers on the continuous number line: ..., −2, −1, 0, 0.5, π, √2, 3, ...<br>
+      <b>Integers (ℤ):</b> Whole numbers without fractions: ..., −2, −1, 0, 1, 2, ...
+    </div>
+    <p>In quant finance, almost every quantity you touch is a real number: prices, returns, weights, volatilities.</p>
+
+    <svg width="600" height="120" viewBox="0 0 600 120">
+      <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#0f3460"/></marker></defs>
+      <line x1="50" y1="70" x2="550" y2="70" stroke="#0f3460" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="50" y1="65" x2="50" y2="75" stroke="#0f3460" stroke-width="2"/>
+      <text x="50" y="95" text-anchor="middle" font-size="14" fill="#0f3460">0</text>
+      <line x1="150" y1="65" x2="150" y2="75" stroke="#0f3460" stroke-width="2"/>
+      <text x="150" y="95" text-anchor="middle" font-size="14" fill="#0f3460">1</text>
+      <line x1="250" y1="65" x2="250" y2="75" stroke="#0f3460" stroke-width="2"/>
+      <text x="250" y="95" text-anchor="middle" font-size="14" fill="#0f3460">2</text>
+      <line x1="350" y1="65" x2="350" y2="75" stroke="#0f3460" stroke-width="2"/>
+      <text x="350" y="95" text-anchor="middle" font-size="14" fill="#0f3460">3</text>
+      <circle cx="200" cy="70" r="5" fill="#e94560"/>
+      <text x="200" y="55" text-anchor="middle" font-size="13" fill="#e94560" font-weight="bold">√2 ≈ 1.414</text>
+      <circle cx="300" cy="70" r="5" fill="#533483"/>
+      <text x="300" y="55" text-anchor="middle" font-size="13" fill="#533483" font-weight="bold">π ≈ 3.141</text>
+      <text x="300" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">The Real Number Line (ℝ)</text>
+    </svg>
+    <div class="svg-caption">Figure 1: Every scalar lives somewhere on this infinite line.</div>
+
+    <h3>2. Summation Notation (Sigma Σ)</h3>
+    <div class="def">
+      The Greek letter Sigma <span class="math">Σ</span> means "sum". <br>
+      <span class="math">Σ<sub>i=1</sub><sup>n</sup> x<sub>i</sub> = x₁ + x₂ + ... + x<sub>n</sub></span>
+    </div>
+    <p>Example: If you have 5 daily returns <span class="math">r₁, r₂, r₃, r₄, r₅</span>, their average is <span class="math">(1/5) Σ<sub>i=1</sub><sup>5</sup> r<sub>i</sub></span>. You will see Σ everywhere in portfolio math.</p>
+
+    <h3>3. Functions & Variables</h3>
+    <div class="def">
+      <b>Variable:</b> A symbol representing an unknown or changing quantity (e.g., <span class="math">r</span> for return, <span class="math">t</span> for time).<br>
+      <b>Function:</b> A rule that maps an input to an output. <span class="math">f(x) = 2x + 3</span> means "double the input and add 3".
+    </div>
+
+    <h3>4. Basic Python / NumPy Awareness</h3>
+    <p>This guide uses Python for experiments. You only need to know:</p>
+    <ul class="check">
+      <li>Variables store data: <span class="inline-code">x = 5</span></li>
+      <li>Lists hold sequences: <span class="inline-code">my_list = [1, 2, 3]</span></li>
+      <li>NumPy is the library for fast math: <span class="inline-code">import numpy as np</span></li>
+      <li>Arrays are like super-powered lists: <span class="inline-code">arr = np.array([1, 2, 3])</span></li>
+    </ul>
+    <div class="note">
+      <b>Why Python?</b> Quantitative finance runs on Python (and C++ for speed). NumPy handles the linear algebra so you can focus on the finance.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCALARS ==================== -->
+<div id="scalars" class="tab-content">
+  <div class="card">
+    <h2>Scalars</h2>
+    <div class="def">
+      A <b>scalar</b> is a single number. It has <b>magnitude</b> (size) but no direction. Scalars are the atoms of linear algebra.
+    </div>
+
+    <h3>Notation</h3>
+    <p>We usually write scalars with lowercase letters: <span class="math">a, b, x, y, α, β</span>. In typed notes, we often use italics.</p>
+    <div class="formula-box">
+      <span class="math">x = 7.5</span>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;<span class="math">r = 0.03</span>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;<span class="math">σ = 0.15</span>
+    </div>
+
+    <h3>Visualizing a Scalar</h3>
+    <p>A scalar is just a point on the number line. It tells you "how much" but not "which way".</p>
+    <svg width="600" height="140" viewBox="0 0 600 140">
+      <line x1="50" y1="80" x2="550" y2="80" stroke="#0f3460" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="300" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">Scalar as a Point</text>
+      <!-- ticks -->
+      <line x1="100" y1="75" x2="100" y2="85" stroke="#0f3460" stroke-width="2"/><text x="100" y="105" text-anchor="middle" font-size="13">-2</text>
+      <line x1="200" y1="75" x2="200" y2="85" stroke="#0f3460" stroke-width="2"/><text x="200" y="105" text-anchor="middle" font-size="13">-1</text>
+      <line x1="300" y1="75" x2="300" y2="85" stroke="#0f3460" stroke-width="2"/><text x="300" y="105" text-anchor="middle" font-size="13">0</text>
+      <line x1="400" y1="75" x2="400" y2="85" stroke="#0f3460" stroke-width="2"/><text x="400" y="105" text-anchor="middle" font-size="13">1</text>
+      <line x1="500" y1="75" x2="500" y2="85" stroke="#0f3460" stroke-width="2"/><text x="500" y="105" text-anchor="middle" font-size="13">2</text>
+      <!-- scalar points -->
+      <circle cx="340" cy="80" r="6" fill="#e94560"/>
+      <text x="340" y="65" text-anchor="middle" font-size="13" fill="#e94560" font-weight="bold">x = 0.4</text>
+      <circle cx="460" cy="80" r="6" fill="#2ecc71"/>
+      <text x="460" y="65" text-anchor="middle" font-size="13" fill="#2ecc71" font-weight="bold">y = 1.6</text>
+      <circle cx="160" cy="80" r="6" fill="#533483"/>
+      <text x="160" y="65" text-anchor="middle" font-size="13" fill="#533483" font-weight="bold">z = -1.4</text>
+    </svg>
+    <div class="svg-caption">Figure 2: Three scalars plotted as points. Negative scalars live left of zero.</div>
+
+    <h3>Scalar Arithmetic</h3>
+    <p>All the familiar rules apply:</p>
+    <table>
+      <tr><th>Property</th><th>Symbol</th><th>Example</th></tr>
+      <tr><td>Commutative</td><td><span class="math">a + b = b + a</span></td><td>3 + 5 = 5 + 3</td></tr>
+      <tr><td>Associative</td><td><span class="math">(a + b) + c = a + (b + c)</span></td><td>(2+3)+4 = 2+(3+4)</td></tr>
+      <tr><td>Distributive</td><td><span class="math">a(b + c) = ab + ac</span></td><td>2(3+4) = 2·3 + 2·4</td></tr>
+      <tr><td>Identity (add)</td><td><span class="math">a + 0 = a</span></td><td>7 + 0 = 7</td></tr>
+      <tr><td>Identity (mult)</td><td><span class="math">a · 1 = a</span></td><td>7 · 1 = 7</td></tr>
+    </table>
+
+    <h3>Quant Application: The Scalar in Finance</h3>
+    <div class="quant">
+      <b>Single Asset Return:</b> If Apple stock goes from $150 to $165, the scalar return is <span class="math">r = (165−150)/150 = 0.10</span> or 10%.<br><br>
+      <b>Risk-Free Rate:</b> The 3-month Treasury yield might be <span class="math">r<sub>f</sub> = 0.052</span> (5.2%). This is a scalar.<br><br>
+      <b>Volatility:</b> The standard deviation of returns, <span class="math">σ = 0.20</span>, is a scalar measuring "how bumpy" the price path is.
+    </div>
+    <p>Even complex quant models are built by combining millions of scalar operations. Master the scalar, and you master the foundation.</p>
+
+    <h3>Key Insight</h3>
+    <div class="note">
+      <b>Dimension Check:</b> A scalar is <b>0-dimensional</b>. It has no length, width, or height. It is just a magnitude. Every other object in this guide (vector, matrix, tensor) is built by stacking scalars in organized ways.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Scalars</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E1.1</b> Calculate the simple return if a stock moves from $80 to $92. Express it as a decimal and a percentage.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">r = (92−80)/80 = 12/80 = 0.15 = 15%</span></div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E1.2</b> If <span class="math">a = 4</span>, <span class="math">b = −2</span>, <span class="math">c = 0.5</span>, compute <span class="math">a(b + c)</span> and <span class="math">ab + ac</span>. Verify they are equal.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">a(b+c) = 4(−2+0.5) = 4(−1.5) = −6</span>. <span class="math">ab+ac = 4(−2)+4(0.5) = −8+2 = −6</span>. Confirmed.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E1.3</b> A portfolio has two assets. Asset A returns <span class="math">r<sub>A</sub> = 0.08</span> and Asset B returns <span class="math">r<sub>B</sub> = 0.12</span>. If you invest equal dollar amounts, what is the scalar average return?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">r<sub>avg</sub> = (0.08 + 0.12)/2 = 0.10</span> or 10%. This is the unweighted arithmetic mean.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E1.4</b> The continuously compounded return is <span class="math">r<sub>cc</sub> = ln(P<sub>t</sub>/P<sub>t−1</sub>)</span>. If a stock drops from $100 to $85, calculate the simple return and the continuously compounded return. Why are they different?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Simple: <span class="math">(85−100)/100 = −0.15</span>. CC: <span class="math">ln(85/100) = ln(0.85) ≈ −0.1625</span>. They differ because CC assumes reinvestment; it is always smaller in magnitude for losses and larger for gains due to the concavity of the natural log.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== VECTORS ==================== -->
+<div id="vectors" class="tab-content">
+  <div class="card">
+    <h2>Vectors</h2>
+    <div class="def">
+      A <b>vector</b> is an ordered list of scalars. It has both <b>magnitude</b> (length) and <b>direction</b>. Vectors are the molecules of linear algebra—scalars bonded together in a specific sequence.
+    </div>
+
+    <h3>Notation</h3>
+    <p>We write vectors with bold lowercase letters or arrows:</p>
+    <div class="formula-box">
+      <span class="math"><b>v</b> = [v₁, v₂, v₃]ᵀ</span>&nbsp;&nbsp;or&nbsp;&nbsp;<span class="math">v⃗ = (3, −1, 4)</span>
+    </div>
+    <p>The little "T" superscript means <b>transpose</b>—it turns a row into a column. By default in quant finance, vectors are <b>column vectors</b> unless stated otherwise.</p>
+
+    <h3>Row vs Column</h3>
+    <div class="two-col">
+      <div>
+        <p><b>Column vector</b> (n × 1):</p>
+        <div class="formula-box" style="font-size:1.3rem;">
+          <span class="math"><b>v</b> = </span>
+          <table style="display:inline-table; width:auto; margin:0; vertical-align:middle; border-collapse:collapse;">
+            <tr><td style="border:1px solid #333; padding:4px 8px;">3</td></tr>
+            <tr><td style="border:1px solid #333; padding:4px 8px;">−1</td></tr>
+            <tr><td style="border:1px solid #333; padding:4px 8px;">4</td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <p><b>Row vector</b> (1 × n):</p>
+        <div class="formula-box" style="font-size:1.3rem;">
+          <span class="math"><b>v</b>ᵀ = </span>
+          <table style="display:inline-table; width:auto; margin:0; vertical-align:middle; border-collapse:collapse;">
+            <tr>
+              <td style="border:1px solid #333; padding:4px 8px;">3</td>
+              <td style="border:1px solid #333; padding:4px 8px;">−1</td>
+              <td style="border:1px solid #333; padding:4px 8px;">4</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <b>Convention Alert:</b> In this guide, <span class="math"><b>v</b></span> is always a column vector. If we need it horizontal, we explicitly write <span class="math"><b>v</b>ᵀ</span>.
+    </div>
+
+    <h3>Visualizing Vectors</h3>
+    <p>In 2D, a vector is an arrow from the origin to a point <span class="math">(x, y)</span>.</p>
+    <svg width="500" height="400" viewBox="0 0 500 400">
+      <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f3460"/></marker></defs>
+      <!-- axes -->
+      <line x1="50" y1="350" x2="450" y2="350" stroke="#0f3460" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="50" y1="350" x2="50" y2="50" stroke="#0f3460" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="460" y="355" font-size="14" fill="#0f3460">x</text>
+      <text x="40" y="45" font-size="14" fill="#0f3460">y</text>
+      <!-- grid -->
+      <g stroke="#ddd" stroke-width="1">
+        <line x1="50" y1="310" x2="450" y2="310"/><line x1="50" y1="270" x2="450" y2="270"/>
+        <line x1="50" y1="230" x2="450" y2="230"/><line x1="50" y1="190" x2="450" y2="190"/>
+        <line x1="50" y1="150" x2="450" y2="150"/><line x1="50" y1="110" x2="450" y2="110"/>
+        <line x1="50" y1="70" x2="450" y2="70"/>
+        <line x1="90" y1="350" x2="90" y2="50"/><line x1="130" y1="350" x2="130" y2="50"/>
+        <line x1="170" y1="350" x2="170" y2="50"/><line x1="210" y1="350" x2="210" y2="50"/>
+        <line x1="250" y1="350" x2="250" y2="50"/><line x1="290" y1="350" x2="290" y2="50"/>
+        <line x1="330" y1="350" x2="330" y2="50"/><line x1="370" y1="350" x2="370" y2="50"/>
+        <line x1="410" y1="350" x2="410" y2="50"/>
+      </g>
+      <!-- ticks -->
+      <text x="90" y="370" text-anchor="middle" font-size="12">1</text>
+      <text x="170" y="370" text-anchor="middle" font-size="12">3</text>
+      <text x="250" y="370" text-anchor="middle" font-size="12">5</text>
+      <text x="330" y="370" text-anchor="middle" font-size="12">7</text>
+      <text x="410" y="370" text-anchor="middle" font-size="12">9</text>
+      <text x="35" y="315" text-anchor="end" font-size="12">1</text>
+      <text x="35" y="235" text-anchor="end" font-size="12">3</text>
+      <text x="35" y="155" text-anchor="end" font-size="12">5</text>
+      <text x="35" y="75" text-anchor="end" font-size="12">7</text>
+      <!-- vector a -->
+      <line x1="50" y1="350" x2="250" y2="190" stroke="#e94560" stroke-width="3" marker-end="url(#arr)"/>
+      <circle cx="250" cy="190" r="4" fill="#e94560"/>
+      <text x="260" y="180" font-size="14" fill="#e94560" font-weight="bold">a = (5, 4)</text>
+      <!-- vector b -->
+      <line x1="50" y1="350" x2="170" y2="110" stroke="#2ecc71" stroke-width="3" marker-end="url(#arr)"/>
+      <circle cx="170" cy="110" r="4" fill="#2ecc71"/>
+      <text x="180" y="100" font-size="14" fill="#2ecc71" font-weight="bold">b = (3, 6)</text>
+      <!-- dashed components for a -->
+      <line x1="250" y1="190" x2="250" y2="350" stroke="#e94560" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="50" y1="190" x2="250" y2="190" stroke="#e94560" stroke-width="1" stroke-dasharray="4"/>
+    </svg>
+    <div class="svg-caption">Figure 3: 2D vectors as arrows. The dashed lines show the scalar components (x=5, y=4) that make up vector <b>a</b>.</div>
+
+    <h3>Vector Operations</h3>
+    <h4>Addition</h4>
+    <p>Add corresponding entries:</p>
+    <div class="formula-box">
+      <span class="math"><b>a</b> + <b>b</b> = [a₁+b₁, a₂+b₂, ..., a<sub>n</sub>+b<sub>n</sub>]ᵀ</span>
+    </div>
+    <p><b>Geometrically:</b> Place the tail of <b>b</b> at the head of <b>a</b>. The sum is the arrow from the origin to the new head.</p>
+
+    <svg width="500" height="400" viewBox="0 0 500 400">
+      <defs><marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#0f3460"/></marker></defs>
+      <line x1="50" y1="350" x2="450" y2="350" stroke="#0f3460" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="50" y1="350" x2="50" y2="50" stroke="#0f3460" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="460" y="355" font-size="14">x</text><text x="40" y="45" font-size="14">y</text>
+      <!-- a -->
+      <line x1="50" y1="350" x2="250" y2="190" stroke="#e94560" stroke-width="3" marker-end="url(#arr2)"/>
+      <text x="260" y="180" font-size="14" fill="#e94560" font-weight="bold">a</text>
+      <!-- b shifted -->
+      <line x1="250" y1="190" x2="370" y2="70" stroke="#2ecc71" stroke-width="3" marker-end="url(#arr2)"/>
+      <text x="380" y="65" font-size="14" fill="#2ecc71" font-weight="bold">b</text>
+      <!-- a+b -->
+      <line x1="50" y1="350" x2="370" y2="70" stroke="#533483" stroke-width="4" marker-end="url(#arr2)"/>
+      <text x="380" y="60" font-size="16" fill="#533483" font-weight="bold">a + b</text>
+      <!-- helper dashed -->
+      <line x1="370" y1="70" x2="370" y2="350" stroke="#533483" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="50" y1="70" x2="370" y2="70" stroke="#533483" stroke-width="1" stroke-dasharray="4"/>
+    </svg>
+    <div class="svg-caption">Figure 4: Tip-to-tail addition. a = (5,4), b = (3,6), so a+b = (8,10).</div>
+
+    <h4>Scalar Multiplication</h4>
+    <p>Multiply every entry by a scalar:</p>
+    <div class="formula-box">
+      <span class="math">c · <b>v</b> = [c·v₁, c·v₂, ..., c·v<sub>n</sub>]ᵀ</span>
+    </div>
+    <p>If <span class="math">c > 1</span>, the vector stretches. If <span class="math">0 < c < 1</span>, it shrinks. If <span class="math">c < 0</span>, it flips direction.</p>
+
+    <h4>Vector Norm (Length)</h4>
+    <p>The Euclidean norm (L2 norm) is calculated with the Pythagorean theorem:</p>
+    <div class="formula-box">
+      <span class="math">||<b>v</b>|| = √(v₁² + v₂² + ... + v<sub>n</sub>²)</span>
+    </div>
+    <p>For <span class="math"><b>a</b> = (5, 4)</span>, the length is <span class="math">√(25+16) = √41 ≈ 6.40</span>.</p>
+
+    <h3>Quant Application: Vectors in Finance</h3>
+    <div class="quant">
+      <b>Portfolio Weights Vector (<b>w</b>):</b> Suppose you hold 3 assets. You invest 50% in Asset 1, 30% in Asset 2, and 20% in Asset 3. Then:<br>
+      <div class="formula-box" style="font-size:1.2rem;">
+        <span class="math"><b>w</b> = [0.50, 0.30, 0.20]ᵀ</span>
+      </div>
+      The sum of weights is <span class="math">Σ w<sub>i</sub> = 1.0</span> (100%). In a long/short portfolio, some weights can be negative.<br><br>
+      <b>Returns Vector (<b>r</b>):</b> If the same 3 assets return 8%, 12%, and −2% today:<br>
+      <div class="formula-box" style="font-size:1.2rem;">
+        <span class="math"><b>r</b> = [0.08, 0.12, −0.02]ᵀ</span>
+      </div>
+    </div>
+    <div class="note">
+      <b>Why columns?</b> In quant notation, stacking returns as a column vector <span class="math"><b>r</b></span> makes the portfolio return formula beautifully simple: <span class="math">R<sub>p</sub> = <b>w</b>ᵀ<b>r</b></span> (a dot product, covered later).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Vectors</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E2.1</b> Let <span class="math"><b>u</b> = [2, −1, 4]ᵀ</span> and <span class="math"><b>v</b> = [0, 3, 2]ᵀ</span>. Compute <span class="math"><b>u</b> + <b>v</b></span> and <span class="math">3<b>u</b></span>.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>u</b>+<b>v</b> = [2+0, −1+3, 4+2]ᵀ = [2, 2, 6]ᵀ</span>. <span class="math">3<b>u</b> = [6, −3, 12]ᵀ</span>.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E2.2</b> Compute the length of <span class="math"><b>v</b> = [3, 4]ᵀ</span>.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">||<b>v</b>|| = √(3²+4²) = √25 = 5</span>.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E2.3</b> A weight vector <span class="math"><b>w</b> = [0.4, 0.6]ᵀ</span> and return vector <span class="math"><b>r</b> = [0.10, 0.05]ᵀ</span>. Compute the portfolio return <span class="math">R<sub>p</sub> = <b>w</b>ᵀ<b>r</b></span> by hand.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">R<sub>p</sub> = 0.4(0.10) + 0.6(0.05) = 0.04 + 0.03 = 0.07</span> or 7%.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E2.4</b> Prove that for any vectors <span class="math"><b>a</b>, <b>b</b></span> in ℝⁿ, <span class="math">||<b>a</b> + <b>b</b>||² = ||<b>a</b>||² + ||<b>b</b>||² + 2(<b>a</b>ᵀ<b>b</b>)</span>. (This is the law of cosines in n dimensions.)
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Expand the dot product: <span class="math">||<b>a</b>+<b>b</b>||² = (<b>a</b>+<b>b</b>)ᵀ(<b>a</b>+<b>b</b>) = <b>a</b>ᵀ<b>a</b> + <b>a</b>ᵀ<b>b</b> + <b>b</b>ᵀ<b>a</b> + <b>b</b>ᵀ<b>b</b></span>. Since <span class="math"><b>a</b>ᵀ<b>b</b> = <b>b</b>ᵀ<b>a</b></span> (scalar), this equals <span class="math">||<b>a</b>||² + ||<b>b</b>||² + 2<b>a</b>ᵀ<b>b</b></span>.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MATRICES ==================== -->
+<div id="matrices" class="tab-content">
+  <div class="card">
+    <h2>Matrices</h2>
+    <div class="def">
+      A <b>matrix</b> is a rectangular grid of scalars arranged in <b>rows</b> and <b>columns</b>. It is a 2-dimensional array. If a vector is a list, a matrix is a spreadsheet.
+    </div>
+
+    <h3>Notation</h3>
+    <p>Capital bold letters denote matrices: <span class="math"><b>A</b>, <b>B</b>, <b>Σ</b>, <b>R</b></span>.</p>
+    <div class="formula-box">
+      <span class="math"><b>A</b> ∈ ℝ<sup>m×n</sup></span>&nbsp;&nbsp;means "A is a matrix with <span class="math">m</span> rows and <span class="math">n</span> columns of real numbers."
+    </div>
+    <p>Element <span class="math">A<sub>ij</sub></span> lives in row <span class="math">i</span>, column <span class="math">j</span>. Remember: <b>Row first, Column second</b>.</p>
+
+    <h3>Anatomy of a Matrix</h3>
+    <svg width="520" height="320" viewBox="0 0 520 320">
+      <!-- matrix grid -->
+      <rect x="80" y="60" width="320" height="200" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <!-- vertical lines -->
+      <line x1="160" y1="60" x2="160" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="240" y1="60" x2="240" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="320" y1="60" x2="320" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <!-- horizontal lines -->
+      <line x1="80" y1="110" x2="400" y2="110" stroke="#0f3460" stroke-width="1"/>
+      <line x1="80" y1="160" x2="400" y2="160" stroke="#0f3460" stroke-width="1"/>
+      <line x1="80" y1="210" x2="400" y2="210" stroke="#0f3460" stroke-width="1"/>
+      <!-- entries -->
+      <text x="120" y="95" text-anchor="middle" font-size="16" fill="#0f3460">A₁₁</text>
+      <text x="200" y="95" text-anchor="middle" font-size="16" fill="#0f3460">A₁₂</text>
+      <text x="280" y="95" text-anchor="middle" font-size="16" fill="#0f3460">A₁₃</text>
+      <text x="360" y="95" text-anchor="middle" font-size="16" fill="#0f3460">A₁₄</text>
+
+      <text x="120" y="145" text-anchor="middle" font-size="16" fill="#0f3460">A₂₁</text>
+      <text x="200" y="145" text-anchor="middle" font-size="16" fill="#0f3460">A₂₂</text>
+      <text x="280" y="145" text-anchor="middle" font-size="16" fill="#0f3460">A₂₃</text>
+      <text x="360" y="145" text-anchor="middle" font-size="16" fill="#0f3460">A₂₄</text>
+
+      <text x="120" y="195" text-anchor="middle" font-size="16" fill="#0f3460">A₃₁</text>
+      <text x="200" y="195" text-anchor="middle" font-size="16" fill="#0f3460">A₃₂</text>
+      <text x="280" y="195" text-anchor="middle" font-size="16" fill="#0f3460">A₃₃</text>
+      <text x="360" y="195" text-anchor="middle" font-size="16" fill="#0f3460">A₃₄</text>
+
+      <text x="120" y="245" text-anchor="middle" font-size="16" fill="#0f3460">A₄₁</text>
+      <text x="200" y="245" text-anchor="middle" font-size="16" fill="#0f3460">A₄₂</text>
+      <text x="280" y="245" text-anchor="middle" font-size="16" fill="#0f3460">A₄₃</text>
+      <text x="360" y="245" text-anchor="middle" font-size="16" fill="#0f3460">A₄₄</text>
+
+      <!-- highlight row 2 -->
+      <rect x="80" y="110" width="320" height="50" fill="#e94560" opacity="0.15"/>
+      <text x="430" y="140" font-size="14" fill="#e94560" font-weight="bold">Row 2</text>
+      <!-- highlight col 3 -->
+      <rect x="240" y="60" width="80" height="200" fill="#2ecc71" opacity="0.15"/>
+      <text x="280" y="40" text-anchor="middle" font-size="14" fill="#2ecc71" font-weight="bold">Column 3</text>
+      <!-- highlight A_23 -->
+      <rect x="240" y="110" width="80" height="50" fill="#533483" opacity="0.3"/>
+      <text x="280" y="145" text-anchor="middle" font-size="16" fill="white" font-weight="bold">A₂₃</text>
+      <text x="280" y="300" text-anchor="middle" font-size="14" fill="#533483" font-weight="bold">A₂₃ = row 2, column 3</text>
+
+      <text x="240" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f3460">Matrix A ∈ ℝ⁴ˣ⁴</text>
+    </svg>
+    <div class="svg-caption">Figure 5: A 4×4 square matrix. Each cell Aᵢⱼ is a scalar. Rows run horizontally; columns run vertically.</div>
+
+    <h3>Special Matrices</h3>
+    <table>
+      <tr><th>Name</th><th>Symbol</th><th>Definition</th><th>Quant Example</th></tr>
+      <tr><td>Zero Matrix</td><td><span class="math"><b>0</b></span></td><td>All entries are 0</td><td>No positions held</td></tr>
+      <tr><td>Identity</td><td><span class="math"><b>I</b></span></td><td>1s on diagonal, 0s elsewhere</td><td>Neutral element in multiplication</td></tr>
+      <tr><td>Diagonal</td><td><span class="math">diag(<b>d</b>)</span></td><td>Non-zero only on main diagonal</td><td>Variances of uncorrelated assets</td></tr>
+      <tr><td>Symmetric</td><td><span class="math"><b>A</b> = <b>A</b>ᵀ</span></td><td><span class="math">A<sub>ij</sub> = A<sub>ji</sub></span></td><td>Covariance / Correlation matrices</td></tr>
+      <tr><td>Upper Triangular</td><td><span class="math"><b>U</b></span></td><td>Non-zero on and above diagonal</td><td>Cholesky decomposition output</td></tr>
+      <tr><td>Column Vector</td><td><span class="math"><b>x</b></span></td><td>Matrix with 1 column (n×1)</td><td>Portfolio weights</td></tr>
+      <tr><td>Row Vector</td><td><span class="math"><b>x</b>ᵀ</span></td><td>Matrix with 1 row (1×n)</td><td>Portfolio weights transposed</td></tr>
+    </table>
+
+    <h3>Identity Matrix Visual</h3>
+    <svg width="300" height="200" viewBox="0 0 300 200">
+      <text x="150" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">Identity Matrix I₃</text>
+      <rect x="70" y="50" width="160" height="120" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="123" y1="50" x2="123" y2="170" stroke="#0f3460" stroke-width="1"/>
+      <line x1="177" y1="50" x2="177" y2="170" stroke="#0f3460" stroke-width="1"/>
+      <line x1="70" y1="90" x2="230" y2="90" stroke="#0f3460" stroke-width="1"/>
+      <line x1="70" y1="130" x2="230" y2="130" stroke="#0f3460" stroke-width="1"/>
+      <text x="97" y="80" text-anchor="middle" font-size="18" fill="#e94560" font-weight="bold">1</text>
+      <text x="150" y="80" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="203" y="80" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="97" y="120" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="150" y="120" text-anchor="middle" font-size="18" fill="#e94560" font-weight="bold">1</text>
+      <text x="203" y="120" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="97" y="160" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="150" y="160" text-anchor="middle" font-size="18" fill="#0f3460">0</text>
+      <text x="203" y="160" text-anchor="middle" font-size="18" fill="#e94560" font-weight="bold">1</text>
+      <line x1="97" y1="85" x2="203" y2="155" stroke="#e94560" stroke-width="2" stroke-dasharray="5,3" opacity="0.5"/>
+    </svg>
+    <div class="svg-caption">Figure 6: I₃. The diagonal of 1s acts like the number 1 in scalar multiplication.</div>
+
+    <h3>Quant Application: The Returns Matrix</h3>
+    <div class="quant">
+      <b>Time-Series of Returns:</b> Suppose we track 3 assets over 5 days. We can store all returns in a matrix <span class="math"><b>R</b> ∈ ℝ⁵ˣ³</span> where rows = time and columns = assets.<br><br>
+      <table style="width:auto; margin:auto;">
+        <tr><th></th><th>Asset A</th><th>Asset B</th><th>Asset C</th></tr>
+        <tr><td>Day 1</td><td>0.01</td><td>−0.005</td><td>0.02</td></tr>
+        <tr><td>Day 2</td><td>0.015</td><td>0.01</td><td>−0.01</td></tr>
+        <tr><td>Day 3</td><td>−0.002</td><td>0.008</td><td>0.005</td></tr>
+        <tr><td>Day 4</td><td>0.005</td><td>0.0</td><td>0.012</td></tr>
+        <tr><td>Day 5</td><td>0.008</td><td>−0.003</td><td>0.007</td></tr>
+      </table>
+      Here, <span class="math">R₄₂ = 0.0</span> means Asset B returned 0% on Day 4.
+    </div>
+    <div class="note">
+      <b>Convention Warning:</b> Some textbooks put assets as rows and dates as columns (<span class="math"><b>R</b> ∈ ℝ³ˣ⁵</span>). Always check the dimensions! In Python/NumPy, <span class="inline-code">R.shape</span> tells you immediately.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Matrices</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E3.1</b> Write out the 3×3 identity matrix by hand. How many non-zero entries does it have?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">3 non-zero entries (the diagonal ones). I₃ = diag(1,1,1).</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E3.2</b> For matrix <span class="math"><b>A</b></span> below, identify <span class="math">A₃₂</span> and state the dimensions.<br>
+      <span class="math"><b>A</b> = [[1,4],[2,5],[3,6]]</span>
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Dimensions are 3×2. <span class="math">A₃₂ = 6</span> (3rd row, 2nd column).</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E3.3</b> Construct a 2×2 symmetric matrix where the diagonal entries are 4 and 9, and the off-diagonal entries are both −2. Verify <span class="math"><b>A</b> = <b>A</b>ᵀ</span> visually.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>A</b> = [[4, −2], [−2, 9]]</span>. Transposing swaps rows and columns, but since A₁₂ = A₂₁ = −2, the matrix is unchanged.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E3.4</b> A covariance matrix <span class="math"><b>Σ</b></span> must be symmetric and positive semi-definite. Explain why symmetry is required physically (hint: what does Σᵢⱼ represent?).
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math">Σᵢⱼ</span> is the covariance of asset i with asset j. Covariance is commutative: Cov(X,Y) = Cov(Y,X). Therefore <span class="math">Σᵢⱼ = Σⱼᵢ</span>, forcing symmetry.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPS I ==================== -->
+<div id="ops1" class="tab-content">
+  <div class="card">
+    <h2>Matrix Operations I: Addition, Scalar Multiplication & Transpose</h2>
+    <p>Before multiplying matrices, you must master the three "element-wise" operations. These are the most intuitive because they work exactly like their scalar cousins.</p>
+
+    <h3>1. Matrix Addition</h3>
+    <div class="def">
+      Two matrices add if they have the <b>exact same dimensions</b>. You add corresponding entries.
+    </div>
+    <div class="formula-box">
+      <span class="math">(<b>A</b> + <b>B</b>)<sub>ij</sub> = A<sub>ij</sub> + B<sub>ij</sub></span>
+    </div>
+    <p><b>Visual:</b> Overlay two grids of the same size and sum each overlapping cell.</p>
+    <svg width="600" height="220" viewBox="0 0 600 220">
+      <!-- A -->
+      <text x="60" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">A</text>
+      <rect x="20" y="40" width="80" height="80" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="60" y1="40" x2="60" y2="120" stroke="#0f3460"/><line x1="20" y1="80" x2="100" y2="80" stroke="#0f3460"/>
+      <text x="40" y="68" text-anchor="middle" font-size="16">1</text><text x="80" y="68" text-anchor="middle" font-size="16">2</text>
+      <text x="40" y="108" text-anchor="middle" font-size="16">3</text><text x="80" y="108" text-anchor="middle" font-size="16">4</text>
+      <!-- plus -->
+      <text x="130" y="85" text-anchor="middle" font-size="24" fill="#0f3460">+</text>
+      <!-- B -->
+      <text x="190" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">B</text>
+      <rect x="150" y="40" width="80" height="80" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="190" y1="40" x2="190" y2="120" stroke="#0f3460"/><line x1="150" y1="80" x2="230" y2="80" stroke="#0f3460"/>
+      <text x="170" y="68" text-anchor="middle" font-size="16">5</text><text x="210" y="68" text-anchor="middle" font-size="16">6</text>
+      <text x="170" y="108" text-anchor="middle" font-size="16">7</text><text x="210" y="108" text-anchor="middle" font-size="16">8</text>
+      <!-- equals -->
+      <text x="260" y="85" text-anchor="middle" font-size="24" fill="#0f3460">=</text>
+      <!-- C -->
+      <text x="340" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#e94560">C = A+B</text>
+      <rect x="300" y="40" width="80" height="80" fill="none" stroke="#e94560" stroke-width="2"/>
+      <line x1="340" y1="40" x2="340" y2="120" stroke="#e94560"/><line x1="300" y1="80" x2="380" y2="80" stroke="#e94560"/>
+      <text x="320" y="68" text-anchor="middle" font-size="16" fill="#e94560" font-weight="bold">6</text><text x="360" y="68" text-anchor="middle" font-size="16" fill="#e94560" font-weight="bold">8</text>
+      <text x="320" y="108" text-anchor="middle" font-size="16" fill="#e94560" font-weight="bold">10</text><text x="360" y="108" text-anchor="middle" font-size="16" fill="#e94560" font-weight="bold">12</text>
+
+      <!-- invalid example -->
+      <text x="480" y="25" text-anchor="middle" font-size="14" fill="#721c24" font-weight="bold">INVALID</text>
+      <rect x="440" y="40" width="80" height="120" fill="none" stroke="#721c24" stroke-width="2" stroke-dasharray="4"/>
+      <text x="480" y="100" text-anchor="middle" font-size="12" fill="#721c24">2×3</text>
+      <text x="480" y="140" text-anchor="middle" font-size="12" fill="#721c24">Cannot add to 2×2</text>
+    </svg>
+    <div class="svg-caption">Figure 7: Element-wise addition. Dimensions must match exactly.</div>
+
+    <h3>2. Scalar Multiplication</h3>
+    <div class="def">
+      Multiply <b>every</b> entry of the matrix by a scalar.
+    </div>
+    <div class="formula-box">
+      <span class="math">(c<b>A</b>)<sub>ij</sub> = c · A<sub>ij</sub></span>
+    </div>
+    <p>This scales the entire matrix uniformly—like zooming in or out on a grid.</p>
+
+    <h3>3. Matrix Transpose</h3>
+    <div class="def">
+      The <b>transpose</b> flips a matrix over its main diagonal. Rows become columns; columns become rows.
+    </div>
+    <div class="formula-box">
+      <span class="math">(<b>A</b>ᵀ)<sub>ij</sub> = A<sub>ji</sub></span>
+    </div>
+    <p>If <span class="math"><b>A</b></span> is <span class="math">m × n</span>, then <span class="math"><b>A</b>ᵀ</span> is <span class="math">n × m</span>.</p>
+
+    <svg width="520" height="240" viewBox="0 0 520 240">
+      <text x="120" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">A (3×2)</text>
+      <rect x="60" y="40" width="120" height="180" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="120" y1="40" x2="120" y2="220" stroke="#0f3460"/><line x1="60" y1="100" x2="180" y2="100" stroke="#0f3460"/><line x1="60" y1="160" x2="180" y2="160" stroke="#0f3460"/>
+      <text x="90" y="78" text-anchor="middle" font-size="16">1</text><text x="150" y="78" text-anchor="middle" font-size="16">2</text>
+      <text x="90" y="138" text-anchor="middle" font-size="16">3</text><text x="150" y="138" text-anchor="middle" font-size="16">4</text>
+      <text x="90" y="198" text-anchor="middle" font-size="16">5</text><text x="150" y="198" text-anchor="middle" font-size="16">6</text>
+      <!-- arrow -->
+      <path d="M210,130 L270,130" stroke="#0f3460" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="240" y="120" text-anchor="middle" font-size="14" fill="#0f3460">Transpose</text>
+      <!-- A^T -->
+      <text x="390" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#e94560">Aᵀ (2×3)</text>
+      <rect x="330" y="40" width="180" height="120" fill="none" stroke="#e94560" stroke-width="2"/>
+      <line x1="390" y1="40" x2="390" y2="160" stroke="#e94560"/><line x1="450" y1="40" x2="450" y2="160" stroke="#e94560"/>
+      <line x1="330" y1="80" x2="510" y2="80" stroke="#e94560"/><line x1="330" y1="120" x2="510" y2="120" stroke="#e94560"/>
+      <text x="360" y="68" text-anchor="middle" font-size="16" fill="#e94560">1</text><text x="420" y="68" text-anchor="middle" font-size="16" fill="#e94560">3</text><text x="480" y="68" text-anchor="middle" font-size="16" fill="#e94560">5</text>
+      <text x="360" y="108" text-anchor="middle" font-size="16" fill="#e94560">2</text><text x="420" y="108" text-anchor="middle" font-size="16" fill="#e94560">4</text><text x="480" y="108" text-anchor="middle" font-size="16" fill="#e94560">6</text>
+      <!-- diagonal line -->
+      <line x1="60" y1="40" x2="180" y2="220" stroke="#533483" stroke-width="1" stroke-dasharray="4" opacity="0.4"/>
+      <text x="100" y="35" font-size="12" fill="#533483">Main diagonal</text>
+    </svg>
+    <div class="svg-caption">Figure 8: Transpose turns rows into columns. The diagonal stays fixed.</div>
+
+    <h3>Properties</h3>
+    <table>
+      <tr><th>Property</th><th>Formula</th></tr>
+      <tr><td>Double transpose</td><td><span class="math">(<b>A</b>ᵀ)ᵀ = <b>A</b></span></td></tr>
+      <tr><td>Transpose of sum</td><td><span class="math">(<b>A</b> + <b>B</b>)ᵀ = <b>A</b>ᵀ + <b>B</b>ᵀ</span></td></tr>
+      <tr><td>Transpose of product</td><td><span class="math">(<b>AB</b>)ᵀ = <b>B</b>ᵀ<b>A</b>ᵀ</span> (order flips!)</td></tr>
+      <tr><td>Symmetric check</td><td><span class="math"><b>A</b> is symmetric ⇔ <b>A</b> = <b>A</b>ᵀ</span></td></tr>
+    </table>
+
+    <h3>Quant Application</h3>
+    <div class="quant">
+      <b>Turning weights into operations:</b> Portfolio weights <span class="math"><b>w</b></span> are a column vector. To compute portfolio return, you need <span class="math"><b>w</b>ᵀ<b>r</b></span>. The transpose <span class="math"><b>w</b>ᵀ</span> turns the column into a row so the multiplication dimensions align (1×n)(n×1) = scalar.<br><br>
+      <b>Symmetric matrices:</b> Covariance matrices <span class="math"><b>Σ</b></span> are always symmetric. If you estimate <span class="math"><b>Σ</b></span> from data and it is not perfectly symmetric due to rounding errors, quant practitioners often symmetrize it: <span class="math"><b>Σ</b><sub>sym</sub> = ½(<b>Σ</b> + <b>Σ</b>ᵀ)</span>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Ops I</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E4.1</b> Let <span class="math"><b>A</b> = [[1,2],[3,4]]</span> and <span class="math"><b>B</b> = [[0,1],[1,0]]</span>. Compute <span class="math"><b>A</b> + <b>B</b></span> and <span class="math">2<b>A</b></span>.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>A</b>+<b>B</b> = [[1,3],[4,4]]</span>. <span class="math">2<b>A</b> = [[2,4],[6,8]]</span>.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E4.2</b> If <span class="math"><b>A</b></span> is 4×7, what are the dimensions of <span class="math"><b>A</b>ᵀ</span>? How many entries does <span class="math"><b>A</b></span> have?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>A</b>ᵀ</span> is 7×4. Total entries = 4 × 7 = 28.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E4.3</b> Prove that <span class="math">(<b>A</b> + <b>B</b>)ᵀ = <b>A</b>ᵀ + <b>B</b>ᵀ</span> by comparing entry (i,j) on both sides.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">LHS entry (i,j) = (<b>A</b>+<b>B</b>)<sub>ji</sub> = A<sub>ji</sub> + B<sub>ji</sub>. RHS entry (i,j) = (<b>A</b>ᵀ)<sub>ij</sub> + (<b>B</b>ᵀ)<sub>ij</sub> = A<sub>ji</sub> + B<sub>ji</sub>. Since every entry matches, the matrices are equal.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E4.4</b> A correlation matrix <span class="math"><b>C</b></span> is symmetric with 1s on the diagonal. If <span class="math"><b>C</b></span> is 5×5, how many <b>unique</b> entries determine the entire matrix? (Do not count the diagonal.)
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Total entries = 25. Diagonal = 5. Remaining off-diagonal = 20. By symmetry, only half are unique: 20/2 = <b>10</b> unique off-diagonal entries.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OPS II ==================== -->
+<div id="ops2" class="tab-content">
+  <div class="card">
+    <h2>Matrix Operations II: Matrix Multiplication</h2>
+    <p>Matrix multiplication is the most important—and initially most confusing—operation in quant finance. It is <b>not</b> element-wise. It is a structured way of combining rows and columns via the <b>dot product</b>.</p>
+
+    <h3>The Rule</h3>
+    <div class="def">
+      To multiply <span class="math"><b>A</b> (m×n)</span> by <span class="math"><b>B</b> (n×p)</span>, the <b>inner dimensions must match</b>: the number of columns in <b>A</b> must equal the number of rows in <b>B</b>. The result <span class="math"><b>C</b> = <b>AB</b></span> has dimensions <span class="math">m × p</span>.
+    </div>
+    <div class="formula-box">
+      <span class="math">C<sub>ij</sub> = Σ<sub>k=1</sub><sup>n</sup> A<sub>ik</sub> · B<sub>kj</sub></span>
+    </div>
+    <p>In plain English: to find the entry in row <span class="math">i</span>, column <span class="math">j</span> of the answer, take the dot product of row <span class="math">i</span> of <b>A</b> with column <span class="math">j</span> of <b>B</b>.</p>
+
+    <h3>Visual Walkthrough</h3>
+    <svg width="640" height="280" viewBox="0 0 640 280">
+      <!-- A matrix -->
+      <text x="80" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3460">A (2×3)</text>
+      <rect x="20" y="40" width="120" height="100" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="60" y1="40" x2="60" y2="140" stroke="#0f3460"/><line x1="100" y1="40" x2="100" y2="140" stroke="#0f3460"/>
+      <line x1="20" y1="90" x2="140" y2="90" stroke="#0f3460"/>
+      <text x="40" y="73" text-anchor="middle" font-size="14">a₁₁</text><text x="80" y="73" text-anchor="middle" font-size="14">a₁₂</text><text x="120" y="73" text-anchor="middle" font-size="14">a₁₃</text>
+      <text x="40" y="123" text-anchor="middle" font-size="14">a₂₁</text><text x="80" y="123" text-anchor="middle" font-size="14">a₂₂</text><text x="120" y="123" text-anchor="middle" font-size="14">a₂₃</text>
+      <!-- highlight row 1 of A -->
+      <rect x="20" y="40" width="120" height="50" fill="#e94560" opacity="0.2"/>
+
+      <!-- B matrix -->
+      <text x="240" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#0f3460">B (3×2)</text>
+      <rect x="180" y="40" width="120" height="150" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="220" y1="40" x2="220" y2="190" stroke="#0f3460"/><line x1="260" y1="40" x2="260" y2="190" stroke="#0f3460"/>
+      <line x1="180" y1="90" x2="300" y2="90" stroke="#0f3460"/><line x1="180" y1="140" x2="300" y2="140" stroke="#0f3460"/>
+      <text x="200" y="73" text-anchor="middle" font-size="14">b₁₁</text><text x="240" y="73" text-anchor="middle" font-size="14">b₁₂</text><text x="280" y="73" text-anchor="middle" font-size="14">b₁₃</text>
+      <text x="200" y="123" text-anchor="middle" font-size="14">b₂₁</text><text x="240" y="123" text-anchor="middle" font-size="14">b₂₂</text><text x="280" y="123" text-anchor="middle" font-size="14">b₂₃</text>
+      <text x="200" y="173" text-anchor="middle" font-size="14">b₃₁</text><text x="240" y="173" text-anchor="middle" font-size="14">b₃₂</text><text x="280" y="173" text-anchor="middle" font-size="14">b₃₃</text>
+      <!-- highlight col 1 of B -->
+      <rect x="180" y="40" width="40" height="150" fill="#2ecc71" opacity="0.2"/>
+
+      <!-- times and equals -->
+      <text x="160" y="120" font-size="20" fill="#0f3460">×</text>
+      <text x="320" y="120" font-size="20" fill="#0f3460">=</text>
+
+      <!-- C matrix -->
+      <text x="460" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#533483">C = AB (2×3)</text>
+      <rect x="380" y="40" width="160" height="100" fill="none" stroke="#533483" stroke-width="2"/>
+      <line x1="420" y1="40" x2="420" y2="140" stroke="#533483"/><line x1="460" y1="40" x2="460" y2="140" stroke="#533483"/><line x1="500" y1="40" x2="500" y2="140" stroke="#533483"/>
+      <line x1="380" y1="90" x2="540" y2="90" stroke="#533483"/>
+      <text x="400" y="73" text-anchor="middle" font-size="14" fill="#533483">c₁₁</text><text x="440" y="73" text-anchor="middle" font-size="14" fill="#533483">c₁₂</text><text x="480" y="73" text-anchor="middle" font-size="14" fill="#533483">c₁₃</text><text x="520" y="73" text-anchor="middle" font-size="14" fill="#533483">c₁₄</text>
+      <text x="400" y="123" text-anchor="middle" font-size="14" fill="#533483">c₂₁</text><text x="440" y="123" text-anchor="middle" font-size="14" fill="#533483">c₂₂</text><text x="480" y="123" text-anchor="middle" font-size="14" fill="#533483">c₂₃</text><text x="520" y="123" text-anchor="middle" font-size="14" fill="#533483">c₂₄</text>
+      <!-- highlight c_11 -->
+      <rect x="380" y="40" width="40" height="50" fill="#533483" opacity="0.4"/>
+      <text x="400" y="73" text-anchor="middle" font-size="14" fill="white" font-weight="bold">c₁₁</text>
+
+      <!-- formula -->
+      <text x="320" y="220" text-anchor="middle" font-size="14" fill="#0f3460">c₁₁ = a₁₁·b₁₁ + a₁₂·b₂₁ + a₁₃·b₃₁ = row₁(A) · col₁(B)</text>
+      <text x="320" y="250" text-anchor="middle" font-size="14" fill="#e94560" font-weight="bold">Inner dimensions must match: 3 = 3 ✓</text>
+    </svg>
+    <div class="svg-caption">Figure 9: Matrix multiplication as a grid of dot products. Each output cell is a row·column pairing.</div>
+
+    <h3>Why Order Matters</h3>
+    <div class="note">
+      <b>Matrix multiplication is NOT commutative:</b> <span class="math"><b>AB</b> ≠ <b>BA</b></span> in general. In fact, <b>BA</b> might not even be defined if the inner dimensions do not match.<br><br>
+      <b>Analogy:</b> Putting on socks then shoes is different from shoes then socks. The operations are ordered.
+    </div>
+
+    <h3>Properties That DO Hold</h3>
+    <table>
+      <tr><th>Property</th><th>Formula</th></tr>
+      <tr><td>Associative</td><td><span class="math">(<b>AB</b>)<b>C</b> = <b>A</b>(<b>BC</b>)</span></td></tr>
+      <tr><td>Distributive</td><td><span class="math"><b>A</b>(<b>B</b>+<b>C</b>) = <b>AB</b> + <b>AC</b></span></td></tr>
+      <tr><td>Identity</td><td><span class="math"><b>AI</b> = <b>IA</b> = <b>A</b></span></td></tr>
+      <tr><td>Zero</td><td><span class="math"><b>A0</b> = <b>0</b></span></td></tr>
+    </table>
+
+    <h3>Other Products (Quick Reference)</h3>
+    <p>While standard matrix multiplication is most common, quants occasionally use:</p>
+    <ul>
+      <li><b>Hadamard Product (⊙):</b> Element-wise multiplication. <span class="math">(<b>A</b> ⊙ <b>B</b>)<sub>ij</sub> = A<sub>ij</sub>·B<sub>ij</sub></span>. Requires identical dimensions. Used in element-wise risk adjustments.</li>
+      <li><b>Kronecker Product (⊗):</b> Builds block matrices. Used in multi-asset covariance structures and vector autoregressions.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Matrix Multiplication</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E5.1</b> Multiply <span class="math">[[1,2],[3,4]] × [[5,6],[7,8]]</span> by hand. What are the dimensions of the result?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Result is 2×2. [[1·5+2·7, 1·6+2·8], [3·5+4·7, 3·6+4·8]] = [[19,22],[43,50]].</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E5.2</b> If <span class="math"><b>A</b></span> is 3×4 and <span class="math"><b>B</b></span> is 4×2, can you compute <span class="math"><b>BA</b></span>? Why or why not?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">No. <b>B</b> is 4×2 and <b>A</b> is 3×4. Inner dimensions are 2 and 3, which do not match.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E5.3</b> Let <span class="math"><b>A</b> = [[0,1],[0,0]]</span> and <span class="math"><b>B</b> = [[0,0],[1,0]]</span>. Compute <span class="math"><b>AB</b></span> and <span class="math"><b>BA</b></span>. Are they equal?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>AB</b> = [[1,0],[0,0]]</span>. <span class="math"><b>BA</b> = [[0,0],[0,1]]</span>. They are not equal—classic proof that matrix multiplication is non-commutative.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E5.4</b> A factor model states <span class="math"><b>r</b> = <b>Bf</b> + <b>ε</b></span> where <span class="math"><b>B</b></span> is n×k (loadings), <span class="math"><b>f</b></span> is k×1 (factors), and <span class="math"><b>ε</b></span> is n×1 (noise). If n=500 assets and k=5 factors, verify the dimensions of <span class="math"><b>Bf</b></span> and argue why <span class="math"><b>r</b></span> must be n×1.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>B</b></span> (500×5) × <span class="math"><b>f</b></span> (5×1) → inner dims match (5=5), output is 500×1. <span class="math"><b>ε</b></span> is 500×1, so <span class="math"><b>r</b> = <b>Bf</b> + <b>ε</b></span> is valid element-wise addition of two 500×1 vectors.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DOT & CROSS ==================== -->
+<div id="products" class="tab-content">
+  <div class="card">
+    <h2>Dot Product & Cross Product</h2>
+    <p>These two products appear constantly in quant work. The dot product measures <b>alignment</b>; the cross product measures <b>orthogonality</b> in 3D space.</p>
+
+    <h3>Dot Product (Inner Product)</h3>
+    <div class="def">
+      For two vectors <span class="math"><b>a</b>, <b>b</b> ∈ ℝⁿ</span>, the dot product is the sum of the products of their corresponding components.
+    </div>
+    <div class="formula-box">
+      <span class="math"><b>a</b> · <b>b</b> = <b>a</b>ᵀ<b>b</b> = Σ<sub>i=1</sub><sup>n</sup> a<sub>i</sub>b<sub>i</sub></span>
+    </div>
+    <p><b>Geometric interpretation:</b> <span class="math"><b>a</b> · <b>b</b> = ||<b>a</b>|| ||<b>b</b>|| cos θ</span>, where <span class="math">θ</span> is the angle between them.</p>
+    <ul>
+      <li>If <span class="math"><b>a</b> · <b>b</b> > 0</span>, the vectors point in similar directions (<span class="math">θ < 90°</span>).</li>
+      <li>If <span class="math"><b>a</b> · <b>b</b> = 0</span>, they are <b>orthogonal</b> (perpendicular, <span class="math">θ = 90°</span>).</li>
+      <li>If <span class="math"><b>a</b> · <b>b</b> < 0</span>, they point in opposite directions (<span class="math">θ > 90°</span>).</li>
+    </ul>
+
+    <svg width="500" height="300" viewBox="0 0 500 300">
+      <line x1="50" y1="250" x2="450" y2="250" stroke="#0f3460" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="50" y1="250" x2="50" y2="50" stroke="#0f3460" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="460" y="255" font-size="14">x</text><text x="40" y="45" font-size="14">y</text>
+      <!-- vector a -->
+      <line x1="50" y1="250" x2="250" y2="150" stroke="#e94560" stroke-width="3" marker-end="url(#arr)"/>
+      <text x="260" y="145" font-size="14" fill="#e94560" font-weight="bold">a</text>
+      <!-- vector b -->
+      <line x1="50" y1="250" x2="350" y2="190" stroke="#2ecc71" stroke-width="3" marker-end="url(#arr)"/>
+      <text x="360" y="195" font-size="14" fill="#2ecc71" font-weight="bold">b</text>
+      <!-- projection of b onto a -->
+      <line x1="50" y1="250" x2="290" y2="170" stroke="#2ecc71" stroke-width="1" stroke-dasharray="4" opacity="0.6"/>
+      <line x1="350" y1="190" x2="290" y2="170" stroke="#2ecc71" stroke-width="1" stroke-dasharray="4" opacity="0.6"/>
+      <!-- angle arc -->
+      <path d="M 90,250 A 40,40 0 0,0 78,220" stroke="#533483" stroke-width="2" fill="none"/>
+      <text x="100" y="230" font-size="14" fill="#533483">θ</text>
+      <!-- formula -->
+      <text x="250" y="290" text-anchor="middle" font-size="14" fill="#0f3460">a·b = ||a|| ||b|| cos θ</text>
+      <text x="250" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">Dot Product Geometry</text>
+    </svg>
+    <div class="svg-caption">Figure 10: The dot product equals the length of a times the length of b's projection onto a.</div>
+
+    <h3>Cross Product</h3>
+    <div class="def">
+      The cross product <span class="math"><b>a</b> × <b>b</b></span> is defined <b>only in 3D</b>. It produces a new vector that is <b>perpendicular</b> to both <b>a</b> and <b>b</b>, with magnitude equal to the area of the parallelogram they span.
+    </div>
+    <div class="formula-box">
+      <span class="math"><b>a</b> × <b>b</b> = [a₂b₃−a₃b₂, a₃b₁−a₁b₃, a₁b₂−a₂b₁]ᵀ</span>
+    </div>
+    <p><b>Magnitude:</b> <span class="math">||<b>a</b> × <b>b</b>|| = ||<b>a</b>|| ||<b>b</b>|| sin θ</span></p>
+    <div class="note">
+      <b>Quant Relevance:</b> Cross products are rare in traditional equity quant but appear in statistical arbitrage (pairs trading geometry), 3D volatility surfaces, and physics-based models. The <b>dot product</b>, however, is everywhere.
+    </div>
+
+    <h3>Quant Application: Portfolio Return as Dot Product</h3>
+    <div class="quant">
+      <b>The most important formula in portfolio theory:</b><br>
+      <div class="formula-box" style="font-size:1.3rem;">
+        <span class="math">R<sub>p</sub> = <b>w</b>ᵀ<b>r</b> = Σ<sub>i=1</sub><sup>n</sup> w<sub>i</sub> r<sub>i</sub></span>
+      </div>
+      This is exactly the dot product of the weight vector and the return vector. It says: "Multiply each asset's weight by its return, then sum."<br><br>
+      <b>Covariance as Dot Product:</b> If you center two return series (subtract their means), their sample covariance is proportional to the dot product of the centered vectors.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Dot & Cross</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E6.1</b> Compute the dot product of <span class="math"><b>a</b> = [1, 2, 3]</span> and <span class="math"><b>b</b> = [4, 5, 6]</span>.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">1·4 + 2·5 + 3·6 = 4 + 10 + 18 = <b>32</b>.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E6.2</b> Are <span class="math"><b>u</b> = [2, −1]</span> and <span class="math"><b>v</b> = [1, 2]</span> orthogonal? Verify with the dot product.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>u</b>·<b>v</b> = 2(1) + (−1)(2) = 2 − 2 = 0</span>. Yes, they are orthogonal (perpendicular).</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E6.3</b> Compute <span class="math"><b>a</b> × <b>b</b></span> for <span class="math"><b>a</b> = [1, 0, 0]</span> and <span class="math"><b>b</b> = [0, 1, 0]</span>. What is special about the result?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>a</b>×<b>b</b> = [0·0−0·1, 0·0−1·0, 1·1−0·0] = [0,0,1]</span>. This is the unit vector in the z-direction. It is perpendicular to both the x-axis and y-axis, following the right-hand rule.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E6.4</b> In a minimum-variance portfolio, weights satisfy <span class="math"><b>w</b>ᵀ<b>1</b> = 1</span> (budget constraint) and <span class="math"><b>w</b>ᵀ<b>Σw</b></span> is minimized. Using Lagrange multipliers, one derives <span class="math"><b>Σw</b> = λ<b>1</b></span>. Explain why <span class="math"><b>w</b></span> must be proportional to <span class="math"><b>Σ</b>⁻¹<b>1</b></span> and identify which operation (dot product, matrix-vector, etc.) is used at each step.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">From <span class="math"><b>Σw</b> = λ<b>1</b></span>, left-multiply both sides by <span class="math"><b>Σ</b>⁻¹</span> (matrix inverse operation): <span class="math"><b>w</b> = λ<b>Σ</b>⁻¹<b>1</b></span>. The budget constraint <span class="math"><b>w</b>ᵀ<b>1</b> = 1</span> is a dot product. Substituting gives <span class="math">λ(<b>Σ</b>⁻¹<b>1</b>)ᵀ<b>1</b> = 1</span>, which solves for λ. Thus <b>w</b> is proportional to <b>Σ</b>⁻¹<b>1</b>.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TENSORS ==================== -->
+<div id="tensors" class="tab-content">
+  <div class="card">
+    <h2>Tensors</h2>
+    <div class="def">
+      A <b>tensor</b> is a multi-dimensional array of scalars. Scalars are 0D tensors, vectors are 1D tensors, matrices are 2D tensors, and tensors of order 3+ are often just called "tensors" in deep learning and quant finance.
+    </div>
+
+    <h3>The Dimension Ladder</h3>
+    <table>
+      <tr><th>Order</th><th>Name</th><th>Dimensions</th><th>Example in Finance</th></tr>
+      <tr><td>0</td><td>Scalar</td><td>()</td><td>Single return value: 0.05</td></tr>
+      <tr><td>1</td><td>Vector</td><td>(n,)</td><td>Daily returns for 1 asset over n days</td></tr>
+      <tr><td>2</td><td>Matrix</td><td>(m, n)</td><td>Returns for m assets over n days</td></tr>
+      <tr><td>3</td><td>3-Tensor</td><td>(m, n, p)</td><td>Returns for m assets over n days at p different times of day</td></tr>
+      <tr><td>4</td><td>4-Tensor</td><td>(m, n, p, q)</td><td>Batch of 3D tensors for parallel GPU computation</td></tr>
+    </table>
+
+    <h3>Visualizing a 3-Tensor</h3>
+    <p>A 3D tensor can be thought of as a <b>cube of numbers</b>, or a stack of matrices.</p>
+    <svg width="500" height="350" viewBox="0 0 500 350">
+      <!-- back face -->
+      <polygon points="150,80 350,80 350,230 150,230" fill="#f0f4ff" stroke="#0f3460" stroke-width="2"/>
+      <!-- side face -->
+      <polygon points="350,80 420,50 420,200 350,230" fill="#e9ecef" stroke="#0f3460" stroke-width="2"/>
+      <!-- top face -->
+      <polygon points="150,80 220,50 420,50 350,80" fill="#fff5f5" stroke="#0f3460" stroke-width="2"/>
+      <!-- front face (offset) -->
+      <polygon points="120,110 320,110 320,260 120,260" fill="white" stroke="#e94560" stroke-width="2" opacity="0.9"/>
+      <polygon points="320,110 390,80 390,230 320,260" fill="#f8f9fa" stroke="#e94560" stroke-width="2" opacity="0.9"/>
+      <polygon points="120,110 190,80 390,80 320,110" fill="#fff" stroke="#e94560" stroke-width="2" opacity="0.9"/>
+
+      <!-- grid lines front -->
+      <line x1="187" y1="110" x2="187" y2="260" stroke="#e94560" stroke-width="1" opacity="0.5"/>
+      <line x1="253" y1="110" x2="253" y2="260" stroke="#e94560" stroke-width="1" opacity="0.5"/>
+      <line x1="120" y1="160" x2="320" y2="160" stroke="#e94560" stroke-width="1" opacity="0.5"/>
+      <line x1="120" y1="210" x2="320" y2="210" stroke="#e94560" stroke-width="1" opacity="0.5"/>
+
+      <!-- labels -->
+      <text x="220" y="290" text-anchor="middle" font-size="14" fill="#0f3460">Assets (columns)</text>
+      <text x="60" y="190" text-anchor="middle" font-size="14" fill="#0f3460" transform="rotate(-90 60,190)">Time (rows)</text>
+      <text x="430" y="130" text-anchor="middle" font-size="14" fill="#0f3460" transform="rotate(-30 430,130)">Features (depth)</text>
+      <text x="220" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">3D Tensor: Time × Assets × Features</text>
+    </svg>
+    <div class="svg-caption">Figure 11: A 3D tensor as a stack of matrices. Each "slice" along the depth axis is a matrix.</div>
+
+    <h3>Tensor Indexing</h3>
+    <p>For a 3-tensor <span class="math"><b>𝒯</b></span>, element <span class="math">𝒯<sub>ijk</sub></span> is:</p>
+    <ul>
+      <li><span class="math">i</span> = row (e.g., time step)</li>
+      <li><span class="math">j</span> = column (e.g., asset)</li>
+      <li><span class="math">k</span> = depth (e.g., feature: open, high, low, close, volume)</li>
+    </ul>
+
+    <h3>Quant Application: Tensors in Modern Quant</h3>
+    <div class="quant">
+      <b>Multi-Factor Models:</b> A 3-tensor <span class="math"><b>𝒳</b> ∈ ℝ<sup>T×N×F</sup></span> where T=time, N=assets, F=factors (value, momentum, quality).<br><br>
+      <b>Order Book Tensors:</b> In high-frequency trading, a tensor might represent [time, price_level, side] with values being order sizes.<br><br>
+      <b>Batch Processing:</b> When training neural networks on returns, you feed a 4-tensor: [batch_size, time_steps, assets, features].<br><br>
+      <b>Rolling Covariance:</b> A 3-tensor where each slice k is the covariance matrix for a rolling window k. This gives <span class="math"><b>𝒞</b> ∈ ℝ<sup>N×N×W</sup></span> for W windows.
+    </div>
+    <div class="note">
+      <b>NumPy handles tensors natively:</b> An <span class="inline-code">np.array</span> with <span class="inline-code">shape=(10, 50, 5)</span> is a 3-tensor. You slice it exactly like a matrix but with an extra index: <span class="inline-code">tensor[t, n, f]</span>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Tensors</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E7.1</b> A tensor has shape (100, 50, 10). How many scalars does it contain? What are the dimensions of slice <span class="math">𝒯[:, :, 0]</span>?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">100 × 50 × 10 = 50,000 scalars. Slice <span class="math">𝒯[:,:,0]</span> is 100×50 (a matrix).</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E7.2</b> If a batch of 32 images is stored as a 4-tensor with shape (32, 64, 64, 3), what does each dimension represent?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">32 = batch size, 64×64 = image height×width, 3 = RGB color channels. In finance analogies, this is like [batch, time, assets, features].</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E7.3</b> You have a 3-tensor of returns <span class="math"><b>𝒯</b> ∈ ℝ<sup>252×100×5</sup></span> (252 trading days, 100 stocks, 5 features). Describe two meaningful 2D slices you could extract and what each represents.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">(1) <span class="math">𝒯[0, :, :]</span>: All 100 stocks and all 5 features for Day 1 (cross-sectional snapshot). (2) <span class="math">𝒯[:, 0, 0]</span>: The time-series of Feature 0 for Stock 0 across all 252 days.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E7.4</b> In a tensor network for portfolio optimization, you contract a 3-tensor <span class="math"><b>𝒢</b><sub>ijk</sub></span> with a vector <span class="math">v<sub>k</sub></span> over index k to produce a matrix <span class="math">M<sub>ij</sub> = Σ<sub>k</sub> 𝒢<sub>ijk</sub>v<sub>k</sub></span>. This is called <b>tensor contraction</b>. If <span class="math"><b>𝒢</b></span> is 10×10×10 and <span class="math"><b>v</b></span> is 10×1, what are the dimensions of <span class="math"><b>M</b></span> and how many scalar multiplications are required?
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>M</b></span> is 10×10. Each of the 100 entries requires a dot product of length 10, so 100 × 10 = <b>1,000</b> scalar multiplications. This generalizes matrix-vector multiplication into higher dimensions.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QUANT APPLICATIONS ==================== -->
+<div id="quant" class="tab-content">
+  <div class="card">
+    <h2>Deep Dive: Quantitative Finance Applications</h2>
+    <p>This section ties every concept above into the daily workflow of a quant engineer. We focus on <b>representation</b>—how real-world financial data maps to linear algebra objects.</p>
+
+    <h3>1. Representing Asset Returns</h3>
+    <p>Returns are the fundamental building block. There are two main types:</p>
+    <ul>
+      <li><b>Simple return:</b> <span class="math">R<sub>t</sub> = (P<sub>t</sub> − P<sub>t−1</sub>) / P<sub>t−1</sub></span></li>
+      <li><b>Log return:</b> <span class="math">r<sub>t</sub> = ln(P<sub>t</sub> / P<sub>t−1</sub>)</span></li>
+    </ul>
+    <p>Both are <b>scalars</b> for a single asset at a single time. When we generalize:</p>
+    <div class="quant">
+      <b>Single asset, many times:</b> A <b>vector</b> <span class="math"><b>r</b> ∈ ℝ<sup>T</sup></span>.<br>
+      <b>Many assets, single time:</b> A <b>vector</b> <span class="math"><b>r</b> ∈ ℝ<sup>N</sup></span>.<br>
+      <b>Many assets, many times:</b> A <b>matrix</b> <span class="math"><b>R</b> ∈ ℝ<sup>T×N</sup></span> (or <span class="math">N×T</span> depending on convention).
+    </div>
+
+    <h3>2. Cross-Sectional vs Time-Series Matrices</h3>
+    <p>This distinction confuses every beginner. It is purely about <b>which dimension you hold constant</b>.</p>
+
+    <div class="two-col">
+      <div class="card" style="margin:0;">
+        <h4>Cross-Sectional View</h4>
+        <p>Fix a <b>single point in time</b>. Look across all assets.</p>
+        <div class="formula-box">
+          <span class="math"><b>r</b><sub>t</sub> = [r<sub>t,1</sub>, r<sub>t,2</sub>, ..., r<sub>t,N</sub>]ᵀ</span>
+        </div>
+        <p>This is a <b>column vector</b> of length N. It answers: "What happened today across all stocks?"</p>
+        <p><b>Quant use:</b> Cross-sectional regression (predicting tomorrow's winners from today's characteristics), factor scoring, ranking.</p>
+      </div>
+      <div class="card" style="margin:0;">
+        <h4>Time-Series View</h4>
+        <p>Fix a <b>single asset</b>. Look across all time.</p>
+        <div class="formula-box">
+          <span class="math"><b>r</b><sub>i</sub> = [r<sub>1,i</sub>, r<sub>2,i</sub>, ..., r<sub>T,i</sub>]ᵀ</span>
+        </div>
+        <p>This is a <b>column vector</b> of length T. It answers: "What happened to Apple over the last year?"</p>
+        <p><b>Quant use:</b> Momentum signals, moving averages, volatility estimation, ARMA models.</p>
+      </div>
+    </div>
+
+    <svg width="600" height="320" viewBox="0 0 600 320">
+      <!-- Matrix -->
+      <rect x="100" y="60" width="300" height="200" fill="none" stroke="#0f3460" stroke-width="2"/>
+      <line x1="160" y1="60" x2="160" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="220" y1="60" x2="220" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="280" y1="60" x2="280" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="340" y1="60" x2="340" y2="260" stroke="#0f3460" stroke-width="1"/>
+      <line x1="100" y1="110" x2="400" y2="110" stroke="#0f3460" stroke-width="1"/>
+      <line x1="100" y1="160" x2="400" y2="160" stroke="#0f3460" stroke-width="1"/>
+      <line x1="100" y1="210" x2="400" y2="210" stroke="#0f3460" stroke-width="1"/>
+
+      <!-- Cross-sectional highlight (row) -->
+      <rect x="100" y="110" width="300" height="50" fill="#e94560" opacity="0.3"/>
+      <text x="450" y="140" font-size="14" fill="#e94560" font-weight="bold">Cross-Sectional</text>
+      <text x="450" y="158" font-size="12" fill="#e94560">One time, all assets</text>
+
+      <!-- Time-series highlight (column) -->
+      <rect x="220" y="60" width="60" height="200" fill="#2ecc71" opacity="0.3"/>
+      <text x="250" y="285" text-anchor="middle" font-size="14" fill="#2ecc71" font-weight="bold">Time-Series</text>
+      <text x="250" y="303" text-anchor="middle" font-size="12" fill="#2ecc71">One asset, all time</text>
+
+      <text x="250" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#0f3460">Returns Matrix R (Time × Assets)</text>
+      <text x="250" y="330" text-anchor="middle" font-size="14" fill="#0f3460">Rows = Time (t=1...T) | Columns = Assets (i=1...N)</text>
+    </svg>
+    <div class="svg-caption">Figure 12: A cross-sectional slice is a row (one day, all stocks). A time-series slice is a column (one stock, all days).</div>
+
+    <h3>3. Portfolio Weights & The Dot Product</h3>
+    <p>The portfolio weight vector <span class="math"><b>w</b> ∈ ℝ<sup>N</sup></span> must satisfy the budget constraint:</p>
+    <div class="formula-box">
+      <span class="math">Σ<sub>i=1</sub><sup>N</sup> w<sub>i</sub> = <b>1</b>ᵀ<b>w</b> = 1</span>
+    </div>
+    <p>This is the dot product of <span class="math"><b>w</b></span> with a vector of ones. The portfolio return is:</p>
+    <div class="formula-box">
+      <span class="math">R<sub>p</sub> = <b>w</b>ᵀ<b>r</b> = Σ w<sub>i</sub> r<sub>i</sub></span>
+    </div>
+    <p>And portfolio variance is:</p>
+    <div class="formula-box">
+      <span class="math">σ<sub>p</sub>² = <b>w</b>ᵀ<b>Σw</b></span>
+    </div>
+    <p>where <span class="math"><b>Σ</b></span> is the <b>covariance matrix</b>—a symmetric, positive semi-definite matrix where <span class="math">Σ<sub>ij</sub> = Cov(r<sub>i</sub>, r<sub>j</sub>)</span>.</p>
+
+    <h3>4. Covariance & Correlation Matrices</h3>
+    <div class="quant">
+      <b>Covariance Matrix <b>Σ</b>:</b><br>
+      <ul>
+        <li>Diagonal <span class="math">Σ<sub>ii</sub></span>: Variance of asset <span class="math">i</span> (risk squared).</li>
+        <li>Off-diagonal <span class="math">Σ<sub>ij</sub></span>: Covariance between assets <span class="math">i</span> and <span class="math">j</span>.</li>
+        <li>Symmetric: <span class="math">Σ<sub>ij</sub> = Σ<sub>ji</sub></span>.</li>
+        <li>Positive semi-definite: <span class="math"><b>w</b>ᵀ<b>Σw</b> ≥ 0</span> for all <span class="math"><b>w</b></span>. (Variance is never negative.)</li>
+      </ul>
+      <b>Correlation Matrix <b>C</b>:</b> A normalized covariance matrix where all diagonals are 1 and off-diagonals are in [−1, 1].
+      <div class="formula-box">
+        <span class="math">C<sub>ij</sub> = Σ<sub>ij</sub> / (σ<sub>i</sub> σ<sub>j</sub>)</span>
+      </div>
+    </div>
+
+    <h3>5. Factor Models as Matrix Equations</h3>
+    <p>The workhorse of modern quant:</p>
+    <div class="formula-box">
+      <span class="math"><b>r</b> = <b>Bf</b> + <b>ε</b></span>
+    </div>
+    <ul>
+      <li><span class="math"><b>r</b></span>: N×1 vector of asset returns.</li>
+      <li><span class="math"><b>B</b></span>: N×K matrix of factor loadings (how sensitive each asset is to each factor).</li>
+      <li><span class="math"><b>f</b></span>: K×1 vector of factor returns (e.g., market, size, value).</li>
+      <li><span class="math"><b>ε</b></span>: N×1 vector of idiosyncratic (asset-specific) returns.</li>
+    </ul>
+    <p>This is a <b>matrix-vector product</b> plus a vector. It decomposes returns into systematic (factor) and idiosyncratic (noise) components.</p>
+  </div>
+
+  <div class="card">
+    <h3>Exercises: Quant Applications</h3>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E8.1</b> A portfolio has weights <span class="math"><b>w</b> = [0.3, 0.5, 0.2]ᵀ</span> and returns <span class="math"><b>r</b> = [0.10, 0.04, 0.12]ᵀ</span>. Compute the portfolio return and verify the weights sum to 1.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Sum = 0.3+0.5+0.2 = 1.0. Return = 0.3(0.10)+0.5(0.04)+0.2(0.12) = 0.03+0.02+0.024 = <b>0.074</b> or 7.4%.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier easy">Easy</span><b>E8.2</b> Given covariance matrix <span class="math"><b>Σ</b> = [[0.04, 0.01],[0.01, 0.09]]</span> and weights <span class="math"><b>w</b> = [0.5, 0.5]ᵀ</span>, compute portfolio variance <span class="math"><b>w</b>ᵀ<b>Σw</b></span>.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">First compute <span class="math"><b>Σw</b> = [0.04·0.5+0.01·0.5, 0.01·0.5+0.09·0.5] = [0.025, 0.05]</span>. Then <span class="math"><b>w</b>ᵀ(<b>Σw</b>) = 0.5(0.025)+0.5(0.05) = 0.0125+0.025 = 0.0375</span>. Std dev = √0.0375 ≈ 19.36%.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier medium">Medium</span><b>E8.3</b> In a factor model, <span class="math"><b>B</b></span> is 100×3 and <span class="math"><b>f</b></span> is 3×1. Explain why the systematic return <span class="math"><b>Bf</b></span> has rank at most 3, and what this implies about diversification of idiosyncratic risk.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner"><span class="math"><b>Bf</b></span> is a linear combination of the 3 columns of <b>B</b> weighted by <b>f</b>. Thus it lives in the column space of <b>B</b>, which has dimension ≤3. Idiosyncratic risk <b>ε</b> is uncorrelated across assets, so holding many assets diversifies <b>ε</b> away (variance → 0), but systematic risk <b>Bf</b> cannot be diversified because all assets move together through the 3 factors.</div></div>
+    </div>
+    <div class="exercise">
+      <span class="tier hard">Hard</span><b>E8.4</b> The Global Minimum Variance (GMV) portfolio weights are <span class="math"><b>w</b><sub>gmv</sub> = <b>Σ</b>⁻¹<b>1</b> / (<b>1</b>ᵀ<b>Σ</b>⁻¹<b>1</b>)</span>. Prove that these weights indeed minimize <span class="math"><b>w</b>ᵀ<b>Σw</b></span> subject to <span class="math"><b>1</b>ᵀ<b>w</b> = 1</span> using the method of Lagrange multipliers. Identify every matrix/vector operation.
+      <button class="collapsible">Show Solution</button>
+      <div class="solution"><div class="solution-inner">Lagrangian: <span class="math">L = <b>w</b>ᵀ<b>Σw</b> − λ(<b>1</b>ᵀ<b>w</b> − 1)</span>. Take derivative w.r.t <b>w</b> (vector calculus): <span class="math">∂L/∂<b>w</b> = 2<b>Σw</b> − λ<b>1</b> = 0</span>. Thus <span class="math"><b>Σw</b> = (λ/2)<b>1</b></span>. Left-multiply by <b>Σ</b>⁻¹: <span class="math"><b>w</b> = (λ/2)<b>Σ</b>⁻¹<b>1</b></span>. Plug into constraint: <span class="math"><b>1</b>ᵀ<b>w</b> = (λ/2)<b>1</b>ᵀ<b>Σ</b>⁻¹<b>1</b> = 1</span>, so <span class="math">λ/2 = 1/(<b>1</b>ᵀ<b>Σ</b>⁻¹<b>1</b>)</span>. Substituting back gives the formula.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== COLAB EXPERIMENTS ==================== -->
+<div id="colab" class="tab-content">
+  <div class="card">
+    <h2>Google Colab Experiments</h2>
+    <p>Each experiment is designed to be copy-pasted into a Colab cell. Run them one by one. Observe the output. Modify parameters and break things—that is how you learn.</p>
+
+    <h3>Experiment 1: Scalars & Returns</h3>
+    <p><b>Goal:</b> Compute simple and log returns from price data.</p>
+    <pre><code># Experiment 1: Scalars & Returns
+import numpy as np
+
+prices = np.array([100, 102, 101, 105, 108])
+
+# Simple returns (scalar subtraction and division)
+simple_returns = (prices[1:] - prices[:-1]) / prices[:-1]
+print("Simple returns:", simple_returns)
+
+# Log returns (scalar log)
+log_returns = np.log(prices[1:] / prices[:-1])
+print("Log returns:", log_returns)
+
+# Verify: log(1+r) ≈ r for small r
+print("Approximation check:", np.log(1 + simple_returns))
+</code></pre>
+
+    <h3>Experiment 2: Vectors & Portfolio Weights</h3>
+    <p><b>Goal:</b> Build weight and return vectors; compute portfolio return.</p>
+    <pre><code># Experiment 2: Vectors & Portfolio Weights
+import numpy as np
+
+# Column vectors
+w = np.array([[0.4], [0.3], [0.3]])  # 3×1
+r = np.array([[0.10], [0.05], [0.08]])  # 3×1
+
+# Portfolio return: w^T @ r (dot product)
+portfolio_return = w.T @ r  # 1×1 matrix
+print("Portfolio return:", portfolio_return[0,0])
+
+# Check budget constraint
+print("Sum of weights:", np.sum(w))
+
+# Vector norm (L2) = concentration measure
+print("L2 norm of weights:", np.linalg.norm(w))
+</code></pre>
+
+    <h3>Experiment 3: Matrices & Transpose</h3>
+    <p><b>Goal:</b> Construct a returns matrix, transpose it, verify symmetry.</p>
+    <pre><code># Experiment 3: Matrices & Transpose
+import numpy as np
+
+# 5 days × 3 assets
+R = np.array([
+    [0.01, -0.005, 0.02],
+    [0.015, 0.01, -0.01],
+    [-0.002, 0.008, 0.005],
+    [0.005, 0.0, 0.012],
+    [0.008, -0.003, 0.007]
+])
+print("Shape:", R.shape)  # (5, 3)
+
+# Transpose: assets × days
+R_T = R.T
+print("Transposed shape:", R_T.shape)  # (3, 5)
+
+# Verify (A^T)^T = A
+print("Double transpose equals original?", np.allclose(R, R.T.T))
+
+# Cross-sectional slice: day 2 (index 1)
+print("Day 2 cross-section:", R[1, :])
+
+# Time-series slice: asset 1 (index 0)
+print("Asset 1 time-series:", R[:, 0])
+</code></pre>
+
+    <h3>Experiment 4: Matrix Multiplication</h3>
+    <p><b>Goal:</b> Multiply matrices by hand and with NumPy; explore non-commutativity.</p>
+    <pre><code># Experiment 4: Matrix Multiplication
+import numpy as np
+
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+
+# Standard product
+C = A @ B
+print("A @ B:
+", C)
+
+# Non-commutativity
+D = B @ A
+print("B @ A:
+", D)
+print("Equal?", np.allclose(C, D))
+
+# Identity check
+I = np.eye(2)
+print("A @ I:
+", A @ I)
+
+# Dimensions mismatch example
+try:
+    E = np.array([[1, 2, 3]])  # 1×3
+    F = np.array([[1], [2]])   # 2×1
+    print(E @ F)
+except ValueError as e:
+    print("Error (expected):", e)
+</code></pre>
+
+    <h3>Experiment 5: Dot Products & Angles</h3>
+    <p><b>Goal:</b> Compute dot products, norms, and angles between vectors.</p>
+    <pre><code># Experiment 5: Dot Products & Angles
+import numpy as np
+
+a = np.array([3, 4])
+b = np.array([4, 0])
+
+dot = np.dot(a, b)
+norm_a = np.linalg.norm(a)
+norm_b = np.linalg.norm(b)
+
+cos_theta = dot / (norm_a * norm_b)
+theta_rad = np.arccos(cos_theta)
+theta_deg = np.degrees(theta_rad)
+
+print(f"Dot product: {dot}")
+print(f"Angle: {theta_deg:.2f} degrees")
+
+# Orthogonal check
+c = np.array([2, -1.5])
+print("a·c =", np.dot(a, c), "(nearly orthogonal?)")
+</code></pre>
+
+    <h3>Experiment 6: Covariance & Portfolio Variance</h3>
+    <p><b>Goal:</b> Estimate covariance from data and compute portfolio variance.</p>
+    <pre><code># Experiment 6: Covariance & Portfolio Variance
+import numpy as np
+
+# Simulate 3 assets, 100 days
+np.random.seed(42)
+returns = np.random.randn(100, 3) * 0.02  # mean 0, std 2%
+
+# Covariance matrix (annualized)
+Sigma = np.cov(returns, rowvar=False) * 252
+print("Covariance matrix:
+", Sigma)
+
+# Verify symmetric
+print("Symmetric?", np.allclose(Sigma, Sigma.T))
+
+# Portfolio variance
+w = np.array([0.4, 0.4, 0.2])
+port_var = w @ Sigma @ w  # quadratic form
+print(f"Portfolio variance: {port_var:.6f}")
+print(f"Portfolio std dev: {np.sqrt(port_var):.4f}")
+</code></pre>
+
+    <h3>Experiment 7: Tensors & 3D Slicing</h3>
+    <p><b>Goal:</b> Create a 3-tensor and extract meaningful slices.</p>
+    <pre><code># Experiment 7: Tensors & 3D Slicing
+import numpy as np
+
+# Tensor: 10 days, 5 assets, 3 features (return, volume, volatility)
+tensor = np.random.randn(10, 5, 3)
+print("Tensor shape:", tensor.shape)
+
+# Slice: all assets, all features for day 0
+day_0 = tensor[0, :, :]
+print("Day 0 slice shape:", day_0.shape)  # (5, 3)
+
+# Slice: time-series of feature 0 for asset 2
+asset_2_feat_0 = tensor[:, 2, 0]
+print("Asset 2, Feature 0 shape:", asset_2_feat_0.shape)  # (10,)
+
+# Mean across time for each asset-feature pair
+mean_across_time = np.mean(tensor, axis=0)
+print("Mean shape:", mean_across_time.shape)  # (5, 3)
+</code></pre>
+
+    <h3>Experiment 8: Factor Model Simulation</h3>
+    <p><b>Goal:</b> Simulate the factor model <span class="math"><b>r</b> = <b>Bf</b> + <b>ε</b></span>.</p>
+    <pre><code># Experiment 8: Factor Model Simulation
+import numpy as np
+
+N, K = 50, 3  # 50 assets, 3 factors
+
+# Factor loadings matrix B (N×K)
+B = np.random.randn(N, K)
+
+# Factor returns f (K×1)
+f = np.array([[0.02], [0.01], [-0.005]])
+
+# Idiosyncratic noise (N×1)
+epsilon = np.random.randn(N, 1) * 0.01
+
+# Total returns
+r = B @ f + epsilon
+print("Returns shape:", r.shape)
+print("First 5 returns:", r[:5].flatten())
+
+# Decompose variance
+sys_var = np.var(B @ f)
+idio_var = np.var(epsilon)
+print(f"Systematic variance: {sys_var:.6f}")
+print(f"Idiosyncratic variance: {idio_var:.6f}")
+</code></pre>
+  </div>
+</div>
+
+<!-- ==================== PRACTICE PROBLEMS ==================== -->
+<div id="practice" class="tab-content">
+  <div class="card">
+    <h2>Practice Problems</h2>
+    <p>Solutions are hidden. Attempt each problem before peeking. Problems are organized by tier within each topic.</p>
+
+    <h3>Topic: Scalars & Basic Arithmetic</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P1.1</b> If a bond pays $5 coupon and its price drops from $100 to $98, what is the total return scalar? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">Total return = (98+5−100)/100 = 3/100 = 0.03 or 3%.</div></div></div>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P1.2</b> Solve for scalar x: 3(x + 2) = 2x + 10. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">3x+6=2x+10 → x=4.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P1.3</b> The Sharpe ratio is S = (R<sub>p</sub> − R<sub>f</sub>) / σ<sub>p</sub>. If R<sub>p</sub>=0.12, R<sub>f</sub>=0.03, σ<sub>p</sub>=0.15, compute S. If volatility doubles but excess return stays the same, what happens to S? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">S = (0.12−0.03)/0.15 = 0.60. If σ doubles to 0.30, S halves to 0.30. Sharpe is inversely proportional to volatility.</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P1.4</b> Prove that for any scalar a ≠ 0, the equation ax = b has exactly one solution. Relate this to the concept of matrix invertibility later. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">Multiply both sides by a⁻¹: x = a⁻¹b. Since a⁻¹ exists uniquely when a≠0, the solution is unique. This is the scalar analog of a matrix having an inverse: <b>Ax</b>=<b>b</b> has a unique solution iff <b>A</b> is invertible (non-singular), just as a≠0 is the scalar condition.</div></div></div>
+
+    <h3>Topic: Vectors</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P2.1</b> Given <b>v</b> = [2, −3, 1], compute 2<b>v</b> and ||<b>v</b>||. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">2<b>v</b> = [4, −6, 2]. ||<b>v</b>|| = √(4+9+1) = √14 ≈ 3.742.</div></div></div>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P2.2</b> Construct a unit vector in the direction of <b>a</b> = [3, 4]. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">||<b>a</b>||=5. Unit vector = [3/5, 4/5] = [0.6, 0.8].</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P2.3</b> A portfolio has weights <b>w</b> = [0.2, 0.5, 0.3] and returns <b>r</b> = [0.08, 0.12, 0.05]. Compute return and show that if you double all weights (and go leveraged), the return doubles but the weights no longer sum to 1. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">R<sub>p</sub> = 0.2(0.08)+0.5(0.12)+0.3(0.05) = 0.091 = 9.1%. Doubled weights: 2<b>w</b> = [0.4,1.0,0.6], sum=2.0. Return = 2×9.1% = 18.2%. This represents 2× leverage.</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P2.4</b> The angle θ between two vectors satisfies cos θ = (<b>a</b>·<b>b</b>)/(||<b>a</b>||||<b>b</b>||). Show that if <b>a</b> and <b>b</b> are portfolio weight vectors with all positive entries, cos θ cannot be negative. What does this imply about the angles between long-only portfolios? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">If all entries are positive, <b>a</b>·<b>b</b> = Σ aᵢbᵢ > 0. Norms are always positive. Thus cos θ > 0, so θ ∈ [0°, 90°). Long-only portfolios always have an acute angle between them; they can never be orthogonal or opposite.</div></div></div>
+
+    <h3>Topic: Matrices</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P3.1</b> Write a 2×3 matrix <b>A</b> where A<sub>ij</sub> = i + j. Compute <b>A</b>ᵀ. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><b>A</b> = [[2,3,4],[3,4,5]]. <b>A</b>ᵀ = [[2,3],[3,4],[4,5]].</div></div></div>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P3.2</b> Is the matrix [[2,1],[1,2]] symmetric? Is [[0,1],[−1,0]] symmetric? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">First: yes (A₁₂=A₂₁=1). Second: no (A₁₂=1, A₂₁=−1). The second is skew-symmetric: <b>A</b>ᵀ = −<b>A</b>.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P3.3</b> A diagonal matrix <b>D</b> = diag(2, 3, 5). Compute <b>D</b>² (i.e., <b>D</b>×<b>D</b>) without doing full matrix multiplication. Generalize: what is diag(d₁,...,dₙ)ᵏ? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><b>D</b>² = diag(4,9,25). In general, diag(d₁,...,dₙ)ᵏ = diag(d₁ᵏ,...,dₙᵏ). Diagonal matrices commute and multiply entry-wise on the diagonal.</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P3.4</b> Prove that the product of two upper triangular matrices is upper triangular. Use the summation formula C<sub>ij</sub> = Σ<sub>k</sub> A<sub>ik</sub>B<sub>kj</sub> and analyze when i > j. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">For i > j, consider C<sub>ij</sub> = Σ<sub>k=1</sub>ⁿ A<sub>ik</sub>B<sub>kj</sub>. Split sum at k=i. For k < i, A<sub>ik</sub>=0 (above diagonal? No—upper triangular means A<sub>ik</sub>=0 when i>k). Wait: upper triangular means A<sub>ik</sub>=0 if i>k. So for k < i, A<sub>ik</sub>=0. For k ≥ i > j, B<sub>kj</sub>=0 because k > j and B is upper triangular (B<sub>kj</sub>=0 if k>j). Thus every term is zero. C<sub>ij</sub>=0 for i>j, so C is upper triangular.</div></div></div>
+
+    <h3>Topic: Matrix Multiplication</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P4.1</b> Multiply [[1,0],[0,2]] × [[3,4],[5,6]]. What is special about the first matrix? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">Result = [[3,4],[10,12]]. The first matrix is diagonal; it scales row 1 by 1 and row 2 by 2. Diagonal matrices on the left scale rows.</div></div></div>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P4.2</b> If <b>A</b> is 3×2 and <b>B</b> is 2×4, what is (<b>AB</b>)ᵀ? Express in terms of <b>A</b>ᵀ and <b>B</b>ᵀ and state its dimensions. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">(<b>AB</b>)ᵀ = <b>B</b>ᵀ<b>A</b>ᵀ. Dimensions: <b>B</b>ᵀ is 4×2, <b>A</b>ᵀ is 2×3, product is 4×3.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P4.3</b> Let <b>J</b> be the 3×3 matrix of all ones. Compute <b>J</b>². What does <b>J</b> do when it left-multiplies a vector? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><b>J</b>² = 3<b>J</b> because each entry is sum of three 1s. <b>Jx</b> returns a vector where every entry is the sum of x's components. It is the "sum operator."</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P4.4</b> A permutation matrix <b>P</b> has exactly one "1" in each row and column, rest zeros. Show that <b>P</b>ᵀ<b>P</b> = <b>I</b>. What does <b>P</b> do to a vector, and why is <b>P</b>⁻¹ = <b>P</b>ᵀ? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">(<b>P</b>ᵀ<b>P</b>)<sub>ij</sub> = Σ<sub>k</sub> P<sub>ki</sub>P<sub>kj</sub>. Since each column of <b>P</b> has exactly one 1, the sum is 1 if i=j (the same 1 is hit twice) and 0 otherwise (different columns have 1s in different rows). Thus <b>P</b>ᵀ<b>P</b>=<b>I</b>. <b>P</b> reorders (permutes) vector entries; its inverse undoes the reordering, which is exactly the transpose.</div></div></div>
+
+    <h3>Topic: Dot & Cross Products</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P5.1</b> Compute [1,2,3] · [3,2,1]. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">3+4+3=10.</div></div></div>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P5.2</b> Find a vector orthogonal to [1, 2] in ℝ². <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">[2, −1] works: 1·2 + 2·(−1) = 0. Any scalar multiple k[2,−1] also works.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P5.3</b> The projection of <b>b</b> onto <b>a</b> is proj<sub><b>a</b></sub>(<b>b</b>) = (<b>a</b>·<b>b</b> / <b>a</b>·<b>a</b>) <b>a</b>. Project <b>b</b> = [4,0] onto <b>a</b> = [1,1]. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><b>a</b>·<b>b</b>=4, <b>a</b>·<b>a</b>=2. Scalar = 2. Projection = 2[1,1] = [2,2]. This is the closest point to <b>b</b> on the line spanned by <b>a</b>.</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P5.4</b> In PCA, the first principal component <b>v</b> maximizes <b>v</b>ᵀ<b>Σv</b> subject to <b>v</b>ᵀ<b>v</b>=1. Using Lagrange multipliers, show that <b>Σv</b> = λ<b>v</b>, meaning <b>v</b> is an eigenvector of <b>Σ</b>. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">L = <b>v</b>ᵀ<b>Σv</b> − λ(<b>v</b>ᵀ<b>v</b>−1). ∂L/∂<b>v</b> = 2<b>Σv</b> − 2λ<b>v</b> = 0 → <b>Σv</b> = λ<b>v</b>. This is the eigenvalue equation. The maximum variance is the largest eigenvalue λ₁.</div></div></div>
+
+    <h3>Topic: Tensors</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P6.1</b> A video dataset has shape (1000, 64, 64, 3). How many scalars? What does each dim represent? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">1000×64×64×3 = 12,288,000 scalars. 1000 frames, 64×64 pixels, 3 RGB channels.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P6.2</b> You have a 3-tensor <b>𝒯</b> of shape (T, N, F). Write NumPy code to compute the mean across the time axis for each (asset, feature) pair. What is the output shape? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><span class="inline-code">np.mean(𝒯, axis=0)</span> → shape (N, F). It collapses the time dimension, giving the average feature value per asset.</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P6.3</b> Einstein summation convention says repeated indices are summed. The matrix product C<sub>ij</sub> = A<sub>ik</sub>B<sub>kj</sub> is written "ik,kj→ij". Write the tensor contraction M<sub>ij</sub> = Σ<sub>k</sub> 𝒢<sub>ijk</sub>v<sub>k</sub> in einsum notation and explain why it generalizes matrix-vector multiplication. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">einsum: "ijk,k->ij". It sums over k, leaving i and j free. If j were absent, this would be standard matrix-vector multiplication A<sub>ik</sub>v<sub>k</sub> → (Av)<sub>i</sub>. The extra index j means we perform an independent matrix-vector product for every j, stacking the results into a matrix.</div></div></div>
+
+    <h3>Topic: Quant Applications</h3>
+    <div class="exercise"><span class="tier easy">Easy</span><b>P7.1</b> Given <b>Σ</b> = [[0.09, 0.02],[0.02, 0.16]] and <b>w</b> = [0.5, 0.5], compute portfolio variance and standard deviation. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner"><b>Σw</b> = [0.055, 0.09]. <b>w</b>ᵀ<b>Σw</b> = 0.5(0.055)+0.5(0.09) = 0.0725. σ = √0.0725 ≈ 0.2693 or 26.93%.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P7.2</b> You have a returns matrix <b>R</b> (T×N). Write the matrix expression for the vector of cross-sectional mean returns (average return per asset across time). What are its dimensions? <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">(1/T) <b>1</b>ᵀ<b>R</b>, where <b>1</b> is a T×1 vector of ones. Result is 1×N, a row vector of mean returns per asset.</div></div></div>
+    <div class="exercise"><span class="tier medium">Medium</span><b>P7.3</b> In a long/short portfolio, weights can be negative. If <b>w</b> = [0.8, −0.3, 0.5], verify the sum is 1 and compute the leverage (sum of absolute weights). <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">Sum = 0.8−0.3+0.5 = 1.0. Leverage = |0.8|+|−0.3|+|0.5| = 1.6. This means $1.60 of capital is deployed for every $1 of equity ($0.30 short finances part of the long).</div></div></div>
+    <div class="exercise"><span class="tier hard">Hard</span><b>P7.4</b> The Markowitz optimization problem is: min <b>w</b>ᵀ<b>Σw</b> s.t. <b>w</b>ᵀ<b>μ</b> = R<sub>target</sub> and <b>w</b>ᵀ<b>1</b> = 1. Set up the Lagrangian with two multipliers (λ, γ) and derive the first-order conditions. Express the solution in matrix form. <button class="collapsible">Solution</button><div class="solution"><div class="solution-inner">L = <b>w</b>ᵀ<b>Σw</b> − λ(<b>w</b>ᵀ<b>μ</b>−R<sub>t</sub>) − γ(<b>w</b>ᵀ<b>1</b>−1). ∂L/∂<b>w</b> = 2<b>Σw</b> − λ<b>μ</b> − γ<b>1</b> = 0 → <b>w</b> = ½<b>Σ</b>⁻¹(λ<b>μ</b>+γ<b>1</b>). Substituting the two constraints gives a 2×2 linear system in λ and γ, solvable by matrix inversion. This is the foundation of mean-variance optimization.</div></div></div>
+  </div>
+</div>
+
+<!-- ==================== CHEAT SHEET ==================== -->
+<div id="cheatsheet" class="tab-content">
+  <div class="card">
+    <h2>Cheat Sheet</h2>
+    <p>Quick reference for notation, formulas, and dimensions. Print this tab.</p>
+
+    <h3>Notation</h3>
+    <table>
+      <tr><th>Symbol</th><th>Meaning</th><th>Dimensions</th></tr>
+      <tr><td><span class="math">x, α, r</span></td><td>Scalar</td><td>0D</td></tr>
+      <tr><td><span class="math"><b>x</b>, <b>w</b>, <b>r</b></span></td><td>Column vector</td><td>n × 1</td></tr>
+      <tr><td><span class="math"><b>x</b>ᵀ, <b>w</b>ᵀ</span></td><td>Row vector (transpose)</td><td>1 × n</td></tr>
+      <tr><td><span class="math"><b>A</b>, <b>B</b>, <b>Σ</b></span></td><td>Matrix</td><td>m × n</td></tr>
+      <tr><td><span class="math"><b>𝒯</b></span></td><td>Tensor (3D+)</td><td>d₁ × d₂ × ... × dₖ</td></tr>
+      <tr><td><span class="math"><b>I</b></span></td><td>Identity matrix</td><td>n × n</td></tr>
+      <tr><td><span class="math"><b>1</b></span></td><td>Vector of ones</td><td>n × 1</td></tr>
+    </table>
+
+    <h3>Core Formulas</h3>
+    <table>
+      <tr><th>Operation</th><th>Formula</th><th>Dimensions</th></tr>
+      <tr><td>Vector addition</td><td><span class="math"><b>a</b> + <b>b</b></span></td><td>n × 1</td></tr>
+      <tr><td>Scalar mult</td><td><span class="math">c<b>a</b></span></td><td>n × 1</td></tr>
+      <tr><td>Dot product</td><td><span class="math"><b>a</b>ᵀ<b>b</b> = Σ aᵢbᵢ</span></td><td>scalar</td></tr>
+      <tr><td>Vector norm</td><td><span class="math">||<b>a</b>|| = √(<b>a</b>ᵀ<b>a</b>)</span></td><td>scalar</td></tr>
+      <tr><td>Matrix addition</td><td><span class="math"><b>A</b> + <b>B</b></span></td><td>m × n</td></tr>
+      <tr><td>Matrix product</td><td><span class="math"><b>AB</b></span></td><td>(m×n)(n×p) → m×p</td></tr>
+      <tr><td>Transpose</td><td><span class="math">(<b>A</b>ᵀ)<sub>ij</sub> = A<sub>ji</sub></span></td><td>n × m</td></tr>
+      <tr><td>Inverse</td><td><span class="math"><b>A</b>⁻¹<b>A</b> = <b>I</b></span></td><td>n × n</td></tr>
+      <tr><td>Portfolio return</td><td><span class="math">R<sub>p</sub> = <b>w</b>ᵀ<b>r</b></span></td><td>scalar</td></tr>
+      <tr><td>Portfolio variance</td><td><span class="math">σ<sub>p</sub>² = <b>w</b>ᵀ<b>Σw</b></span></td><td>scalar</td></tr>
+      <tr><td>Factor model</td><td><span class="math"><b>r</b> = <b>Bf</b> + <b>ε</b></span></td><td>N×1 = (N×K)(K×1) + N×1</td></tr>
+    </table>
+
+    <h3>Key Properties</h3>
+    <ul class="check">
+      <li><span class="math">(<b>AB</b>)ᵀ = <b>B</b>ᵀ<b>A</b>ᵀ</span></li>
+      <li><span class="math"><b>AB</b> ≠ <b>BA</b></span> (non-commutative)</li>
+      <li><span class="math">(<b>A</b>ᵀ)ᵀ = <b>A</b></span></li>
+      <li>Covariance matrix <span class="math"><b>Σ</b></span> is symmetric and positive semi-definite</li>
+      <li>Correlation matrix has 1s on diagonal, values in [−1, 1] off-diagonal</li>
+    </ul>
+
+    <h3>Dimension Sanity Check</h3>
+    <div class="note">
+      Always track dimensions. If you expect a scalar and get a matrix, check your transposes. The inner dimensions must match for multiplication.
+    </div>
+    <div class="formula-box">
+      <span class="math">(1×N)(N×1) = scalar</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span class="math">(N×1)(1×N) = N×N matrix</span>&nbsp;&nbsp;|&nbsp;&nbsp;<span class="math">(m×n)(n×p) = m×p</span>
+    </div>
+
+    <h3>Python / NumPy Quick Reference</h3>
+    <table>
+      <tr><th>Task</th><th>Code</th></tr>
+      <tr><td>Create vector</td><td><span class="inline-code">v = np.array([1,2,3])</span></td></tr>
+      <tr><td>Create matrix</td><td><span class="inline-code">A = np.array([[1,2],[3,4]])</span></td></tr>
+      <tr><td>Transpose</td><td><span class="inline-code">A.T</span></td></tr>
+      <tr><td>Matrix multiply</td><td><span class="inline-code">A @ B</span> or <span class="inline-code">np.dot(A,B)</span></td></tr>
+      <tr><td>Element-wise mult</td><td><span class="inline-code">A * B</span></td></tr>
+      <tr><td>Dot product</td><td><span class="inline-code">np.dot(a,b)</span> or <span class="inline-code">a @ b</span></td></tr>
+      <tr><td>Norm</td><td><span class="inline-code">np.linalg.norm(v)</span></td></tr>
+      <tr><td>Inverse</td><td><span class="inline-code">np.linalg.inv(A)</span></td></tr>
+      <tr><td>Covariance</td><td><span class="inline-code">np.cov(R, rowvar=False)</span></td></tr>
+      <tr><td>Shape</td><td><span class="inline-code">A.shape</span></td></tr>
+      <tr><td>Ones vector</td><td><span class="inline-code">np.ones((n,1))</span></td></tr>
+      <tr><td>Identity</td><td><span class="inline-code">np.eye(n)</span></td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<script>
+function showTab(tabId) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  // Show selected
+  document.getElementById(tabId).classList.add('active');
+  // Update nav buttons
+  document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  // Scroll to top
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Collapsible solution toggles
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList.contains('collapsible')) {
+    e.target.classList.toggle('active');
+    var content = e.target.nextElementSibling;
+    if (content.style.maxHeight) {
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  }
+});
+</script>
+
+</body>
+</html>
