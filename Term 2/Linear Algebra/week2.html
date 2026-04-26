@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Systems & Gaussian Elimination — Quant Engineer Study Guide</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --border: #475569;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  header {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    padding: 2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 { font-size: 1.6rem; color: var(--accent); margin-bottom: 0.5rem; }
+  header p { color: var(--text2); font-size: 0.95rem; }
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
+  .tab-btn {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { background: var(--border); }
+  .tab-btn.active { background: var(--accent); color: var(--bg); font-weight: 600; border-color: var(--accent); }
+  .tab-content { display: none; padding: 2rem 1rem; max-width: 1000px; margin: 0 auto; }
+  .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  h2 { color: var(--accent); margin: 2rem 0 1rem; font-size: 1.4rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { color: var(--accent2); margin: 1.5rem 0 0.8rem; font-size: 1.15rem; }
+  h4 { color: var(--text); margin: 1.2rem 0 0.6rem; font-size: 1.05rem; }
+  p { margin-bottom: 1rem; color: var(--text2); }
+  ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text2); }
+  li { margin-bottom: 0.4rem; }
+  strong { color: var(--text); }
+  .highlight { background: rgba(56, 189, 248, 0.1); border-left: 4px solid var(--accent); padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .warning-box { background: rgba(251, 191, 36, 0.1); border-left: 4px solid var(--warning); padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .success-box { background: rgba(52, 211, 153, 0.1); border-left: 4px solid var(--success); padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }
+  .formula {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    overflow-x: auto;
+    text-align: center;
+  }
+  .matrix {
+    display: inline-grid;
+    grid-template-columns: repeat(var(--cols), auto);
+    gap: 0.5rem 1rem;
+    padding: 0.5rem 1rem;
+    border-left: 2px solid var(--text);
+    border-right: 2px solid var(--text);
+    border-radius: 4px;
+    margin: 0 0.5rem;
+    vertical-align: middle;
+  }
+  .matrix-cell { text-align: center; min-width: 2rem; }
+  .svg-container { text-align: center; margin: 1.5rem 0; }
+  svg { max-width: 100%; height: auto; }
+  .code-block {
+    background: #020617;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .tier { margin: 1.5rem 0; padding: 1rem; border-radius: 8px; }
+  .tier-easy { background: rgba(52, 211, 153, 0.08); border: 1px solid var(--success); }
+  .tier-medium { background: rgba(251, 191, 36, 0.08); border: 1px solid var(--warning); }
+  .tier-hard { background: rgba(248, 113, 113, 0.08); border: 1px solid var(--danger); }
+  .tier h4 { margin-top: 0; }
+  .exercise { margin: 0.8rem 0; padding: 0.8rem; background: var(--surface); border-radius: 6px; }
+  .answer { display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg); border-radius: 4px; color: var(--success); }
+  .toggle-ans { background: var(--surface2); color: var(--accent); border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-top: 0.5rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  th, td { border: 1px solid var(--border); padding: 0.6rem; text-align: left; }
+  th { background: var(--surface2); color: var(--accent); }
+  tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+  .step { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+  .step-num { background: var(--accent); color: var(--bg); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 0.85rem; flex-shrink: 0; }
+  .step-body { flex: 1; }
+  @media print {
+    .tab-nav { display: none; }
+    .tab-content { display: block !important; page-break-before: always; }
+    body { background: white; color: black; }
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>Linear Systems & Gaussian Elimination</h1>
+  <p>A Self-Contained Study Guide for Aspiring Quant Engineers</p>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('prereq')">1. Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('systems')">2. Linear Systems</button>
+  <button class="tab-btn" onclick="showTab('gaussian')">3. Gaussian Elimination</button>
+  <button class="tab-btn" onclick="showTab('echelon')">4. Echelon Forms</button>
+  <button class="tab-btn" onclick="showTab('quant')">5. Quant Applications</button>
+  <button class="tab-btn" onclick="showTab('colab')">6. Colab Experiments</button>
+  <button class="tab-btn" onclick="showTab('exercises')">7. Practice Exercises</button>
+</nav>
+
+<section id="prereq" class="tab-content active">
+<h2>Module 1: Prerequisites & Foundations</h2>
+<p>Before we solve complex pricing models, we need a shared language. This module builds the absolute basics—vectors, matrices, and operations—using only high-school algebra as a starting point.</p>
+
+<h3>1.1 What is a Vector?</h3>
+<p>A <strong>vector</strong> is simply an ordered list of numbers. Think of it as a point in space or an arrow from the origin to that point.</p>
+<div class="highlight">
+<strong>Example:</strong> A 2-dimensional vector v = (3, 2) means "go 3 units right and 2 units up." In quant finance, vectors store things like portfolio weights, daily returns, or cash flows.
+</div>
+
+<div class="svg-container">
+<svg width="400" height="300" viewBox="0 0 400 300">
+  <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/></marker></defs>
+  <line x1="50" y1="250" x2="350" y2="250" stroke="#475569" stroke-width="2"/><text x="360" y="255" fill="#94a3b8" font-size="14">x</text>
+  <line x1="50" y1="250" x2="50" y2="30" stroke="#475569" stroke-width="2"/><text x="40" y="25" fill="#94a3b8" font-size="14">y</text>
+  <line x1="50" y1="250" x2="230" y2="170" stroke="#38bdf8" stroke-width="3" marker-end="url(#arr)"/>
+  <circle cx="230" cy="170" r="4" fill="#f87171"/>
+  <text x="235" y="165" fill="#f1f5f9" font-size="13">v = (3, 2)</text>
+  <line x1="230" y1="170" x2="230" y2="250" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="50" y1="170" x2="230" y2="170" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4"/>
+  <text x="235" y="265" fill="#fbbf24" font-size="12">3</text>
+  <text x="30" y="175" fill="#fbbf24" font-size="12">2</text>
+</svg>
+</div>
+
+<h4>Vector Operations</h4>
+<ul>
+<li><strong>Addition:</strong> Add corresponding entries. (1, 2) + (3, 4) = (4, 6). Geometrically, place the tail of one at the head of the other.</li>
+<li><strong>Scalar Multiplication:</strong> Multiply every entry by a number (scalar). 2 * (1, 3) = (2, 6). This stretches or shrinks the arrow.</li>
+</ul>
+
+<h3>1.2 What is a Matrix?</h3>
+<p>A <strong>matrix</strong> is a rectangular array of numbers. We describe it by its <em>rows</em> (horizontal) and <em>columns</em> (vertical). An m x n matrix has m rows and n columns.</p>
+<div class="formula">
+A = <span class="matrix" style="--cols:3;">
+<span class="matrix-cell">a_11</span><span class="matrix-cell">a_12</span><span class="matrix-cell">a_13</span>
+<span class="matrix-cell">a_21</span><span class="matrix-cell">a_22</span><span class="matrix-cell">a_23</span>
+</span>  is a 2 x 3 matrix
+</div>
+<p>The entry a_23 lives in row 2, column 3. In quant work, matrices store correlations, Jacobians of pricing functions, or transition probabilities.</p>
+
+<h4>Matrix-Vector Multiplication</h4>
+<p>This is the most important operation for linear systems. When we multiply a matrix A by a vector x, we take the <strong>dot product</strong> of each row of A with x.</p>
+<div class="formula">
+<span class="matrix" style="--cols:2;"><span class="matrix-cell">2</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span><span class="matrix-cell">3</span></span>
+x
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">x_1</span><span class="matrix-cell">x_2</span></span>
+=
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">2x_1 + 1x_2</span><span class="matrix-cell">-1x_1 + 3x_2</span></span>
+</div>
+<p>Each row of the matrix defines a linear equation. The result is a new vector.</p>
+
+<h3>1.3 Linear Combinations</h3>
+<p>A <strong>linear combination</strong> of vectors is formed by multiplying each vector by a scalar and adding them. If we can reach every point in space through linear combinations of a set of vectors, those vectors are called a <strong>basis</strong>.</p>
+<div class="highlight">
+<strong>Quant intuition:</strong> A replicating portfolio is a linear combination of underlying assets. If you have stocks A and B, any portfolio (w_1, w_2) is a linear combination of the individual asset payoff vectors.
+</div>
+
+<h3>1.4 The Identity Matrix & Inverses</h3>
+<p>The <strong>identity matrix</strong> I is the "do nothing" matrix—multiplying by I leaves a vector unchanged. It has 1s on the diagonal and 0s elsewhere.</p>
+<div class="formula">
+I_2 = <span class="matrix" style="--cols:2;"><span class="matrix-cell">1</span><span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">1</span></span>
+</div>
+<p>If there exists a matrix B such that AB = BA = I, then B is the <strong>inverse</strong> of A, written A^-1. Not all matrices have inverses—only square matrices with linearly independent rows/columns.</p>
+
+<div class="success-box">
+<strong>Checkpoint:</strong> Before moving on, ensure you can multiply a 2x2 matrix by a 2-vector, and that you understand why matrix-vector multiplication represents a system of linear equations.
+</div>
+</section>
+
+<section id="systems" class="tab-content">
+<h2>Module 2: Systems of Linear Equations</h2>
+
+<h3>2.1 The Core Problem</h3>
+<p>A <strong>system of linear equations</strong> asks: "What inputs (x, y, z...) simultaneously satisfy all of these linear relationships?" Each equation represents a line, plane, or hyperplane. The solution is where they all intersect.</p>
+
+<div class="formula">
+2x + y = 5<br>
+x - y = 1
+</div>
+<p>Here we have 2 equations and 2 unknowns. The solution x = 2, y = 1 satisfies both.</p>
+
+<h3>2.2 The Three Possible Outcomes</h3>
+<p>For any linear system, exactly one of three things happens:</p>
+
+<h4>Case A: Unique Solution</h4>
+<p>The equations intersect at exactly one point. Geometrically, two non-parallel lines cross once. Algebraically, the coefficient matrix has full rank.</p>
+<div class="svg-container">
+<svg width="320" height="240" viewBox="0 0 320 240">
+  <line x1="40" y1="200" x2="280" y2="40" stroke="#38bdf8" stroke-width="3"/>
+  <line x1="40" y1="40" x2="280" y2="200" stroke="#f87171" stroke-width="3"/>
+  <circle cx="160" cy="120" r="5" fill="#34d399"/>
+  <text x="170" y="115" fill="#34d399" font-size="13">One intersection</text>
+  <text x="250" y="35" fill="#38bdf8" font-size="12">Eq 1</text>
+  <text x="250" y="215" fill="#f87171" font-size="12">Eq 2</text>
+</svg>
+</div>
+
+<h4>Case B: No Solution (Inconsistent)</h4>
+<p>The equations describe parallel lines or planes that never meet. In quant finance, this often signals an <strong>arbitrage opportunity</strong> or a mis-specified model.</p>
+<div class="svg-container">
+<svg width="320" height="240" viewBox="0 0 320 240">
+  <line x1="40" y1="80" x2="280" y2="80" stroke="#38bdf8" stroke-width="3"/>
+  <line x1="40" y1="160" x2="280" y2="160" stroke="#f87171" stroke-width="3"/>
+  <text x="290" y="85" fill="#38bdf8" font-size="12">Eq 1</text>
+  <text x="290" y="165" fill="#f87171" font-size="12">Eq 2</text>
+  <text x="120" y="130" fill="#fbbf24" font-size="14">No intersection</text>
+</svg>
+</div>
+
+<h4>Case C: Infinitely Many Solutions</h4>
+<p>The equations describe the same line or plane, or they intersect along a common line (in higher dimensions). One variable is "free" to be anything, and the others follow.</p>
+<div class="svg-container">
+<svg width="320" height="240" viewBox="0 0 320 240">
+  <line x1="40" y1="200" x2="280" y2="40" stroke="#38bdf8" stroke-width="3"/>
+  <line x1="40" y1="200" x2="280" y2="40" stroke="#f87171" stroke-width="3" stroke-dasharray="6,4"/>
+  <text x="250" y="35" fill="#38bdf8" font-size="12">Eq 1</text>
+  <text x="250" y="55" fill="#f87171" font-size="12">Eq 2</text>
+  <text x="80" y="120" fill="#34d399" font-size="14">Infinite overlap</text>
+</svg>
+</div>
+
+<h3>2.3 Matrix Form: Ax = b</h3>
+<p>Every linear system can be written compactly as <strong>Ax = b</strong>, where:</p>
+<ul>
+<li><strong>A</strong> is the <em>coefficient matrix</em> (contains the numbers multiplying the variables)</li>
+<li><strong>x</strong> is the <em>unknown vector</em> (what we want to find)</li>
+<li><strong>b</strong> is the <em>constant vector</em> (the right-hand side numbers)</li>
+</ul>
+
+<div class="formula">
+<span class="matrix" style="--cols:2;"><span class="matrix-cell">2</span><span class="matrix-cell">1</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span></span>
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">x</span><span class="matrix-cell">y</span></span>
+=
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">5</span><span class="matrix-cell">1</span></span>
+</div>
+
+<h3>2.4 The Augmented Matrix</h3>
+<p>To solve a system, we often combine A and b into one array called the <strong>augmented matrix</strong> [A | b]. This lets us manipulate the entire system at once.</p>
+<div class="formula">
+[ A | b ] = <span class="matrix" style="--cols:3;"><span class="matrix-cell">2</span><span class="matrix-cell">1</span><span class="matrix-cell">|</span><span class="matrix-cell">5</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span><span class="matrix-cell">|</span><span class="matrix-cell">1</span></span>
+</div>
+<p>The vertical bar is just a visual reminder of the equals sign.</p>
+
+<div class="highlight">
+<strong>Quant intuition:</strong> In yield curve fitting, A might contain bond cash flow timings, x contains the unknown zero rates, and b contains observed market prices. Solving Ax = b finds the rates consistent with market data.
+</div>
+</section>
+
+<section id="gaussian" class="tab-content">
+<h2>Module 3: Gaussian Elimination</h2>
+<p>Gaussian elimination is the algorithmic heart of linear algebra. It systematically transforms any system into an easy-to-solve triangular form using three simple moves.</p>
+
+<h3>3.1 The Three Elementary Row Operations</h3>
+<p>These operations change the system's appearance without changing its solution set:</p>
+
+<table>
+<tr><th>Operation</th><th>Symbol</th><th>What it does</th><th>Quant analogy</th></tr>
+<tr><td><strong>Swap</strong></td><td>R_i <-> R_j</td><td>Interchange two rows</td><td>Reordering pricing equations by maturity</td></tr>
+<tr><td><strong>Scale</strong></td><td>kR_i -> R_i</td><td>Multiply a row by a non-zero constant</td><td>Converting prices to percentages</td></tr>
+<tr><td><strong>Replace</strong></td><td>R_i + kR_j -> R_i</td><td>Add a multiple of one row to another</td><td>Netting out common risk factors</td></tr>
+</table>
+
+<div class="warning-box">
+<strong>Critical rule:</strong> You can multiply a row by any number <em>except zero</em>. Multiplying by zero destroys information and changes the solution set.
+</div>
+
+<h3>3.2 The Goal: Upper Triangular Form</h3>
+<p>We want to create zeros <em>below</em> the main diagonal. Once achieved, we use <strong>back substitution</strong> (solving from the bottom up).</p>
+
+<h3>3.3 Worked Example: Step-by-Step</h3>
+<p>Solve the system:</p>
+<div class="formula">
+2x + y - z = 8<br>
+-3x - y + 2z = -11<br>
+-2x + y + 2z = -3
+</div>
+
+<p><strong>Step 0 — Augmented matrix:</strong></p>
+<div class="formula">
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">2</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span><span class="matrix-cell">8</span>
+<span class="matrix-cell">-3</span><span class="matrix-cell">-1</span><span class="matrix-cell">2</span><span class="matrix-cell">-11</span>
+<span class="matrix-cell">-2</span><span class="matrix-cell">1</span><span class="matrix-cell">2</span><span class="matrix-cell">-3</span>
+</span>
+</div>
+
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body"><strong>Make the first pivot 1.</strong> Divide Row 1 by 2 (scale operation):<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">0.5</span><span class="matrix-cell">-0.5</span><span class="matrix-cell">4</span>
+<span class="matrix-cell">-3</span><span class="matrix-cell">-1</span><span class="matrix-cell">2</span><span class="matrix-cell">-11</span>
+<span class="matrix-cell">-2</span><span class="matrix-cell">1</span><span class="matrix-cell">2</span><span class="matrix-cell">-3</span>
+</span>
+</div>
+</div>
+
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body"><strong>Eliminate below the pivot.</strong> Add 3*R1 to R2, and add 2*R1 to R3:<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">0.5</span><span class="matrix-cell">-0.5</span><span class="matrix-cell">4</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">0.5</span><span class="matrix-cell">0.5</span><span class="matrix-cell">1</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">2</span><span class="matrix-cell">1</span><span class="matrix-cell">5</span>
+</span>
+</div>
+</div>
+
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body"><strong>Second pivot.</strong> Scale R2 by 2, then eliminate below using R3 - 4*R2:<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">0.5</span><span class="matrix-cell">-0.5</span><span class="matrix-cell">4</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">1</span><span class="matrix-cell">2</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">-3</span><span class="matrix-cell">-3</span>
+</span>
+</div>
+</div>
+
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body"><strong>Third pivot.</strong> Scale R3 by -1/3:<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">0.5</span><span class="matrix-cell">-0.5</span><span class="matrix-cell">4</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">1</span><span class="matrix-cell">2</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">1</span>
+</span>
+</div>
+</div>
+
+<p><strong>Back substitution:</strong></p>
+<ul>
+<li>From R3: z = 1</li>
+<li>From R2: y + z = 2 -> y = 1</li>
+<li>From R1: x + 0.5y - 0.5z = 4 -> x + 0.5 - 0.5 = 4 -> x = 4</li>
+</ul>
+<div class="success-box">
+<strong>Solution:</strong> x = 4, y = 1, z = 1. Verify by plugging back into the original equations.
+</div>
+
+<h3>3.4 Pivoting & Partial Pivoting</h3>
+<p>If a pivot position contains 0 (or a very small number), we <strong>swap</strong> rows to move a non-zero entry into that spot. In quant computing, we always use <strong>partial pivoting</strong> (swap with the row having the largest absolute value in that column) to minimize floating-point errors.</p>
+
+<div class="highlight">
+<strong>Why this matters for quants:</strong> When calibrating a model to 100+ market prices, small numerical errors from bad pivoting can propagate and produce arbitrage-violating prices. Stable elimination is not optional—it is a risk management tool.
+</div>
+</section>
+
+<section id="echelon" class="tab-content">
+<h2>Module 4: Echelon & Reduced Echelon Forms</h2>
+
+<h3>4.1 Row Echelon Form (REF)</h3>
+<p>A matrix is in <strong>Row Echelon Form</strong> when it satisfies three conditions:</p>
+<ol>
+<li>All nonzero rows are above any rows of all zeros.</li>
+<li>Each leading entry (pivot) of a row is in a column to the right of the leading entry above it.</li>
+<li>All entries in a column below a leading entry are zeros.</li>
+</ol>
+
+<div class="svg-container">
+<svg width="500" height="220" viewBox="0 0 500 220">
+  <rect x="50" y="40" width="400" height="140" rx="8" fill="none" stroke="#475569" stroke-width="2"/>
+  <text x="250" y="25" fill="#38bdf8" font-size="16" text-anchor="middle" font-weight="bold">Row Echelon Form Structure</text>
+  <path d="M70 160 L70 120 L150 120 L150 90 L230 90 L230 60 L310 60" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="70" cy="120" r="4" fill="#f87171"/><text x="60" y="115" fill="#f1f5f9" font-size="12">Pivot 1</text>
+  <circle cx="150" cy="90" r="4" fill="#f87171"/><text x="140" y="85" fill="#f1f5f9" font-size="12">Pivot 2</text>
+  <circle cx="230" cy="60" r="4" fill="#f87171"/><text x="220" y="55" fill="#f1f5f9" font-size="12">Pivot 3</text>
+  <text x="340" y="65" fill="#94a3b8" font-size="12">Zeros above? Not required.</text>
+  <text x="340" y="95" fill="#94a3b8" font-size="12">Zeros below? Required.</text>
+  <text x="340" y="125" fill="#94a3b8" font-size="12">Staircase moves right.</text>
+</svg>
+</div>
+
+<div class="formula">
+Example of REF:<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">2</span><span class="matrix-cell">-1</span><span class="matrix-cell">4</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">3</span><span class="matrix-cell">2</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span>
+</span>
+</div>
+
+<h3>4.2 Reduced Row Echelon Form (RREF)</h3>
+<p>RREF adds two more rules, making the solution completely obvious:</p>
+<ol start="4">
+<li>The leading entry in each nonzero row is 1.</li>
+<li>Each leading 1 is the only nonzero entry in its column.</li>
+</ol>
+
+<div class="formula">
+Same matrix in RREF:<br>
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">1</span><span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">-8</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">0</span><span class="matrix-cell">5</span>
+<span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">1</span><span class="matrix-cell">-1</span>
+</span>
+</div>
+<p>In RREF, the solution reads directly: x_1 = -8, x_2 = 5, x_3 = -1. No back substitution needed.</p>
+
+<h3>4.3 Rank and Free Variables</h3>
+<p>The <strong>rank</strong> of a matrix is the number of pivots in its REF. It tells us the number of "independent" equations.</p>
+<ul>
+<li>If rank = number of variables -> unique solution.</li>
+<li>If rank &lt; number of variables -> infinitely many solutions (free variables exist).</li>
+<li>If rank &lt; rank of augmented matrix -> no solution (inconsistent).</li>
+</ul>
+
+<div class="highlight">
+<strong>Free variables</strong> are columns without pivots. They act as parameters. If x_3 is free, we write x_3 = t (any real number), then express the other variables in terms of t.
+</div>
+
+<h3>4.4 Parametric Solutions</h3>
+<p>When a system has infinitely many solutions, we describe the solution set using <strong>parametric form</strong>:</p>
+<div class="formula">
+x = p + t*v_1 + s*v_2 + ...
+</div>
+<p>where p is a particular solution, and v_1, v_2 span the space of homogeneous solutions (solutions to Ax = 0).</p>
+
+<div class="success-box">
+<strong>Key theorem:</strong> The general solution to Ax = b equals one particular solution plus the entire solution space of Ax = 0. This decomposition is fundamental to understanding no-arbitrage pricing (the homogeneous space represents zero-cost portfolios).
+</div>
+</section>
+
+<section id="quant" class="tab-content">
+<h2>Module 5: Quantitative Finance Applications</h2>
+
+<h3>5.1 Solving Calibration Equations</h3>
+<p><strong>Calibration</strong> means tuning model parameters so that model outputs match observed market prices. This almost always reduces to solving a linear system.</p>
+
+<h4>Example: Calibrating a Local Volatility Surface</h4>
+<p>Suppose we observe call option prices C_1, C_2, ..., C_n for different strikes and maturities. A finite-difference discretization of the Dupire PDE yields one linear equation per market quote:</p>
+<div class="formula">
+M * sigma = C
+</div>
+<p>where sigma is the vector of unknown local volatilities at grid points, C is the vector of observed prices, and M is a matrix of differential operators and boundary conditions. Gaussian elimination (or its sparse variants) solves for sigma.</p>
+
+<div class="svg-container">
+<svg width="500" height="260" viewBox="0 0 500 260">
+  <rect x="30" y="30" width="200" height="200" rx="8" fill="none" stroke="#475569" stroke-width="2"/>
+  <text x="130" y="20" fill="#38bdf8" font-size="14" text-anchor="middle">Market Quotes C</text>
+  <circle cx="80" cy="80" r="6" fill="#f87171"/><text x="95" y="85" fill="#94a3b8" font-size="12">C_1(K_1,T_1)</text>
+  <circle cx="80" cy="130" r="6" fill="#f87171"/><text x="95" y="135" fill="#94a3b8" font-size="12">C_2(K_2,T_2)</text>
+  <circle cx="80" cy="180" r="6" fill="#f87171"/><text x="95" y="185" fill="#94a3b8" font-size="12">C_3(K_3,T_3)</text>
+  <path d="M240 130 L290 130" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="265" y="120" fill="#38bdf8" font-size="13" text-anchor="middle">Ax=b</text>
+  <rect x="300" y="30" width="170" height="200" rx="8" fill="none" stroke="#475569" stroke-width="2"/>
+  <text x="385" y="20" fill="#34d399" font-size="14" text-anchor="middle">Model sigma</text>
+  <rect x="320" y="70" width="130" height="30" rx="4" fill="#1e293b" stroke="#34d399"/>
+  <text x="385" y="90" fill="#34d399" font-size="12" text-anchor="middle">sigma(K_1,T_1)</text>
+  <rect x="320" y="120" width="130" height="30" rx="4" fill="#1e293b" stroke="#34d399"/>
+  <text x="385" y="140" fill="#34d399" font-size="12" text-anchor="middle">sigma(K_2,T_2)</text>
+  <rect x="320" y="170" width="130" height="30" rx="4" fill="#1e293b" stroke="#34d399"/>
+  <text x="385" y="190" fill="#34d399" font-size="12" text-anchor="middle">sigma(K_3,T_3)</text>
+</svg>
+</div>
+
+<h3>5.2 Arbitrage-Free Pricing Systems</h3>
+<p>The <strong>Fundamental Theorem of Asset Pricing</strong> states: a market is arbitrage-free if and only if there exists a <strong>risk-neutral measure</strong> under which discounted prices are martingales. In finite-state models, this becomes a linear system.</p>
+
+<h4>The Replicating Portfolio as a Linear System</h4>
+<p>Consider a one-period model with 3 states and 2 assets (stock + bond). A derivative with payoff D in each state can be replicated by holding Delta shares and B bonds if:</p>
+<div class="formula">
+Delta*S_1(up) + B*(1+r) = D(up)<br>
+Delta*S_1(down) + B*(1+r) = D(down)
+</div>
+<p>This is Ax = b. If a solution exists for every derivative, the market is <strong>complete</strong>. If no solution exists for some payoff, that payoff cannot be perfectly hedged.</p>
+
+<div class="warning-box">
+<strong>Arbitrage detection:</strong> If the system for a "zero-cost" portfolio (b = 0) has a nonzero solution, you have found an arbitrage: a portfolio that costs nothing today but pays something positive in some state tomorrow.
+</div>
+
+<h3>5.3 Yield Curve Fitting</h3>
+<p>The <strong>yield curve</strong> shows interest rates across maturities. We construct it by solving for zero-coupon rates that reproduce observed bond prices.</p>
+
+<h4>Bootstrapping as Sequential Elimination</h4>
+<p>Given bond prices P_1, P_2, ..., P_n with known cash flows, the price of bond i is the discounted sum of its cash flows:</p>
+<div class="formula">
+P_i = CF_i1*d(1) + CF_i2*d(2) + ... + CF_in*d(n)
+</div>
+<p>where d(t) = e^(-r(t)*t) is the discount factor. Collecting all bonds gives a lower-triangular system:</p>
+<div class="formula">
+<span class="matrix" style="--cols:4;">
+<span class="matrix-cell">CF_11</span><span class="matrix-cell">0</span><span class="matrix-cell">0</span><span class="matrix-cell">0</span>
+<span class="matrix-cell">CF_21</span><span class="matrix-cell">CF_22</span><span class="matrix-cell">0</span><span class="matrix-cell">0</span>
+<span class="matrix-cell">CF_31</span><span class="matrix-cell">CF_32</span><span class="matrix-cell">CF_33</span><span class="matrix-cell">0</span>
+<span class="matrix-cell">CF_41</span><span class="matrix-cell">CF_42</span><span class="matrix-cell">CF_43</span><span class="matrix-cell">CF_44</span>
+</span>
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">d_1</span><span class="matrix-cell">d_2</span><span class="matrix-cell">d_3</span><span class="matrix-cell">d_4</span></span>
+=
+<span class="matrix" style="--cols:1;"><span class="matrix-cell">P_1</span><span class="matrix-cell">P_2</span><span class="matrix-cell">P_3</span><span class="matrix-cell">P_4</span></span>
+</div>
+
+<p>Because it is lower-triangular, forward substitution (the mirror of back substitution) solves it instantly: find d_1 from bond 1, plug into bond 2 to find d_2, and so on.</p>
+
+<h4>Spline Fitting: Over-Determined Systems</h4>
+<p>When we have more bonds than time points, the system becomes <strong>over-determined</strong> (more equations than unknowns). We solve the <strong>least-squares</strong> problem:</p>
+<div class="formula">
+min_x ||Ax - b||^2
+</div>
+<p>whose solution satisfies the <strong>normal equations</strong>: A^T A x = A^T b. Gaussian elimination on A^T A finds the best-fit yield curve.</p>
+
+<div class="svg-container">
+<svg width="500" height="240" viewBox="0 0 500 240">
+  <text x="250" y="20" fill="#38bdf8" font-size="16" text-anchor="middle" font-weight="bold">Yield Curve from Bond Prices</text>
+  <line x1="50" y1="200" x2="450" y2="200" stroke="#475569" stroke-width="2"/>
+  <line x1="50" y1="200" x2="50" y2="40" stroke="#475569" stroke-width="2"/>
+  <text x="460" y="205" fill="#94a3b8" font-size="13">Maturity (T)</text>
+  <text x="30" y="30" fill="#94a3b8" font-size="13">Rate r(T)</text>
+  <path d="M50 180 Q150 160 250 100 T450 60" fill="none" stroke="#34d399" stroke-width="3"/>
+  <circle cx="100" cy="165" r="5" fill="#f87171"/><text x="95" y="185" fill="#f87171" font-size="11">1Y</text>
+  <circle cx="200" cy="130" r="5" fill="#f87171"/><text x="195" y="150" fill="#f87171" font-size="11">2Y</text>
+  <circle cx="300" cy="90" r="5" fill="#f87171"/><text x="295" y="110" fill="#f87171" font-size="11">5Y</text>
+  <circle cx="400" cy="70" r="5" fill="#f87171"/><text x="395" y="90" fill="#f87171" font-size="11">10Y</text>
+  <text x="250" y="225" fill="#94a3b8" font-size="12" text-anchor="middle">Each bond price contributes one equation to the linear system.</text>
+</svg>
+</div>
+</section>
+
+<section id="colab" class="tab-content">
+<h2>Module 6: Google Colab Experiments</h2>
+<p>Each experiment is designed to run in a single Colab cell. Copy-paste and execute. No external data files required.</p>
+
+<h3>Experiment 1: Visualizing Solutions in 2D</h3>
+<p>Plot two lines and their intersection to build geometric intuition.</p>
+<div class="code-block">import numpy as np
+import matplotlib.pyplot as plt
+
+# System: 2x + y = 5, x - y = 1
+x = np.linspace(-2, 4, 100)
+y1 = 5 - 2*x      # from eq1
+y2 = x - 1        # from eq2
+
+plt.figure(figsize=(8,6))
+plt.plot(x, y1, 'b-', linewidth=2, label='2x + y = 5')
+plt.plot(x, y2, 'r-', linewidth=2, label='x - y = 1')
+plt.plot(2, 1, 'go', markersize=10, label='Solution (2,1)')
+plt.axhline(0, color='black', linewidth=0.5)
+plt.axvline(0, color='black', linewidth=0.5)
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.title('Linear System: Unique Solution')
+plt.xlabel('x'); plt.ylabel('y')
+plt.show()
+
+# Verify with NumPy
+A = np.array([[2,1],[1,-1]])
+b = np.array([5,1])
+print("Solution:", np.linalg.solve(A, b))</div>
+
+<h3>Experiment 2: Manual Gaussian Elimination</h3>
+<p>Implement elimination step-by-step to see the algorithm, not just the answer.</p>
+<div class="code-block">import numpy as np
+
+def gauss_elimination(A, b):
+    """Perform Gaussian elimination with partial pivoting."""
+    n = len(b)
+    Ab = np.hstack([A, b.reshape(-1,1)]).astype(float)
+    
+    for col in range(n):
+        # Partial pivot: find row with max absolute value in current column
+        pivot_row = np.argmax(np.abs(Ab[col:, col])) + col
+        Ab[[col, pivot_row]] = Ab[[pivot_row, col]]
+        
+        pivot = Ab[col, col]
+        if abs(pivot) < 1e-12:
+            raise ValueError("Matrix is singular or nearly singular")
+        
+        # Eliminate rows below
+        for row in range(col+1, n):
+            factor = Ab[row, col] / pivot
+            Ab[row, col:] -= factor * Ab[col, col:]
+            print(f"Eliminating row {row} using factor {factor:.3f}")
+        print(f"After column {col}:
+{Ab}
+")
+    
+    # Back substitution
+    x = np.zeros(n)
+    for i in range(n-1, -1, -1):
+        x[i] = (Ab[i, -1] - np.dot(Ab[i, i+1:n], x[i+1:n])) / Ab[i, i]
+    return x
+
+A = np.array([[2,1,-1],[-3,-1,2],[-2,1,2]], dtype=float)
+b = np.array([8, -11, -3], dtype=float)
+x = gauss_elimination(A, b)
+print("Solution:", x)
+print("Verification A@x:", A @ x)</div>
+
+<h3>Experiment 3: REF and RREF with SymPy</h3>
+<p>Use symbolic computation to get exact fractions, not floating-point approximations.</p>
+<div class="code-block">from sympy import Matrix, symbols
+
+A = Matrix([[2,1,-1,8],[-3,-1,2,-11],[-2,1,2,-3]])
+print("Original augmented matrix:")
+print(A)
+
+print("
+Row Echelon Form:")
+print(A.rref()[0])  # RREF
+
+# Identify pivots and free variables
+rref, pivot_cols = A.rref()
+print("Pivot columns:", pivot_cols)
+print("Free variables (if any):", [i for i in range(A.cols-1) if i not in pivot_cols])</div>
+
+<h3>Experiment 4: Yield Curve Bootstrapper</h3>
+<p>Bootstrap zero rates from 3 hypothetical bonds.</p>
+<div class="code-block">import numpy as np
+
+# Bonds: (Price, CF_t1, CF_t2, CF_t3)
+bonds = np.array([
+    [98.0,  100,   0,   0],   # 1-year zero (par=100)
+    [95.0,    5, 105,   0],   # 2-year coupon=5%
+    [90.0,    4,   4, 104],   # 3-year coupon=4%
+], dtype=float)
+
+n = len(bonds)
+d = np.zeros(n)  # discount factors
+
+# Forward substitution (lower triangular system)
+for i in range(n):
+    known = sum(bonds[i, j+1] * d[j] for j in range(i))
+    d[i] = (bonds[i, 0] - known) / bonds[i, i+1]
+    print(f"d({i+1}Y) = {d[i]:.6f}")
+
+# Convert to zero rates
+T = np.arange(1, n+1)
+rates = -np.log(d) / T
+print("
+Zero rates (continuous compounding):")
+for t, r in zip(T, rates):
+    print(f"r({t}Y) = {r*100:.3f}%")</div>
+
+<h3>Experiment 5: Detecting Arbitrage</h3>
+<p>Set up a state-price system and check for arbitrage via rank.</p>
+<div class="code-block">import numpy as np
+
+# 3 assets, 3 states (payoff matrix)
+D = np.array([
+    [1.1, 1.1, 1.1],   # Risk-free bond, price=1
+    [1.2, 1.0, 0.8],   # Stock, price=1
+    [0.0, 0.0, 1.1],   # Call option, price=?
+], dtype=float)
+
+prices = np.array([1.0, 1.0, 0.15])
+
+# Check if state prices exist: D.T * psi = prices
+# If no solution, arbitrage exists
+try:
+    psi = np.linalg.solve(D.T, prices)
+    print("State prices:", psi)
+    if np.any(psi <= 0):
+        print("WARNING: Negative state price detected -> Arbitrage opportunity!")
+    else:
+        print("No arbitrage: all state prices positive.")
+except np.linalg.LinAlgError:
+    print("Market is incomplete or arbitrage exists (singular matrix).")</div>
+
+<h3>Experiment 6: Ill-Conditioned Calibration</h3>
+<p>Demonstrate why partial pivoting and condition numbers matter in quant work.</p>
+<div class="code-block">import numpy as np
+
+# Hilbert matrix: notoriously ill-conditioned
+n = 5
+A = np.array([[1/(i+j+1) for j in range(n)] for i in range(n)])
+b = np.ones(n)
+
+print("Condition number:", np.linalg.cond(A))
+
+# Solve with default (partial pivoting)
+x1 = np.linalg.solve(A, b)
+
+# Solve with a tiny perturbation
+b_perturbed = b + 1e-10 * np.random.randn(n)
+x2 = np.linalg.solve(A, b_perturbed)
+
+print("Change in solution under tiny perturbation:")
+print(np.linalg.norm(x1 - x2))
+print("
+Moral: In quant calibration, ill-conditioned systems amplify data errors.")</div>
+</section>
+
+<section id="exercises" class="tab-content">
+<h2>Module 7: Practice Exercises</h2>
+<p>Solutions are hidden; click "Show Answer" to reveal. Attempt every problem before checking.</p>
+
+<h3>7.1 Prerequisites: Vectors & Matrices</h3>
+
+<div class="tier tier-easy">
+<h4>Tier: Easy</h4>
+<div class="exercise">
+<strong>E1.1</strong> Let u = (2, -1) and v = (0, 3). Compute 2u - v and draw a rough sketch of the vectors and the result.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">2u - v = (4, -2) - (0, 3) = (4, -5). Sketch: u goes right 2, down 1; v goes up 3; result goes right 4, down 5.</div>
+</div>
+<div class="exercise">
+<strong>E1.2</strong> Multiply the matrix <span class="matrix" style="--cols:2;"><span class="matrix-cell">1</span><span class="matrix-cell">2</span><span class="matrix-cell">3</span><span class="matrix-cell">4</span></span> by the vector <span class="matrix" style="--cols:1;"><span class="matrix-cell">5</span><span class="matrix-cell">6</span></span>.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">(1*5 + 2*6, 3*5 + 4*6) = (17, 39).</div>
+</div>
+</div>
+
+<div class="tier tier-medium">
+<h4>Tier: Medium</h4>
+<div class="exercise">
+<strong>M1.1</strong> Find the 2x2 matrix A such that A*(x,y) = (2x + y, x - 3y) for all x, y.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">A = [[2, 1], [1, -3]]. The first row produces the first component; the second row produces the second.</div>
+</div>
+<div class="exercise">
+<strong>M1.2</strong> Show that the vectors (1,1) and (2,2) do NOT form a basis for R^2.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">They are linearly dependent: (2,2) = 2*(1,1). Any linear combination stays on the line y = x, so we cannot reach points like (1,0).</div>
+</div>
+</div>
+
+<div class="tier tier-hard">
+<h4>Tier: Hard</h4>
+<div class="exercise">
+<strong>H1.1</strong> A portfolio has weights w = (w_1, w_2, w_3). The covariance matrix is Sigma = [[1,0.5,0.2],[0.5,1,0.3],[0.2,0.3,1]]. Write the formula for portfolio variance sigma^2_p in matrix form and expand it into a scalar expression.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">sigma^2_p = w^T Sigma w = w_1^2 + w_2^2 + w_3^2 + w_1*w_2 + 0.4*w_1*w_3 + 0.6*w_2*w_3. (Because w^T Sigma w = Sum_i Sum_j w_i sigma_ij w_j, and covariance matrix is symmetric.)</div>
+</div>
+</div>
+
+<h3>7.2 Linear Systems</h3>
+
+<div class="tier tier-easy">
+<h4>Tier: Easy</h4>
+<div class="exercise">
+<strong>E2.1</strong> Solve by inspection: x + y = 5, x - y = 1. State whether the solution is unique, infinite, or none.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Add equations: 2x = 6 -> x = 3, then y = 2. Unique solution.</div>
+</div>
+<div class="exercise">
+<strong>E2.2</strong> Write the augmented matrix for: 3x + 2y = 7, x - y = 0.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">[[3, 2 | 7], [1, -1 | 0]]</div>
+</div>
+</div>
+
+<div class="tier tier-medium">
+<h4>Tier: Medium</h4>
+<div class="exercise">
+<strong>M2.1</strong> Determine by geometric reasoning whether the system has 0, 1, or infinity solutions:<br>
+2x + 4y = 6<br>
+x + 2y = 3
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">The second equation is exactly half the first. They represent the same line. Infinite solutions; parametric form: x = 3 - 2t, y = t.</div>
+</div>
+<div class="exercise">
+<strong>M2.2</strong> A quant has 3 equations and 3 unknowns but notices the third equation is the sum of the first two. What does this imply about the number of solutions? What if the RHS of the third equation does NOT equal the sum of the first two RHS values?
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">If RHS_3 = RHS_1 + RHS_2: dependent equations, rank = 2 &lt; 3, so infinity solutions (one free variable). If RHS_3 != RHS_1 + RHS_2: inconsistent, no solutions (parallel planes in 3D).</div>
+</div>
+</div>
+
+<div class="tier tier-hard">
+<h4>Tier: Hard</h4>
+<div class="exercise">
+<strong>H2.1</strong> Consider the system Ax = b where A is 5x5 and rank(A) = 4, but rank([A|b]) = 5. A junior quant claims there is "almost a solution." Explain why this is impossible and what it means for a replicating portfolio interpretation.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Rank(A) != rank([A|b]) means the system is inconsistent—no exact solution exists. In replicating portfolio terms: the target payoff cannot be replicated by the available assets. The junior quant may be thinking of a least-squares approximation, but that is not an exact replication and leaves residual risk.</div>
+</div>
+</div>
+
+<h3>7.3 Gaussian Elimination</h3>
+
+<div class="tier tier-easy">
+<h4>Tier: Easy</h4>
+<div class="exercise">
+<strong>E3.1</strong> Perform one row operation to create a zero in position (2,1):<br>
+[[1, 2 | 3], [4, 5 | 6]]
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">R_2 -> R_2 - 4*R_1 yields [[1,2|3], [0,-3|-6]].</div>
+</div>
+<div class="exercise">
+<strong>E3.2</strong> Solve using back substitution after elimination:<br>
+x + 2y = 5<br>
+    3y = 6
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">y = 2, then x + 4 = 5 -> x = 1.</div>
+</div>
+</div>
+
+<div class="tier tier-medium">
+<h4>Tier: Medium</h4>
+<div class="exercise">
+<strong>M3.1</strong> Solve completely using Gaussian elimination with partial pivoting:<br>
+0x + 2y = 4<br>
+3x + 4y = 11<br>
+(Notice the zero pivot—swap rows first!)
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Swap R_1&lt;-&gt;R_2: [[3,4|11],[0,2|4]]. Then y=2, and 3x+8=11 -> x=1. Partial pivoting saved us from division by zero.</div>
+</div>
+<div class="exercise">
+<strong>M3.2</strong> Reduce to REF (not RREF):<br>
+[[2, 4, 2 | 8], [1, 3, 1 | 5], [1, 2, 2 | 7]]
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">R_1/2 -> [[1,2,1|4],[1,3,1|5],[1,2,2|7]]; R_2-R_1, R_3-R_1 -> [[1,2,1|4],[0,1,0|1],[0,0,1|3]]. This is REF. Back substitution gives z=3, y=1, x=4-2-3=-1.</div>
+</div>
+</div>
+
+<div class="tier tier-hard">
+<h4>Tier: Hard</h4>
+<div class="exercise">
+<strong>H3.1</strong> Implement (on paper) Gaussian elimination for the 4x4 system arising from a cubic spline interpolation with knots at x=0,1,2,3 and values y=0,1,4,9. The spline second-derivative vector M satisfies a tridiagonal system. Set up the augmented matrix and perform two elimination steps.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">For natural cubic spline (M_0=M_3=0), the system for M_1, M_2 is:<br>
+2*M_1 + 0.5*M_2 = 6<br>
+0.5*M_1 + 2*M_2 = 6<br>
+Augmented: [[2, 0.5 | 6], [0.5, 2 | 6]].<br>
+Step 1: R_1/2 -> [[1, 0.25 | 3], [0.5, 2 | 6]].<br>
+Step 2: R_2 - 0.5*R_1 -> [[1, 0.25 | 3], [0, 1.875 | 4.5]].<br>
+Continue: M_2 = 2.4, M_1 = 2.4. (This matches the second derivative of f(x)=x^2, which is 2 everywhere—close but not exact due to coarse spacing.)</div>
+</div>
+</div>
+
+<h3>7.4 Echelon & Reduced Echelon Forms</h3>
+
+<div class="tier tier-easy">
+<h4>Tier: Easy</h4>
+<div class="exercise">
+<strong>E4.1</strong> Which of these is in REF? (a) [[1,2],[0,0],[0,1]] (b) [[1,3,2],[0,1,4],[0,0,0]] (c) [[0,1],[1,0]]
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Only (b). (a) has a zero row above a nonzero row. (c) has the pivot of row 2 to the left of row 1.</div>
+</div>
+<div class="exercise">
+<strong>E4.2</strong> Count the pivots: [[1,2,3],[0,1,4],[0,0,1]]. What is the rank?
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">3 pivots. Rank = 3.</div>
+</div>
+</div>
+
+<div class="tier tier-medium">
+<h4>Tier: Medium</h4>
+<div class="exercise">
+<strong>M4.1</strong> Convert to RREF and state the solution set:<br>
+[[1, 2, -1 | 4], [0, 1, 3 | 2], [0, 0, 0 | 0]]
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">R_1 - 2*R_2 -> [[1,0,-7|0],[0,1,3|2],[0,0,0|0]].<br>
+Pivot vars: x_1, x_2. Free var: x_3 = t.<br>
+Solution: x_1 = 7t, x_2 = 2 - 3t, x_3 = t. Infinite solutions along a line in 3D.</div>
+</div>
+<div class="exercise">
+<strong>M4.2</strong> A 3x5 matrix in RREF has pivots in columns 1 and 3 only. Describe the solution space of Ax = 0 in parametric form.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Free variables: x_2, x_4, x_5. Let x_2=s, x_4=t, x_5=u. From RREF structure, x_1 and x_3 are expressed in terms of these. The solution space is a 3-dimensional subspace of R^5 (a hyperplane through the origin).</div>
+</div>
+</div>
+
+<div class="tier tier-hard">
+<h4>Tier: Hard</h4>
+<div class="exercise">
+<strong>H4.1</strong> Prove that the RREF of a matrix is unique. Then explain why this uniqueness guarantees that two different quant models calibrated to the same market data using different numerical libraries must yield identical RREF constraint matrices (and thus identical solution spaces).
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">Uniqueness of RREF is a standard theorem: every matrix row-reduces to exactly one RREF. In calibration, if two libraries produce REFs that look different, reducing both to RREF reveals whether they encode the same constraints. If their RREFs differ, at least one implementation contains a bug or uses inconsistent market assumptions.</div>
+</div>
+</div>
+
+<h3>7.5 Quantitative Applications</h3>
+
+<div class="tier tier-easy">
+<h4>Tier: Easy</h4>
+<div class="exercise">
+<strong>E5.1</strong> A 1-year zero-coupon bond trades at 95.23. What is the continuously compounded zero rate r? Set up the equation 100*e^(-r*1) = 95.23 and solve.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">e^(-r) = 0.9523 -> -r = ln(0.9523) -> r = 0.0489 or 4.89%.</div>
+</div>
+<div class="exercise">
+<strong>E5.2</strong> In a 2-state world, a stock costs 100 and pays 110 (up) or 90 (down). The risk-free bond pays 102 in both states. Set up the 2x2 linear system to find the replicating portfolio (Delta shares, B bonds) for a call option with payoff 10 (up) and 0 (down).
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">110*Delta + 102*B = 10; 90*Delta + 102*B = 0. Subtract: 20*Delta = 10 -> Delta = 0.5. Then B = -90*0.5/102 = -0.4412. Option price = 100*Delta + 1*B = 50 - 0.4412 = 49.56. (Note: This is a simplified one-period binomial model.)</div>
+</div>
+</div>
+
+<div class="tier tier-medium">
+<h4>Tier: Medium</h4>
+<div class="exercise">
+<strong>M5.1</strong> You observe three bonds:<br>
+&bull; 1Y zero: price 96.12, face 100<br>
+&bull; 2Y coupon 5%: price 99.50, pays 5 at Y1 and 105 at Y2<br>
+&bull; 3Y coupon 6%: price 101.25, pays 6, 6, 106<br>
+Bootstrap the discount factors d(1), d(2), d(3).
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">d(1) = 96.12/100 = 0.9612.<br>
+99.50 = 5*d(1) + 105*d(2) -> d(2) = (99.50 - 4.806)/105 = 0.9028.<br>
+101.25 = 6*d(1) + 6*d(2) + 106*d(3) -> d(3) = (101.25 - 5.767 - 5.417)/106 = 0.8492.</div>
+</div>
+<div class="exercise">
+<strong>M5.2</strong> A quant calibrates a model to 5 market prices using 4 parameters. The normal equations A^T A x = A^T b yield a 4x4 system. After elimination, the RREF shows a free variable. What does this imply about the calibration, and what should the quant do?
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">A free variable means the calibration problem is under-determined: infinitely many parameter sets produce the same market fit. The quant should add a regularization constraint (e.g., minimum norm, smoothness penalty) or collect an additional independent market quote to make the system full-rank.</div>
+</div>
+</div>
+
+<div class="tier tier-hard">
+<h4>Tier: Hard</h4>
+<div class="exercise">
+<strong>H5.1</strong> (Arbitrage matrix) In a 3-state market, assets have payoff matrix D = [[1.05,1.05,1.05],[1.2,1.0,0.8],[1.0,1.1,1.2]] and prices p = (1, 1, 1.02). Find whether an arbitrage exists by attempting to solve D^T psi = p for state prices psi. If no exact solution exists, compute the least-squares residual and discuss whether approximate state prices are sufficient for risk management.
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">D^T is 3x3. Compute det(D^T) or attempt direct solve. If D is invertible, psi = (D^T)^-1 p. If any psi_i &lt;= 0, arbitrage exists. If D is singular and p is not in the column space, no exact state prices exist—the market admits arbitrage or is incomplete. Least-squares gives the best-fit psi but does NOT guarantee no-arbitrage; the residual represents mispricing that a trader could exploit.</div>
+</div>
+<div class="exercise">
+<strong>H5.2</strong> (Yield curve spline) Fit a cubic spline r(T) = a + bT + cT^2 + dT^3 to the zero rates bootstrapped at T = 1, 2, 3, 4 years. The spline must be continuous and have continuous first derivative at interior knots. Set up the 8x8 linear system for the coefficients of two cubic pieces (one for [1,2], one for [2,3], one for [3,4]) and explain why the tridiagonal structure makes Gaussian elimination O(n) instead of O(n^3).
+<button class="toggle-ans" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+<div class="answer">For each interior knot, continuity of r and r' gives 2 equations. Endpoint values give 2 more. Natural spline conditions (r"=0 at ends) give the final 2. The resulting matrix has nonzeros only on the main diagonal and the two adjacent diagonals. Gaussian elimination only needs to eliminate one element per column, so each step is O(1) and total cost is O(n) instead of O(n^3). This is the Thomas algorithm, critical for real-time curve updates.</div>
+</div>
+</div>
+
+<div class="success-box">
+<strong>Study Tip:</strong> Complete all Easy exercises first to build muscle memory. Use Medium exercises to connect concepts. Hard exercises are interview-level; master them before applying to quant roles.
+</div>
+</section>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>

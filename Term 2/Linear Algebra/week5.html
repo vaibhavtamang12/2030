@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rank, Nullity & The Fundamental Theorem — A Self-Contained Quant Study Guide</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb; --primary-dark: #1d4ed8; --secondary: #059669;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+            --border: #e2e8f0; --accent-warm: #d97706; --accent-danger: #dc2626;
+            --code-bg: #0f172a; --code-text: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border); position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-header { padding: 24px; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .sidebar-header h1 { font-size: 1.1rem; line-height: 1.4; }
+        .sidebar-header p { font-size: 0.8rem; opacity: 0.9; margin-top: 6px; }
+        .nav-list { list-style: none; padding: 12px 0; }
+        .nav-list li { padding: 0; }
+        .nav-list button { width: 100%; text-align: left; padding: 12px 24px; background: none; border: none; font-size: 0.9rem; color: var(--text); cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; }
+        .nav-list button:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-list button.active { background: #eff6ff; color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+        .nav-list .tier-2 { padding-left: 40px; font-size: 0.85rem; color: var(--muted); }
+        .main { margin-left: 280px; flex: 1; padding: 40px; max-width: 900px; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-size: 2rem; margin-bottom: 8px; color: var(--primary-dark); }
+        h3 { font-size: 1.4rem; margin: 32px 0 12px; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+        h4 { font-size: 1.1rem; margin: 24px 0 8px; color: var(--secondary); }
+        p { margin-bottom: 16px; }
+        .card { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card-highlight { border-left: 4px solid var(--primary); }
+        .card-warm { border-left: 4px solid var(--accent-warm); }
+        .card-danger { border-left: 4px solid var(--accent-danger); }
+        .card-success { border-left: 4px solid var(--secondary); }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+        .tag-prereq { background: #fef3c7; color: #92400e; }
+        .tag-core { background: #dbeafe; color: #1e40af; }
+        .tag-quant { background: #d1fae5; color: #065f46; }
+        .tag-lab { background: #ede9fe; color: #5b21b6; }
+        .tag-exercise { background: #fce7f3; color: #9d174d; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px; border-radius: 8px; overflow-x: auto; font-family: "SF Mono", Monaco, "Cascadia Code", monospace; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
+        code { font-family: "SF Mono", Monaco, "Cascadia Code", monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--primary-dark); }
+        pre code { background: none; padding: 0; color: inherit; }
+        .definition { background: #eff6ff; border-left: 4px solid var(--primary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .definition strong { color: var(--primary-dark); }
+        .theorem { background: #f0fdf4; border-left: 4px solid var(--secondary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .theorem strong { color: #065f46; }
+        .warning { background: #fff7ed; border-left: 4px solid var(--accent-warm); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning strong { color: #92400e; }
+        .example-box { background: #fafafa; border: 1px dashed var(--border); padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .example-box h5 { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95rem; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; font-weight: 600; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; }
+        tr:hover { background: #f8fafc; }
+        .svg-container { text-align: center; margin: 24px 0; }
+        .svg-container svg { max-width: 100%; height: auto; }
+        .mermaid { margin: 20px 0; }
+        .tier-label { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; margin-right: 8px; }
+        .tier-easy { background: #d1fae5; color: #065f46; }
+        .tier-medium { background: #fef3c7; color: #92400e; }
+        .tier-hard { background: #fee2e2; color: #991b1b; }
+        .exercise { margin-bottom: 20px; padding: 16px; background: var(--card); border-radius: 8px; border: 1px solid var(--border); }
+        .exercise p { margin-bottom: 8px; }
+        .collapsible { background: #f1f5f9; border: none; padding: 12px 16px; width: 100%; text-align: left; cursor: pointer; border-radius: 6px; font-weight: 600; margin-top: 8px; }
+        .collapsible:hover { background: #e2e8f0; }
+        .content { display: none; padding: 16px; background: #f8fafc; border-radius: 0 0 6px 6px; margin-bottom: 12px; }
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 2px solid var(--border); }
+        .nav-buttons button { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .nav-buttons button:hover { background: var(--primary-dark); }
+        .nav-buttons button:disabled { background: var(--border); cursor: not-allowed; }
+        .formula-box { text-align: center; padding: 20px; font-size: 1.2rem; margin: 20px 0; background: #f8fafc; border-radius: 8px; }
+        ul, ol { margin-left: 24px; margin-bottom: 16px; }
+        li { margin-bottom: 8px; }
+        .progress-bar { position: fixed; top: 0; left: 280px; right: 0; height: 4px; background: var(--border); z-index: 200; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); width: 0%; transition: width 0.3s; }
+        @media (max-width: 768px) { .sidebar { width: 100%; position: relative; height: auto; } .main { margin-left: 0; padding: 20px; } }
+    </style>
+<base target="_blank">
+</head>
+<body>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="layout">
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h1>Rank, Nullity & The Fundamental Theorem</h1>
+        <p>A Complete Quant Study Guide</p>
+    </div>
+    <ul class="nav-list">
+        <li><button onclick="showSection(0)" class="active" id="nav-0">0. Prerequisites</button></li>
+        <li><button onclick="showSection(1)" id="nav-1">1. Vectors & Matrices</button></li>
+        <li><button onclick="showSection(2)" id="nav-2">2. Linear Independence & Span</button></li>
+        <li><button onclick="showSection(3)" id="nav-3">3. Systems of Equations</button></li>
+        <li><button onclick="showSection(4)" id="nav-4">4. Column Space C(A)</button></li>
+        <li><button onclick="showSection(5)" id="nav-5">5. Row Space C(Aᵀ)</button></li>
+        <li><button onclick="showSection(6)" id="nav-6">6. Null Space N(A)</button></li>
+        <li><button onclick="showSection(7)" id="nav-7">7. Left Null Space N(Aᵀ)</button></li>
+        <li><button onclick="showSection(8)" id="nav-8">8. Rank</button></li>
+        <li><button onclick="showSection(9)" id="nav-9">9. Nullity</button></li>
+        <li><button onclick="showSection(10)" id="nav-10">10. Rank-Nullity Theorem</button></li>
+        <li><button onclick="showSection(11)" id="nav-11">11. Four Fundamental Subspaces</button></li>
+        <li><button onclick="showSection(12)" id="nav-12">12. Quant: Multicollinearity</button></li>
+        <li><button onclick="showSection(13)" id="nav-13">13. Quant: Model Redundancy</button></li>
+        <li><button onclick="showSection(14)" id="nav-14">14. Quant: Constraint Feasibility</button></li>
+        <li><button onclick="showSection(15)" id="nav-15">15. Colab Experiments</button></li>
+        <li><button onclick="showSection(16)" id="nav-16">16. Practice Problems</button></li>
+    </ul>
+</aside>
+
+<main class="main">
+<div class="section" id="section-0"><span class="tag tag-prereq">Prerequisite</span><h2>Prerequisites: The Foundation</h2>
+<p>Before we can understand rank, nullity, and the four fundamental subspaces, we need a shared vocabulary. This section is your launchpad. Every concept here will be used repeatedly in the chapters ahead. Do not skip it.</p>
+
+<h3>0.1 What is a Vector?</h3>
+<p>A <strong>vector</strong> is simply an ordered list of numbers. We write it as a column:</p>
+<div class="formula-box">$v = \begin{bmatrix} v_1 \\ v_2 \\ \vdots \\ v_n \end{bmatrix} \in \mathbb{R}^n$</div>
+<p>Geometrically, think of a vector as an <strong>arrow</strong> from the origin to a point in $n$-dimensional space. In quant finance, a vector might represent the daily returns of $n$ assets, the weights of a portfolio, or the features describing a stock.</p>
+
+<div class="card card-highlight">
+    <h4>Quant Intuition</h4>
+    <p>If you hold 3 assets — Apple, Microsoft, and Tesla — your <strong>portfolio weight vector</strong> could be $w = [0.4, 0.4, 0.2]^T$. This is a point in 3D space. Every possible portfolio is a point in this same space.</p>
+</div>
+
+<h3>0.2 What is a Matrix?</h3>
+<p>A <strong>matrix</strong> is a rectangular array of numbers with $m$ rows and $n$ columns:</p>
+<div class="formula-box">$A = \begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \end{bmatrix} \in \mathbb{R}^{m \times n}$</div>
+
+<p>There are two equally important ways to visualize a matrix:</p>
+<ol>
+    <li><strong>As a linear transformation:</strong> A matrix $A$ takes a vector $x \in \mathbb{R}^n$ and produces a new vector $Ax \in \mathbb{R}^m$. It stretches, rotates, shears, or projects space.</li>
+    <li><strong>As a data table:</strong> Each row is an observation; each column is a feature. In quant terms, rows might be dates and columns might be asset prices or risk factors.</li>
+</ol>
+
+<div class="svg-container">
+<svg width="600" height="280" viewBox="0 0 600 280">
+    <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+    <rect x="40" y="60" width="140" height="160" fill="#dbeafe" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="110" y="50" text-anchor="middle" font-weight="bold" font-size="14">ℝⁿ (Input)</text>
+    <text x="110" y="100" text-anchor="middle" font-size="13">Vector x</text>
+    <circle cx="110" cy="130" r="6" fill="#2563eb"/>
+
+    <path d="M 190 140 L 260 140" stroke="#334155" stroke-width="3" marker-end="url(#arr)"/>
+    <text x="225" y="130" text-anchor="middle" font-size="14" font-weight="bold">A</text>
+    <text x="225" y="165" text-anchor="middle" font-size="11" fill="#64748b">Transformation</text>
+
+    <rect x="280" y="60" width="140" height="160" fill="#d1fae5" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="350" y="50" text-anchor="middle" font-weight="bold" font-size="14">ℝᵐ (Output)</text>
+    <text x="350" y="100" text-anchor="middle" font-size="13">Vector Ax = b</text>
+    <circle cx="350" cy="130" r="6" fill="#059669"/>
+
+    <rect x="460" y="60" width="120" height="160" fill="#fff7ed" stroke="#d97706" stroke-width="2" rx="8"/>
+    <text x="520" y="50" text-anchor="middle" font-weight="bold" font-size="14">Data View</text>
+    <text x="520" y="90" text-anchor="middle" font-size="11">m observations</text>
+    <text x="520" y="110" text-anchor="middle" font-size="11">n features</text>
+    <line x1="470" y1="130" x2="570" y2="130" stroke="#d97706" stroke-width="1"/>
+    <line x1="470" y1="150" x2="570" y2="150" stroke="#d97706" stroke-width="1"/>
+    <line x1="470" y1="170" x2="570" y2="170" stroke="#d97706" stroke-width="1"/>
+    <line x1="500" y1="120" x2="500" y2="190" stroke="#d97706" stroke-width="1"/>
+    <line x1="540" y1="120" x2="540" y2="190" stroke="#d97706" stroke-width="1"/>
+</svg>
+</div>
+
+<h3>0.3 Matrix-Vector Multiplication</h3>
+<p>When we multiply $A$ by $x$, we are taking a <strong>linear combination of the columns of $A$</strong> using the entries of $x$ as weights:</p>
+<div class="formula-box">$Ax = x_1 \begin{bmatrix} \vdots \\ a_{*1} \\ \vdots \end{bmatrix} + x_2 \begin{bmatrix} \vdots \\ a_{*2} \\ \vdots \end{bmatrix} + \cdots + x_n \begin{bmatrix} \vdots \\ a_{*n} \\ \vdots \end{bmatrix}$</div>
+<p>This perspective — that $Ax$ is a combination of columns — is the single most important insight for understanding the column space.</p>
+
+<h3>0.4 The Transpose</h3>
+<p>The <strong>transpose</strong> $A^T$ flips rows and columns. If $A$ is $m \times n$, then $A^T$ is $n \times m$. The rows of $A$ become the columns of $A^T$ and vice versa. We will see that the row space of $A$ is exactly the column space of $A^T$.</p>
+
+<h3>0.5 Determinants (Briefly)</h3>
+<p>For a <strong>square</strong> matrix ($n \times n$), the determinant measures how much the matrix scales volumes. If $\det(A) = 0$, the matrix "collapses" space — it squashes a volume down to a lower dimension (like flattening a box into a plane). This is our first hint of <strong>rank deficiency</strong>.</p>
+<div class="warning"><strong>Key Takeaway:</strong> A zero determinant means the matrix is not invertible. It has "lost" at least one dimension of information. We will soon call this being "rank deficient."</div>
+</div>
+<div class="section" id="section-1"><span class="tag tag-prereq">Prerequisite</span><h2>Vectors & Matrices: The Quant Lens</h2>
+<h3>1.1 Vector Spaces</h3>
+<p>A <strong>vector space</strong> is a collection of vectors that can be added together and multiplied by scalars (real numbers), with the result still staying in the collection. $\mathbb{R}^n$ is the canonical example.</p>
+<p>In quantitative finance, the <strong>space of all possible portfolios</strong> with $n$ assets forms $\mathbb{R}^n$. The <strong>space of all possible return histories</strong> over $m$ days forms $\mathbb{R}^m$.</p>
+
+<h3>1.2 Subspaces</h3>
+<p>A <strong>subspace</strong> is a subset of a vector space that is itself a vector space. It must contain the zero vector and be closed under addition and scalar multiplication.</p>
+<p>Think of a subspace as a "flat" surface passing through the origin: a line through the origin in 3D, a plane through the origin, or the origin itself. It cannot be a line that misses the origin — that is not a subspace.</p>
+
+<div class="svg-container">
+<svg width="500" height="300" viewBox="0 0 500 300">
+    <rect x="20" y="20" width="460" height="260" fill="#f8fafc" stroke="#cbd5e1" rx="8"/>
+    <text x="250" y="45" text-anchor="middle" font-weight="bold" font-size="15">ℝ³ and its Subspaces</text>
+    <!-- Plane -->
+    <polygon points="80,220 180,80 380,80 280,220" fill="#dbeafe" stroke="#2563eb" stroke-width="2" opacity="0.6"/>
+    <text x="280" y="120" fill="#1e40af" font-size="13">Plane (2D subspace)</text>
+    <!-- Line -->
+    <line x1="250" y1="150" x2="350" y2="250" stroke="#dc2626" stroke-width="3"/>
+    <text x="360" y="240" fill="#991b1b" font-size="13">Line (1D subspace)</text>
+    <!-- Origin -->
+    <circle cx="250" cy="150" r="5" fill="#059669"/>
+    <text x="250" y="140" text-anchor="middle" fill="#065f46" font-size="12" font-weight="bold">Origin (0D)</text>
+    <!-- Point not through origin -->
+    <line x1="100" y1="100" x2="160" y2="60" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="80" y="80" fill="#64748b" font-size="11">Not a subspace</text>
+</svg>
+</div>
+
+<h3>1.3 Matrices as Collections of Vectors</h3>
+<p>Every matrix has two natural decompositions into vectors:</p>
+<ul>
+    <li><strong>Column view:</strong> $A = [a_1 \; a_2 \; \cdots \; a_n]$ where each $a_j \in \mathbb{R}^m$.</li>
+    <li><strong>Row view:</strong> $A = \begin{bmatrix} r_1^T \\ r_2^T \\ \vdots \\ r_m^T \end{bmatrix}$ where each $r_i^T \in \mathbb{R}^{1 \times n}$.</li>
+</ul>
+<p>These two views give rise to the <strong>column space</strong> and the <strong>row space</strong> respectively. They are the two sides of the same coin.</p>
+
+<div class="card card-success">
+    <h4>Quant Connection</h4>
+    <p>In a factor model, the return matrix $R$ (assets $\times$ dates) has columns representing time series of individual assets. The <strong>column space</strong> represents all portfolios that can be formed from these assets. The <strong>row space</strong> represents all linear combinations of dates — useful for understanding temporal structure.</p>
+</div>
+</div>
+<div class="section" id="section-2"><span class="tag tag-prereq">Prerequisite</span><h2>Linear Independence & Span</h2>
+<h3>2.1 Linear Independence</h3>
+<p>A set of vectors $\{v_1, v_2, \ldots, v_k\}$ is <strong>linearly independent</strong> if the only solution to:</p>
+<div class="formula-box">$c_1 v_1 + c_2 v_2 + \cdots + c_k v_k = 0$</div>
+<p>is $c_1 = c_2 = \cdots = c_k = 0$. In other words, <strong>no vector in the set can be built from the others</strong>.</p>
+
+<div class="definition">
+    <strong>Intuitive Test:</strong> If you can write one vector as a combination of the others, they are <em>dependent</em>. If every vector adds a genuinely new "direction," they are <em>independent</em>.
+</div>
+
+<p>Geometrically in $\mathbb{R}^3$:</p>
+<ul>
+    <li>Two vectors are independent if they do not lie on the same line.</li>
+    <li>Three vectors are independent if they do not all lie in the same plane.</li>
+</ul>
+
+<div class="example-box">
+    <h5>Example: Testing Independence</h5>
+    <p>Are $v_1 = [1, 2, 3]^T$, $v_2 = [2, 4, 6]^T$, $v_3 = [1, 0, 0]^T$ independent?</p>
+    <p>Notice $v_2 = 2v_1$. So $2v_1 - v_2 + 0v_3 = 0$ with non-zero coefficients. They are <strong>dependent</strong>. The set only spans a plane, not all of $\mathbb{R}^3$.</p>
+</div>
+
+<h3>2.2 Span</h3>
+<p>The <strong>span</strong> of a set of vectors is the set of <strong>all possible linear combinations</strong> of those vectors:</p>
+<div class="formula-box">$\text{Span}\{v_1, \ldots, v_k\} = \left\{ \sum_{i=1}^k c_i v_i \;:\; c_i \in \mathbb{R} \right\}$</div>
+<p>The span is always a subspace. It is the "reach" of your vectors — every point you can possibly get to by scaling and adding them.</p>
+
+<div class="card card-warm">
+    <h4>Analogy: The Paint Palette</h4>
+    <p>Imagine each vector is a primary color. The span is every color you can mix from your palette. If you only have red and yellow, you can make orange but never blue. Your span is a plane (2D) inside the full 3D color space. If you add blue, your span becomes the entire space.</p>
+</div>
+
+<h3>2.3 Basis</h3>
+<p>A <strong>basis</strong> for a subspace is a set of vectors that is:</p>
+<ol>
+    <li><strong>Linearly independent</strong> (no redundancy), and</li>
+    <li><strong>Spans the subspace</strong> (covers everything).</li>
+</ol>
+<p>The number of vectors in any basis for a subspace is called the <strong>dimension</strong> of that subspace. This number is unique — every basis has the same size.</p>
+
+<div class="theorem">
+    <strong>Key Principle:</strong> The dimension of a subspace tells you its "true" number of degrees of freedom. A plane has dimension 2, a line has dimension 1, a point has dimension 0.
+</div>
+</div>
+<div class="section" id="section-3"><span class="tag tag-prereq">Prerequisite</span><h2>Systems of Linear Equations</h2>
+<h3>3.1 The Fundamental Problem</h3>
+<p>The equation $Ax = b$ is the central problem of linear algebra. We are given a matrix $A \in \mathbb{R}^{m \times n}$ and a vector $b \in \mathbb{R}^m$, and we want to find $x \in \mathbb{R}^n$ such that the equation holds.</p>
+
+<p>There are three possible outcomes:</p>
+<table>
+    <tr><th>Case</th><th>Condition</th><th>Meaning</th></tr>
+    <tr><td><strong>No solution</strong></td><td>$b \notin C(A)$</td><td>$b$ is not reachable by $A$</td></tr>
+    <tr><td><strong>Unique solution</strong></td><td>$b \in C(A)$ and columns independent</td><td>Exactly one $x$ works</td></tr>
+    <tr><td><strong>Infinitely many</strong></td><td>$b \in C(A)$ and columns dependent</td><td>Multiple $x$ give same $b$</td></tr>
+</table>
+
+<h3>3.2 Row Reduction (RREF)</h3>
+<p><strong>Gaussian elimination</strong> transforms $A$ into <strong>Reduced Row Echelon Form (RREF)</strong> through three operations: swapping rows, scaling rows, and adding multiples of one row to another. The RREF reveals:</p>
+<ul>
+    <li><strong>Pivot columns:</strong> Columns containing leading 1s. These correspond to <strong>basic variables</strong>.</li>
+    <li><strong>Free columns:</strong> Columns without pivots. These correspond to <strong>free variables</strong>.</li>
+</ul>
+
+<div class="example-box">
+    <h5>Example: RREF</h5>
+    <p>$A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 7 \\ 3 & 6 & 10 \end{bmatrix} \xrightarrow{RREF} \begin{bmatrix} 1 & 2 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \end{bmatrix}$</p>
+    <p>Pivots in columns 1 and 3. Column 2 is free. This tells us column 2 is a combination of columns 1 and 3.</p>
+</div>
+
+<h3>3.3 Parametric Solution Form</h3>
+<p>When there are free variables, the solution to $Ax = b$ can be written as:</p>
+<div class="formula-box">$x = x_p + x_n$</div>
+<p>where $x_p$ is a <strong>particular solution</strong> to $Ax = b$, and $x_n$ is any vector in the <strong>null space</strong> of $A$ (solving $Ax = 0$). This decomposition previews the deep connection between solutions and subspaces that we will explore fully later.</p>
+
+<div class="warning">
+    <strong>Preview:</strong> The set of all solutions to $Ax = b$ is an <em>affine subspace</em> — it is a translate (shift) of the null space. If the null space is just $\{0\}$, the solution is unique. If the null space is larger, there are infinitely many solutions.
+</div>
+</div>
+<div class="section" id="section-4"><span class="tag tag-core">Core Concept</span><h2>Column Space C(A)</h2>
+<h3>4.1 Definition</h3>
+<p>The <strong>column space</strong> of a matrix $A$, denoted $C(A)$ or $\text{Im}(A)$ (the image), is the set of all possible linear combinations of the columns of $A$:</p>
+<div class="formula-box">$C(A) = \text{Span}\{a_1, a_2, \ldots, a_n\} = \left\{ Ax \;:\; x \in \mathbb{R}^n \right\} \subseteq \mathbb{R}^m$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> The column space is the "output space" of the matrix. It is every vector $b$ for which the equation $Ax = b$ has <em>at least one</em> solution. If $b$ is not in $C(A)$, then $Ax = b$ is impossible.
+</div>
+
+<h3>4.2 Geometric Intuition</h3>
+<p>Imagine $A$ as a <strong>factory</strong>. The input $x$ is a recipe specifying how much of each raw material (column) to use. The output $Ax$ is the finished product. The column space is the <strong>catalog of all products this factory can manufacture</strong>.</p>
+
+<p>If $A$ is $3 \times 3$ and its columns are linearly independent, the factory can manufacture <strong>anything in 3D space</strong>. If the third column is just a combination of the first two, the factory is limited to a <strong>plane</strong> — it can never produce a vector pointing out of that plane.</p>
+
+<div class="svg-container">
+<svg width="600" height="350" viewBox="0 0 600 350">
+    <defs><marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+    <!-- Input space -->
+    <rect x="30" y="50" width="180" height="250" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="120" y="40" text-anchor="middle" font-weight="bold" font-size="14">ℝⁿ (Recipes x)</text>
+
+    <!-- Factory -->
+    <rect x="240" y="120" width="100" height="100" fill="#fef3c7" stroke="#d97706" stroke-width="2" rx="8"/>
+    <text x="290" y="155" text-anchor="middle" font-weight="bold" font-size="13">Matrix A</text>
+    <text x="290" y="175" text-anchor="middle" font-size="11">Factory</text>
+    <text x="290" y="195" text-anchor="middle" font-size="11">Process</text>
+
+    <path d="M 215 170 L 235 170" stroke="#334155" stroke-width="3" marker-end="url(#arr2)"/>
+    <path d="M 345 170 L 365 170" stroke="#334155" stroke-width="3" marker-end="url(#arr2)"/>
+
+    <!-- Output space -->
+    <rect x="380" y="50" width="200" height="250" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="480" y="40" text-anchor="middle" font-weight="bold" font-size="14">ℝᵐ (Products b)</text>
+
+    <!-- Column space region -->
+    <ellipse cx="480" cy="170" rx="70" ry="90" fill="#bbf7d0" stroke="#16a34a" stroke-width="2" opacity="0.7"/>
+    <text x="480" y="120" text-anchor="middle" font-size="12" fill="#065f46">Column Space C(A)</text>
+    <text x="480" y="140" text-anchor="middle" font-size="11" fill="#065f46">Everything A can</text>
+    <text x="480" y="155" text-anchor="middle" font-size="11" fill="#065f46">actually produce</text>
+
+    <!-- b outside -->
+    <circle cx="550" cy="80" r="5" fill="#dc2626"/>
+    <text x="550" y="70" text-anchor="middle" font-size="11" fill="#991b1b">b ∉ C(A)</text>
+    <text x="550" y="95" text-anchor="middle" font-size="10" fill="#991b1b">Impossible!</text>
+
+    <!-- b inside -->
+    <circle cx="460" cy="200" r="5" fill="#059669"/>
+    <text x="460" y="220" text-anchor="middle" font-size="11" fill="#065f46">b ∈ C(A)</text>
+    <text x="460" y="235" text-anchor="middle" font-size="10" fill="#065f46">Feasible</text>
+</svg>
+</div>
+
+<h3>4.3 Finding a Basis for C(A)</h3>
+<p>The <strong>pivot columns</strong> of the <em>original</em> matrix $A$ form a basis for $C(A)$. This is crucial: we look at the RREF to identify <em>which</em> columns are pivot columns, but we take the corresponding columns from the <em>original</em> $A$ as the basis vectors.</p>
+
+<div class="example-box">
+    <h5>Worked Example</h5>
+    <p>Let $A = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 2 & 4 & 1 & 9 \\ 3 & 6 & 0 & 12 \end{bmatrix}$.</p>
+    <p>Step 1: Compute RREF.</p>
+    <p>$RREF(A) = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 0 \end{bmatrix}$</p>
+    <p>Step 2: Pivots in columns <strong>1 and 3</strong>.</p>
+    <p>Step 3: Basis for $C(A)$ is $\left\{ \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} \right\}$.</p>
+    <p>Step 4: $\dim(C(A)) = 2$. The column space is a 2D plane in $\mathbb{R}^3$.</p>
+    <p>Notice column 2 = $2 \times$ column 1, and column 4 = $4 \times$ column 1 + $1 \times$ column 3. They add no new directions.</p>
+</div>
+
+<h3>4.4 Dimension of C(A)</h3>
+<p>The dimension of the column space is the number of pivot columns. This number is so important that it gets its own name: the <strong>rank</strong> of $A$. We will study rank formally in Section 8, but you now know that:</p>
+<div class="formula-box">$\dim(C(A)) = \text{rank}(A) = \text{number of pivots}$</div>
+
+<div class="card card-success">
+    <h4>Quant Application Preview</h4>
+    <p>In a linear factor model $R = XF + \epsilon$, the column space of $X$ represents all returns that can be explained by the factors. If $X$ is the matrix of factor exposures, $C(X)$ is the <strong>attainable return space</strong>. Any portfolio return not in $C(X)$ is idiosyncratic (unexplained by factors).</p>
+</div>
+</div>
+<div class="section" id="section-5"><span class="tag tag-core">Core Concept</span><h2>Row Space C(Aᵀ)</h2>
+<h3>5.1 Definition</h3>
+<p>The <strong>row space</strong> of $A$, denoted $C(A^T)$, is the span of the rows of $A$. Since the rows of $A$ are the columns of $A^T$, we have:</p>
+<div class="formula-box">$C(A^T) = \text{Span}\{r_1^T, r_2^T, \ldots, r_m^T\} \subseteq \mathbb{R}^n$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> The row space lives in the <em>input space</em> $\mathbb{R}^n$. It represents all possible linear combinations of the measurement equations (rows). While the column space tells us what outputs are possible, the row space tells us what constraints or relationships exist among the input variables.
+</div>
+
+<h3>5.2 Why the Row Space Matters</h3>
+<p>Each row of $A$ represents a linear equation. The row space captures all equations that can be formed by combining these. If a row is a combination of others, it adds no new constraint — it is <strong>redundant</strong>.</p>
+
+<p>There is a deep symmetry: the row space and column space have the <strong>same dimension</strong>, even though they live in different spaces ($\mathbb{R}^n$ vs $\mathbb{R}^m$). This is one of the most remarkable facts in linear algebra, and we will prove it when we study rank.</p>
+
+<h3>5.3 Finding a Basis for C(A^T)</h3>
+<p>Unlike the column space, the basis for the row space is taken directly from the <strong>non-zero rows of the RREF</strong> of $A$. The row operations of Gaussian elimination do not change the row space (they only recombine rows within the span), so the RREF rows are a clean, orthogonally-looking basis.</p>
+
+<div class="example-box">
+    <h5>Worked Example (continued)</h5>
+    <p>For $A = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 2 & 4 & 1 & 9 \\ 3 & 6 & 0 & 12 \end{bmatrix}$, the RREF is:</p>
+    <p>$\begin{bmatrix} 1 & 2 & 0 & 4 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 0 \end{bmatrix}$</p>
+    <p>The non-zero rows are $[1, 2, 0, 4]$ and $[0, 0, 1, 1]$.</p>
+    <p>Basis for $C(A^T)$: $\{[1, 2, 0, 4]^T, [0, 0, 1, 1]^T\}$.</p>
+    <p>$\dim(C(A^T)) = 2$.</p>
+</div>
+
+<h3>5.4 Geometric Intuition</h3>
+<p>While $C(A)$ is a subspace of the output space $\mathbb{R}^m$, $C(A^T)$ is a subspace of the input space $\mathbb{R}^n$. Think of $C(A^T)$ as the "active" part of the input — the part that actually gets transformed. The rest of the input (the null space) gets destroyed.</p>
+
+<div class="svg-container">
+<svg width="600" height="280" viewBox="0 0 600 280">
+    <rect x="30" y="40" width="220" height="200" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="140" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝⁿ (Input Space)</text>
+
+    <!-- Row space -->
+    <rect x="50" y="60" width="180" height="100" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" rx="4"/>
+    <text x="140" y="85" text-anchor="middle" font-size="12" fill="#1e40af">Row Space C(Aᵀ)</text>
+    <text x="140" y="105" text-anchor="middle" font-size="11" fill="#1e40af">dim = r</text>
+    <text x="140" y="125" text-anchor="middle" font-size="11" fill="#1e40af">"Active" inputs</text>
+
+    <!-- Null space -->
+    <rect x="50" y="170" width="180" height="55" fill="#fecaca" stroke="#dc2626" stroke-width="2" rx="4"/>
+    <text x="140" y="190" text-anchor="middle" font-size="12" fill="#991b1b">Null Space N(A)</text>
+    <text x="140" y="210" text-anchor="middle" font-size="11" fill="#991b1b">dim = n−r</text>
+
+    <path d="M 260 140 L 320 140" stroke="#334155" stroke-width="3" marker-end="url(#arr2)"/>
+    <text x="290" y="130" text-anchor="middle" font-size="13" font-weight="bold">A</text>
+
+    <rect x="340" y="40" width="220" height="200" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="450" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝᵐ (Output Space)</text>
+
+    <!-- Column space -->
+    <rect x="360" y="60" width="180" height="100" fill="#bbf7d0" stroke="#059669" stroke-width="2" rx="4"/>
+    <text x="450" y="85" text-anchor="middle" font-size="12" fill="#065f46">Column Space C(A)</text>
+    <text x="450" y="105" text-anchor="middle" font-size="11" fill="#065f46">dim = r</text>
+    <text x="450" y="125" text-anchor="middle" font-size="11" fill="#065f46">"Reachable" outputs</text>
+
+    <!-- Left null space -->
+    <rect x="360" y="170" width="180" height="55" fill="#fde68a" stroke="#d97706" stroke-width="2" rx="4"/>
+    <text x="450" y="190" text-anchor="middle" font-size="12" fill="#92400e">Left Null Space N(Aᵀ)</text>
+    <text x="450" y="210" text-anchor="middle" font-size="11" fill="#92400e">dim = m−r</text>
+</svg>
+</div>
+
+<div class="card card-success">
+    <h4>Quant Connection</h4>
+    <p>In a linear regression $y = X\beta + \epsilon$, the row space of $X$ represents all linear combinations of observations that are "explained" by the model design. The orthogonal complement (null space) represents the "unexplained" degrees of freedom in the parameter space.</p>
+</div>
+</div>
+<div class="section" id="section-6"><span class="tag tag-core">Core Concept</span><h2>Null Space N(A)</h2>
+<h3>6.1 Definition</h3>
+<p>The <strong>null space</strong> (or <strong>kernel</strong>) of $A$, denoted $N(A)$ or $\ker(A)$, is the set of all inputs that get mapped to the zero vector:</p>
+<div class="formula-box">$N(A) = \left\{ x \in \mathbb{R}^n \;:\; Ax = 0 \right\} \subseteq \mathbb{R}^n$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> The null space is the "blind spot" of the matrix. These are the inputs that the matrix completely destroys. They contribute nothing to the output. In quant terms, they represent <strong>offsetting positions</strong> or <strong>arbitrage portfolios</strong> that net to zero exposure.
+</div>
+
+<h3>6.2 Geometric Intuition</h3>
+<p>Imagine shining a flashlight (matrix $A$) at a wall ($\mathbb{R}^m$). The null space is everything in the room ($\mathbb{R}^n$) that sits in the shadow — the light never reaches the wall from those points. Alternatively, think of $A$ as a <strong>net</strong>: the null space contains everything that slips through the holes.</p>
+
+<div class="svg-container">
+<svg width="600" height="320" viewBox="0 0 600 320">
+    <!-- Input -->
+    <rect x="30" y="40" width="200" height="240" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="130" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝⁿ</text>
+
+    <!-- Null space line -->
+    <line x1="80" y1="240" x2="180" y2="80" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+    <text x="130" y="70" text-anchor="middle" fill="#991b1b" font-size="13" font-weight="bold">N(A)</text>
+    <text x="130" y="255" text-anchor="middle" fill="#991b1b" font-size="11">All x with Ax = 0</text>
+
+    <!-- Some vector in null space -->
+    <circle cx="130" cy="160" r="5" fill="#dc2626"/>
+    <text x="145" y="155" fill="#991b1b" font-size="11">xₙ</text>
+
+    <!-- Arrow -->
+    <path d="M 240 160 L 300 160" stroke="#334155" stroke-width="3" marker-end="url(#arr2)"/>
+    <text x="270" y="150" text-anchor="middle" font-size="13" font-weight="bold">A</text>
+
+    <!-- Output -->
+    <rect x="320" y="40" width="200" height="240" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="420" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝᵐ</text>
+
+    <!-- Zero vector -->
+    <circle cx="420" cy="160" r="6" fill="#059669"/>
+    <text x="420" y="185" text-anchor="middle" fill="#065f46" font-size="13" font-weight="bold">0</text>
+    <text x="420" y="200" text-anchor="middle" fill="#065f46" font-size="11">Everything in N(A)</text>
+    <text x="420" y="215" text-anchor="middle" fill="#065f46" font-size="11">maps here</text>
+
+    <!-- Other vector not in null space -->
+    <circle cx="80" cy="100" r="5" fill="#2563eb"/>
+    <text x="65" y="95" fill="#1e40af" font-size="11">x₁</text>
+    <path d="M 85 105 L 315 120" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arr2)"/>
+    <circle cx="420" cy="125" r="5" fill="#2563eb"/>
+    <text x="440" y="120" fill="#1e40af" font-size="11">Ax₁ ≠ 0</text>
+</svg>
+</div>
+
+<h3>6.3 Finding the Null Space</h3>
+<p>To find $N(A)$, solve the homogeneous system $Ax = 0$:</p>
+<ol>
+    <li>Reduce $A$ to RREF.</li>
+    <li>Identify <strong>free variables</strong> (columns without pivots).</li>
+    <li>For each free variable, set it to 1 and others to 0, then solve for the pivot variables.</li>
+    <li>Each free variable generates one basis vector for $N(A)$.</li>
+</ol>
+
+<div class="example-box">
+    <h5>Detailed Example</h5>
+    <p>Find $N(A)$ for $A = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 2 & 4 & 1 & 9 \\ 3 & 6 & 0 & 12 \end{bmatrix}$.</p>
+    <p>RREF: $\begin{bmatrix} 1 & 2 & 0 & 4 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 0 \end{bmatrix}$</p>
+    <p>Pivot variables: $x_1, x_3$. Free variables: $x_2, x_4$.</p>
+    <p>Equations: $x_1 + 2x_2 + 4x_4 = 0$ and $x_3 + x_4 = 0$.</p>
+    <p>So $x_1 = -2x_2 - 4x_4$ and $x_3 = -x_4$.</p>
+    <p>Write as: $x = x_2 \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix} + x_4 \begin{bmatrix} -4 \\ 0 \\ -1 \\ 1 \end{bmatrix}$</p>
+    <p>Basis for $N(A)$: $\left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} -4 \\ 0 \\ -1 \\ 1 \end{bmatrix} \right\}$</p>
+    <p>$\dim(N(A)) = 2$. There are 2 free variables, so the null space is a 2D plane in $\mathbb{R}^4$.</p>
+</div>
+
+<h3>6.4 The Null Space and Solutions to Ax = b</h3>
+<p>If $x_p$ is any particular solution to $Ax = b$, then <strong>every</strong> solution has the form:</p>
+<div class="formula-box">$x = x_p + x_n$ where $x_n \in N(A)$</div>
+<p>This means: once you find one solution, you can add any null space vector and still have a solution. The null space measures the "non-uniqueness" of solutions.</p>
+
+<div class="card card-success">
+    <h4>Quant Application: Arbitrage & Offsetting Positions</h4>
+    <p>Suppose $A$ represents the factor exposures of $n$ assets to $m$ risk factors. A vector $x \in N(A)$ represents a portfolio with <strong>zero net exposure to all factors</strong>. In efficient markets, such portfolios should earn the risk-free rate (or zero, depending on normalization). Finding the null space is equivalent to finding <strong>arbitrage opportunities</strong> or <strong>factor-neutral hedges</strong>.</p>
+</div>
+</div>
+<div class="section" id="section-7"><span class="tag tag-core">Core Concept</span><h2>Left Null Space N(Aᵀ)</h2>
+<h3>7.1 Definition</h3>
+<p>The <strong>left null space</strong> of $A$, denoted $N(A^T)$, is the null space of the transpose:</p>
+<div class="formula-box">$N(A^T) = \left\{ y \in \mathbb{R}^m \;:\; A^T y = 0 \right\} = \left\{ y \in \mathbb{R}^m \;:\; y^T A = 0 \right\} \subseteq \mathbb{R}^m$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> The left null space contains all vectors $y$ that, when multiplied on the left of $A$, produce zero. Equivalently, $y$ gives a linear combination of the <em>rows</em> of $A$ that equals the zero row. It reveals <strong>redundancy among equations</strong> or <strong>hidden conservation laws</strong> in the system.
+</div>
+
+<h3>7.2 Why "Left"?</h3>
+<p>For the standard null space, we multiply on the right: $Ax = 0$. For the left null space, we multiply on the left: $y^T A = 0$ (or $A^T y = 0$). It is the natural dual to the null space, but operating on the output side.</p>
+
+<h3>7.3 Geometric Intuition</h3>
+<p>Think of the rows of $A$ as constraints on the input variables. The left null space contains the "constraint redundancies." If $y \in N(A^T)$, then taking the linear combination of equations weighted by $y$ gives $0 = 0$ — a trivial identity. This means one equation was unnecessary; it carried no new information.</p>
+
+<div class="svg-container">
+<svg width="600" height="300" viewBox="0 0 600 300">
+    <rect x="30" y="40" width="220" height="220" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="140" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝᵐ (Output/Equation Space)</text>
+
+    <!-- Left null space -->
+    <rect x="50" y="60" width="180" height="80" fill="#fde68a" stroke="#d97706" stroke-width="2" rx="4"/>
+    <text x="140" y="85" text-anchor="middle" font-size="12" fill="#92400e">Left Null Space N(Aᵀ)</text>
+    <text x="140" y="105" text-anchor="middle" font-size="11" fill="#92400e">dim = m − r</text>
+    <text x="140" y="125" text-anchor="middle" font-size="11" fill="#92400e">Redundant equations</text>
+
+    <!-- Column space -->
+    <rect x="50" y="155" width="180" height="90" fill="#bbf7d0" stroke="#059669" stroke-width="2" rx="4"/>
+    <text x="140" y="180" text-anchor="middle" font-size="12" fill="#065f46">Column Space C(A)</text>
+    <text x="140" y="200" text-anchor="middle" font-size="11" fill="#065f46">dim = r</text>
+    <text x="140" y="220" text-anchor="middle" font-size="11" fill="#065f46">Independent equations</text>
+
+    <path d="M 260 150 L 320 150" stroke="#334155" stroke-width="3" marker-end="url(#arr2)"/>
+    <text x="290" y="140" text-anchor="middle" font-size="13" font-weight="bold">Aᵀ</text>
+
+    <rect x="340" y="40" width="220" height="220" fill="#fef3c7" stroke="#d97706" stroke-width="2" rx="8"/>
+    <text x="450" y="30" text-anchor="middle" font-weight="bold" font-size="14">ℝⁿ</text>
+    <text x="450" y="60" text-anchor="middle" font-size="12">Aᵀy = 0 means</text>
+    <text x="450" y="80" text-anchor="middle" font-size="12">y is orthogonal</text>
+    <text x="450" y="100" text-anchor="middle" font-size="12">to every column of A</text>
+
+    <circle cx="450" cy="150" r="5" fill="#d97706"/>
+    <text x="450" y="170" text-anchor="middle" font-size="11" fill="#92400e">y ∈ N(Aᵀ)</text>
+</svg>
+</div>
+
+<h3>7.4 Finding the Left Null Space</h3>
+<p>To find $N(A^T)$, solve $A^T y = 0$. Equivalently, row-reduce $A^T$ and find the special solutions. The number of free variables in $A^T$ is $m - r$, so:</p>
+<div class="formula-box">$\dim(N(A^T)) = m - \text{rank}(A)$</div>
+
+<div class="example-box">
+    <h5>Worked Example</h5>
+    <p>For $A = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 2 & 4 & 1 & 9 \\ 3 & 6 & 0 & 12 \end{bmatrix}$, we have $A^T = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \\ 0 & 1 & 0 \\ 4 & 9 & 12 \end{bmatrix}$.</p>
+    <p>RREF of $A^T$: $\begin{bmatrix} 1 & 0 & 3 \\ 0 & 1 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{bmatrix}$</p>
+    <p>Pivots in columns 1 and 2. Free variable: $y_3$.</p>
+    <p>Equations: $y_1 + 3y_3 = 0$, $y_2 = 0$. So $y_1 = -3y_3$, $y_2 = 0$.</p>
+    <p>Basis for $N(A^T)$: $\left\{ \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix} \right\}$</p>
+    <p>$\dim(N(A^T)) = 1 = 3 - 2$. Check: $[-3, 0, 1] \cdot A = [-3(1)+0(2)+1(3), \ldots] = [0, 0, 0, 0]$. ✓</p>
+</div>
+
+<div class="card card-success">
+    <h4>Quant Application: No-Arbitrage & Feasibility</h4>
+    <p>The left null space is critical for checking whether a system of constraints is feasible. If $y \in N(A^T)$ and $y^T b \neq 0$, then $Ax = b$ has <strong>no solution</strong> — the constraints are contradictory. In pricing theory, this connects to <strong>Farkas' Lemma</strong>: either a portfolio exists with certain payoffs, or there is an arbitrage pricing vector in the left null space.</p>
+</div>
+</div>
+<div class="section" id="section-8"><span class="tag tag-core">Core Concept</span><h2>Rank</h2>
+<h3>8.1 Definition</h3>
+<p>The <strong>rank</strong> of a matrix $A$, denoted $\text{rank}(A)$, is the dimension of its column space:</p>
+<div class="formula-box">$\text{rank}(A) = \dim(C(A)) = \text{number of pivot columns in RREF}$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> Rank is the "true" number of independent directions the matrix can produce. It measures how much information the matrix preserves. A rank of $r$ means the matrix squashes $n$-dimensional space down to an $r$-dimensional subspace of the output.
+</div>
+
+<h3>8.2 The Fundamental Fact: Column Rank = Row Rank</h3>
+<div class="theorem">
+    <strong>Theorem:</strong> For any matrix $A$, the dimension of the column space equals the dimension of the row space:
+    <div class="formula-box">$\dim(C(A)) = \dim(C(A^T)) = \text{rank}(A)$</div>
+</div>
+
+<p><strong>Why is this true?</strong> Every row operation preserves the row space, and the number of non-zero rows in RREF equals the number of pivot columns. The pivots mark both independent rows and independent columns. This symmetry is deep and not obvious from the definition alone.</p>
+
+<h3>8.3 Full Rank vs. Rank Deficiency</h3>
+<table>
+    <tr><th>Type</th><th>Condition</th><th>Meaning</th></tr>
+    <tr><td><strong>Full column rank</strong></td><td>$\text{rank}(A) = n$</td><td>All columns independent; null space = $\{0\}$; $Ax=b$ has at most one solution</td></tr>
+    <tr><td><strong>Full row rank</strong></td><td>$\text{rank}(A) = m$</td><td>All rows independent; left null space = $\{0\}$; $Ax=b$ has at least one solution for every $b$</td></tr>
+    <tr><td><strong>Full rank</strong></td><td>$\text{rank}(A) = \min(m,n)$</td><td>Maximum possible rank; matrix is "as large as it can be"</td></tr>
+    <tr><td><strong>Rank deficient</strong></td><td>$\text{rank}(A) < \min(m,n)$</td><td>Some redundancy; information is lost in transformation</td></tr>
+</table>
+
+<div class="svg-container">
+<svg width="650" height="400" viewBox="0 0 650 400">
+    <text x="325" y="25" text-anchor="middle" font-weight="bold" font-size="16">Rank as Dimension Preservation</text>
+
+    <!-- Full rank 3x3 -->
+    <rect x="30" y="50" width="180" height="150" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="120" y="70" text-anchor="middle" font-weight="bold" font-size="13" fill="#065f46">Full Rank (3×3)</text>
+    <text x="120" y="95" text-anchor="middle" font-size="11">rank = 3</text>
+    <text x="120" y="115" text-anchor="middle" font-size="11">Cube → Cube</text>
+    <text x="120" y="135" text-anchor="middle" font-size="11">Volume preserved</text>
+    <text x="120" y="155" text-anchor="middle" font-size="11">det ≠ 0, invertible</text>
+    <polygon points="80,170 100,120 160,120 140,170" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>
+
+    <!-- Rank 2 -->
+    <rect x="235" y="50" width="180" height="150" fill="#fff7ed" stroke="#d97706" stroke-width="2" rx="8"/>
+    <text x="325" y="70" text-anchor="middle" font-weight="bold" font-size="13" fill="#92400e">Rank 2 (3×3)</text>
+    <text x="325" y="95" text-anchor="middle" font-size="11">rank = 2</text>
+    <text x="325" y="115" text-anchor="middle" font-size="11">Cube → Flattened</text>
+    <text x="325" y="135" text-anchor="middle" font-size="11">Volume collapsed</text>
+    <text x="325" y="155" text-anchor="middle" font-size="11">det = 0, not invertible</text>
+    <polygon points="285,170 305,120 365,120 345,170" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+    <text x="325" y="150" text-anchor="middle" font-size="10" fill="#92400e">2D plane</text>
+
+    <!-- Rank 1 -->
+    <rect x="440" y="50" width="180" height="150" fill="#fef2f2" stroke="#dc2626" stroke-width="2" rx="8"/>
+    <text x="530" y="70" text-anchor="middle" font-weight="bold" font-size="13" fill="#991b1b">Rank 1 (3×3)</text>
+    <text x="530" y="95" text-anchor="middle" font-size="11">rank = 1</text>
+    <text x="530" y="115" text-anchor="middle" font-size="11">Cube → Line</text>
+    <text x="530" y="135" text-anchor="middle" font-size="11">All info lost except</text>
+    <text x="530" y="155" text-anchor="middle" font-size="11">one direction</text>
+    <line x1="490" y1="170" x2="570" y2="120" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Tall matrix -->
+    <rect x="30" y="220" width="280" height="160" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="170" y="245" text-anchor="middle" font-weight="bold" font-size="13" fill="#1e40af">Tall Matrix (m > n)</text>
+    <text x="170" y="270" text-anchor="middle" font-size="11">Example: 5 days × 3 assets</text>
+    <text x="170" y="295" text-anchor="middle" font-size="11">max rank = 3 (number of columns)</text>
+    <text x="170" y="320" text-anchor="middle" font-size="11">Always rank deficient if m > n</text>
+    <text x="170" y="345" text-anchor="middle" font-size="11">but can have full column rank</text>
+
+    <!-- Wide matrix -->
+    <rect x="340" y="220" width="280" height="160" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2" rx="8"/>
+    <text x="480" y="245" text-anchor="middle" font-weight="bold" font-size="13" fill="#5b21b6">Wide Matrix (n > m)</text>
+    <text x="480" y="270" text-anchor="middle" font-size="11">Example: 3 days × 5 assets</text>
+    <text x="480" y="295" text-anchor="middle" font-size="11">max rank = 3 (number of rows)</text>
+    <text x="480" y="320" text-anchor="middle" font-size="11">Always rank deficient if n > m</text>
+    <text x="480" y="345" text-anchor="middle" font-size="11">but can have full row rank</text>
+</svg>
+</div>
+
+<h3>8.4 Computing Rank</h3>
+<p>Practical methods:</p>
+<ol>
+    <li><strong>RREF:</strong> Count pivots. Best for small, exact matrices.</li>
+    <li><strong>SVD:</strong> Count non-zero singular values. Best for numerical computation and near-rank-deficiency.</li>
+    <li><strong>Determinant (square only):</strong> If $\det(A) \neq 0$, rank = $n$. If $\det(A) = 0$, rank < $n$.</li>
+</ol>
+
+<div class="card card-success">
+    <h4>Quant Application: Effective Number of Factors</h4>
+    <p>In principal component analysis (PCA) of a covariance matrix $\Sigma$, the rank of the return matrix $R$ tells you the <strong>effective number of independent risk factors</strong> driving your universe. If you have 500 stocks but $\text{rank}(R) = 12$, then 12 factors explain virtually all systematic movement. The remaining 488 dimensions are idiosyncratic noise or near-collinear redundancies.</p>
+</div>
+</div>
+<div class="section" id="section-9"><span class="tag tag-core">Core Concept</span><h2>Nullity</h2>
+<h3>9.1 Definition</h3>
+<p>The <strong>nullity</strong> of a matrix $A$, denoted $\text{nullity}(A)$, is the dimension of its null space:</p>
+<div class="formula-box">$\text{nullity}(A) = \dim(N(A)) = \text{number of free variables}$</div>
+
+<div class="definition">
+    <strong>Plain English:</strong> Nullity counts how many "useless" degrees of freedom exist in the input. These are directions you can move in the input space without changing the output at all. High nullity means many inputs map to the same output — the system is "underdetermined."
+</div>
+
+<h3>9.2 Nullity and Free Variables</h3>
+<p>When solving $Ax = 0$ via RREF, each <strong>free variable</strong> introduces one parameter into the solution. That parameter traces out a line in the null space. With $k$ free variables, the null space is $k$-dimensional. Thus:</p>
+<div class="formula-box">$\text{nullity}(A) = n - \text{number of pivots} = n - \text{rank}(A)$</div>
+
+<p>This equation is the seed of the Rank-Nullity Theorem, which we formalize next.</p>
+
+<h3>9.3 Geometric Intuition</h3>
+<p>If rank is the "information preserved," nullity is the "information destroyed." Together they account for all input dimensions:</p>
+<div class="formula-box">$\text{(preserved)} + \text{(destroyed)} = \text{(total input dimensions)}$</div>
+
+<div class="svg-container">
+<svg width="600" height="250" viewBox="0 0 600 250">
+    <rect x="30" y="40" width="540" height="180" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="8"/>
+    <text x="300" y="30" text-anchor="middle" font-weight="bold" font-size="15">Input Space ℝⁿ = Row Space ⊕ Null Space</text>
+
+    <!-- Row space portion -->
+    <rect x="50" y="60" width="300" height="140" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" rx="4"/>
+    <text x="200" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e40af">Row Space C(Aᵀ)</text>
+    <text x="200" y="115" text-anchor="middle" font-size="12" fill="#1e40af">Dimension = rank(A) = r</text>
+    <text x="200" y="140" text-anchor="middle" font-size="12" fill="#1e40af">This part gets transformed</text>
+    <text x="200" y="165" text-anchor="middle" font-size="12" fill="#1e40af">non-trivially by A</text>
+
+    <!-- Null space portion -->
+    <rect x="370" y="60" width="180" height="140" fill="#fecaca" stroke="#dc2626" stroke-width="2" rx="4"/>
+    <text x="460" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#991b1b">Null Space N(A)</text>
+    <text x="460" y="115" text-anchor="middle" font-size="12" fill="#991b1b">Dimension = nullity(A)</text>
+    <text x="460" y="140" text-anchor="middle" font-size="12" fill="#991b1b">This part gets</text>
+    <text x="460" y="165" text-anchor="middle" font-size="12" fill="#991b1b">mapped to zero</text>
+
+    <!-- Plus sign -->
+    <text x="355" y="135" text-anchor="middle" font-size="24" font-weight="bold" fill="#334155">⊕</text>
+
+    <!-- Bracket -->
+    <path d="M 20 60 Q 10 130 20 200" stroke="#334155" stroke-width="2" fill="none"/>
+    <path d="M 580 60 Q 590 130 580 200" stroke="#334155" stroke-width="2" fill="none"/>
+    <text x="300" y="225" text-anchor="middle" font-size="13" font-weight="bold" fill="#334155">Total: n = rank(A) + nullity(A)</text>
+</svg>
+</div>
+
+<h3>9.4 Nullity and Solution Uniqueness</h3>
+<table>
+    <tr><th>Nullity</th><th>Meaning for Ax = b</th></tr>
+    <tr><td>$\text{nullity}(A) = 0$</td><td>Unique solution if it exists. $N(A) = \{0\}$.</td></tr>
+    <tr><td>$\text{nullity}(A) = 1$</td><td>Solutions form a line: $x_p + t \cdot v$.</td></tr>
+    <tr><td>$\text{nullity}(A) = k$</td><td>Solutions form a $k$-dimensional affine subspace.</td></tr>
+</table>
+
+<div class="card card-success">
+    <h4>Quant Application: Degrees of Freedom in Underdetermined Systems</h4>
+    <p>In portfolio optimization with fewer constraints than assets ($m < n$), the constraint matrix $A$ has nullity $n - m > 0$. This means there are infinitely many portfolios satisfying the constraints. The null space vectors represent <strong>zero-cost, zero-risk adjustments</strong> you can make to a feasible portfolio without violating constraints. Quant strategies like <strong>130/30 extensions</strong> or <strong>market-neutral overlays</strong> exploit this null space structure.</p>
+</div>
+</div>
+<div class="section" id="section-10"><span class="tag tag-core">Core Theorem</span><h2>The Rank-Nullity Theorem</h2>
+<h3>10.1 Statement of the Theorem</h3>
+<div class="theorem">
+    <strong>Rank-Nullity Theorem:</strong> For any matrix $A \in \mathbb{R}^{m \times n}$ with rank $r$:
+    <div class="formula-box">$\text{rank}(A) + \text{nullity}(A) = n$</div>
+    Equivalently: $\dim(C(A)) + \dim(N(A)) = n$.
+</div>
+
+<p>This is a <strong>conservation law</strong> for dimensions. Every input dimension either contributes to the output (rank) or is annihilated (nullity). There is no third option.</p>
+
+<h3>10.2 Proof Intuition (The Splitting of ℝⁿ)</h3>
+<p>Consider the linear transformation $T(x) = Ax$. The domain $\mathbb{R}^n$ can be decomposed into two orthogonal parts:</p>
+<ol>
+    <li>The <strong>row space</strong> $C(A^T)$, which maps <strong>isomorphically</strong> (one-to-one and onto) onto the column space $C(A)$.</li>
+    <li>The <strong>null space</strong> $N(A)$, which maps entirely to $0$.</li>
+</ol>
+
+<p>Every vector $x \in \mathbb{R}^n$ can be uniquely written as $x = x_r + x_n$ where $x_r \in C(A^T)$ and $x_n \in N(A)$. The map from $C(A^T)$ to $C(A)$ preserves dimension, so $\dim(C(A^T)) = \dim(C(A)) = r$. Since $\dim(C(A^T)) + \dim(N(A)) = n$, we get $r + \text{nullity}(A) = n$.</p>
+
+<div class="svg-container">
+<svg width="700" height="420" viewBox="0 0 700 420">
+    <defs><marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+    <text x="350" y="25" text-anchor="middle" font-weight="bold" font-size="16">The Rank-Nullity Theorem: Conservation of Dimension</text>
+
+    <!-- Domain -->
+    <rect x="30" y="50" width="250" height="340" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="155" y="45" text-anchor="middle" font-weight="bold" font-size="14">Domain: ℝⁿ</text>
+
+    <!-- Row space -->
+    <rect x="50" y="70" width="210" height="160" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" rx="4"/>
+    <text x="155" y="95" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e40af">Row Space C(Aᵀ)</text>
+    <text x="155" y="115" text-anchor="middle" font-size="12" fill="#1e40af">dim = r</text>
+    <text x="155" y="140" text-anchor="middle" font-size="11" fill="#1e40af">Maps 1-to-1 onto</text>
+    <text x="155" y="158" text-anchor="middle" font-size="11" fill="#1e40af">Column Space</text>
+    <text x="155" y="176" text-anchor="middle" font-size="11" fill="#1e40af">(Isomorphism)</text>
+
+    <!-- Null space -->
+    <rect x="50" y="250" width="210" height="120" fill="#fecaca" stroke="#dc2626" stroke-width="2" rx="4"/>
+    <text x="155" y="275" text-anchor="middle" font-size="13" font-weight="bold" fill="#991b1b">Null Space N(A)</text>
+    <text x="155" y="295" text-anchor="middle" font-size="12" fill="#991b1b">dim = n − r</text>
+    <text x="155" y="320" text-anchor="middle" font-size="11" fill="#991b1b">Maps entirely</text>
+    <text x="155" y="338" text-anchor="middle" font-size="11" fill="#991b1b">to zero</text>
+
+    <!-- Arrow to codomain -->
+    <path d="M 290 150 L 370 150" stroke="#334155" stroke-width="3" marker-end="url(#arr3)"/>
+    <text x="330" y="140" text-anchor="middle" font-size="13" font-weight="bold">A</text>
+    <text x="330" y="170" text-anchor="middle" font-size="11" fill="#64748b">rank = r</text>
+
+    <path d="M 290 310 L 370 310" stroke="#334155" stroke-width="3" stroke-dasharray="6,4"/>
+    <text x="330" y="300" text-anchor="middle" font-size="11" fill="#991b1b">nullity = n−r</text>
+    <text x="330" y="330" text-anchor="middle" font-size="11" fill="#991b1b">→ 0</text>
+
+    <!-- Codomain -->
+    <rect x="390" y="50" width="280" height="340" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="530" y="45" text-anchor="middle" font-weight="bold" font-size="14">Codomain: ℝᵐ</text>
+
+    <!-- Column space -->
+    <rect x="410" y="70" width="240" height="160" fill="#bbf7d0" stroke="#059669" stroke-width="2" rx="4"/>
+    <text x="530" y="95" text-anchor="middle" font-size="13" font-weight="bold" fill="#065f46">Column Space C(A)</text>
+    <text x="530" y="115" text-anchor="middle" font-size="12" fill="#065f46">dim = r</text>
+    <text x="530" y="140" text-anchor="middle" font-size="11" fill="#065f46">The "image" of A</text>
+    <text x="530" y="158" text-anchor="middle" font-size="11" fill="#065f46">All reachable outputs</text>
+
+    <!-- Left null space -->
+    <rect x="410" y="250" width="240" height="120" fill="#fde68a" stroke="#d97706" stroke-width="2" rx="4"/>
+    <text x="530" y="275" text-anchor="middle" font-size="13" font-weight="bold" fill="#92400e">Left Null Space N(Aᵀ)</text>
+    <text x="530" y="295" text-anchor="middle" font-size="12" fill="#92400e">dim = m − r</text>
+    <text x="530" y="320" text-anchor="middle" font-size="11" fill="#92400e">Orthogonal to C(A)</text>
+    <text x="530" y="338" text-anchor="middle" font-size="11" fill="#92400e">Unreachable outputs</text>
+
+    <!-- Equations -->
+    <text x="155" y="385" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">r + (n−r) = n ✓</text>
+    <text x="530" y="385" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">r + (m−r) = m ✓</text>
+</svg>
+</div>
+
+<h3>10.3 Examples</h3>
+<div class="example-box">
+    <h5>Example 1: Wide Matrix</h5>
+    <p>$A = \begin{bmatrix} 1 & 2 & 3 & 4 \\ 2 & 4 & 6 & 8 \end{bmatrix}$ ($2 \times 4$)</p>
+    <p>RREF: $\begin{bmatrix} 1 & 2 & 3 & 4 \\ 0 & 0 & 0 & 0 \end{bmatrix}$. Rank = 1.</p>
+    <p>Nullity = $4 - 1 = 3$. Indeed, there are 3 free variables.</p>
+    <p>Left nullity = $2 - 1 = 1$.</p>
+</div>
+
+<div class="example-box">
+    <h5>Example 2: Tall Matrix</h5>
+    <p>$A = \begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 1 \\ 2 & 3 \end{bmatrix}$ ($4 \times 2$)</p>
+    <p>RREF: $\begin{bmatrix} 1 & 0 \\ 0 & 1 \\ 0 & 0 \\ 0 & 0 \end{bmatrix}$. Rank = 2 (full column rank).</p>
+    <p>Nullity = $2 - 2 = 0$. Only $x = 0$ solves $Ax = 0$.</p>
+    <p>Left nullity = $4 - 2 = 2$.</p>
+</div>
+
+<div class="example-box">
+    <h5>Example 3: Square Invertible</h5>
+    <p>$A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$. $\det(A) = -2 \neq 0$.</p>
+    <p>Rank = 2, Nullity = $2 - 2 = 0$. The matrix preserves all information.</p>
+</div>
+
+<h3>10.4 Implications</h3>
+<ul>
+    <li><strong>For square matrices:</strong> $\text{rank}(A) = n \iff \text{nullity}(A) = 0 \iff A$ is invertible.</li>
+    <li><strong>For wide matrices ($n > m$):</strong> Nullity $\geq n - m > 0$. There is always a non-trivial null space.</li>
+    <li><strong>For tall matrices ($m > n$):</strong> Left nullity $\geq m - n > 0$. There are always redundant equations.</li>
+</ul>
+
+<div class="card card-success">
+    <h4>Quant Application: The Bias-Variance Tradeoff</h4>
+    <p>In overparameterized models ($n > m$, more parameters than observations), the rank-nullity theorem guarantees $\text{nullity}(X) > 0$. This means infinitely many parameter vectors perfectly fit the training data. The "minimum norm" solution (used in ridgeless regression) selects the one with smallest Euclidean norm, which lies in the row space. The null space represents the "interpolation ambiguity" — different models with identical training performance but wildly different out-of-sample behavior.</p>
+</div>
+</div>
+<div class="section" id="section-11"><span class="tag tag-core">Core Theorem</span><h2>The Four Fundamental Subspaces</h2>
+<h3>11.1 The Grand Picture</h3>
+<p>Every matrix $A \in \mathbb{R}^{m \times n}$ with rank $r$ defines four fundamental subspaces that completely characterize its behavior:</p>
+
+<table>
+    <tr><th>Subspace</th><th>Symbol</th><th>Contained In</th><th>Dimension</th><th>Basis From</th></tr>
+    <tr><td><strong>Column Space</strong></td><td>$C(A)$</td><td>$\mathbb{R}^m$</td><td>$r$</td><td>Pivot columns of $A$</td></tr>
+    <tr><td><strong>Null Space</strong></td><td>$N(A)$</td><td>$\mathbb{R}^n$</td><td>$n - r$</td><td>Special solutions to $Ax=0$</td></tr>
+    <tr><td><strong>Row Space</strong></td><td>$C(A^T)$</td><td>$\mathbb{R}^n$</td><td>$r$</td><td>Non-zero rows of RREF($A$)</td></tr>
+    <tr><td><strong>Left Null Space</strong></td><td>$N(A^T)$</td><td>$\mathbb{R}^m$</td><td>$m - r$</td><td>Special solutions to $A^T y = 0$</td></tr>
+</table>
+
+<h3>11.2 The Fundamental Theorem of Linear Algebra</h3>
+<p>These four subspaces are not arbitrary. They are linked by deep <strong>orthogonality</strong> relationships:</p>
+
+<div class="theorem">
+    <strong>Part 1 (Dimensions):</strong>
+    <ul>
+        <li>$\dim(C(A)) = \dim(C(A^T)) = r$</li>
+        <li>$\dim(N(A)) = n - r$</li>
+        <li>$\dim(N(A^T)) = m - r$</li>
+    </ul>
+    <strong>Part 2 (Orthogonality):</strong>
+    <ul>
+        <li>$N(A) \perp C(A^T)$ — the null space is orthogonal to the row space</li>
+        <li>$N(A^T) \perp C(A)$ — the left null space is orthogonal to the column space</li>
+    </ul>
+    <strong>Part 3 (Direct Sum):</strong>
+    <ul>
+        <li>$\mathbb{R}^n = C(A^T) \oplus N(A)$</li>
+        <li>$\mathbb{R}^m = C(A) \oplus N(A^T)$</li>
+    </ul>
+</div>
+
+<div class="svg-container">
+<svg width="720" height="480" viewBox="0 0 720 480">
+    <defs><marker id="arr4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+    <text x="360" y="25" text-anchor="middle" font-weight="bold" font-size="17">The Four Fundamental Subspaces</text>
+
+    <!-- R^n box -->
+    <rect x="30" y="50" width="280" height="400" fill="#eff6ff" stroke="#2563eb" stroke-width="3" rx="12"/>
+    <text x="170" y="45" text-anchor="middle" font-weight="bold" font-size="16" fill="#1e40af">ℝⁿ</text>
+
+    <!-- Row space -->
+    <rect x="50" y="70" width="240" height="180" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" rx="8"/>
+    <text x="170" y="95" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e40af">Row Space C(Aᵀ)</text>
+    <text x="170" y="115" text-anchor="middle" font-size="12" fill="#1e40af">dim = r</text>
+    <text x="170" y="140" text-anchor="middle" font-size="11" fill="#1e40af">Orthogonal complement</text>
+    <text x="170" y="158" text-anchor="middle" font-size="11" fill="#1e40af">of N(A)</text>
+    <text x="170" y="185" text-anchor="middle" font-size="11" fill="#1e40af">Basis: non-zero rows</text>
+    <text x="170" y="203" text-anchor="middle" font-size="11" fill="#1e40af">of RREF(A)</text>
+
+    <!-- Null space -->
+    <rect x="50" y="270" width="240" height="160" fill="#fecaca" stroke="#dc2626" stroke-width="2" rx="8"/>
+    <text x="170" y="295" text-anchor="middle" font-size="14" font-weight="bold" fill="#991b1b">Null Space N(A)</text>
+    <text x="170" y="315" text-anchor="middle" font-size="12" fill="#991b1b">dim = n − r</text>
+    <text x="170" y="340" text-anchor="middle" font-size="11" fill="#991b1b">Orthogonal complement</text>
+    <text x="170" y="358" text-anchor="middle" font-size="11" fill="#991b1b">of C(Aᵀ)</text>
+    <text x="170" y="385" text-anchor="middle" font-size="11" fill="#991b1b">Basis: special solutions</text>
+    <text x="170" y="403" text-anchor="middle" font-size="11" fill="#991b1b">to Ax = 0</text>
+
+    <!-- Perpendicular symbol -->
+    <text x="170" y="258" text-anchor="middle" font-size="20" fill="#64748b">⊥</text>
+
+    <!-- Arrow A -->
+    <path d="M 320 200 L 380 200" stroke="#334155" stroke-width="4" marker-end="url(#arr4)"/>
+    <text x="350" y="190" text-anchor="middle" font-size="16" font-weight="bold">A</text>
+    <text x="350" y="220" text-anchor="middle" font-size="11" fill="#64748b">rank = r</text>
+
+    <!-- R^m box -->
+    <rect x="400" y="50" width="280" height="400" fill="#f0fdf4" stroke="#059669" stroke-width="3" rx="12"/>
+    <text x="540" y="45" text-anchor="middle" font-weight="bold" font-size="16" fill="#065f46">ℝᵐ</text>
+
+    <!-- Column space -->
+    <rect x="420" y="70" width="240" height="180" fill="#bbf7d0" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="540" y="95" text-anchor="middle" font-size="14" font-weight="bold" fill="#065f46">Column Space C(A)</text>
+    <text x="540" y="115" text-anchor="middle" font-size="12" fill="#065f46">dim = r</text>
+    <text x="540" y="140" text-anchor="middle" font-size="11" fill="#065f46">Orthogonal complement</text>
+    <text x="540" y="158" text-anchor="middle" font-size="11" fill="#065f46">of N(Aᵀ)</text>
+    <text x="540" y="185" text-anchor="middle" font-size="11" fill="#065f46">Basis: pivot columns</text>
+    <text x="540" y="203" text-anchor="middle" font-size="11" fill="#065f46">of original A</text>
+
+    <!-- Left null space -->
+    <rect x="420" y="270" width="240" height="160" fill="#fde68a" stroke="#d97706" stroke-width="2" rx="8"/>
+    <text x="540" y="295" text-anchor="middle" font-size="14" font-weight="bold" fill="#92400e">Left Null Space N(Aᵀ)</text>
+    <text x="540" y="315" text-anchor="middle" font-size="12" fill="#92400e">dim = m − r</text>
+    <text x="540" y="340" text-anchor="middle" font-size="11" fill="#92400e">Orthogonal complement</text>
+    <text x="540" y="358" text-anchor="middle" font-size="11" fill="#92400e">of C(A)</text>
+    <text x="540" y="385" text-anchor="middle" font-size="11" fill="#92400e">Basis: special solutions</text>
+    <text x="540" y="403" text-anchor="middle" font-size="11" fill="#92400e">to Aᵀy = 0</text>
+
+    <!-- Perpendicular symbol -->
+    <text x="540" y="258" text-anchor="middle" font-size="20" fill="#64748b">⊥</text>
+
+    <!-- SVD annotation -->
+    <text x="360" y="460" text-anchor="middle" font-size="12" fill="#64748b" font-style="italic">SVD: U gives bases for ℝᵐ; V gives bases for ℝⁿ; Σ gives the scaling between them</text>
+</svg>
+</div>
+
+<h3>11.3 The SVD Connection</h3>
+<p>The <strong>Singular Value Decomposition (SVD)</strong> $A = U\Sigma V^T$ makes the four subspaces explicit:</p>
+<ul>
+    <li>$C(A) = \text{Span}\{u_1, \ldots, u_r\}$ (first $r$ columns of $U$)</li>
+    <li>$N(A^T) = \text{Span}\{u_{r+1}, \ldots, u_m\}$ (last $m-r$ columns of $U$)</li>
+    <li>$C(A^T) = \text{Span}\{v_1, \ldots, v_r\}$ (first $r$ columns of $V$)</li>
+    <li>$N(A) = \text{Span}\{v_{r+1}, \ldots, v_n\}$ (last $n-r$ columns of $V$)</li>
+</ul>
+<p>The SVD provides <strong>orthonormal bases</strong> for all four subspaces simultaneously. This is why it is the "gold standard" for numerical linear algebra.</p>
+
+<h3>11.4 Complete Worked Example</h3>
+<div class="example-box">
+    <h5>Finding All Four Subspaces</h5>
+    <p>Let $A = \begin{bmatrix} 1 & 2 & 0 & 4 \\ 2 & 4 & 1 & 9 \\ 3 & 6 & 0 & 12 \end{bmatrix}$ ($3 \times 4$, rank $r = 2$).</p>
+
+    <p><strong>1. Column Space C(A) ⊆ ℝ³:</strong></p>
+    <p>Basis: $\left\{ \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}, \begin{bmatrix} 0 \\ 1 \\ 0 \end{bmatrix} \right\}$, dim = 2.</p>
+
+    <p><strong>2. Null Space N(A) ⊆ ℝ⁴:</strong></p>
+    <p>Basis: $\left\{ \begin{bmatrix} -2 \\ 1 \\ 0 \\ 0 \end{bmatrix}, \begin{bmatrix} -4 \\ 0 \\ -1 \\ 1 \end{bmatrix} \right\}$, dim = 2 = 4 − 2.</p>
+
+    <p><strong>3. Row Space C(A^T) ⊆ ℝ⁴:</strong></p>
+    <p>Basis: $\{[1, 2, 0, 4]^T, [0, 0, 1, 1]^T\}$, dim = 2.</p>
+    <p>Check orthogonality: $[1,2,0,4] \cdot [-2,1,0,0] = -2+2 = 0$ ✓</p>
+
+    <p><strong>4. Left Null Space N(A^T) ⊆ ℝ³:</strong></p>
+    <p>Basis: $\left\{ \begin{bmatrix} -3 \\ 0 \\ 1 \end{bmatrix} \right\}$, dim = 1 = 3 − 2.</p>
+    <p>Check orthogonality: $[-3, 0, 1] \cdot [1, 2, 3] = -3 + 0 + 3 = 0$ ✓</p>
+    <p>Check: $[-3, 0, 1] \cdot [0, 1, 0] = 0$ ✓</p>
+</div>
+
+<div class="card card-success">
+    <h4>Quant Application: The Geometry of Regression</h4>
+    <p>In OLS regression, the response vector $y$ is decomposed into:</p>
+    <div class="formula-box">$y = \hat{y} + \epsilon = P_{C(X)} y + P_{N(X^T)} y$</div>
+    <p>where $\hat{y} \in C(X)$ is the predicted values (projection onto column space) and $\epsilon \in N(X^T)$ is the residual (projection onto left null space). The orthogonality $C(X) \perp N(X^T)$ is exactly why residuals are orthogonal to predictions. This is the geometric foundation of least squares.</p>
+</div>
+</div>
+<div class="section" id="section-12"><span class="tag tag-quant">Quant</span><h2>Quant Application: Multicollinearity Diagnostics</h2>
+<h3>12.1 What is Multicollinearity?</h3>
+<p>In linear regression $y = X\beta + \epsilon$, <strong>multicollinearity</strong> occurs when the columns of the design matrix $X$ are linearly dependent or nearly so. This means $X$ is <strong>rank deficient</strong> or <strong>ill-conditioned</strong>.</p>
+
+<div class="definition">
+    <strong>Exact multicollinearity:</strong> $\text{rank}(X) < p$ (where $p$ = number of predictors). Then $X^T X$ is singular and the OLS estimator $\hat{\beta} = (X^T X)^{-1} X^T y$ <em>does not exist</em>.
+</div>
+
+<div class="definition">
+    <strong>Near multicollinearity:</strong> $\text{rank}(X) = p$ but some singular values of $X$ are very small. Then $X^T X$ is invertible but <em>numerically unstable</em>. Small changes in $y$ cause huge changes in $\hat{\beta}$.
+</div>
+
+<h3>12.2 The Geometry of Multicollinearity</h3>
+<p>When two predictors are highly correlated, their column vectors in $X$ point in nearly the same direction. The column space is "squashed" — it is technically 2D but almost 1D. The matrix $X^T X$ has one very large eigenvalue and one very small eigenvalue. Inverting $X^T X$ amplifies the small eigenvalue, blowing up the variance of the estimator.</p>
+
+<div class="svg-container">
+<svg width="600" height="320" viewBox="0 0 600 320">
+    <!-- Well-conditioned -->
+    <rect x="20" y="30" width="260" height="260" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="150" y="25" text-anchor="middle" font-weight="bold" font-size="14" fill="#065f46">Well-Conditioned X</text>
+    <line x1="80" y1="240" x2="80" y2="80" stroke="#059669" stroke-width="3" marker-end="url(#arr4)"/>
+    <text x="65" y="70" fill="#065f46" font-size="12">x₁</text>
+    <line x1="80" y1="240" x2="220" y2="200" stroke="#059669" stroke-width="3" marker-end="url(#arr4)"/>
+    <text x="230" y="200" fill="#065f46" font-size="12">x₂</text>
+    <text x="150" y="120" text-anchor="middle" font-size="11" fill="#065f46">Nearly orthogonal</text>
+    <text x="150" y="140" text-anchor="middle" font-size="11" fill="#065f46">Large angle between columns</text>
+    <text x="150" y="170" text-anchor="middle" font-size="11" fill="#065f46">κ(X) ≈ 1</text>
+    <text x="150" y="190" text-anchor="middle" font-size="11" fill="#065f46">Stable estimates</text>
+
+    <!-- Ill-conditioned -->
+    <rect x="320" y="30" width="260" height="260" fill="#fef2f2" stroke="#dc2626" stroke-width="2" rx="8"/>
+    <text x="450" y="25" text-anchor="middle" font-weight="bold" font-size="14" fill="#991b1b">Multicollinear X</text>
+    <line x1="380" y1="240" x2="380" y2="80" stroke="#dc2626" stroke-width="3" marker-end="url(#arr4)"/>
+    <text x="365" y="70" fill="#991b1b" font-size="12">x₁</text>
+    <line x1="380" y1="240" x2="390" y2="85" stroke="#dc2626" stroke-width="3" marker-end="url(#arr4)"/>
+    <text x="400" y="80" fill="#991b1b" font-size="12">x₂</text>
+    <text x="450" y="120" text-anchor="middle" font-size="11" fill="#991b1b">Nearly parallel</text>
+    <text x="450" y="140" text-anchor="middle" font-size="11" fill="#991b1b">Small angle between columns</text>
+    <text x="450" y="170" text-anchor="middle" font-size="11" fill="#991b1b">κ(X) >> 1</text>
+    <text x="450" y="190" text-anchor="middle" font-size="11" fill="#991b1b">Unstable estimates</text>
+    <text x="450" y="210" text-anchor="middle" font-size="11" fill="#991b1b">High variance in β̂</text>
+</svg>
+</div>
+
+<h3>12.3 Diagnostic 1: Variance Inflation Factor (VIF)</h3>
+<p>For predictor $j$, regress $X_j$ on all other predictors: $X_j = X_{-j} \gamma + \delta$. Let $R_j^2$ be the R² of this regression. Then:</p>
+<div class="formula-box">$\text{VIF}_j = \frac{1}{1 - R_j^2}$</div>
+
+<p><strong>Interpretation:</strong></p>
+<ul>
+    <li>$\text{VIF}_j = 1$: $X_j$ is uncorrelated with others (ideal).</li>
+    <li>$\text{VIF}_j > 5$: Moderate multicollinearity (concerning).</li>
+    <li>$\text{VIF}_j > 10$: Severe multicollinearity (action required).</li>
+</ul>
+
+<p><strong>Why it works:</strong> If $X_j$ is nearly in the span of other columns, $R_j^2 \approx 1$, making VIF explode. This is exactly a statement about <strong>rank deficiency</strong>: the column space has not grown when $X_j$ was added.</p>
+
+<h3>12.4 Diagnostic 2: Condition Number</h3>
+<p>The <strong>condition number</strong> of $X$ is:</p>
+<div class="formula-box">$\kappa(X) = \frac{\sigma_{\max}}{\sigma_{\min}}$</div>
+<p>where $\sigma_{\max}$ and $\sigma_{\min}$ are the largest and smallest singular values of $X$.</p>
+
+<table>
+    <tr><th>κ(X)</th><th>Interpretation</th></tr>
+    <tr><td>1</td><td>Perfectly conditioned (orthogonal columns)</td></tr>
+    <tr><td>10–30</td><td>Good</td></tr>
+    <tr><td>30–100</td><td>Moderate concern</td></tr>
+    <tr><td>> 1000</td><td>Severe multicollinearity</td></tr>
+</table>
+
+<p>The condition number is the ratio of the longest to shortest semi-axis of the hyper-ellipse that $X$ maps the unit sphere into. A huge ratio means the ellipse is needle-like — one direction is stretched vastly more than another.</p>
+
+<h3>12.5 Diagnostic 3: Eigenvalue Analysis of XᵀX</h3>
+<p>The eigenvalues $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_p$ of $X^T X$ are the squares of singular values. If $\lambda_p \approx 0$, then $X^T X$ is nearly singular. The <strong>condition number</strong> can also be computed as $\sqrt{\lambda_1 / \lambda_p}$.</p>
+
+<div class="warning">
+    <strong>Key Insight:</strong> Multicollinearity is rank deficiency in disguise. If $\text{rank}(X) = r < p$, then $p - r$ eigenvalues of $X^T X$ are exactly zero. Near-multicollinearity means $p - r$ eigenvalues are <em>numerically</em> zero (tiny compared to the largest).
+</div>
+
+<h3>12.6 Remedies</h3>
+<ul>
+    <li><strong>Drop variables:</strong> Remove the most redundant predictor (highest VIF).</li>
+    <li><strong>Combine variables:</strong> Create an index or use PCA to replace correlated predictors with principal components.</li>
+    <li><strong>Ridge regression:</strong> Add $\lambda I$ to $X^T X$, effectively increasing all eigenvalues by $\lambda$.</li>
+    <li><strong>Partial Least Squares:</strong> Find directions in $X$ that both explain variance and predict $y$.</li>
+</ul>
+
+<div class="card card-success">
+    <h4>Quant Example: Factor Correlation in Equity Models</h4>
+    <p>In a Fama-French style model, if you include both "Value" (HML) and "Book-to-Market" as separate factors, they may be nearly collinear because HML is constructed from B/M. The VIF for B/M might exceed 15. The rank of the factor matrix is effectively one less than the number of factors. A quant would drop one, orthogonalize them, or use ridge regression to stabilize factor risk premia estimates.</p>
+</div>
+</div>
+<div class="section" id="section-13"><span class="tag tag-quant">Quant</span><h2>Quant Application: Model Redundancy</h2>
+<h3>13.1 Parameter Identifiability</h3>
+<p>A statistical model is <strong>identifiable</strong> if different parameter values produce different probability distributions for the data. In linear models, identifiability fails precisely when the design matrix is rank deficient.</p>
+
+<div class="definition">
+    <strong>Non-identifiability:</strong> If $\text{rank}(X) < p$, there exist $\beta_1 \neq \beta_2$ such that $X\beta_1 = X\beta_2$. The parameters cannot be uniquely determined from the data, no matter how much data you collect.
+</div>
+
+<h3>13.2 Detecting Redundancy via Rank</h3>
+<p>Given a model with $p$ features and $n$ observations:</p>
+<ol>
+    <li>Form the design matrix $X \in \mathbb{R}^{n \times p}$.</li>
+    <li>Compute $r = \text{rank}(X)$.</li>
+    <li>If $r < p$, there are $p - r$ redundant features.</li>
+    <li>The redundant features are exactly those <strong>not</strong> in the pivot columns of $X$.</li>
+</ol>
+
+<div class="example-box">
+    <h5>Example: Redundant Features</h5>
+    <p>Suppose $X = [\text{Size}, \text{BM}, \text{LogSize}, \text{Size}^2]$ where Size is market cap.</p>
+    <p>If LogSize is exactly $\log(\text{Size})$, the columns are functionally dependent. But even with approximation, if Size and LogSize are highly correlated, the <em>numerical rank</em> may be 3 even though the <em>algebraic rank</em> is 4.</p>
+    <p>A quant would check: $\text{rank}(X)$ via SVD with tolerance. If only 3 singular values are above $10^{-10}$, the effective rank is 3.</p>
+</div>
+
+<h3>13.3 PCA as Rank Revelation</h3>
+<p>Principal Component Analysis (PCA) is essentially a <strong>change of basis to the row space</strong>. The principal components are the eigenvectors of $X^T X$ (or equivalently, the right singular vectors of $X$).</p>
+
+<p>If $X$ has rank $r < p$, only the first $r$ principal components have non-zero eigenvalues. The remaining $p - r$ components lie in the null space of $X$ — they capture no variance in the data.</p>
+
+<div class="formula-box">$X = U_r \Sigma_r V_r^T = \sum_{i=1}^r \sigma_i u_i v_i^T$</div>
+
+<p>This is the <strong>best rank-$r$ approximation</strong> of $X$. In quant finance, this is used to:</p>
+<ul>
+    <li>Reduce a large correlation matrix to its dominant factors.</li>
+    <li>Remove noise from covariance estimation.</li>
+    <li>Construct statistical arbitrage strategies based on residual (null space) returns.</li>
+</ul>
+
+<h3>13.4 Information Criteria and Rank</h3>
+<p>Model selection criteria like AIC and BIC penalize the number of parameters. But if $X$ is rank deficient, the <strong>effective number of parameters</strong> is $r$, not $p$. The correct degrees of freedom for the model is $r$, and for the residuals is $n - r$.</p>
+
+<div class="warning">
+    <strong>Common Mistake:</strong> Using $p$ as the degrees of freedom when $\text{rank}(X) = r < p$ leads to incorrect F-statistics, t-statistics, and p-values. The quant must use the <em>rank</em> (effective dimension) for all inference.
+</div>
+
+<h3>13.5 Factor Models and Rank</h3>
+<p>In a linear factor model $R = B F + \epsilon$, the matrix of factor returns $F$ should ideally have full row rank. If $\text{rank}(F) < k$ (number of factors), some factors are redundant. The return space $C(R)$ has dimension at most $\text{rank}(F)$, meaning the model cannot explain more dimensions of risk than it has independent factors.</p>
+
+<div class="card card-success">
+    <h4>Quant Example: Smart Beta Redundancy</h4>
+    <p>A smart beta fund claims to offer 10 different "factor ETFs" (momentum, quality, value, low-vol, etc.). By stacking their return series into $R \in \mathbb{R}^{T \times 10}$ and computing the SVD, a quant finds only 4 singular values above 1% of the maximum. The effective rank is 4. The remaining 6 ETFs are linear combinations (plus noise) of the 4 true factors. The fund is charging 10 fees for 4 unique exposures. This is model redundancy in practice.</p>
+</div>
+</div>
+<div class="section" id="section-14"><span class="tag tag-quant">Quant</span><h2>Quant Application: Constraint Feasibility</h2>
+<h3>14.1 The Feasibility Problem</h3>
+<p>In quantitative finance, we constantly solve constrained optimization problems:</p>
+<div class="formula-box">$\min_w f(w) \quad \text{subject to} \quad Aw = b, \; Gw \leq h$</div>
+<p>Before optimizing, we must ask: <strong>Does any $w$ satisfy the constraints?</strong> This is the <strong>feasibility problem</strong>.</p>
+
+<div class="definition">
+    <strong>Feasibility:</strong> The system $Aw = b$ is feasible if and only if $b \in C(A)$. Equivalently, $\text{rank}(A) = \text{rank}([A \;|\; b])$.
+</div>
+
+<h3>14.2 The Role of the Left Null Space</h3>
+<p>Recall that $N(A^T)$ is the orthogonal complement of $C(A)$ in $\mathbb{R}^m$. Therefore:</p>
+<div class="formula-box">$b \in C(A) \iff y^T b = 0 \text{ for all } y \in N(A^T)$</div>
+
+<p><strong>Practical test:</strong> Find a basis $\{y_1, \ldots, y_{m-r}\}$ for $N(A^T)$. Check if $y_i^T b = 0$ for all $i$. If any check fails, the system is <strong>infeasible</strong>.</p>
+
+<div class="example-box">
+    <h5>Example: Infeasible Portfolio Constraints</h5>
+    <p>Constraints: (1) $w_1 + w_2 + w_3 = 1$ (budget), (2) $0.5w_1 + 0.5w_2 + 0.5w_3 = 0.3$ (sector).</p>
+    <p>$A = \begin{bmatrix} 1 & 1 & 1 \\ 0.5 & 0.5 & 0.5 \end{bmatrix}$, $b = \begin{bmatrix} 1 \\ 0.3 \end{bmatrix}$.</p>
+    <p>Row 2 = 0.5 × Row 1, so rank = 1. Left null space basis: $y = [-0.5, 1]^T$.</p>
+    <p>Check: $y^T b = -0.5(1) + 1(0.3) = -0.2 \neq 0$.</p>
+    <p><strong>Conclusion:</strong> Infeasible! You cannot have weights summing to 1 while their average is 0.3 (which would require sum = 0.9).</p>
+</div>
+
+<h3>14.3 Farkas' Lemma</h3>
+<div class="theorem">
+    <strong>Farkas' Lemma:</strong> Exactly one of the following is true:
+    <ol>
+        <li>There exists $x \geq 0$ such that $Ax = b$.</li>
+        <li>There exists $y$ such that $y^T A \geq 0$ and $y^T b < 0$.</li>
+    </ol>
+</div>
+
+<p><strong>Quant interpretation:</strong> Either there is a portfolio with non-negative weights achieving payoff $b$, or there is an arbitrage pricing vector $y$ that prices all assets non-negatively but gives negative value to $b$. This is the mathematical foundation of <strong>no-arbitrage pricing</strong>.</p>
+
+<h3>14.4 Inequality Constraints and Rank</h3>
+<p>For inequalities $Gw \leq h$, the <strong>active set</strong> at a solution consists of constraints that hold with equality. The rank of the active constraint matrix determines the local degrees of freedom. If the active constraints have rank $r$, the feasible set locally looks like an $(n-r)$-dimensional surface.</p>
+
+<div class="svg-container">
+<svg width="600" height="320" viewBox="0 0 600 320">
+    <!-- Feasible region -->
+    <rect x="30" y="40" width="250" height="250" fill="#f0fdf4" stroke="#059669" stroke-width="2" rx="8"/>
+    <text x="155" y="35" text-anchor="middle" font-weight="bold" font-size="14" fill="#065f46">Feasible Region</text>
+
+    <!-- Constraints -->
+    <line x1="50" y1="260" x2="250" y2="100" stroke="#2563eb" stroke-width="2"/>
+    <text x="260" y="100" fill="#1e40af" font-size="11">w₁ + w₂ ≤ 1</text>
+    <line x1="80" y1="70" x2="240" y2="260" stroke="#d97706" stroke-width="2"/>
+    <text x="245" y="270" fill="#92400e" font-size="11">w₁ ≥ 0</text>
+    <line x1="50" y1="150" x2="200" y2="150" stroke="#dc2626" stroke-width="2"/>
+    <text x="205" y="145" fill="#991b1b" font-size="11">w₂ ≥ 0.5</text>
+
+    <!-- Intersection point -->
+    <circle cx="130" cy="150" r="6" fill="#059669"/>
+    <text x="130" y="140" text-anchor="middle" font-size="11" fill="#065f46">Optimal w*</text>
+
+    <!-- Active constraints annotation -->
+    <text x="155" y="295" text-anchor="middle" font-size="11" fill="#065f46">Active constraints: rank = 2</text>
+    <text x="155" y="310" text-anchor="middle" font-size="11" fill="#065f46">Local dimension: n − r = 0 (vertex)</text>
+
+    <!-- Infeasible example -->
+    <rect x="320" y="40" width="250" height="250" fill="#fef2f2" stroke="#dc2626" stroke-width="2" rx="8"/>
+    <text x="445" y="35" text-anchor="middle" font-weight="bold" font-size="14" fill="#991b1b">Infeasible Region</text>
+
+    <line x1="340" y1="260" x2="540" y2="100" stroke="#2563eb" stroke-width="2"/>
+    <text x="545" y="100" fill="#1e40af" font-size="11">w₁ + w₂ ≤ 0.5</text>
+    <line x1="340" y1="80" x2="540" y2="80" stroke="#d97706" stroke-width="2"/>
+    <text x="545" y="75" fill="#92400e" font-size="11">w₁ + w₂ ≥ 1</text>
+
+    <text x="445" y="180" text-anchor="middle" font-size="12" fill="#991b1b">No overlap!</text>
+    <text x="445" y="200" text-anchor="middle" font-size="11" fill="#991b1b">Left null space test</text>
+    <text x="445" y="215" text-anchor="middle" font-size="11" fill="#991b1b">detects contradiction</text>
+
+    <text x="445" y="295" text-anchor="middle" font-size="11" fill="#991b1b">b ∉ C(A)</text>
+</svg>
+</div>
+
+<h3>14.5 Rank and Optimization Degeneracy</h3>
+<p>In quadratic programming (e.g., mean-variance optimization), the Hessian of the objective is typically the covariance matrix $\Sigma$. If $\Sigma$ is rank deficient, the problem has a <strong>flat direction</strong> — infinitely many portfolios have the same risk. The null space of $\Sigma$ represents <strong>risk-free combinations</strong> (in theory) or <strong>unpriced directions</strong> (in practice).</p>
+
+<div class="card card-success">
+    <h4>Quant Example: Portfolio Constraint Checking</h4>
+    <p>Before running a mean-variance optimizer, a quant assembles constraints:</p>
+    <ul>
+        <li>$\sum w_i = 1$ (budget)</li>
+        <li>$\sum w_i \beta_i = 0$ (market neutral)</li>
+        <li>$\sum w_i \text{sector}_i = b_{\text{sector}}$ (sector bets)</li>
+        <li>$w_i \geq 0$ (no shorting)</li>
+    </ul>
+    <p>The equality constraint matrix $A$ is checked for rank. If the sector constraints conflict with the budget constraint (e.g., requiring 120% allocation to tech while staying 100% invested), the left null space test immediately flags infeasibility, saving expensive optimization runtime.</p>
+</div>
+</div>
+<div class="section" id="section-15"><span class="tag tag-lab">Lab</span><h2>Google Colab Experiments</h2>
+<h3>15.1 Experiment 1: Visualizing the Four Subspaces in 3D</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Compute and visualize the column space, null space, row space, and left null space for a concrete matrix using NumPy and Matplotlib.</p>
+    <pre><code># Experiment 1: Four Subspaces Visualization
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import null_space
+from mpl_toolkits.mplot3d import Axes3D
+
+# Define a 3x4 matrix with rank 2
+A = np.array([
+    [1, 2, 0, 4],
+    [2, 4, 1, 9],
+    [3, 6, 0, 12]
+], dtype=float)
+
+print("Matrix A:")
+print(A)
+print(f"\nShape: {A.shape}")
+print(f"Rank: {np.linalg.matrix_rank(A)}")
+
+# Column Space: span of pivot columns (columns 0 and 2)
+C_A = A[:, [0, 2]]
+print("\nBasis for Column Space (pivot columns):")
+print(C_A)
+
+# Null Space
+N_A = null_space(A)
+print(f"\nBasis for Null Space (dim={N_A.shape[1]}):")
+print(N_A)
+
+# Verify: A @ null_space should be ~0
+print("\nVerification A @ N_A:")
+print(np.round(A @ N_A, 10))
+
+# Row Space = Column Space of A^T
+C_AT = A.T[:, [0, 1]]  # pivot rows of A (non-zero rows of RREF)
+print("\nBasis for Row Space:")
+print(C_AT)
+
+# Left Null Space
+N_AT = null_space(A.T)
+print(f"\nBasis for Left Null Space (dim={N_AT.shape[1]}):")
+print(N_AT)
+
+# Verify orthogonality
+print("\nOrthogonality checks:")
+print("N(A) ⊥ C(A^T):", np.round(N_A.T @ C_AT, 10))
+print("N(A^T) ⊥ C(A):", np.round(N_AT.T @ C_A, 10))
+
+# 3D Plot of Column Space and Left Null Space
+fig = plt.figure(figsize=(12, 5))
+
+# Plot 1: Column Space in R^3
+ax1 = fig.add_subplot(121, projection='3d')
+# Plot the two basis vectors
+origin = np.array([[0, 0, 0]]).T
+ax1.quiver(*origin, C_A[0,0], C_A[1,0], C_A[2,0], color='blue', arrow_length_ratio=0.1, linewidth=3, label='Col 1')
+ax1.quiver(*origin, C_A[0,1], C_A[1,1], C_A[2,1], color='green', arrow_length_ratio=0.1, linewidth=3, label='Col 3')
+# Plot left null space
+ax1.quiver(*origin, N_AT[0,0], N_AT[1,0], N_AT[2,0], color='red', arrow_length_ratio=0.1, linewidth=3, label='Left Null')
+ax1.set_title('ℝ³: C(A) (blue/green) and N(Aᵀ) (red)')
+ax1.set_xlabel('x'); ax1.set_ylabel('y'); ax1.set_zlabel('z')
+ax1.legend()
+
+# Plot 2: Row Space and Null Space in R^4 (projected to first 3 coords)
+ax2 = fig.add_subplot(122, projection='3d')
+ax2.quiver(*origin, C_AT[0,0], C_AT[1,0], C_AT[2,0], color='blue', arrow_length_ratio=0.1, linewidth=3, label='Row 1')
+ax2.quiver(*origin, C_AT[0,1], C_AT[1,1], C_AT[2,1], color='green', arrow_length_ratio=0.1, linewidth=3, label='Row 2')
+ax2.quiver(*origin, N_A[0,0], N_A[1,0], N_A[2,0], color='red', arrow_length_ratio=0.1, linewidth=3, label='Null 1')
+ax2.quiver(*origin, N_A[0,1], N_A[1,1], N_A[2,1], color='orange', arrow_length_ratio=0.1, linewidth=3, label='Null 2')
+ax2.set_title('ℝ⁴ (proj): C(Aᵀ) (blue/green) and N(A) (red/orange)')
+ax2.set_xlabel('x'); ax2.set_ylabel('y'); ax2.set_zlabel('z')
+ax2.legend()
+
+plt.tight_layout()
+plt.show()</code></pre>
+    <p><strong>Expected Output:</strong> Rank = 2. Null space dimension = 2. Left null space dimension = 1. All orthogonality checks should yield zeros (or numerical noise ~1e-15).</p>
+</div>
+
+<h3>15.2 Experiment 2: Multicollinearity Detection with VIF</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Generate correlated financial features, compute VIF, condition number, and demonstrate numerical rank deficiency.</p>
+    <pre><code># Experiment 2: Multicollinearity Diagnostics
+import numpy as np
+import pandas as pd
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+np.random.seed(42)
+n = 200
+
+# Generate features
+x1 = np.random.randn(n)
+x2 = x1 + 0.05 * np.random.randn(n)      # Nearly collinear with x1
+x3 = np.random.randn(n)                     # Independent
+x4 = 2*x1 + 3*x2 + 0.01*np.random.randn(n) # Nearly a linear combo
+
+X = np.column_stack([x1, x2, x3, x4])
+feature_names = ['Momentum', 'Momentum_Lag', 'Value', 'Combo']
+
+# Compute VIF
+vif_data = pd.DataFrame()
+vif_data["Feature"] = feature_names
+vif_data["VIF"] = [variance_inflation_factor(X, i) for i in range(X.shape[1])]
+print("Variance Inflation Factors:")
+print(vif_data)
+print()
+
+# Condition number
+cond = np.linalg.cond(X)
+print(f"Condition number of X: {cond:.2f}")
+
+# Numerical rank
+rank = np.linalg.matrix_rank(X, tol=1e-10)
+print(f"Numerical rank (tol=1e-10): {rank}")
+
+# SVD analysis
+U, s, Vt = np.linalg.svd(X)
+print("\nSingular values:")
+print(s)
+print(f"\nRatio max/min singular value: {s[0]/s[-1]:.2f}")
+
+# Demonstrate instability: solve Xβ = y for two similar y's
+y1 = np.random.randn(n)
+y2 = y1 + 1e-6 * np.random.randn(n)
+
+# Use pseudo-inverse for stable comparison
+beta1 = np.linalg.lstsq(X, y1, rcond=None)[0]
+beta2 = np.linalg.lstsq(X, y2, rcond=None)[0]
+
+print(f"\n||β₁ - β₂||₂ = {np.linalg.norm(beta1 - beta2):.4f}")
+print("(Small perturbation in y causes large change in β due to multicollinearity)")
+
+# Plot singular values
+import matplotlib.pyplot as plt
+plt.figure(figsize=(8, 4))
+plt.semilogy(s, 'bo-', markersize=8)
+plt.axhline(y=1e-10, color='r', linestyle='--', label='Tolerance')
+plt.xlabel('Index'); plt.ylabel('Singular Value (log scale)')
+plt.title('Singular Values: Visualizing Near-Rank-Deficiency')
+plt.legend(); plt.grid(True)
+plt.show()</code></pre>
+    <p><strong>Expected Output:</strong> VIF for Momentum_Lag and Combo should be very high (>50). Condition number should be large (>1000). One singular value should be tiny (~0.01 or less), revealing the effective rank is 3 despite 4 columns.</p>
+</div>
+
+<h3>15.3 Experiment 3: Rank-Nullity Theorem Verification</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Verify the theorem numerically for random matrices of various shapes.</p>
+    <pre><code># Experiment 3: Rank-Nullity Verification
+import numpy as np
+from scipy.linalg import null_space
+
+def verify_rank_nullity(m, n, rank_target=None):
+    if rank_target is None:
+        A = np.random.randn(m, n)
+    else:
+        # Construct matrix with exact rank
+        U = np.random.randn(m, rank_target)
+        V = np.random.randn(n, rank_target)
+        A = U @ V.T
+
+    r = np.linalg.matrix_rank(A)
+    nullity = null_space(A).shape[1]
+
+    print(f"Matrix {m}×{n}: rank={r}, nullity={nullity}, sum={r+nullity}, n={n}")
+    assert r + nullity == n, "Rank-Nullity theorem violated!"
+    print("✓ Theorem holds\n")
+
+# Test various shapes
+for (m, n) in [(5, 3), (3, 5), (4, 4), (10, 2), (2, 10)]:
+    verify_rank_nullity(m, n)
+
+# Test with exact rank deficiency
+print("Testing exact rank deficiency:")
+verify_rank_nullity(5, 5, rank_target=3)
+verify_rank_nullity(4, 6, rank_target=2)
+
+# Verify using SVD directly
+A = np.random.randn(5, 4)
+r = np.linalg.matrix_rank(A)
+U, s, Vt = np.linalg.svd(A)
+print(f"\nSVD verification for 5×4 matrix:")
+print(f"Non-zero singular values: {np.sum(s > 1e-10)} (should equal rank={r})")
+print(f"Right null space dim: {Vt[r:].shape[0]} (should equal nullity={4-r})")
+print(f"Left null space dim: {U[:, r:].shape[1]} (should equal left nullity={5-r})")</code></pre>
+</div>
+
+<h3>15.4 Experiment 4: Constraint Feasibility Checker</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Build a feasibility checker for portfolio constraints using left null space and rank tests.</p>
+    <pre><code># Experiment 4: Constraint Feasibility
+import numpy as np
+from scipy.linalg import null_space
+
+def check_feasibility(A, b):
+    """Check if Ax = b is feasible using rank test and left null space."""
+    r_A = np.linalg.matrix_rank(A)
+    r_Ab = np.linalg.matrix_rank(np.column_stack([A, b]))
+
+    feasible = (r_A == r_Ab)
+
+    # Left null space check
+    N_AT = null_space(A.T)
+    violations = []
+    if N_AT.size > 0:
+        for i in range(N_AT.shape[1]):
+            y = N_AT[:, i]
+            y_dot_b = y @ b
+            if not np.isclose(y_dot_b, 0):
+                violations.append((y, y_dot_b))
+
+    return feasible, violations
+
+# Example 1: Feasible
+A1 = np.array([[1, 1, 1],
+               [0.5, 0.3, 0.2]], dtype=float)
+b1 = np.array([1.0, 0.35])
+f1, v1 = check_feasibility(A1, b1)
+print(f"Example 1 (should be feasible): {f1}")
+if v1:
+    print("Left null space violations found (unexpected!):", v1)
+else:
+    print("No left null space violations ✓")
+
+# Example 2: Infeasible (contradictory)
+A2 = np.array([[1, 1, 1],
+               [0.5, 0.5, 0.5]], dtype=float)
+b2 = np.array([1.0, 0.3])
+f2, v2 = check_feasibility(A2, b2)
+print(f"\nExample 2 (should be infeasible): {f2}")
+if v2:
+    print("Left null space violations (expected):")
+    for y, val in v2:
+        print(f"  y = {y}, yᵀb = {val:.4f}")
+
+# Example 3: Portfolio with sector and budget
+A3 = np.array([
+    [1, 1, 1, 1],           # Budget
+    [1, 0, 0, 0],           # Tech min
+    [0, 0, 1, 1],           # Healthcare
+    [0.1, 0.2, 0.3, 0.4]    # Expected return
+], dtype=float)
+b3 = np.array([1.0, 0.3, 0.4, 0.25])
+f3, v3 = check_feasibility(A3, b3)
+print(f"\nPortfolio constraints feasible: {f3}")
+if not f3:
+    print("Infeasible! Violations:")
+    for y, val in v3:
+        print(f"  y = {np.round(y, 2)}, yᵀb = {val:.4f}")
+        print(f"  Interpretation: {y} is an arbitrage/constraint redundancy vector")
+
+# Solve if feasible
+if f3:
+    w = np.linalg.lstsq(A3, b3, rcond=None)[0]
+    print(f"\nOne feasible portfolio: {np.round(w, 4)}")
+    print(f"Verification A3 @ w = {np.round(A3 @ w, 4)}")</code></pre>
+</div>
+
+<h3>15.5 Experiment 5: SVD and the Four Subspaces</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Use SVD to extract orthonormal bases for all four fundamental subspaces.</p>
+    <pre><code># Experiment 5: SVD Decomposition of Subspaces
+import numpy as np
+
+A = np.array([
+    [3, 2, 1],
+    [6, 4, 2],
+    [1, 0, 1],
+    [0, 1, 1]
+], dtype=float)
+
+m, n = A.shape
+r = np.linalg.matrix_rank(A)
+print(f"Matrix shape: {m}×{n}, Rank: {r}\n")
+
+U, s, Vt = np.linalg.svd(A)
+V = Vt.T
+
+print("Singular values:", s)
+print()
+
+# 1. Column Space: first r columns of U
+print("Column Space basis (first r columns of U):")
+print(np.round(U[:, :r], 4))
+print()
+
+# 2. Left Null Space: last m-r columns of U
+print(f"Left Null Space basis (last {m-r} columns of U):")
+print(np.round(U[:, r:], 4))
+print()
+
+# 3. Row Space: first r columns of V
+print("Row Space basis (first r columns of V):")
+print(np.round(V[:, :r], 4))
+print()
+
+# 4. Null Space: last n-r columns of V
+print(f"Null Space basis (last {n-r} columns of V):")
+print(np.round(V[:, r:], 4))
+print()
+
+# Verify all orthogonality relationships
+print("Verification:")
+print("U[:, :r] ⊥ U[:, r:]:", np.allclose(U[:, :r].T @ U[:, r:], 0))
+print("V[:, :r] ⊥ V[:, r:]:", np.allclose(V[:, :r].T @ V[:, r:], 0))
+print("A @ V[:, r:] ≈ 0:", np.allclose(A @ V[:, r:], 0))
+print("A.T @ U[:, r:] ≈ 0:", np.allclose(A.T @ U[:, r:], 0))
+
+# Reconstruct A from rank-r approximation
+A_approx = U[:, :r] @ np.diag(s[:r]) @ V[:, :r].T
+print(f"\nRank-{r} reconstruction error: {np.linalg.norm(A - A_approx):.2e}")</code></pre>
+</div>
+
+<h3>15.6 Experiment 6: PCA as Rank Approximation</h3>
+<div class="card card-lab">
+    <h4>Objective</h4>
+    <p>Apply PCA to a correlation matrix and identify the effective rank of a stock universe.</p>
+    <pre><code># Experiment 6: PCA and Effective Rank
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+n_stocks = 50
+n_days = 252
+
+# Simulate returns with 3 true factors
+F = np.random.randn(n_days, 3)  # Common factors
+B = np.random.randn(n_stocks, 3) * 0.5  # Factor loadings
+idiosyncratic = np.random.randn(n_days, n_stocks) * 0.3
+
+R = F @ B.T + idiosyncratic  # Returns
+
+# Compute covariance and correlation
+Sigma = np.cov(R, rowvar=False)
+D = np.diag(1 / np.sqrt(np.diag(Sigma)))
+Corr = D @ Sigma @ D
+
+# Eigenvalue decomposition
+eigvals, eigvecs = np.linalg.eigh(Corr)
+eigvals = eigvals[::-1]  # Sort descending
+
+# Effective rank: count eigenvalues above threshold
+thresholds = [0.01, 0.05, 0.1]
+for t in thresholds:
+    eff_rank = np.sum(eigvals > t)
+    print(f"Eigenvalues > {t}: {eff_rank}")
+
+# Plot scree plot
+plt.figure(figsize=(10, 4))
+plt.subplot(1, 2, 1)
+plt.plot(range(1, n_stocks+1), eigvals, 'bo-', markersize=4)
+plt.axhline(y=1, color='r', linestyle='--', label='Average eigenvalue (noise)')
+plt.xlabel('Principal Component'); plt.ylabel('Eigenvalue')
+plt.title('Scree Plot: Identifying True Factors')
+plt.legend(); plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.semilogy(range(1, n_stocks+1), eigvals, 'bo-', markersize=4)
+plt.axhline(y=1, color='r', linestyle='--')
+plt.xlabel('Principal Component'); plt.ylabel('Eigenvalue (log)')
+plt.title('Log Scale: Gap Between Signal and Noise')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Variance explained
+cum_var = np.cumsum(eigvals) / np.sum(eigvals)
+print(f"\nVariance explained by first 3 PCs: {cum_var[2]:.2%}")
+print(f"Variance explained by first 10 PCs: {cum_var[9]:.2%}")
+
+# Project returns onto first 3 PCs (row space)
+PCs = eigvecs[:, -3:][:, ::-1]  # Top 3 eigenvectors
+R_proj = R @ PCs
+print(f"\nProjected returns shape: {R_proj.shape}")
+print("These 3 dimensions capture the systematic (factor) component.")
+print("The remaining 47 dimensions are approximately in the null space of the factor model.")</code></pre>
+    <p><strong>Expected Output:</strong> The scree plot shows a clear "elbow" after 3 components. The first 3 eigenvalues are large, and the rest cluster around 1 (the average for random correlation matrices). This reveals the <strong>effective rank</strong> of the return-generating process is approximately 3, even though we have 50 stocks.</p>
+</div>
+</div>
+<div class="section" id="section-16"><span class="tag tag-exercise">Exercises</span><h2>Practice Problems</h2>
+<h3>How to Use This Section</h3>
+<p>Problems are organized by topic and tiered by difficulty. Each problem has a collapsible solution. Attempt the problem before viewing the answer. <strong>Easy</strong> problems test basic computation. <strong>Medium</strong> problems test conceptual understanding and simple proofs. <strong>Hard</strong> problems test quant-specific applications and deeper synthesis.</p>
+
+<h3>Topic: Column Space, Row Space, Null Space</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P1.1.</strong> Let $A = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 5 \\ 3 & 6 & 8 \end{bmatrix}$. Find a basis for $C(A)$ and state its dimension.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>RREF of $A$ is $\begin{bmatrix} 1 & 2 & 0 \\ 0 & 0 & 1 \\ 0 & 0 & 0 \end{bmatrix}$. Pivots in columns 1 and 3. Basis: $\left\{ \begin{bmatrix}1\\2\\3\end{bmatrix}, \begin{bmatrix}3\\5\\8\end{bmatrix} \right\}$. $\dim(C(A)) = 2$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P1.2.</strong> For the same matrix $A$ above, find a basis for $N(A)$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Free variable $x_2$. From RREF: $x_1 + 2x_2 = 0$, $x_3 = 0$. So $x_1 = -2x_2$. Basis: $\left\{ \begin{bmatrix}-2\\1\\0\end{bmatrix} \right\}$. $\dim(N(A)) = 1$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P1.3.</strong> Prove that if $A$ is $m \times n$ with full column rank, then $N(A) = \{0\}$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Full column rank means $\text{rank}(A) = n$. By rank-nullity: $\text{nullity}(A) = n - \text{rank}(A) = n - n = 0$. Thus $\dim(N(A)) = 0$, so $N(A) = \{0\}$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P1.4.</strong> Let $X \in \mathbb{R}^{n \times p}$ be a design matrix in a regression. Suppose you add a new column $x_{new}$ that is a linear combination of existing columns. Describe precisely what happens to: (a) $\text{rank}(X)$, (b) $N(X)$, (c) the OLS estimator $\hat{\beta}$, and (d) the projection matrix $P = X(X^T X)^{-1}X^T$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>(a) Rank does not change. The column space is unchanged.<br/>
+        (b) Null space gains one dimension (new free variable).<br/>
+        (c) $(X^T X)^{-1}$ does not exist. OLS has infinitely many solutions. The minimum-norm solution sets the coefficient on $x_{new}$ to 0 and distributes its effect across the columns it replaces.<br/>
+        (d) $P$ is still well-defined as $X X^+$ (using pseudoinverse) and projects onto $C(X)$. It is unique even though $\hat{\beta}$ is not.</p>
+    </div>
+</div>
+
+<h3>Topic: Rank & Nullity</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P2.1.</strong> Find the rank and nullity of $A = \begin{bmatrix} 1 & 2 & 3 & 4 \\ 2 & 4 & 6 & 8 \\ 1 & 1 & 1 & 1 \end{bmatrix}$. Verify the rank-nullity theorem.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>RREF: $\begin{bmatrix} 1 & 0 & -1 & -2 \\ 0 & 1 & 2 & 3 \\ 0 & 0 & 0 & 0 \end{bmatrix}$. Rank = 2. Nullity = 4 - 2 = 2. Check: 2 + 2 = 4 = n. ✓</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P2.2.</strong> Prove that $\text{rank}(AB) \leq \min(\text{rank}(A), \text{rank}(B))$ for compatible matrices $A$ and $B$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>(1) $C(AB) \subseteq C(A)$ because every column of $AB$ is $A$ times a column of $B$, hence in $C(A)$. Thus $\text{rank}(AB) \leq \text{rank}(A)$.<br/>
+        (2) $N(B) \subseteq N(AB)$ because if $Bx = 0$ then $ABx = 0$. By rank-nullity, $\text{nullity}(B) \leq \text{nullity}(AB)$, so $n - \text{rank}(B) \leq n - \text{rank}(AB)$, giving $\text{rank}(AB) \leq \text{rank}(B)$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P2.3.</strong> Let $A \in \mathbb{R}^{n \times n}$ be symmetric ($A = A^T$) and idempotent ($A^2 = A$). Such matrices are called <strong>projection matrices</strong>. Prove that $\text{rank}(A) = \text{trace}(A)$. Then explain why the hat matrix $H = X(X^T X)^{-1}X^T$ in OLS has rank equal to $p$ (the number of predictors).</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>For idempotent $A$, eigenvalues are 0 or 1. The rank equals the number of non-zero eigenvalues, which equals the sum of eigenvalues (since they are 0 or 1), which equals $\text{trace}(A)$.<br/><br/>
+        For $H = X(X^T X)^{-1}X^T$: $H^2 = H$ (idempotent) and $H^T = H$ (symmetric). Thus $\text{rank}(H) = \text{trace}(H) = \text{trace}(X(X^T X)^{-1}X^T) = \text{trace}((X^T X)^{-1}X^T X) = \text{trace}(I_p) = p$.</p>
+    </div>
+</div>
+
+<h3>Topic: Four Fundamental Subspaces</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P3.1.</strong> For $A = \begin{bmatrix} 1 & 2 \\ 3 & 6 \\ 5 & 10 \end{bmatrix}$, find all four fundamental subspaces and their dimensions.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Rank = 1.<br/>
+        $C(A) = \text{Span}\left\{\begin{bmatrix}1\\3\\5\end{bmatrix}\right\}$, dim = 1.<br/>
+        $N(A) = \text{Span}\left\{\begin{bmatrix}-2\\1\end{bmatrix}\right\}$, dim = 1.<br/>
+        $C(A^T) = \text{Span}\left\{\begin{bmatrix}1\\2\end{bmatrix}\right\}$, dim = 1.<br/>
+        $N(A^T)$: solve $A^T y = 0$. Basis: $\left\{\begin{bmatrix}-3\\1\\0\end{bmatrix}, \begin{bmatrix}-5\\0\\1\end{bmatrix}\right\}$, dim = 2.<br/>
+        Check: $1+1=2=n$ and $1+2=3=m$. ✓</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P3.2.</strong> Prove that $N(A) \perp C(A^T)$. That is, every vector in the null space is orthogonal to every vector in the row space.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Let $x \in N(A)$ and $w \in C(A^T)$. Then $Ax = 0$ and $w = A^T y$ for some $y$.<br/>
+        Compute $w^T x = (A^T y)^T x = y^T A x = y^T 0 = 0$.<br/>
+        Thus $x \perp w$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P3.3.</strong> Let $A = U\Sigma V^T$ be the SVD of $A$. Show explicitly that the first $r$ columns of $V$ form an orthonormal basis for $C(A^T)$ and the last $n-r$ columns form an orthonormal basis for $N(A)$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Write $V = [V_r \; V_{n-r}]$ where $V_r$ has the first $r$ columns.<br/>
+        $A = U_r \Sigma_r V_r^T$. Then $A^T = V_r \Sigma_r U_r^T$.<br/>
+        Any vector in $C(A^T)$ has form $A^T y = V_r (\Sigma_r U_r^T y)$, which is in $\text{Span}(V_r)$. Conversely, $V_r = A^T (U_r \Sigma_r^{-1})$, so $\text{Span}(V_r) \subseteq C(A^T)$.<br/><br/>
+        For $N(A)$: $AV_{n-r} = U_r \Sigma_r V_r^T V_{n-r} = 0$ since $V_r^T V_{n-r} = 0$ (orthogonality of $V$). Thus $\text{Span}(V_{n-r}) \subseteq N(A)$. By dimensions, $\dim(N(A)) = n-r = \dim(\text{Span}(V_{n-r}))$, so they are equal.</p>
+    </div>
+</div>
+
+<h3>Topic: Multicollinearity</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P4.1.</strong> A regression has design matrix $X$ with condition number $\kappa(X) = 5000$. The smallest singular value is $\sigma_{\min} = 0.01$. What is $\sigma_{\max}$? Is this a concern?</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>$\sigma_{\max} = \kappa \cdot \sigma_{\min} = 5000 \times 0.01 = 50$. Yes, $\kappa > 1000$ indicates severe multicollinearity. Estimates will be numerically unstable.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P4.2.</strong> You have two predictors $X_1$ and $X_2$ with correlation $\rho = 0.99$. Derive an approximate formula for $\text{VIF}_1$ in terms of $\rho$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Regressing $X_1$ on $X_2$ gives $R_1^2 = \rho^2 = 0.9801$. Thus $\text{VIF}_1 = \frac{1}{1 - 0.9801} = \frac{1}{0.0199} \approx 50.25$.<br/>
+        In general, for two predictors: $\text{VIF}_1 = \text{VIF}_2 = \frac{1}{1 - \rho^2}$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P4.3.</strong> In ridge regression, we solve $\hat{\beta}_{ridge} = (X^T X + \lambda I)^{-1} X^T y$. Let $X = U\Sigma V^T$ be the SVD. Show that $\hat{\beta}_{ridge} = V D U^T y$ where $D$ is diagonal with entries $\frac{\sigma_i}{\sigma_i^2 + \lambda}$. Explain how this stabilizes the solution when $X$ has small singular values, and connect this to the rank-nullity theorem.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>$X^T X + \lambda I = V \Sigma^2 V^T + \lambda V V^T = V(\Sigma^2 + \lambda I)V^T$.<br/>
+        Inverse: $V(\Sigma^2 + \lambda I)^{-1}V^T$.<br/>
+        Thus $\hat{\beta} = V(\Sigma^2 + \lambda I)^{-1}V^T V \Sigma U^T y = V(\Sigma^2 + \lambda I)^{-1} \Sigma U^T y$.<br/>
+        The $i$-th diagonal entry is $\frac{\sigma_i}{\sigma_i^2 + \lambda}$.<br/><br/>
+        When $\sigma_i \approx 0$ (near-null space direction), the unregularized inverse would have $1/\sigma_i \to \infty$, amplifying noise. Ridge replaces this with $\sigma_i / \lambda \approx 0$, effectively <strong>shrinking the null space components</strong> toward zero. The solution lives primarily in the row space (the stable, high-signal subspace).</p>
+    </div>
+</div>
+
+<h3>Topic: Model Redundancy</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P5.1.</strong> A factor model uses 5 factors but the return matrix $R$ has rank 3. How many redundant factors exist? What does this imply about the factor covariance matrix?</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>There are $5 - 3 = 2$ redundant factors. The factor covariance matrix $\Sigma_F$ will be singular (rank 3, not 5). Its inverse does not exist, and minimum-variance optimization using $\Sigma_F$ requires pseudoinverse or regularization.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P5.2.</strong> You have a design matrix $X \in \mathbb{R}^{100 \times 10}$. You compute $\text{rank}(X) = 8$. How many degrees of freedom should you use for the residual variance estimate $\hat{\sigma}^2 = \frac{\|y - X\hat{\beta}\|^2}{n - k}$? Should $k = 10$ or $k = 8$?</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Use $k = 8$ (the rank), not $k = 10$. The correct degrees of freedom is $n - \text{rank}(X) = 92$. Using $k = 10$ would understate the residual variance because it pretends 10 parameters were estimated when only 8 were identifiable. This affects all t-tests, F-tests, and confidence intervals.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P5.3.</strong> A hedge fund claims to trade 100 "independent" strategies. You stack their monthly returns into $R \in \mathbb{R}^{60 \times 100}$ and find only 7 singular values above 5% of the maximum. Construct a statistical test to determine if the effective rank is significantly less than 100, and explain the economic implications.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Use the <strong>random matrix theory</strong> Marchenko-Pastur distribution. For an $n \times p$ matrix of i.i.d. noise, the eigenvalues of $\frac{1}{n}X^T X$ are bounded by $\sigma^2(1 \pm \sqrt{p/n})^2$. Eigenvalues above this upper bound indicate signal; those within the MP band are noise.<br/><br/>
+        Here $n=60, p=100$, so $p/n = 1.67$. The upper MP bound is approximately $\sigma^2(1 + \sqrt{1.67})^2 \approx 4.8\sigma^2$. If only 7 eigenvalues exceed this, the effective rank is 7.<br/><br/>
+        <strong>Economic implication:</strong> The fund is charging fees on 100 strategies but delivering only 7 independent risk premia. Investors are paying for diversification they are not receiving. The remaining 93 strategies are either noise or linear combinations of the 7 true factors.</p>
+    </div>
+</div>
+
+<h3>Topic: Constraint Feasibility</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-easy">EASY</span>
+    <p><strong>P6.1.</strong> Check if $Ax = b$ is feasible for $A = \begin{bmatrix} 1 & 2 \\ 2 & 4 \\ 3 & 6 \end{bmatrix}$ and $b = \begin{bmatrix} 3 \\ 6 \\ 10 \end{bmatrix}$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Rank(A) = 1. Augmented matrix $[A|b] = \begin{bmatrix} 1 & 2 & 3 \\ 2 & 4 & 6 \\ 3 & 6 & 10 \end{bmatrix}$. RREF shows rank = 2 (third row becomes $[0, 0, 1]$). Since $\text{rank}(A) \neq \text{rank}([A|b])$, the system is <strong>infeasible</strong>. Alternatively, left null space vector $y = [-2, 1, 0]^T$ gives $y^T b = -6 + 6 = 0$, but $y = [-3, 0, 1]^T$ gives $y^T b = -9 + 10 = 1 \neq 0$. Infeasible.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-medium">MEDIUM</span>
+    <p><strong>P6.2.</strong> A portfolio has constraints: (i) $\sum w_i = 1$, (ii) $\sum w_i \beta_i = 0$ (market neutral), (iii) $w_1 + w_2 = 0.5$. Write the constraint matrix $A$ and vector $b$. Under what condition on $\beta$ is this system guaranteed feasible for any $b$?</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>$A = \begin{bmatrix} 1 & 1 & 1 & \cdots & 1 \\ \beta_1 & \beta_2 & \beta_3 & \cdots & \beta_n \\ 1 & 1 & 0 & \cdots & 0 \end{bmatrix}$, $b = \begin{bmatrix} 1 \\ 0 \\ 0.5 \end{bmatrix}$.<br/>
+        For feasibility for <em>any</em> $b$, $A$ must have full row rank (rank = 3). This requires the rows to be independent. If $\beta_1 = \beta_2$, rows 1 and 3 might combine to produce row 2 for certain $\beta$ patterns. Specifically, if $\beta_1 = \beta_2 = c$ and all other $\beta_i = c$ too, then row 2 = $c \times$ row 1, making rank < 3.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P6.3.</strong> (Farkas' Lemma Application) In a market with 3 assets, the payoff matrix is $A = \begin{bmatrix} 1 & 1 & 1 \\ 2 & 1 & 3 \\ 1 & 2 & 1 \end{bmatrix}$ (states $\times$ assets). The price vector is $p = [1, 1, 1]^T$. A claim with payoff $b = [2, 3, 2]^T$ is introduced. Use Farkas' lemma to determine if there exists an arbitrage portfolio $y$ such that $y^T A \geq 0$ and $y^T b < 0$, or if $b$ is replicable with non-negative holdings.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>First check if $b \in C(A)$. RREF of $[A|b]$ shows rank = 3, same as rank(A), so $b$ is replicable: $b = A x$ for some $x$.<br/>
+        Solving: $x = [1, 0, 1]^T$. All entries non-negative!<br/>
+        By Farkas' Lemma, case (1) holds: there exists $x \geq 0$ with $Ax = b$. Therefore case (2) is false — no arbitrage exists for this claim.<br/><br/>
+        If instead $b = [2, 3, 4]^T$, we find $x = [0.5, 1.5, 0]^T$ (also non-negative), so still no arbitrage. But if $b$ were outside $C(A)$ or required negative holdings, an arbitrage $y$ would exist in the left null space of the augmented system.</p>
+    </div>
+</div>
+
+<h3>Topic: Synthesis & Proof</h3>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P7.1.</strong> Let $P \in \mathbb{R}^{n \times n}$ be a projection matrix onto a subspace $S$ of dimension $k$. Show that $\text{rank}(P) = k$, $N(P) = S^\perp$, and $C(P) = S$. Then explain why the residual maker $M = I - P$ is also a projection, and identify its four fundamental subspaces in terms of those of $P$.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>$P$ is idempotent ($P^2 = P$) and symmetric. For any $x$, $Px \in S$ by definition, so $C(P) \subseteq S$. For any $s \in S$, $Ps = s$, so $S \subseteq C(P)$. Thus $C(P) = S$ and $\text{rank}(P) = \dim(S) = k$.<br/>
+        If $x \in N(P)$, then $Px = 0$, so $x \perp S$ (since $P$ projects onto $S$). Thus $N(P) = S^\perp$.<br/>
+        $M = I - P$ is symmetric and $M^2 = I - 2P + P^2 = I - 2P + P = I - P = M$, so $M$ is a projection.<br/>
+        $C(M) = N(P) = S^\perp$, $N(M) = C(P) = S$, $C(M^T) = C(M) = S^\perp$, $N(M^T) = N(M) = S$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P7.2.</strong> (Quant Interview Problem) You are given a covariance matrix $\Sigma \in \mathbb{R}^{p \times p}$ estimated from $n < p$ observations. Prove that $\Sigma$ is rank-deficient and find its maximum possible rank. If you need to compute $\Sigma^{-1}$ for Markowitz optimization, what should you do?</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>The sample covariance is $\Sigma = \frac{1}{n-1} X^T X$ where $X \in \mathbb{R}^{n \times p}$ is the centered data matrix. Since $\text{rank}(X^T X) = \text{rank}(X) \leq \min(n, p) = n < p$, $\Sigma$ has rank at most $n$. It is singular.<br/><br/>
+        <strong>Remedies:</strong><br/>
+        1. <strong>Shrinkage:</strong> $\hat{\Sigma} = \delta F + (1-\delta)\Sigma$ where $F$ is a well-conditioned target (e.g., identity or single-index model).<br/>
+        2. <strong>PCA:</strong> Keep only top $n$ eigencomponents, invert in that subspace, and set inverse to 0 in null space (or use pseudoinverse).<br/>
+        3. <strong>Ridge:</strong> Add $\lambda I$ to $\Sigma$ before inverting.<br/>
+        4. <strong>Factor model:</strong> Model $\Sigma = B\Sigma_F B^T + D$ where $B$ is $p \times k$ with $k \ll p$.</p>
+    </div>
+</div>
+
+<div class="exercise">
+    <span class="tier-label tier-hard">HARD</span>
+    <p><strong>P7.3.</strong> Let $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{n \times p}$. Prove that $\text{rank}(A) + \text{rank}(B) - n \leq \text{rank}(AB) \leq \min(\text{rank}(A), \text{rank}(B))$. This is the <strong>Sylvester rank inequality</strong>. Explain its quant interpretation when $A$ is a factor loading matrix and $B$ is a factor return matrix.</p>
+    <button class="collapsible" onclick="toggle(this)">Show Solution</button>
+    <div class="content">
+        <p>Upper bound proved in P2.2. For lower bound: consider the linear map $T: C(B) \to C(AB)$ defined by $T(x) = Ax$. The null space of $T$ is $C(B) \cap N(A)$. By rank-nullity on $T$: $\dim(C(B)) = \dim(C(AB)) + \dim(C(B) \cap N(A))$. Thus $\text{rank}(B) \leq \text{rank}(AB) + \dim(N(A)) = \text{rank}(AB) + n - \text{rank}(A)$. Rearranging gives the lower bound.<br/><br/>
+        <strong>Quant interpretation:</strong> If $A$ is $p \times k$ (loadings) and $B$ is $k \times T$ (factor returns), then $AB$ is the $p \times T$ matrix of explained returns. The inequality says the explained return matrix cannot have rank higher than either the loading matrix or the factor return matrix. Moreover, if the factor model is "saturated" ($k$ factors, $k$ independent loadings, $k$ independent factor time series), then $\text{rank}(AB) = k$.</p>
+    </div>
+</div>
+</div>
+<div class="nav-buttons">
+    <button id="prevBtn" onclick="prevSection()">← Previous</button>
+    <button id="nextBtn" onclick="nextSection()">Next →</button>
+</div>
+</main>
+</div>
+
+<script>
+    let currentSection = 0;
+    const totalSections = 17;
+
+    function showSection(index) {
+        if (index < 0 || index >= totalSections) return;
+
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-list button').forEach(b => b.classList.remove('active'));
+
+        // Show target
+        document.getElementById('section-' + index).classList.add('active');
+        document.getElementById('nav-' + index).classList.add('active');
+
+        currentSection = index;
+
+        // Update buttons
+        document.getElementById('prevBtn').disabled = (index === 0);
+        document.getElementById('nextBtn').disabled = (index === totalSections - 1);
+
+        // Update progress
+        const progress = ((index + 1) / totalSections) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+
+        // Scroll to top
+        document.querySelector('.main').scrollTop = 0;
+        window.scrollTo(0, 0);
+    }
+
+    function prevSection() { showSection(currentSection - 1); }
+    function nextSection() { showSection(currentSection + 1); }
+
+    function toggle(btn) {
+        const content = btn.nextElementSibling;
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            btn.textContent = 'Show Solution';
+        } else {
+            content.style.display = 'block';
+            btn.textContent = 'Hide Solution';
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft') prevSection();
+        if (e.key === 'ArrowRight') nextSection();
+    });
+
+    // Initialize Mermaid
+    mermaid.initialize({startOnLoad: true, theme: 'default'});
+
+    // Show first section
+    showSection(0);
+</script>
+</body>
+</html>

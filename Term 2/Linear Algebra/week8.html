@@ -1,0 +1,2807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVD & Dimensionality Reduction — Complete Quant Study Guide</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --success: #34d399;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  header {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  header h1 { font-size: 1.8rem; color: var(--accent); margin-bottom: 0.5rem; }
+  header p { color: var(--text2); font-size: 1rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+    padding-top: 1rem;
+  }
+  .tab-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .tab-btn:hover { background: var(--surface2); color: var(--text); }
+  .tab-btn.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+  .tab-content { display: none; animation: fadeIn 0.3s; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { color: var(--accent); margin: 2rem 0 1rem; font-size: 1.5rem; border-left: 4px solid var(--accent); padding-left: 1rem; }
+  h3 { color: var(--accent2); margin: 1.5rem 0 0.75rem; font-size: 1.2rem; }
+  h4 { color: var(--success); margin: 1.2rem 0 0.5rem; font-size: 1.05rem; }
+  p { margin-bottom: 1rem; color: var(--text); }
+  .callout {
+    background: var(--surface);
+    border-left: 4px solid var(--accent);
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout.warn { border-left-color: var(--warn); }
+  .callout.danger { border-left-color: var(--danger); }
+  .callout.success { border-left-color: var(--success); }
+  .callout-title { font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+
+  code, pre {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: #0b1220;
+    border-radius: 6px;
+  }
+  code { padding: 0.2rem 0.4rem; font-size: 0.9em; color: var(--accent); }
+  pre {
+    padding: 1.2rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  pre code { padding: 0; background: none; }
+
+  .math-block {
+    background: var(--surface);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 1.1rem;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .diagram-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .diagram-caption {
+    margin-top: 0.75rem;
+    color: var(--text2);
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .exercise-tier {
+    margin: 1.5rem 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .tier-header {
+    padding: 0.8rem 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .tier-easy .tier-header { background: rgba(52,211,153,0.15); color: var(--success); }
+  .tier-medium .tier-header { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .tier-hard .tier-header { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .tier-body { padding: 1.2rem; background: var(--surface); }
+  .tier-body ol { padding-left: 1.5rem; }
+  .tier-body li { margin-bottom: 0.8rem; }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .resource-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .resource-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .resource-card h4 { margin: 0 0 0.5rem; color: var(--accent); }
+  .resource-card p { font-size: 0.9rem; color: var(--text2); margin: 0; }
+  .resource-card a { color: var(--accent2); text-decoration: none; }
+  .resource-card a:hover { text-decoration: underline; }
+
+  .step-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+  .step-box {
+    background: var(--surface2);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .step-arrow { color: var(--accent); font-size: 1.2rem; font-weight: bold; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    .tabs { gap: 0.3rem; }
+    .tab-btn { padding: 0.5rem 0.8rem; font-size: 0.8rem; }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface2); color: var(--accent); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-prereq { background: rgba(129,140,248,0.2); color: var(--accent2); }
+  .badge-core { background: rgba(56,189,248,0.2); color: var(--accent); }
+  .badge-quant { background: rgba(52,211,153,0.2); color: var(--success); }
+
+  .progress-track {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .progress-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--text2);
+  }
+  .progress-item.done { background: rgba(52,211,153,0.15); border-color: var(--success); color: var(--success); }
+
+  .colab-box {
+    background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(129,140,248,0.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .colab-box h4 { color: var(--accent); margin-top: 0; }
+
+  .formula-inline { font-family: 'Georgia', serif; font-style: italic; color: var(--accent); }
+
+  .highlight-box {
+    background: rgba(251,191,36,0.1);
+    border: 1px dashed var(--warn);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text2);
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    font-size: 0.9rem;
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>🔷 SVD & Dimensionality Reduction</h1>
+  <p>A Complete Self-Contained Study Guide for Aspiring Quant Engineers</p>
+  <p style="margin-top:0.5rem;font-size:0.85rem;color:#64748b;">Offline Ready • Visual • Interactive • With Code & Exercises</p>
+</header>
+
+<div class="container">
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('roadmap')">📍 Roadmap</button>
+  <button class="tab-btn" onclick="showTab('prereq')">🧱 Prerequisites</button>
+  <button class="tab-btn" onclick="showTab('svd-theory')">🔬 SVD Theory</button>
+  <button class="tab-btn" onclick="showTab('svd-compute')">⚙️ SVD Computation</button>
+  <button class="tab-btn" onclick="showTab('lowrank')">📉 Low-Rank Approx</button>
+  <button class="tab-btn" onclick="showTab('eckart')">🏛️ Eckart-Young</button>
+  <button class="tab-btn" onclick="showTab('factor')">📊 Factor Reduction</button>
+  <button class="tab-btn" onclick="showTab('arb')">💹 Stat Arb Signals</button>
+  <button class="tab-btn" onclick="showTab('covreg')">🛡️ Covariance Reg</button>
+  <button class="tab-btn" onclick="showTab('experiments')">🧪 Colab Labs</button>
+  <button class="tab-btn" onclick="showTab('exercises')">📝 All Exercises</button>
+  <button class="tab-btn" onclick="showTab('resources')">🔗 Resources</button>
+</div>
+
+<!-- ==================== ROADMAP ==================== -->
+<div id="roadmap" class="tab-content active">
+  <h2>📍 Learning Roadmap</h2>
+  <p>This guide is designed as a <strong>linear progression</strong>. Each topic builds on the previous one. Do not skip prerequisites — they contain intuitions you will need later.</p>
+
+  <div class="progress-track">
+    <div class="progress-item">1. Prerequisites</div>
+    <div class="progress-item">2. SVD Theory</div>
+    <div class="progress-item">3. SVD Computation</div>
+    <div class="progress-item">4. Low-Rank Approximation</div>
+    <div class="progress-item">5. Eckart-Young Theorem</div>
+    <div class="progress-item">6. Factor Reduction</div>
+    <div class="progress-item">7. Stat Arb Signals</div>
+    <div class="progress-item">8. Covariance Regularization</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">💡 How to Use This Guide</div>
+    <p>• Read each tab in order. Every tab assumes you understood the previous ones.<br>
+    • Run the Colab experiments <em>as you read</em> — not after.<br>
+    • Do at least the Easy exercises before moving to the next topic.<br>
+    • The HTML file works 100% offline. Save it and study anywhere.</p>
+  </div>
+
+  <h3>Topic Dependency Graph</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+        </marker>
+      </defs>
+      <!-- Prerequisites -->
+      <rect x="350" y="20" width="200" height="40" rx="8" fill="#334155" stroke="#818cf8" stroke-width="2"/>
+      <text x="450" y="45" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Prerequisites</text>
+
+      <!-- SVD Theory -->
+      <rect x="350" y="100" width="200" height="40" rx="8" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="450" y="125" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">SVD Theory</text>
+
+      <!-- SVD Computation -->
+      <rect x="150" y="180" width="200" height="40" rx="8" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="250" y="205" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">SVD Computation</text>
+
+      <!-- Low Rank -->
+      <rect x="650" y="180" width="200" height="40" rx="8" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="750" y="205" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Low-Rank Approx</text>
+
+      <!-- Eckart-Young -->
+      <rect x="650" y="260" width="200" height="40" rx="8" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="750" y="285" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Eckart-Young Theorem</text>
+
+      <!-- Factor Reduction -->
+      <rect x="150" y="340" width="200" height="40" rx="8" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="250" y="365" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Factor Reduction</text>
+
+      <!-- Stat Arb -->
+      <rect x="400" y="340" width="200" height="40" rx="8" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="500" y="365" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Statistical Arbitrage</text>
+
+      <!-- Cov Reg -->
+      <rect x="650" y="340" width="200" height="40" rx="8" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="750" y="365" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Covariance Regularization</text>
+
+      <!-- Arrows -->
+      <line x1="450" y1="60" x2="450" y2="100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="400" y1="140" x2="280" y2="180" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="500" y1="140" x2="720" y2="180" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="750" y1="220" x2="750" y2="260" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="200" y1="220" x2="230" y2="340" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="450" y1="220" x2="450" y2="300" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)" opacity="0.3"/>
+      <line x1="700" y1="300" x2="720" y2="340" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="750" y1="300" x2="750" y2="340" stroke="#34d399" stroke-width="2" marker-end="url(#arrow)"/>
+    </svg>
+    <div class="diagram-caption">Blue = Core Theory &nbsp;|&nbsp; Green = Quant Applications</div>
+  </div>
+
+  <h3>Estimated Time</h3>
+  <table>
+    <tr><th>Section</th><th>Reading</th><th>Experiments</th><th>Exercises</th></tr>
+    <tr><td>Prerequisites</td><td>45 min</td><td>30 min</td><td>30 min</td></tr>
+    <tr><td>SVD Theory</td><td>60 min</td><td>45 min</td><td>45 min</td></tr>
+    <tr><td>SVD Computation</td><td>45 min</td><td>30 min</td><td>30 min</td></tr>
+    <tr><td>Low-Rank Approximation</td><td>45 min</td><td>30 min</td><td>30 min</td></tr>
+    <tr><td>Eckart-Young Theorem</td><td>30 min</td><td>20 min</td><td>30 min</td></tr>
+    <tr><td>Factor Reduction</td><td>45 min</td><td>45 min</td><td>30 min</td></tr>
+    <tr><td>Statistical Arbitrage</td><td>60 min</td><td>60 min</td><td>45 min</td></tr>
+    <tr><td>Covariance Regularization</td><td>45 min</td><td>30 min</td><td>30 min</td></tr>
+  </table>
+  <p><strong>Total:</strong> ~15-18 hours for a complete first pass.</p>
+</div>
+
+<!-- ==================== PREREQUISITES ==================== -->
+<div id="prereq" class="tab-content">
+  <h2>🧱 Prerequisites</h2>
+  <p>Before touching SVD, you need solid footing in four areas. Each is explained below in "first-principles" terms — no prior knowledge assumed.</p>
+
+  <h3><span class="badge badge-prereq">Prereq 1</span> Vectors & Matrices (The LEGO Blocks)</h3>
+  <p>A <strong>vector</strong> is just a list of numbers. Think of it as an arrow pointing from the origin to a point in space.</p>
+  <div class="two-col">
+    <div>
+      <div class="math-block">
+        <strong>Column Vector</strong><br><br>
+        v = [3, 4]ᵀ<br><br>
+        This arrow goes 3 units right,<br>4 units up.
+      </div>
+    </div>
+    <div>
+      <div class="math-block">
+        <strong>Matrix</strong><br><br>
+        A = [[1, 2], [3, 4], [5, 6]]<br><br>
+        A collection of vectors stacked together.<br>3 rows × 2 columns = 3 data points in 2D space.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🎯 Key Intuition for Quants</div>
+    <p>In finance, a matrix often represents <strong>returns data</strong>: rows = days, columns = assets. Each column is a time series (a vector of daily returns for one stock). Each row is a snapshot of all assets on one day.</p>
+  </div>
+
+  <h4>Matrix Multiplication as Transformation</h4>
+  <p>When you multiply a matrix <span class="formula-inline">A</span> by a vector <span class="formula-inline">x</span>, you are <strong>transforming</strong> <span class="formula-inline">x</span> into a new vector <span class="formula-inline">Ax</span>.</p>
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="50" y="60" width="80" height="80" rx="5" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="90" y="105" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">A</text>
+      <text x="90" y="125" text-anchor="middle" fill="#94a3b8" font-size="11">m×n</text>
+
+      <rect x="200" y="75" width="50" height="50" rx="5" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="225" y="105" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">x</text>
+      <text x="225" y="120" text-anchor="middle" fill="#94a3b8" font-size="11">n×1</text>
+
+      <text x="280" y="105" text-anchor="middle" fill="#38bdf8" font-size="24" font-weight="bold">=</text>
+
+      <rect x="340" y="60" width="80" height="80" rx="5" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="380" y="105" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">Ax</text>
+      <text x="380" y="125" text-anchor="middle" fill="#94a3b8" font-size="11">m×1</text>
+
+      <text x="480" y="105" text-anchor="middle" fill="#94a3b8" font-size="13">New vector!</text>
+
+      <path d="M130 100 L190 100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <path d="M255 100 L330 100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+    </svg>
+    <div class="diagram-caption">Matrix × Vector = Transformed Vector. The matrix "does something" to the vector.</div>
+  </div>
+
+  <h3><span class="badge badge-prereq">Prereq 2</span> Eigenvalues & Eigenvectors (The Special Directions)</h3>
+  <p>Most vectors get <em>both</em> stretched and rotated when multiplied by a matrix. But some special vectors only get <strong>stretched</strong> — they keep their direction. These are <strong>eigenvectors</strong>.</p>
+
+  <div class="math-block">
+    <strong>Eigenvalue Equation</strong><br><br>
+    A·v = λ·v<br><br>
+    <span style="color:#94a3b8;">The matrix A stretches eigenvector v by factor λ (the eigenvalue), without rotating it.</span>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Before -->
+      <text x="120" y="30" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="bold">BEFORE: v</text>
+      <line x1="120" y1="220" x2="120" y2="50" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="20" y1="150" x2="220" y2="150" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="120" y1="150" x2="180" y2="90" stroke="#34d399" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="185" y="85" fill="#34d399" font-size="12" font-weight="bold">v</text>
+
+      <!-- After -->
+      <text x="520" y="30" text-anchor="middle" fill="#94a3b8" font-size="13" font-weight="bold">AFTER: Av = λv</text>
+      <line x1="520" y1="220" x2="520" y2="50" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="420" y1="150" x2="620" y2="150" stroke="#475569" stroke-width="1" stroke-dasharray="4"/>
+      <line x1="520" y1="150" x2="610" y2="60" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="615" y="55" fill="#fbbf24" font-size="12" font-weight="bold">λv</text>
+
+      <!-- Same direction indicator -->
+      <text x="320" y="140" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="bold">Same direction!</text>
+      <text x="320" y="165" text-anchor="middle" fill="#94a3b8" font-size="12">Only length changes</text>
+      <path d="M250 150 L280 150" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+      <path d="M390 150 L360 150" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+    </svg>
+    <div class="diagram-caption">Eigenvectors are the "special directions" that survive matrix multiplication unchanged in direction.</div>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🧠 Why This Matters for SVD</div>
+    <p>SVD is essentially a <strong>generalized eigen-decomposition</strong> that works for <em>any</em> matrix (even non-square ones). Eigen-decomposition only works for square matrices. SVD finds the "special directions" of <em>any</em> data matrix.</p>
+  </div>
+
+  <h3><span class="badge badge-prereq">Prereq 3</span> Covariance (How Things Move Together)</h3>
+  <p><strong>Covariance</strong> measures how two variables change together. In finance, we care about how stock returns move together.</p>
+
+  <div class="math-block">
+    Cov(X, Y) = E[(X − μₓ)(Y − μᵧ)]<br><br>
+    <span style="color:#94a3b8;">Positive covariance → they tend to rise and fall together.<br>
+    Negative covariance → when one rises, the other tends to fall.<br>
+    Near zero → they move independently.</span>
+  </div>
+
+  <div class="two-col">
+    <div class="diagram-box" style="margin:0;">
+      <svg viewBox="0 0 250 180" xmlns="http://www.w3.org/2000/svg">
+        <text x="125" y="20" text-anchor="middle" fill="#34d399" font-size="13" font-weight="bold">Positive Covariance</text>
+        <line x1="30" y1="150" x2="220" y2="150" stroke="#475569" stroke-width="1"/>
+        <line x1="30" y1="150" x2="30" y2="30" stroke="#475569" stroke-width="1"/>
+        <circle cx="50" cy="130" r="4" fill="#34d399"/><circle cx="70" cy="110" r="4" fill="#34d399"/>
+        <circle cx="90" cy="95" r="4" fill="#34d399"/><circle cx="110" cy="80" r="4" fill="#34d399"/>
+        <circle cx="130" cy="70" r="4" fill="#34d399"/><circle cx="150" cy="55" r="4" fill="#34d399"/>
+        <circle cx="170" cy="45" r="4" fill="#34d399"/><circle cx="190" cy="35" r="4" fill="#34d399"/>
+        <line x1="50" y1="130" x2="190" y2="35" stroke="#34d399" stroke-width="1" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="diagram-box" style="margin:0;">
+      <svg viewBox="0 0 250 180" xmlns="http://www.w3.org/2000/svg">
+        <text x="125" y="20" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">Negative Covariance</text>
+        <line x1="30" y1="150" x2="220" y2="150" stroke="#475569" stroke-width="1"/>
+        <line x1="30" y1="150" x2="30" y2="30" stroke="#475569" stroke-width="1"/>
+        <circle cx="50" cy="40" r="4" fill="#f87171"/><circle cx="70" cy="55" r="4" fill="#f87171"/>
+        <circle cx="90" cy="70" r="4" fill="#f87171"/><circle cx="110" cy="85" r="4" fill="#f87171"/>
+        <circle cx="130" cy="100" r="4" fill="#f87171"/><circle cx="150" cy="115" r="4" fill="#f87171"/>
+        <circle cx="170" cy="125" r="4" fill="#f87171"/><circle cx="190" cy="140" r="4" fill="#f87171"/>
+        <line x1="50" y1="40" x2="190" y2="140" stroke="#f87171" stroke-width="1" opacity="0.5"/>
+      </svg>
+    </div>
+  </div>
+
+  <p>The <strong>covariance matrix</strong> <span class="formula-inline">Σ</span> for <span class="formula-inline">n</span> assets is an <span class="formula-inline">n×n</span> matrix where entry <span class="formula-inline">Σᵢⱼ</span> is the covariance between asset <span class="formula-inline">i</span> and asset <span class="formula-inline">j</span>.</p>
+
+  <h3><span class="badge badge-prereq">Prereq 4</span> Orthogonality (Perpendicularity in High Dimensions)</h3>
+  <p>Two vectors are <strong>orthogonal</strong> if they are perpendicular — their dot product is zero.</p>
+  <div class="math-block">
+    u ⊥ v  ⟺  u·v = 0<br><br>
+    <span style="color:#94a3b8;">Orthogonal vectors carry independent information.<br>
+    This is the foundation of "decoupling" signals in quant finance.</span>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🔗 Connection to SVD</div>
+    <p>SVD decomposes any matrix into <strong>orthogonal</strong> components. This means it finds a set of completely independent "directions" in your data — no redundancy, no overlap. This is incredibly powerful for removing noise and finding true signals.</p>
+  </div>
+
+  <h3>Prerequisite Quick Check</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy — Verify Understanding</div>
+    <div class="tier-body">
+      <ol>
+        <li>Given vectors <code>a = [1, 2]</code> and <code>b = [2, -1]</code>, compute their dot product. Are they orthogonal?</li>
+        <li>What is the shape of a covariance matrix for 50 assets?</li>
+        <li>If a matrix A has eigenvalue λ=3 and eigenvector v, what is A·v?</li>
+        <li>Explain in one sentence why eigenvectors are "special directions."</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium — Apply Concepts</div>
+    <div class="tier-body">
+      <ol>
+        <li>Construct a 3×3 symmetric matrix. Compute its eigenvalues and eigenvectors using NumPy. Verify that A·v = λ·v for each.</li>
+        <li>Generate two correlated random time series in Python. Compute their covariance matrix. What does the off-diagonal element tell you?</li>
+        <li>Given covariance matrix Σ, show that it is always symmetric (Σ = Σᵀ). Why does this matter?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard — Deep Reasoning</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that for any real symmetric matrix, eigenvectors corresponding to distinct eigenvalues are orthogonal.</li>
+        <li>Given a covariance matrix Σ, show that it is positive semi-definite (xᵀΣx ≥ 0 for all x). What does this imply about its eigenvalues?</li>
+        <li>Explain why a covariance matrix with more assets than observations (n > T) is guaranteed to be singular. What are the implications for portfolio optimization?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SVD THEORY ==================== -->
+<div id="svd-theory" class="tab-content">
+  <h2>🔬 SVD Theory</h2>
+  <p>The <strong>Singular Value Decomposition (SVD)</strong> is one of the most important matrix factorizations in all of mathematics. It works for <em>any</em> matrix — square, rectangular, full rank, rank-deficient, symmetric, non-symmetric. This universality is why it dominates quant finance.</p>
+
+  <h3>The Fundamental Theorem</h3>
+  <p>Any real <span class="formula-inline">m × n</span> matrix <span class="formula-inline">A</span> can be decomposed as:</p>
+  <div class="math-block">
+    <strong>A = U Σ Vᵀ</strong><br><br>
+    Where:<br>
+    • U is <span class="formula-inline">m × m</span> orthogonal matrix (left singular vectors)<br>
+    • Σ is <span class="formula-inline">m × n</span> diagonal matrix (singular values, σ₁ ≥ σ₂ ≥ ... ≥ 0)<br>
+    • Vᵀ is <span class="formula-inline">n × n</span> orthogonal matrix (right singular vectors, transposed)
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 The Big Picture</div>
+    <p>SVD says: <strong>Any linear transformation can be broken down into three simple steps:</strong> (1) rotate the input space (Vᵀ), (2) stretch along axes (Σ), (3) rotate the output space (U). That's it. Every matrix operation is just "rotate → stretch → rotate."</p>
+  </div>
+
+  <h3>Visual Decomposition</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+        </marker>
+      </defs>
+
+      <!-- A -->
+      <rect x="30" y="110" width="90" height="100" rx="6" fill="#334155" stroke="#f87171" stroke-width="2"/>
+      <text x="75" y="160" text-anchor="middle" fill="#e2e8f0" font-size="22" font-weight="bold">A</text>
+      <text x="75" y="185" text-anchor="middle" fill="#94a3b8" font-size="11">m×n</text>
+
+      <text x="140" y="165" fill="#38bdf8" font-size="20" font-weight="bold">=</text>
+
+      <!-- U -->
+      <rect x="180" y="110" width="90" height="100" rx="6" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="225" y="155" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="bold">U</text>
+      <text x="225" y="175" text-anchor="middle" fill="#94a3b8" font-size="10">m×m</text>
+      <text x="225" y="195" text-anchor="middle" fill="#38bdf8" font-size="10">Rotate</text>
+
+      <!-- Sigma -->
+      <rect x="300" y="110" width="90" height="100" rx="6" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="345" y="155" text-anchor="middle" fill="#e2e8f0" font-size="20" font-weight="bold">Σ</text>
+      <text x="345" y="175" text-anchor="middle" fill="#94a3b8" font-size="10">m×n</text>
+      <text x="345" y="195" text-anchor="middle" fill="#fbbf24" font-size="10">Stretch</text>
+
+      <!-- V^T -->
+      <rect x="420" y="110" width="90" height="100" rx="6" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="465" y="150" text-anchor="middle" fill="#e2e8f0" font-size="18" font-weight="bold">Vᵀ</text>
+      <text x="465" y="175" text-anchor="middle" fill="#94a3b8" font-size="10">n×n</text>
+      <text x="465" y="195" text-anchor="middle" fill="#34d399" font-size="10">Rotate</text>
+
+      <!-- Dimensions -->
+      <text x="75" y="260" text-anchor="middle" fill="#94a3b8" font-size="12">Input: ℝⁿ</text>
+      <text x="345" y="260" text-anchor="middle" fill="#94a3b8" font-size="12">Scaled: ℝᵐ</text>
+      <text x="600" y="260" text-anchor="middle" fill="#94a3b8" font-size="12">Output: ℝᵐ</text>
+
+      <!-- Arrows showing flow -->
+      <path d="M75 220 L75 240" stroke="#475569" stroke-width="1" stroke-dasharray="3"/>
+      <path d="M225 220 L225 240" stroke="#475569" stroke-width="1" stroke-dasharray="3"/>
+      <path d="M345 220 L345 240" stroke="#475569" stroke-width="1" stroke-dasharray="3"/>
+      <path d="M465 220 L465 240" stroke="#475569" stroke-width="1" stroke-dasharray="3"/>
+
+      <!-- Expanded view -->
+      <text x="600" y="130" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Expanded:</text>
+      <text x="600" y="155" text-anchor="middle" fill="#e2e8f0" font-size="13">A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + ...</text>
+      <text x="600" y="180" text-anchor="middle" fill="#94a3b8" font-size="11">Sum of rank-1 matrices</text>
+      <text x="600" y="205" text-anchor="middle" fill="#94a3b8" font-size="11">weighted by singular values</text>
+    </svg>
+    <div class="diagram-caption">SVD factors any matrix into rotation → scaling → rotation. The expanded form shows A as a sum of rank-1 "layers."</div>
+  </div>
+
+  <h3>Understanding Each Component</h3>
+
+  <h4>U — The Left Singular Vectors (Output Directions)</h4>
+  <p><span class="formula-inline">U</span> is an orthogonal matrix. Its columns <span class="formula-inline">u₁, u₂, ..., uₘ</span> form an orthonormal basis for the <strong>column space</strong> of <span class="formula-inline">A</span>.</p>
+  <div class="callout">
+    <div class="callout-title">💡 Quant Interpretation</div>
+    <p>If <span class="formula-inline">A</span> is a returns matrix (days × assets), the columns of <span class="formula-inline">U</span> represent <strong>orthogonal time patterns</strong> (e.g., market-wide trends, sector rotations, idiosyncratic shocks). Each <span class="formula-inline">uᵢ</span> is a "pure" temporal signal with no overlap with others.</p>
+  </div>
+
+  <h4>Σ — The Singular Values (Importance Weights)</h4>
+  <p><span class="formula-inline">Σ</span> is a diagonal matrix (rectangular, padded with zeros) containing the <strong>singular values</strong> <span class="formula-inline">σ₁ ≥ σ₂ ≥ ... ≥ σᵣ ≥ 0</span>, where <span class="formula-inline">r</span> is the rank of <span class="formula-inline">A</span>.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+      <text x="250" y="25" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">Singular Value Spectrum</text>
+      <line x1="50" y1="180" x2="450" y2="180" stroke="#475569" stroke-width="1"/>
+      <line x1="50" y1="180" x2="50" y2="40" stroke="#475569" stroke-width="1"/>
+      <text x="250" y="205" text-anchor="middle" fill="#94a3b8" font-size="12">Index i (ordered)</text>
+      <text x="25" y="110" text-anchor="middle" fill="#94a3b8" font-size="12" transform="rotate(-90 25 110)">σᵢ</text>
+
+      <!-- Bars -->
+      <rect x="65" y="50" width="18" height="130" fill="#38bdf8" opacity="0.8" rx="2"/>
+      <rect x="95" y="70" width="18" height="110" fill="#38bdf8" opacity="0.8" rx="2"/>
+      <rect x="125" y="90" width="18" height="90" fill="#38bdf8" opacity="0.8" rx="2"/>
+      <rect x="155" y="110" width="18" height="70" fill="#38bdf8" opacity="0.7" rx="2"/>
+      <rect x="185" y="125" width="18" height="55" fill="#38bdf8" opacity="0.6" rx="2"/>
+      <rect x="215" y="140" width="18" height="40" fill="#38bdf8" opacity="0.5" rx="2"/>
+      <rect x="245" y="150" width="18" height="30" fill="#38bdf8" opacity="0.4" rx="2"/>
+      <rect x="275" y="160" width="18" height="20" fill="#38bdf8" opacity="0.3" rx="2"/>
+      <rect x="305" y="168" width="18" height="12" fill="#38bdf8" opacity="0.2" rx="2"/>
+      <rect x="335" y="172" width="18" height="8" fill="#38bdf8" opacity="0.15" rx="2"/>
+      <rect x="365" y="175" width="18" height="5" fill="#38bdf8" opacity="0.1" rx="2"/>
+      <rect x="395" y="177" width="18" height="3" fill="#38bdf8" opacity="0.08" rx="2"/>
+
+      <!-- Cutoff line -->
+      <line x1="50" y1="140" x2="450" y2="140" stroke="#f87171" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="460" y="143" fill="#f87171" font-size="11">noise floor</text>
+
+      <text x="180" y="35" fill="#34d399" font-size="11" font-weight="bold">Signal</text>
+      <text x="350" y="35" fill="#f87171" font-size="11" font-weight="bold">Noise</text>
+    </svg>
+    <div class="diagram-caption">Typically, only the first few singular values are large (signal). The rest are small (noise). This is the foundation of dimensionality reduction.</div>
+  </div>
+
+  <h4>Vᵀ — The Right Singular Vectors (Input Directions)</h4>
+  <p><span class="formula-inline">V</span> is also orthogonal. Its columns <span class="formula-inline">v₁, v₂, ..., vₙ</span> form an orthonormal basis for the <strong>row space</strong> of <span class="formula-inline">A</span>.</p>
+  <div class="callout">
+    <div class="callout-title">💡 Quant Interpretation</div>
+    <p>The columns of <span class="formula-inline">V</span> represent <strong>orthogonal portfolios</strong> or <strong>factor loadings</strong>. If <span class="formula-inline">v₁</span> = [0.5, 0.5, 0.5, 0.5], it means the first principal component is an equal-weighted portfolio of all four assets. The singular value <span class="formula-inline">σ₁</span> tells you how much variance this portfolio explains.</p>
+  </div>
+
+  <h3>The Sum-of-Rank-1 View</h3>
+  <p>This is the most powerful way to understand SVD:</p>
+  <div class="math-block">
+    <strong>A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + ... + σᵣuᵣvᵣᵀ</strong><br><br>
+    <span style="color:#94a3b8;">Each term σᵢuᵢvᵢᵀ is a rank-1 matrix.<br>
+    It is the outer product of a time pattern (uᵢ) and a portfolio loading (vᵢ), scaled by importance (σᵢ).<br>
+    The full matrix is just the sum of these "layers."</span>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Critical Insight</div>
+    <p>The singular values <span class="formula-inline">σᵢ</span> are like "volume knobs" for each layer. If <span class="formula-inline">σ₅</span> is tiny, then layer 5 contributes almost nothing to <span class="formula-inline">A</span>. You can turn that knob down to zero and barely change the matrix. This is <strong>low-rank approximation</strong> — the core idea of dimensionality reduction.</p>
+  </div>
+
+  <h3>Connection to PCA</h3>
+  <p>For a <strong>centered data matrix</strong> <span class="formula-inline">X</span> (mean subtracted), the right singular vectors <span class="formula-inline">V</span> are exactly the <strong>principal components</strong> of the data. The singular values squared, divided by (n−1), are the eigenvalues of the covariance matrix.</p>
+  <div class="math-block">
+    If X = UΣVᵀ, then:<br><br>
+    Cov(X) = (1/(n−1)) XᵀX = V (Σ²/(n−1)) Vᵀ<br><br>
+    <span style="color:#94a3b8;">So V diagonalizes the covariance matrix. The columns of V are the eigenvectors of XᵀX.</span>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 Why Quants Prefer SVD over Direct PCA</div>
+    <p>1. <strong>Numerical stability:</strong> SVD is more stable than computing XᵀX directly (which squares condition numbers).<br>
+    2. <strong>Works with missing data:</strong> SVD can be extended to handle incomplete matrices.<br>
+    3. <strong>Direct factor extraction:</strong> U gives you the time series of factors directly.</p>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>What are the dimensions of U, Σ, and Vᵀ if A is a 100×20 matrix?</li>
+        <li>Why must singular values be non-negative?</li>
+        <li>What is the rank of A if exactly 3 singular values are non-zero?</li>
+        <li>Explain why U and V are orthogonal matrices. What does UᵀU equal?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that AᵀA = VΣᵀΣVᵀ and AAᵀ = UΣΣᵀUᵀ. What does this tell you about the relationship between SVD and eigen-decomposition?</li>
+        <li>Given a rank-1 matrix A = uvᵀ, what are its singular values and singular vectors?</li>
+        <li>Show that the Frobenius norm of A equals the square root of the sum of squared singular values: ||A||<sub>F</sub>² = Σσᵢ².</li>
+        <li>For a returns matrix X (T×N), interpret the first left singular vector u₁ in financial terms.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove the SVD existence theorem: Show that any real matrix A can be written as UΣVᵀ. (Hint: Consider AᵀA, which is symmetric positive semi-definite, and apply the spectral theorem.)</li>
+        <li>Show that the best rank-k approximation of A in Frobenius norm is obtained by keeping the top k singular values. (This previews the Eckart-Young theorem — prove it from first principles.)</li>
+        <li>Given that SVD of a covariance matrix Σ = QΛQᵀ (spectral decomposition), relate the eigenvalues of Σ to the singular values of the data matrix X.</li>
+        <li>Explain why the condition number of a matrix is σ<sub>max</sub>/σ<sub>min</sub>. How does this relate to numerical stability in solving linear systems Ax = b?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SVD COMPUTATION ==================== -->
+<div id="svd-compute" class="tab-content">
+  <h2>⚙️ SVD Computation</h2>
+  <p>Understanding <em>how</em> SVD is computed deepens your intuition and helps you debug issues in production quant code. We'll cover the conceptual algorithm and practical implementation.</p>
+
+  <h3>The Power Iteration Intuition</h3>
+  <p>The simplest conceptual method to find the top singular vector is <strong>power iteration</strong>:</p>
+  <div class="math-block">
+    1. Start with random vector x<br>
+    2. Repeat: x ← AᵀAx / ||AᵀAx||<br>
+    3. x converges to the top right singular vector v₁<br><br>
+    <span style="color:#94a3b8;">Why? AᵀA has eigenvectors = right singular vectors, eigenvalues = σ².<br>
+    Power iteration amplifies the largest eigenvalue direction.</span>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 650 200" xmlns="http://www.w3.org/2000/svg">
+      <text x="325" y="25" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">Power Iteration: Finding the Dominant Direction</text>
+
+      <rect x="30" y="60" width="100" height="50" rx="6" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="80" y="90" text-anchor="middle" fill="#e2e8f0" font-size="13">Random x</text>
+
+      <path d="M130 85 L170 85" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <rect x="180" y="50" width="120" height="70" rx="6" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="240" y="75" text-anchor="middle" fill="#e2e8f0" font-size="12">Multiply by</text>
+      <text x="240" y="95" text-anchor="middle" fill="#fbbf24" font-size="13" font-weight="bold">AᵀA</text>
+      <text x="240" y="112" text-anchor="middle" fill="#94a3b8" font-size="10">Amplifies largest σ²</text>
+
+      <path d="M300 85 L340 85" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <rect x="350" y="50" width="120" height="70" rx="6" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="410" y="75" text-anchor="middle" fill="#e2e8f0" font-size="12">Normalize</text>
+      <text x="410" y="95" text-anchor="middle" fill="#34d399" font-size="13" font-weight="bold">÷ ||·||</text>
+      <text x="410" y="112" text-anchor="middle" fill="#94a3b8" font-size="10">Unit vector</text>
+
+      <path d="M470 85 L500 85" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <text x="530" y="80" fill="#94a3b8" font-size="12">Converges to</text>
+      <text x="530" y="100" fill="#e2e8f0" font-size="14" font-weight="bold">v₁</text>
+
+      <!-- Loop arrow -->
+      <path d="M410 120 Q410 160 240 160 Q70 160 80 110" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4" fill="none" marker-end="url(#arrow2)"/>
+      <text x="240" y="175" text-anchor="middle" fill="#f87171" font-size="11">Repeat until convergence</text>
+    </svg>
+    <div class="diagram-caption">Power iteration repeatedly applies AᵀA and normalizes. The random vector "aligns" with the dominant singular vector.</div>
+  </div>
+
+  <h3>Modern Algorithms: Golub-Kahan Bidiagonalization</h3>
+  <p>In practice, libraries like NumPy, LAPACK, and Intel MKL use sophisticated algorithms:</p>
+  <div class="step-flow">
+    <div class="step-box">1. Bidiagonalization</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">2. QR Iteration</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">3. Singular Values</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">4. Back-substitution</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">📐 Step 1: Bidiagonalization</div>
+    <p>Reduce A to bidiagonal form B (non-zero only on main diagonal and first super-diagonal) using Householder reflections. This is O(mn²) for m ≥ n.</p>
+  </div>
+  <div class="callout">
+    <div class="callout-title">📐 Step 2: QR Iteration on BᵀB</div>
+    <p>Apply implicit QR algorithm to find eigenvalues of BᵀB, which are σ². This is numerically stable and converges rapidly.</p>
+  </div>
+
+  <h3>Practical Implementation</h3>
+  <div class="colab-box">
+    <h4>💻 NumPy SVD</h4>
+    <pre><code>import numpy as np
+
+# Create a sample returns matrix: 252 days × 10 assets
+np.random.seed(42)
+returns = np.random.randn(252, 10) * 0.02  # 2% daily vol
+
+# Full SVD
+U, s, Vt = np.linalg.svd(returns, full_matrices=False)
+
+print(f"U shape: {U.shape}")      # (252, 10)
+print(f"s shape: {s.shape}")      # (10,) — singular values
+print(f"Vt shape: {Vt.shape}")    # (10, 10)
+
+# Reconstruct
+Sigma = np.diag(s)
+reconstructed = U @ Sigma @ Vt
+print(f"Reconstruction error: {np.linalg.norm(returns - reconstructed):.2e}")
+
+# Explained variance ratio
+explained_var = s**2 / np.sum(s**2)
+print(f"Explained variance by PC1: {explained_var[0]:.1%}")
+print(f"Explained variance by PC2: {explained_var[1]:.1%}")</code></pre>
+  </div>
+
+  <div class="colab-box">
+    <h4>💻 Truncated SVD (for large matrices)</h4>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+
+# If you only need top-k components (much faster!)
+svd = TruncatedSVD(n_components=5)
+factors = svd.fit_transform(returns)  # Shape: (252, 5)
+
+print(f"Components shape: {svd.components_.shape}")  # (5, 10)
+print(f"Explained variance: {svd.explained_variance_ratio_}")
+
+# components_[i] is the i-th right singular vector (portfolio loading)
+# factors[:, i] is the i-th left singular vector (time series)</code></pre>
+  </div>
+
+  <div class="colab-box">
+    <h4>💻 Randomized SVD (for massive matrices)</h4>
+    <pre><code>from sklearn.utils.extmath import randomized_svd
+
+# For very large matrices (e.g., 10,000 assets)
+U, s, Vt = randomized_svd(returns, n_components=5, random_state=42)
+
+# Much faster than full SVD for large n, with provable accuracy bounds</code></pre>
+  </div>
+
+  <h3>Computational Complexity</h3>
+  <table>
+    <tr><th>Operation</th><th>Complexity</th><th>When to Use</th></tr>
+    <tr><td>Full SVD</td><td>O(min(mn², m²n))</td><td>Small matrices, need all components</td></tr>
+    <tr><td>Truncated SVD (k components)</td><td>O(mnk)</td><td>Medium matrices, only top k needed</td></tr>
+    <tr><td>Randomized SVD</td><td>O(mnk + (m+n)k²)</td><td>Very large matrices, approximate</td></tr>
+    <tr><td>Incremental SVD</td><td>O(mnk) per chunk</td><td>Streaming data, online updates</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Quant Production Tip</div>
+    <p>Never compute the full covariance matrix and then eigendecompose it for large universes (e.g., S&P 500). The condition number blows up. Instead, compute SVD directly on the returns matrix — it's faster, more stable, and gives you factors directly.</p>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the NumPy SVD code above. Plot the singular value spectrum. How many components explain 90% of variance?</li>
+        <li>What is the difference between <code>full_matrices=True</code> and <code>full_matrices=False</code> in NumPy?</li>
+        <li>Reconstruct the matrix using only the top 3 singular values. Compute the Frobenius norm of the error.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement power iteration from scratch to find the top singular vector of a random matrix. Compare with NumPy's SVD.</li>
+        <li>Generate a returns matrix with known factor structure: r = Bf + ε, where f has 3 factors. Apply SVD and show that the top 3 singular values are much larger than the rest.</li>
+        <li>Time the execution of full SVD vs. TruncatedSVD vs. randomized_svd on matrices of size (1000, 500), (5000, 1000), and (10000, 500). Plot the results.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement the Golub-Kahan bidiagonalization algorithm for a small matrix (5×5) from scratch. Verify your bidiagonal matrix B satisfies A = UBVᵀ for orthogonal U, V.</li>
+        <li>Explain why the implicit QR algorithm is preferred over explicit QR for finding singular values. What is the "bulge chasing" procedure?</li>
+        <li>Design an incremental SVD update algorithm: given SVD of A, efficiently compute SVD of [A; a] (adding one new row). Test it on streaming returns data.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LOW-RANK APPROXIMATION ==================== -->
+<div id="lowrank" class="tab-content">
+  <h2>📉 Low-Rank Approximation</h2>
+  <p>Low-rank approximation is the <strong>core mechanism</strong> of dimensionality reduction. It says: "Your data matrix looks complicated, but it's mostly made of a few simple patterns. Let's keep only those."</p>
+
+  <h3>The Core Idea</h3>
+  <p>From the SVD sum-of-rank-1 form:</p>
+  <div class="math-block">
+    A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + ... + σᵣuᵣvᵣᵀ<br><br>
+    <span style="color:#94a3b8;">If σₖ₊₁, σₖ₊₂, ... are small, then:</span><br><br>
+    A ≈ σ₁u₁v₁ᵀ + ... + σₖuₖvₖᵀ = Aₖ<br><br>
+    <span style="color:#94a3b8;">Aₖ is a rank-k matrix that approximates A.</span>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 750 400" xmlns="http://www.w3.org/2000/svg">
+      <text x="375" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">Low-Rank Approximation as Layer Removal</text>
+
+      <!-- Full matrix layers -->
+      <text x="120" y="55" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Full Matrix A (rank r)</text>
+
+      <rect x="30" y="70" width="80" height="50" rx="4" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="70" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₁u₁v₁ᵀ</text>
+      <text x="70" y="115" text-anchor="middle" fill="#38bdf8" font-size="10">Big!</text>
+
+      <rect x="120" y="70" width="80" height="50" rx="4" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="160" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₂u₂v₂ᵀ</text>
+      <text x="160" y="115" text-anchor="middle" fill="#38bdf8" font-size="10">Big!</text>
+
+      <rect x="30" y="130" width="80" height="50" rx="4" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="70" y="160" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₃u₃v₃ᵀ</text>
+      <text x="70" y="175" text-anchor="middle" fill="#fbbf24" font-size="10">Medium</text>
+
+      <rect x="120" y="130" width="80" height="50" rx="4" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="160" y="160" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₄u₄v₄ᵀ</text>
+      <text x="160" y="175" text-anchor="middle" fill="#94a3b8" font-size="10">Small</text>
+
+      <rect x="75" y="190" width="80" height="40" rx="4" fill="#334155" stroke="#475569" stroke-width="1"/>
+      <text x="115" y="215" text-anchor="middle" fill="#64748b" font-size="11">... + noise</text>
+
+      <!-- Arrow -->
+      <text x="260" y="150" fill="#38bdf8" font-size="30" font-weight="bold">→</text>
+
+      <!-- Approximated -->
+      <text x="500" y="55" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Rank-2 Approximation A₂</text>
+
+      <rect x="410" y="70" width="80" height="50" rx="4" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="450" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₁u₁v₁ᵀ</text>
+
+      <rect x="500" y="70" width="80" height="50" rx="4" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="540" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">σ₂u₂v₂ᵀ</text>
+
+      <!-- Crossed out layers -->
+      <rect x="410" y="140" width="80" height="40" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="450" y="165" text-anchor="middle" fill="#475569" font-size="11" text-decoration="line-through">σ₃u₃v₃ᵀ</text>
+
+      <rect x="500" y="140" width="80" height="40" rx="4" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="540" y="165" text-anchor="middle" fill="#475569" font-size="11" text-decoration="line-through">σ₄u₄v₄ᵀ</text>
+
+      <text x="495" y="210" text-anchor="middle" fill="#f87171" font-size="12">Removed = Noise</text>
+
+      <!-- Bottom comparison -->
+      <rect x="30" y="280" width="320" height="80" rx="8" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="190" y="305" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Storage</text>
+      <text x="100" y="330" text-anchor="middle" fill="#94a3b8" font-size="12">Full: m×n = 1000×500</text>
+      <text x="100" y="348" text-anchor="middle" fill="#94a3b8" font-size="12">= 500,000 numbers</text>
+      <text x="280" y="330" text-anchor="middle" fill="#34d399" font-size="12">Rank-2: 2(m+n) = 3000</text>
+      <text x="280" y="348" text-anchor="middle" fill="#34d399" font-size="12">= 99.4% compression!</text>
+
+      <rect x="400" y="280" width="320" height="80" rx="8" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="560" y="305" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Interpretation</text>
+      <text x="560" y="330" text-anchor="middle" fill="#94a3b8" font-size="12">A₂ captures the</text>
+      <text x="560" y="348" text-anchor="middle" fill="#94a3b8" font-size="12">"signal" — A − A₂ is "noise"</text>
+    </svg>
+    <div class="diagram-caption">Low-rank approximation keeps the "big layers" and discards the "small layers." The error is the sum of discarded singular values.</div>
+  </div>
+
+  <h3>Measuring Approximation Quality</h3>
+  <p>How good is Aₖ? We use matrix norms:</p>
+
+  <div class="two-col">
+    <div class="math-block" style="margin:0;">
+      <strong>Frobenius Norm</strong><br><br>
+      ||A − Aₖ||<sub>F</sub>² = Σ<sub>i=k+1</sub><sup>r</sup> σᵢ²<br><br>
+      <span style="color:#94a3b8;">Sum of squared discarded singular values.<br>Good for overall energy.</span>
+    </div>
+    <div class="math-block" style="margin:0;">
+      <strong>Spectral (Operator) Norm</strong><br><br>
+      ||A − Aₖ||<sub>2</sub> = σₖ₊₁<br><br>
+      <span style="color:#94a3b8;">Largest singular value of the error.<br>Good for worst-case error.</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">📊 Choosing k in Practice</div>
+    <p><strong>Scree plot:</strong> Plot σᵢ vs. i. Look for the "elbow" where values drop off.<br>
+    <strong>Variance threshold:</strong> Choose smallest k such that Σᵢ₌₁ᵏ σᵢ² / Σᵢ₌₁ʳ σᵢ² ≥ 0.95 (95% variance explained).<br>
+    <strong>Cross-validation:</strong> Hold out data, choose k that minimizes prediction error.<br>
+    <strong>Domain knowledge:</strong> In equities, k=3-5 factors often capture 60-80% of variance.</p>
+  </div>
+
+  <h3>Geometric Interpretation</h3>
+  <p>Low-rank approximation projects your data onto a <strong>k-dimensional subspace</strong> spanned by the top k right singular vectors. This is the "best" k-dimensional subspace in the least-squares sense.</p>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="300" y="25" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">Projection onto Rank-1 Subspace</text>
+
+      <!-- 3D box representing data -->
+      <polygon points="100,200 250,200 280,170 130,170" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <polygon points="100,200 100,80 250,80 250,200" fill="none" stroke="#475569" stroke-width="1"/>
+      <polygon points="250,200 280,170 280,50 250,80" fill="none" stroke="#475569" stroke-width="1"/>
+      <polygon points="100,80 130,50 280,50 250,80" fill="none" stroke="#475569" stroke-width="1"/>
+
+      <!-- Data points -->
+      <circle cx="150" cy="140" r="4" fill="#38bdf8"/><circle cx="170" cy="130" r="4" fill="#38bdf8"/>
+      <circle cx="160" cy="150" r="4" fill="#38bdf8"/><circle cx="180" cy="145" r="4" fill="#38bdf8"/>
+      <circle cx="140" cy="135" r="4" fill="#38bdf8"/><circle cx="190" cy="125" r="4" fill="#38bdf8"/>
+      <circle cx="175" cy="155" r="4" fill="#38bdf8"/><circle cx="155" cy="125" r="4" fill="#38bdf8"/>
+
+      <!-- Principal axis -->
+      <line x1="120" y1="170" x2="210" y2="100" stroke="#fbbf24" stroke-width="3"/>
+      <text x="220" y="95" fill="#fbbf24" font-size="12" font-weight="bold">v₁ (PC1)</text>
+
+      <!-- Projections -->
+      <line x1="150" y1="140" x2="158" y2="133" stroke="#f87171" stroke-width="1" stroke-dasharray="3"/>
+      <line x1="170" y1="130" x2="172" y2="128" stroke="#f87171" stroke-width="1" stroke-dasharray="3"/>
+      <line x1="160" y1="150" x2="165" y2="145" stroke="#f87171" stroke-width="1" stroke-dasharray="3"/>
+      <line x1="180" y1="145" x2="182" y2="143" stroke="#f87171" stroke-width="1" stroke-dasharray="3"/>
+
+      <text x="300" y="140" fill="#94a3b8" font-size="12">Each point projected</text>
+      <text x="300" y="158" fill="#94a3b8" font-size="12">onto the line spanned</text>
+      <text x="300" y="176" fill="#94a3b8" font-size="12">by v₁. The red dashed</text>
+      <text x="300" y="194" fill="#94a3b8" font-size="12">lines are the errors.</text>
+
+      <text x="300" y="230" fill="#f87171" font-size="12">Error = distance from point to line</text>
+      <text x="300" y="248" fill="#f87171" font-size="12">Minimizing sum of squared errors = SVD solution</text>
+    </svg>
+    <div class="diagram-caption">Rank-1 approximation finds the line that minimizes the sum of squared perpendicular distances to all data points.</div>
+  </div>
+
+  <h3>Python: Visualizing Low-Rank Approximation</h3>
+  <div class="colab-box">
+    <h4>💻 Image Compression Example (Intuitive Demo)</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Load a grayscale image (or create synthetic data)
+img = np.random.rand(256, 256)  # Replace with actual image
+
+U, s, Vt = np.linalg.svd(img, full_matrices=False)
+
+fig, axes = plt.subplots(2, 3, figsize=(12, 8))
+axes = axes.flatten()
+
+for idx, k in enumerate([1, 5, 10, 20, 50, 100]):
+    # Reconstruct with top k singular values
+    S = np.diag(s[:k])
+    approx = U[:, :k] @ S @ Vt[:k, :]
+
+    axes[idx].imshow(approx, cmap='gray')
+    axes[idx].set_title(f'k={k}, storage={k*(256+256)}')
+    axes[idx].axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# Plot singular value spectrum
+plt.figure(figsize=(10, 4))
+plt.semilogy(s)
+plt.axhline(y=s[20], color='r', linestyle='--', label='k=20 cutoff')
+plt.xlabel('Index'); plt.ylabel('Singular Value (log scale)')
+plt.title('Singular Value Spectrum')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 Quant Finance Analogy</div>
+    <p>Think of a returns matrix as a "financial image." The top singular vectors capture the "broad strokes" (market factor, sector factors). The bottom singular vectors capture "grain" (idiosyncratic noise, data errors). Low-rank approximation is like blurring the image just enough to remove the grain while keeping the picture clear.</p>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Given singular values [10, 5, 2, 1, 0.5, 0.1], what is the Frobenius norm of the rank-2 approximation error?</li>
+        <li>What is the spectral norm of the rank-3 approximation error for the same singular values?</li>
+        <li>Run the image compression code. At what k does the image become "good enough" visually? Does this match the variance threshold?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Generate a 100×50 matrix with true rank 5 (product of two random matrices). Add Gaussian noise. Apply SVD and use a scree plot to detect the true rank.</li>
+        <li>Prove that the rank-k SVD approximation is the projection of A onto the subspace spanned by the top k right singular vectors.</li>
+        <li>For a returns matrix, compute the cumulative explained variance curve. Fit a piecewise linear model to find the "elbow" automatically.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that among all rank-k matrices, the SVD truncation Aₖ minimizes both the Frobenius norm and the spectral norm of A − B. (This is the Eckart-Young theorem — prove it here as preparation.)</li>
+        <li>Weighted low-rank approximation: Given a weight matrix W, find min<sub>rank(B)=k</sub> ||W ⊙ (A − B)||<sub>F</sub>. Why is this harder than standard SVD? (Hint: SVD no longer applies directly.)</li>
+        <li>Matrix completion: Given a partially observed matrix (some entries missing), use low-rank SVD iteratively to fill in the missing values. Test on a synthetic returns matrix with 30% missing data.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ECKART-YOUNG ==================== -->
+<div id="eckart" class="tab-content">
+  <h2>🏛️ Eckart-Young Theorem</h2>
+  <p>The <strong>Eckart-Young-Mirsky theorem</strong> is the mathematical guarantee that makes SVD-based dimensionality reduction rigorous. It tells us that truncating SVD is not just a heuristic — it is <em>optimal</em>.</p>
+
+  <h3>The Theorem</h3>
+  <div class="math-block">
+    <strong>Eckart-Young-Mirsky Theorem</strong><br><br>
+    Let A be an m×n matrix with SVD A = UΣVᵀ.<br>
+    Let Aₖ = UₖΣₖVₖᵀ be the rank-k truncation (top k singular values).<br><br>
+    Then for any matrix B with rank(B) ≤ k:<br><br>
+    <span style="color:#38bdf8; font-size:1.2em;">||A − Aₖ|| ≤ ||A − B||</span><br><br>
+    <span style="color:#94a3b8;">This holds for both the Frobenius norm and the spectral (operator) norm.</span>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 What This Means in Plain English</div>
+    <p><strong>If you want the best rank-k approximation of any matrix, just keep the top k singular values. There is no better way.</strong> No other algorithm, no neural network, no optimization — nothing can beat SVD truncation for this specific problem.</p>
+  </div>
+
+  <h3>Visual Proof Sketch</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 700 350" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">Why Truncation is Optimal: A Geometric Argument</text>
+
+      <!-- Space of all m×n matrices -->
+      <ellipse cx="350" cy="180" rx="280" ry="140" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+      <text x="350" y="100" text-anchor="middle" fill="#94a3b8" font-size="13">Space of all m×n matrices</text>
+
+      <!-- Point A -->
+      <circle cx="350" cy="180" r="6" fill="#f87171"/>
+      <text x="365" y="175" fill="#f87171" font-size="13" font-weight="bold">A</text>
+
+      <!-- Manifold of rank-k matrices -->
+      <path d="M 150 220 Q 250 280 350 260 Q 450 240 550 200" fill="none" stroke="#34d399" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="520" y="185" fill="#34d399" font-size="12">Manifold of rank-k matrices</text>
+
+      <!-- A_k on the manifold -->
+      <circle cx="350" cy="230" r="6" fill="#38bdf8"/>
+      <text x="365" y="240" fill="#38bdf8" font-size="13" font-weight="bold">Aₖ</text>
+
+      <!-- Another point B on manifold -->
+      <circle cx="480" cy="210" r="5" fill="#fbbf24"/>
+      <text x="495" y="205" fill="#fbbf24" font-size="12" font-weight="bold">B</text>
+
+      <!-- Distance lines -->
+      <line x1="350" y1="180" x2="350" y2="230" stroke="#38bdf8" stroke-width="2"/>
+      <line x1="350" y1="180" x2="480" y2="210" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4"/>
+
+      <!-- Labels -->
+      <text x="300" y="210" fill="#38bdf8" font-size="11">||A − Aₖ||</text>
+      <text x="430" y="185" fill="#fbbf24" font-size="11">||A − B||</text>
+
+      <!-- Result -->
+      <rect x="200" y="290" width="300" height="40" rx="8" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="350" y="315" text-anchor="middle" fill="#34d399" font-size="13" font-weight="bold">Aₖ is the closest point on the rank-k manifold to A</text>
+    </svg>
+    <div class="diagram-caption">The set of rank-k matrices forms a curved manifold in matrix space. Aₖ is the orthogonal projection of A onto this manifold — the closest point.</div>
+  </div>
+
+  <h3>Step-by-Step Proof (Frobenius Norm)</h3>
+
+  <h4>Step 1: Express the error in the SVD basis</h4>
+  <p>Since U and V are orthogonal, they preserve norms:</p>
+  <div class="math-block">
+    ||A − B||<sub>F</sub>² = ||Uᵀ(A − B)V||<sub>F</sub>² = ||Σ − UᵀBV||<sub>F</sub>²
+  </div>
+  <p>Let C = UᵀBV. We need to minimize ||Σ − C||<sub>F</sub> subject to rank(C) ≤ k.</p>
+
+  <h4>Step 2: Rank constraint on C</h4>
+  <p>Since rank(B) ≤ k and U, V are full-rank, rank(C) ≤ k.</p>
+
+  <h4>Step 3: Best rank-k approximation of a diagonal matrix</h4>
+  <p>For a diagonal matrix Σ, the best rank-k approximation is clearly obtained by keeping the k largest diagonal entries and zeroing the rest. Any other choice either keeps smaller values (worse fit) or changes off-diagonal entries (adds error without reducing rank).</p>
+
+  <h4>Step 4: Conclude</h4>
+  <p>The minimum is achieved when C has the same top k diagonal entries as Σ and zeros elsewhere. This means B = UₖΣₖVₖᵀ = Aₖ.</p>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Important Caveats</div>
+    <p>1. <strong>Uniqueness:</strong> If σₖ = σₖ₊₁, the optimal approximation is not unique. Any combination of the tied singular vectors works.<br>
+    2. <strong>Only for unitarily invariant norms:</strong> The theorem holds for norms that don't change under orthogonal transformations (Frobenius, spectral, Ky Fan). It does NOT hold for arbitrary norms like the L1 norm.<br>
+    3. <strong>Fixed rank:</strong> The theorem assumes you fix the rank k in advance. In practice, you often choose k based on data.</p>
+  </div>
+
+  <h3>Quantitative Implications</h3>
+  <div class="two-col">
+    <div class="callout" style="margin:0;">
+      <div class="callout-title">📐 Frobenius Error</div>
+      <p>||A − Aₖ||<sub>F</sub>² = Σ<sub>i=k+1</sub><sup>r</sup> σᵢ²<br><br>
+      The error is exactly the "energy" you threw away. You can compute it before approximating!</p>
+    </div>
+    <div class="callout" style="margin:0;">
+      <div class="callout-title">📐 Spectral Error</div>
+      <p>||A − Aₖ||<sub>2</sub> = σₖ₊₁<br><br>
+      The worst-case error is exactly the first singular value you discarded. Simple and tight.</p>
+    </div>
+  </div>
+
+  <h3>Python Verification</h3>
+  <div class="colab-box">
+    <h4>💻 Verify Eckart-Young</h4>
+    <pre><code>import numpy as np
+
+np.random.seed(42)
+A = np.random.randn(50, 30)
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+
+k = 5
+# Optimal rank-k approximation
+A_k = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+
+# Random rank-k approximation (for comparison)
+B = np.random.randn(50, k) @ np.random.randn(k, 30)
+
+error_optimal = np.linalg.norm(A - A_k, 'fro')
+error_random = np.linalg.norm(A - B, 'fro')
+error_spectral = np.linalg.norm(A - A_k, 2)
+
+print(f"Optimal Frobenius error: {error_optimal:.4f}")
+print(f"Random rank-k error:     {error_random:.4f}")
+print(f"Optimal spectral error:  {error_spectral:.4f}")
+print(f"Expected spectral error (σₖ₊₁): {s[k]:.4f}")
+print(f"
+Random error / Optimal error: {error_random/error_optimal:.2f}x worse")</code></pre>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>State the Eckart-Young theorem in your own words. Why is it important?</li>
+        <li>Given singular values [100, 50, 10, 5, 1], what is the spectral norm error of the rank-2 approximation?</li>
+        <li>Run the verification code. Is the random approximation always worse? By how much on average?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove the Eckart-Young theorem for the spectral norm. (Hint: Use the Courant-Fischer min-max theorem for singular values.)</li>
+        <li>Show that if σₖ = σₖ₊₁, the optimal rank-k approximation is not unique. Construct two different optimal approximations.</li>
+        <li>For a symmetric positive definite matrix, show that the Eckart-Young theorem reduces to the standard eigenvalue truncation result.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that the Eckart-Young theorem holds for all unitarily invariant norms (Ky Fan norms). This requires Weyl's inequality and majorization theory.</li>
+        <li>Weighted Eckart-Young: For diagonal weight matrix W, characterize the solution to min<sub>rank(B)≤k</sub> ||W(A − B)||<sub>F</sub>. Show it is NOT simply weighted SVD truncation.</li>
+        <li>Tensor extension: For a 3-way tensor, explain why there is no direct analog of the Eckart-Young theorem for the CP decomposition. What goes wrong?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FACTOR REDUCTION ==================== -->
+<div id="factor" class="tab-content">
+  <h2>📊 Factor Reduction</h2>
+  <p>In quant finance, we often observe thousands of assets but suspect only a handful of <strong>latent factors</strong> drive most returns. SVD provides the rigorous framework for extracting these factors and reducing dimensionality.</p>
+
+  <h3>The Factor Model Setup</h3>
+  <p>We assume returns are generated by:</p>
+  <div class="math-block">
+    <strong>r = Bf + ε</strong><br><br>
+    Where:<br>
+    • r = asset returns vector (n×1)<br>
+    • B = factor loadings matrix (n×k)<br>
+    • f = factor returns vector (k×1)<br>
+    • ε = idiosyncratic noise (n×1), independent of f<br><br>
+    <span style="color:#94a3b8;">The goal: Given historical returns matrix R (T×n), estimate B and f.</span>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🔗 How SVD Solves This</div>
+    <p>If R = UΣVᵀ, then:<br>
+    • <strong>V</strong> gives the factor loadings B (columns are portfolio weights for each factor)<br>
+    • <strong>UΣ</strong> gives the factor returns F (time series of each factor)<br>
+    • The rank-k truncation gives the best rank-k factor model by Eckart-Young</p>
+  </div>
+
+  <h3>Step-by-Step: SVD Factor Extraction</h3>
+  <div class="step-flow">
+    <div class="step-box">1. Center returns</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">2. Run SVD</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">3. Choose k</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">4. Extract B = Vₖ</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">5. Extract F = UₖΣₖ</div>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+      <text x="400" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">SVD Factor Model Decomposition</text>
+
+      <!-- Returns matrix -->
+      <rect x="30" y="60" width="100" height="140" rx="6" fill="#334155" stroke="#f87171" stroke-width="2"/>
+      <text x="80" y="110" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="bold">R</text>
+      <text x="80" y="130" text-anchor="middle" fill="#94a3b8" font-size="11">T×n</text>
+      <text x="80" y="150" text-anchor="middle" fill="#94a3b8" font-size="10">Returns</text>
+      <text x="80" y="165" text-anchor="middle" fill="#94a3b8" font-size="10">(centered)</text>
+
+      <text x="155" y="135" fill="#38bdf8" font-size="22" font-weight="bold">≈</text>
+
+      <!-- Factor returns -->
+      <rect x="190" y="60" width="100" height="140" rx="6" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="240" y="105" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">UₖΣₖ</text>
+      <text x="240" y="125" text-anchor="middle" fill="#94a3b8" font-size="11">T×k</text>
+      <text x="240" y="145" text-anchor="middle" fill="#38bdf8" font-size="10">Factor</text>
+      <text x="240" y="160" text-anchor="middle" fill="#38bdf8" font-size="10">Returns</text>
+      <text x="240" y="175" text-anchor="middle" fill="#38bdf8" font-size="10">(time series)</text>
+
+      <text x="315" y="135" fill="#e2e8f0" font-size="20" font-weight="bold">×</text>
+
+      <!-- Factor loadings -->
+      <rect x="350" y="60" width="100" height="140" rx="6" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="400" y="105" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">Vₖᵀ</text>
+      <text x="400" y="125" text-anchor="middle" fill="#94a3b8" font-size="11">k×n</text>
+      <text x="400" y="145" text-anchor="middle" fill="#34d399" font-size="10">Factor</text>
+      <text x="400" y="160" text-anchor="middle" fill="#34d399" font-size="10">Loadings</text>
+      <text x="400" y="175" text-anchor="middle" fill="#34d399" font-size="10">(portfolios)</text>
+
+      <!-- Plus noise -->
+      <text x="475" y="135" fill="#e2e8f0" font-size="20" font-weight="bold">+</text>
+
+      <!-- Noise -->
+      <rect x="510" y="60" width="100" height="140" rx="6" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="560" y="110" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold">E</text>
+      <text x="560" y="130" text-anchor="middle" fill="#64748b" font-size="11">T×n</text>
+      <text x="560" y="150" text-anchor="middle" fill="#64748b" font-size="10">Idiosyncratic</text>
+      <text x="560" y="165" text-anchor="middle" fill="#64748b" font-size="10">Noise</text>
+
+      <!-- Annotation -->
+      <rect x="650" y="80" width="130" height="100" rx="6" fill="#1e293b" stroke="#fbbf24" stroke-width="1"/>
+      <text x="715" y="105" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">Interpretation</text>
+      <text x="715" y="125" text-anchor="middle" fill="#94a3b8" font-size="10">V₁ = market portfolio</text>
+      <text x="715" y="142" text-anchor="middle" fill="#94a3b8" font-size="10">V₂ = size portfolio</text>
+      <text x="715" y="159" text-anchor="middle" fill="#94a3b8" font-size="10">V₃ = value portfolio</text>
+      <text x="715" y="176" text-anchor="middle" fill="#94a3b8" font-size="10">... etc</text>
+    </svg>
+    <div class="diagram-caption">The returns matrix is approximated as factor returns × factor loadings + noise. SVD finds the optimal factors by Eckart-Young.</div>
+  </div>
+
+  <h3>Interpreting the Factors</h3>
+  <table>
+    <tr><th>Factor</th><th>Typical Interpretation</th><th>How to Verify</th></tr>
+    <tr><td>PC1 (largest σ)</td><td>Market factor — all assets move together</td><td>Check if all loadings have same sign</td></tr>
+    <tr><td>PC2</td><td>Sector rotation — some sectors vs. others</td><td>Look for positive/negative groupings</td></tr>
+    <tr><td>PC3</td><td>Size or value tilt</td><td>Correlate with known factors (SMB, HML)</td></tr>
+    <tr><td>PC4+</td><td>Industry-specific or noise</td><td>Low explained variance, unstable over time</td></tr>
+  </table>
+
+  <div class="callout">
+    <div class="callout-title">💡 Practical Tip: Factor Stability</div>
+    <p>Real factors are <strong>slowly varying</strong> over time. If your PC2 flips sign every month, it's probably noise, not a real factor. Use <strong>rolling window SVD</strong> and track how singular vectors evolve. Stable vectors = real factors.</p>
+  </div>
+
+  <h3>Python: Factor Extraction from Stock Returns</h3>
+  <div class="colab-box">
+    <h4>💻 Extract & Interpret Factors</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Simulate returns for 20 stocks, 252 days, with 3 true factors
+np.random.seed(42)
+T, n = 252, 20
+k_true = 3
+
+# True factor returns
+f = np.random.randn(T, k_true) * 0.01  # 1% daily factor vol
+
+# True loadings (some positive, some negative)
+B = np.random.randn(n, k_true)
+B[:, 0] = np.abs(B[:, 0])  # PC1: all positive (market)
+
+# Generate returns
+returns = f @ B.T + np.random.randn(T, n) * 0.005  # Add noise
+
+# Center the returns
+returns_centered = returns - returns.mean(axis=0)
+
+# SVD
+U, s, Vt = np.linalg.svd(returns_centered, full_matrices=False)
+
+# Extract top 5 factors
+k = 5
+factor_returns = U[:, :k] * s[:k]  # Shape: T×k
+loadings = Vt[:k, :].T              # Shape: n×k
+
+# Plot singular value spectrum
+plt.figure(figsize=(10, 4))
+plt.bar(range(1, len(s)+1), s**2 / np.sum(s**2))
+plt.axvline(x=k_true+0.5, color='r', linestyle='--', label='True rank')
+plt.xlabel('Component'); plt.ylabel('Explained Variance')
+plt.title('Scree Plot — Factor Detection')
+plt.legend()
+plt.show()
+
+# Plot first loading (should be all positive = market)
+plt.figure(figsize=(10, 4))
+plt.bar(range(n), loadings[:, 0])
+plt.title('PC1 Loadings (Market Factor)')
+plt.xlabel('Asset'); plt.ylabel('Loading')
+plt.axhline(y=0, color='k', linewidth=0.5)
+plt.show()
+
+# Plot factor returns time series
+plt.figure(figsize=(12, 6))
+for i in range(k):
+    plt.plot(factor_returns[:, i], label=f'Factor {i+1}')
+plt.title('Extracted Factor Returns')
+plt.legend()
+plt.show()
+
+# Regress true factors against extracted factors
+correlations = np.corrcoef(f.T, factor_returns[:, :k_true].T)[:k_true, k_true:]
+print("Correlation between true and extracted factors:")
+print(correlations)</code></pre>
+  </div>
+
+  <h3>Risk Parity & Factor Allocation</h3>
+  <p>Once you have orthogonal factors, you can allocate risk evenly across them — a strategy called <strong>risk parity</strong> in factor space.</p>
+  <div class="math-block">
+    <strong>Factor Risk Contribution</strong><br><br>
+    Portfolio variance = wᵀΣw = wᵀ(BΩBᵀ + D)w<br><br>
+    In factor space: var = (Bᵀw)ᵀ Ω (Bᵀw) + wᵀDw<br><br>
+    <span style="color:#94a3b8;">Where Ω = factor covariance, D = diagonal idiosyncratic variance.<br>
+    Risk parity sets each factor's contribution to total risk equal.</span>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the factor extraction code. How many factors explain 80% of variance?</li>
+        <li>Verify that the extracted factors are uncorrelated: compute the correlation matrix of factor_returns.</li>
+        <li>What does it mean if the first loading vector has both positive and negative values?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement rolling-window SVD: compute SVD on a 60-day rolling window and track the first singular vector over time. Plot its stability.</li>
+        <li>Given factor loadings B and factor covariance Ω, derive the portfolio weights that achieve equal risk contribution from each factor.</li>
+        <li>Generate returns with a known sector structure (e.g., 4 sectors of 5 stocks each). Show that PC2-PC4 capture sector effects.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that the SVD-based factor model is equivalent to Principal Component Regression (PCR) when predicting returns. Derive the PCR estimator using SVD.</li>
+        <li>Factor timing: Use the extracted factor returns to build a momentum strategy. Backtest: go long factors with positive 20-day momentum, short negative. Compare Sharpe vs. buy-and-hold.</li>
+        <li>Sparse factor loadings: Modify the factor extraction to encourage sparsity in V (interpretable factors). Use an L1 penalty on loadings and solve via alternating minimization.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STATISTICAL ARBITRAGE ==================== -->
+<div id="arb" class="tab-content">
+  <h2>💹 Statistical Arbitrage Signals</h2>
+  <p><strong>Statistical arbitrage (stat arb)</strong> is a class of trading strategies that exploit <em>statistical</em> relationships between assets rather than fundamental valuations. SVD is the engine that finds these relationships.</p>
+
+  <h3>The Core Idea: Mean Reversion in Residual Space</h3>
+  <p>Stat arb assumes that while asset prices may wander randomly, <strong>linear combinations of assets</strong> (portfolios) mean-revert. SVD finds the optimal mean-reverting portfolios.</p>
+
+  <div class="math-block">
+    <strong>The Stat Arb Pipeline</strong><br><br>
+    1. Model returns as: r = Bf + ε<br>
+    2. The systematic part Bf is hard to predict (efficient market)<br>
+    3. The residual ε = r − Bf may be predictable (mean-reverting)<br>
+    4. <strong>SVD gives us the best low-rank estimate of Bf</strong><br>
+    5. Trade the residuals: buy when ε << 0, sell when ε >> 0
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 Why SVD is Perfect for Stat Arb</div>
+    <p>Eckart-Young guarantees that the SVD truncation gives the <strong>best possible</strong> systematic factor estimate. The residuals are therefore the "cleanest" possible mean-reverting signals — you have removed the maximum amount of non-predictable variance.</p>
+  </div>
+
+  <h3>The SVD Residual Strategy</h3>
+  <div class="step-flow">
+    <div class="step-box">1. Build returns matrix R</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">2. SVD: R ≈ UₖΣₖVₖᵀ</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">3. Systematic: Ŕ = UₖΣₖVₖᵀ</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">4. Residual: E = R − Ŕ</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">5. Z-score residuals</div>
+    <div class="step-arrow">→</div>
+    <div class="step-box">6. Trade extremes</div>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
+      <text x="400" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">SVD-Based Statistical Arbitrage Signal Generation</text>
+
+      <!-- Returns -->
+      <rect x="30" y="50" width="90" height="60" rx="6" fill="#334155" stroke="#f87171" stroke-width="2"/>
+      <text x="75" y="80" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">R</text>
+      <text x="75" y="98" text-anchor="middle" fill="#94a3b8" font-size="10">Returns</text>
+
+      <path d="M120 80 L160 80" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <!-- SVD box -->
+      <rect x="170" y="40" width="100" height="80" rx="6" fill="#334155" stroke="#38bdf8" stroke-width="2"/>
+      <text x="220" y="70" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="bold">SVD</text>
+      <text x="220" y="88" text-anchor="middle" fill="#94a3b8" font-size="10">Rank-k</text>
+      <text x="220" y="103" text-anchor="middle" fill="#94a3b8" font-size="10">truncation</text>
+
+      <!-- Two outputs -->
+      <path d="M270 60 L310 60" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+      <path d="M270 100 L310 100" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <!-- Systematic -->
+      <rect x="320" y="35" width="110" height="50" rx="6" fill="#334155" stroke="#fbbf24" stroke-width="2"/>
+      <text x="375" y="55" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="bold">Ŕ = UₖΣₖVₖᵀ</text>
+      <text x="375" y="72" text-anchor="middle" fill="#fbbf24" font-size="10">Systematic</text>
+
+      <!-- Residual -->
+      <rect x="320" y="100" width="110" height="50" rx="6" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="375" y="120" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="bold">E = R − Ŕ</text>
+      <text x="375" y="137" text-anchor="middle" fill="#34d399" font-size="10">Residual</text>
+
+      <!-- Z-score -->
+      <path d="M430 125 L470 125" stroke="#34d399" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <rect x="480" y="100" width="110" height="50" rx="6" fill="#334155" stroke="#818cf8" stroke-width="2"/>
+      <text x="535" y="120" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="bold">Z = E / σ(E)</text>
+      <text x="535" y="137" text-anchor="middle" fill="#818cf8" font-size="10">Z-score</text>
+
+      <!-- Trading signals -->
+      <path d="M590 125 L630 125" stroke="#818cf8" stroke-width="2" marker-end="url(#arrow2)"/>
+
+      <rect x="640" y="85" width="130" height="80" rx="6" fill="#334155" stroke="#f87171" stroke-width="2"/>
+      <text x="705" y="110" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="bold">Signals</text>
+      <text x="705" y="128" text-anchor="middle" fill="#f87171" font-size="10">Z > +2 → Short</text>
+      <text x="705" y="145" text-anchor="middle" fill="#34d399" font-size="10">Z < −2 → Long</text>
+
+      <!-- Bottom: time series visualization -->
+      <text x="400" y="210" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="bold">Visual: Residual Z-Score for One Asset</text>
+
+      <line x1="80" y1="340" x2="720" y2="340" stroke="#475569" stroke-width="1"/>
+      <line x1="80" y1="340" x2="80" y2="230" stroke="#475569" stroke-width="1"/>
+      <text x="400" y="365" text-anchor="middle" fill="#94a3b8" font-size="11">Time</text>
+      <text x="55" y="285" text-anchor="middle" fill="#94a3b8" font-size="11" transform="rotate(-90 55 285)">Z-Score</text>
+
+      <!-- Zero line -->
+      <line x1="80" y1="285" x2="720" y2="285" stroke="#475569" stroke-width="1" stroke-dasharray="3"/>
+      <text x="735" y="290" fill="#94a3b8" font-size="10">0</text>
+
+      <!-- Thresholds -->
+      <line x1="80" y1="250" x2="720" y2="250" stroke="#f87171" stroke-width="1" stroke-dasharray="4"/>
+      <text x="735" y="255" fill="#f87171" font-size="10">+2</text>
+      <line x1="80" y1="320" x2="720" y2="320" stroke="#34d399" stroke-width="1" stroke-dasharray="4"/>
+      <text x="735" y="325" fill="#34d399" font-size="10">−2</text>
+
+      <!-- Z-score path -->
+      <polyline points="80,285 100,280 120,275 140,270 160,260 180,255 200,250 220,245 240,250 260,255 280,260 300,265 320,270 340,275 360,280 380,285 400,290 420,295 440,300 460,305 480,310 500,315 520,320 540,325 560,320 580,315 600,310 620,305 640,300 660,295 680,290 700,285 720,280" 
+                fill="none" stroke="#38bdf8" stroke-width="2"/>
+
+      <!-- Signal annotations -->
+      <circle cx="200" cy="250" r="5" fill="#f87171" stroke="#f87171" stroke-width="2"/>
+      <text x="200" y="235" text-anchor="middle" fill="#f87171" font-size="10" font-weight="bold">SELL</text>
+
+      <circle cx="520" cy="320" r="5" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="520" y="340" text-anchor="middle" fill="#34d399" font-size="10" font-weight="bold">BUY</text>
+    </svg>
+    <div class="diagram-caption">SVD separates systematic (unpredictable) from residual (mean-reverting). Z-scores of residuals generate trading signals.</div>
+  </div>
+
+  <h3>Why Residuals Mean-Revert</h3>
+  <p>The systematic factors (market, sector, style) represent <strong>shared risk</strong> that is efficiently priced. The residual represents <strong>asset-specific</strong> deviations. These deviations are:</p>
+  <ul style="margin-left:2rem; margin-bottom:1rem; color:var(--text);">
+    <li><strong>Temporary:</strong> Caused by liquidity shocks, index rebalancing, or short-term sentiment</li>
+    <li><strong>Bounded:</strong> A stock can't deviate from its fair value forever (arbitrage forces)</li>
+    <li><strong>Cross-sectional:</strong> When one asset is "too high" and another "too low," pair trading works</li>
+  </ul>
+
+  <h3>Cross-Sectional vs. Time-Series Approaches</h3>
+  <div class="two-col">
+    <div class="callout" style="margin:0;">
+      <div class="callout-title">📊 Cross-Sectional (PCA-based)</div>
+      <p>At each time t:<br>
+      1. Run SVD on recent returns window<br>
+      2. Compute residuals for all assets<br>
+      3. Rank assets by residual Z-score<br>
+      4. Go long bottom decile, short top decile<br><br>
+      <strong>Pros:</strong> Diversified, market-neutral<br>
+      <strong>Cons:</strong> High turnover, transaction costs</p>
+    </div>
+    <div class="callout" style="margin:0;">
+      <div class="callout-title">📈 Time-Series (Single-name)</div>
+      <p>For each asset i:<br>
+      1. Model rᵢ = βᵢ·f + εᵢ using SVD factors<br>
+      2. Track εᵢ over time<br>
+      3. When |εᵢ| > 2σ, take contrarian position<br>
+      4. Hold until εᵢ reverts to 0<br><br>
+      <strong>Pros:</strong> Lower turnover per asset<br>
+      <strong>Cons:</strong> Less diversified, factor exposure</p>
+    </div>
+  </div>
+
+  <h3>Python: Stat Arb Backtest</h3>
+  <div class="colab-box">
+    <h4>💻 SVD Stat Arb Strategy</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Simulate 50 stocks, 500 days, with 5 factors
+T, n = 500, 50
+k_factors = 5
+
+f = np.random.randn(T, k_factors) * 0.015
+B = np.random.randn(n, k_factors)
+returns = f @ B.T + np.random.randn(T, n) * 0.008
+
+# Parameters
+lookback = 60      # Days for SVD window
+k = 3              # Number of factors to remove
+z_threshold = 2.0  # Z-score threshold
+
+pnl = []
+positions = np.zeros(n)
+
+for t in range(lookback, T-1):
+    # Recent returns window
+    window = returns[t-lookback:t, :]
+
+    # Center
+    window_centered = window - window.mean(axis=0)
+
+    # SVD
+    U, s, Vt = np.linalg.svd(window_centered, full_matrices=False)
+
+    # Systematic component (today's returns projected onto factors)
+    today = returns[t, :] - returns[t-lookback:t, :].mean(axis=0)
+    systematic = today @ Vt[:k, :].T @ Vt[:k, :]
+    residual = today - systematic
+
+    # Z-score using historical residual volatility
+    residuals_hist = window_centered - (window_centered @ Vt[:k, :].T @ Vt[:k, :])
+    resid_vol = residuals_hist.std(axis=0) + 1e-8
+    z_scores = residual / resid_vol
+
+    # Generate signals
+    signals = np.zeros(n)
+    signals[z_scores < -z_threshold] = 1   # Long
+    signals[z_scores > z_threshold] = -1   # Short
+
+    # Next day P&L
+    next_day_return = returns[t+1, :]
+    daily_pnl = np.sum(signals * next_day_return)
+    pnl.append(daily_pnl)
+
+pnl = np.array(pnl)
+cumulative = np.cumsum(pnl)
+sharpe = np.mean(pnl) / np.std(pnl) * np.sqrt(252)
+
+print(f"Total Return: {cumulative[-1]:.2%}")
+print(f"Sharpe Ratio: {sharpe:.2f}")
+print(f"Max Drawdown: {(cumulative - np.maximum.accumulate(cumulative)).min():.2%}")
+
+# Plot
+fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+axes[0].plot(cumulative)
+axes[0].set_title('Cumulative P&L — SVD Stat Arb')
+axes[0].set_ylabel('Cumulative Return')
+axes[0].grid(True, alpha=0.3)
+
+axes[1].hist(pnl, bins=50, edgecolor='black', alpha=0.7)
+axes[1].set_title('Distribution of Daily P&L')
+axes[1].set_xlabel('Daily Return')
+axes[1].axvline(x=0, color='r', linestyle='--')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Real-World Considerations</div>
+    <p>1. <strong>Transaction costs:</strong> The strategy above ignores slippage and fees. With 50 stocks rebalanced daily, costs can eat 5-15 bps per trade.<br>
+    2. <strong>Regime changes:</strong> Factor structure changes during crises. The 2008 financial crisis broke many stat arb strategies because correlations spiked to 1.<br>
+    3. <strong>Capacity:</strong> These signals decay as more capital chases them. The half-life of a typical SVD residual signal is 2-5 days.<br>
+    4. <strong>Short constraints:</strong> Hard-to-borrow stocks make shorting expensive or impossible.</p>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the stat arb backtest. How does Sharpe change with k=1 vs. k=5 vs. k=10?</li>
+        <li>What happens if you don't center the returns window before SVD? Why does centering matter?</li>
+        <li>Plot the distribution of Z-scores. Are they approximately normal?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Add transaction costs: assume 5 bps per trade. At what threshold does the strategy become unprofitable?</li>
+        <li>Implement a "regime filter": only trade when the top singular value is not too dominant (market not in crisis). How does this affect drawdowns?</li>
+        <li>Compare SVD-based residuals with OLS residuals (regress each stock on SPY). Which generates better Sharpe?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Build a full cross-sectional stat arb strategy: at each rebalance, rank all assets by residual Z-score, go long bottom 20%, short top 20%. Optimize the lookback window, k, and threshold using walk-forward optimization.</li>
+        <li>Model the residual process as an Ornstein-Uhlenbeck process: dε = −θ(ε − μ)dt + σdW. Estimate θ, μ, σ for each asset's residual. Use the half-life (ln(2)/θ) to set holding periods dynamically.</li>
+        <li>Multi-timeframe SVD: Combine residuals from 5-day, 20-day, and 60-day SVD windows into a composite signal using a machine learning model (e.g., random forest). Does ensemble improve Sharpe?</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== COVARIANCE REGULARIZATION ==================== -->
+<div id="covreg" class="tab-content">
+  <h2>🛡️ Covariance Regularization</h2>
+  <p>Portfolio optimization requires estimating the <strong>covariance matrix</strong> of asset returns. But when you have many assets and limited history, the sample covariance matrix is <strong>noisy, ill-conditioned, and often singular</strong>. SVD-based regularization fixes this.</p>
+
+  <h3>The Problem: Curse of Dimensionality</h3>
+  <div class="math-block">
+    <strong>Sample Covariance Matrix</strong><br><br>
+    Σ̂ = (1/(T−1)) RᵀR<br><br>
+    Where R is T×n (T observations, n assets).<br><br>
+    <span style="color:#f87171;">If n > T, Σ̂ is guaranteed to be singular.<br>
+    Even if n < T, if n/T is large (e.g., 0.5), Σ̂ is extremely noisy.<br>
+    The condition number explodes: σ<sub>max</sub>/σ<sub>min</sub> → ∞</span>
+  </div>
+
+  <div class="diagram-box">
+    <svg viewBox="0 0 650 250" xmlns="http://www.w3.org/2000/svg">
+      <text x="325" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">The Curse of Dimensionality in Covariance Estimation</text>
+
+      <!-- Good case -->
+      <rect x="50" y="50" width="250" height="160" rx="8" fill="#334155" stroke="#34d399" stroke-width="2"/>
+      <text x="175" y="75" text-anchor="middle" fill="#34d399" font-size="13" font-weight="bold">Good: T >> n</text>
+      <text x="175" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">T = 1000 days</text>
+      <text x="175" y="120" text-anchor="middle" fill="#e2e8f0" font-size="12">n = 10 assets</text>
+      <text x="175" y="145" text-anchor="middle" fill="#94a3b8" font-size="11">Σ̂ is well-conditioned</text>
+      <text x="175" y="162" text-anchor="middle" fill="#94a3b8" font-size="11">Stable portfolio weights</text>
+      <text x="175" y="179" text-anchor="middle" fill="#94a3b8" font-size="11">Reliable risk forecasts</text>
+
+      <!-- Bad case -->
+      <rect x="350" y="50" width="250" height="160" rx="8" fill="#334155" stroke="#f87171" stroke-width="2"/>
+      <text x="475" y="75" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">Bad: n ≈ T or n > T</text>
+      <text x="475" y="100" text-anchor="middle" fill="#e2e8f0" font-size="12">T = 252 days</text>
+      <text x="475" y="120" text-anchor="middle" fill="#e2e8f0" font-size="12">n = 500 assets</text>
+      <text x="475" y="145" text-anchor="middle" fill="#94a3b8" font-size="11">Σ̂ is singular / unstable</text>
+      <text x="475" y="162" text-anchor="middle" fill="#94a3b8" font-size="11">Extreme portfolio weights</text>
+      <text x="475" y="179" text-anchor="middle" fill="#94a3b8" font-size="11">Garbage risk forecasts</text>
+    </svg>
+    <div class="diagram-caption">When you have more assets than observations, the sample covariance matrix is mathematically broken. Regularization is mandatory.</div>
+  </div>
+
+  <h3>SVD-Based Shrinkage: The Spectral Filter</h3>
+  <p>The simplest SVD regularization is <strong>spectral truncation</strong> — keep only the top k eigencomponents of the covariance matrix:</p>
+  <div class="math-block">
+    <strong>Spectral Filter</strong><br><br>
+    Σ̂ = V Λ Vᵀ  (eigen-decomposition of sample covariance)<br><br>
+    Σ̃ = Vₖ Λₖ Vₖᵀ + δI<br><br>
+    <span style="color:#94a3b8;">Where Λₖ keeps only top k eigenvalues, and δI adds a small diagonal (ridge) to ensure positive definiteness.</span>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">🔗 Connection to SVD</div>
+    <p>Since Σ̂ = (1/(T−1)) RᵀR, and R = UΣVᵀ, the eigenvectors of Σ̂ are exactly the <strong>right singular vectors V</strong> of R. The eigenvalues of Σ̂ are σᵢ²/(T−1). So SVD of returns directly gives the spectral decomposition of covariance.</p>
+  </div>
+
+  <h3>Ledoit-Wolf Shrinkage (Advanced)</h3>
+  <p>The <strong>Ledoit-Wolf</strong> estimator is the gold standard in quant finance. It shrinks the sample covariance toward a structured target (e.g., identity or single-factor model):</p>
+  <div class="math-block">
+    <strong>Ledoit-Wolf Shrinkage</strong><br><br>
+    Σ* = δ·F + (1−δ)·Σ̂<br><br>
+    Where F is a shrinkage target (e.g., F = tr(Σ̂)/n · I) and δ is the optimal shrinkage intensity.<br><br>
+    <span style="color:#94a3b8;">SVD helps compute δ efficiently and apply the shrinkage in factor space.</span>
+  </div>
+
+  <div class="callout success">
+    <div class="callout-title">🎯 Why This Matters for Quants</div>
+    <p>Markowitz portfolio optimization: w* = Σ⁻¹μ. If Σ is singular, Σ⁻¹ doesn't exist. If Σ is ill-conditioned, tiny changes in μ cause huge changes in w (the "error maximization" problem). Regularized covariance gives stable, investable portfolios.</p>
+  </div>
+
+  <h3>Visual: Effect of Regularization on Portfolio Weights</h3>
+  <div class="diagram-box">
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+      <text x="350" y="25" text-anchor="middle" fill="#e2e8f0" font-size="15" font-weight="bold">Portfolio Weights: Sample vs. Regularized Covariance</text>
+
+      <!-- Sample covariance weights -->
+      <text x="175" y="55" text-anchor="middle" fill="#f87171" font-size="12" font-weight="bold">Sample Covariance</text>
+      <line x1="50" y1="230" x2="300" y2="230" stroke="#475569" stroke-width="1"/>
+      <line x1="50" y1="230" x2="50" y2="70" stroke="#475569" stroke-width="1"/>
+
+      <!-- Extreme weights -->
+      <rect x="60" y="100" width="12" height="130" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="80" y="200" width="12" height="30" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="100" y="180" width="12" height="50" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="120" y="220" width="12" height="10" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="140" y="70" width="12" height="160" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="160" y="210" width="12" height="20" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="180" y="190" width="12" height="40" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="200" y="215" width="12" height="15" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="220" y="85" width="12" height="145" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="240" y="205" width="12" height="25" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="260" y="195" width="12" height="35" fill="#f87171" opacity="0.8" rx="2"/>
+      <rect x="280" y="225" width="12" height="5" fill="#f87171" opacity="0.8" rx="2"/>
+
+      <text x="175" y="250" text-anchor="middle" fill="#94a3b8" font-size="11">Extreme weights, unstable</text>
+
+      <!-- Regularized weights -->
+      <text x="525" y="55" text-anchor="middle" fill="#34d399" font-size="12" font-weight="bold">SVD Regularized (k=5)</text>
+      <line x1="400" y1="230" x2="650" y2="230" stroke="#475569" stroke-width="1"/>
+      <line x1="400" y1="230" x2="400" y2="70" stroke="#475569" stroke-width="1"/>
+
+      <rect x="410" y="180" width="12" height="50" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="430" y="190" width="12" height="40" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="450" y="185" width="12" height="45" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="470" y="195" width="12" height="35" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="490" y="175" width="12" height="55" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="510" y="188" width="12" height="42" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="530" y="192" width="12" height="38" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="550" y="185" width="12" height="45" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="570" y="190" width="12" height="40" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="590" y="195" width="12" height="35" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="610" y="188" width="12" height="42" fill="#34d399" opacity="0.8" rx="2"/>
+      <rect x="630" y="192" width="12" height="38" fill="#34d399" opacity="0.8" rx="2"/>
+
+      <text x="525" y="250" text-anchor="middle" fill="#94a3b8" font-size="11">Smooth weights, stable</text>
+    </svg>
+    <div class="diagram-caption">Sample covariance produces extreme long/short positions. SVD regularization smooths weights and reduces turnover.</div>
+  </div>
+
+  <h3>Python: Covariance Regularization & Portfolio Optimization</h3>
+  <div class="colab-box">
+    <h4>💻 Compare Covariance Estimators</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+from numpy.linalg import inv, eig
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Simulate: 100 assets, 120 days (nearly singular!)
+T, n = 120, 100
+k_true = 5
+
+f = np.random.randn(T, k_true) * 0.02
+B = np.random.randn(n, k_true)
+returns = f @ B.T + np.random.randn(T, n) * 0.01
+
+# Sample covariance
+sample_cov = np.cov(returns.T)
+
+# SVD-based regularization
+U, s, Vt = np.linalg.svd(returns, full_matrices=False)
+k = 5
+factor_cov = (Vt[:k, :].T * (s[:k]**2 / (T-1))) @ Vt[:k, :]
+# Add ridge for positive definiteness
+ridge = 0.001
+reg_cov = factor_cov + ridge * np.eye(n)
+
+# Ledoit-Wolf (simplified)
+F = np.trace(sample_cov) / n * np.eye(n)
+# Optimal shrinkage (simplified formula)
+delta = min(1.0, n / T)  # Simplified
+lw_cov = delta * F + (1 - delta) * sample_cov
+
+# Compare condition numbers
+print(f"Sample cov condition number: {np.linalg.cond(sample_cov):.1e}")
+print(f"SVD reg condition number:    {np.linalg.cond(reg_cov):.1e}")
+print(f"Ledoit-Wolf condition num:   {np.linalg.cond(lw_cov):.1e}")
+
+# Compare minimum variance portfolio weights
+mu = returns.mean(axis=0)
+
+w_sample = inv(sample_cov + 0.01*np.eye(n)) @ mu
+w_sample = w_sample / np.sum(np.abs(w_sample))
+
+w_reg = inv(reg_cov) @ mu
+w_reg = w_reg / np.sum(np.abs(w_reg))
+
+w_lw = inv(lw_cov) @ mu
+w_lw = w_lw / np.sum(np.abs(w_lw))
+
+print(f"
+Sample cov max weight: {np.max(np.abs(w_sample)):.2f}")
+print(f"SVD reg max weight:    {np.max(np.abs(w_reg)):.2f}")
+print(f"Ledoit-Wolf max weight:{np.max(np.abs(w_lw)):.2f}")
+
+# Plot weight distributions
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+for ax, w, title in zip(axes, [w_sample, w_reg, w_lw], 
+                        ['Sample', 'SVD Regularized', 'Ledoit-Wolf']):
+    ax.bar(range(n), w, alpha=0.7)
+    ax.set_title(title)
+    ax.set_ylim(-0.5, 0.5)
+    ax.axhline(y=0, color='k', linewidth=0.5)
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <h3>Out-of-Sample Risk Forecasting</h3>
+  <p>The real test of a covariance estimator is <strong>out-of-sample</strong> risk prediction:</p>
+  <div class="math-block">
+    <strong>Risk Forecast Error</strong><br><br>
+    Predicted risk: σ̂<sub>p</sub>² = wᵀ Σ̃ w<br>
+    Realized risk: σ<sub>p</sub>² = wᵀ Σ<sub>true</sub> w<br><br>
+    <span style="color:#94a3b8;">We want |σ̂<sub>p</sub>² − σ<sub>p</sub>²| to be small.<br>
+    Sample covariance typically underestimates risk (overfitting).<br>
+    SVD regularization provides more honest risk estimates.</span>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">📐 The Marchenko-Pastur Law</div>
+    <p>For random matrices, there is a theoretical threshold below which sample eigenvalues are pure noise. The <strong>Marchenko-Pastur distribution</strong> gives the noise spectrum. In practice, eigenvalues below λ₊ = σ²(1+√(n/T))² are noise and should be shrunk or removed.</p>
+  </div>
+
+  <h3>Exercises</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the covariance comparison code. How does the condition number change as n/T increases from 0.1 to 2.0?</li>
+        <li>What is the rank of the sample covariance matrix when n > T? Prove it.</li>
+        <li>Why do we add a ridge term (δI) after spectral truncation?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement the Marchenko-Pastur threshold: remove eigenvalues below λ₊. Compare out-of-sample risk forecasts vs. sample covariance and Ledoit-Wolf.</li>
+        <li>Generate returns with a known covariance structure. Compute the Frobenius norm ||Σ̃ − Σ<sub>true</sub>|| for sample, ridge, spectral truncation, and Ledoit-Wolf. Which wins?</li>
+        <li>Build a minimum variance portfolio using regularized covariance. Backtest: rebalance monthly using 1-year lookback. Compare turnover and Sharpe across estimators.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Derive the optimal shrinkage intensity δ for Ledoit-Wolf when shrinking toward the identity matrix. Implement the full analytical formula (not the simplified version).</li>
+        <li>Non-linear shrinkage: Instead of truncating or linearly shrinking eigenvalues, apply a non-linear function f(λ) to each eigenvalue based on the Marchenko-Pastur distribution. Implement the QuEST estimator.</li>
+        <li>Dynamic covariance: Use rolling SVD with exponential weighting (give more weight to recent observations). Compare forecasting accuracy vs. equal-weighted rolling window for a portfolio of 50 stocks during 2020.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== EXPERIMENTS ==================== -->
+<div id="experiments" class="tab-content">
+  <h2>🧪 Colab Experiments</h2>
+  <p>Each experiment is designed to be copy-pasted into a Google Colab notebook. Run them as you read each section.</p>
+
+  <div class="callout">
+    <div class="callout-title">🚀 Getting Started</div>
+    <p>Open <a href="https://colab.research.google.com" target="_blank">Google Colab</a> and create a new notebook. Each experiment below is self-contained. Run cells in order.</p>
+  </div>
+
+  <h3>Experiment 1: Visualizing SVD as Rotate-Stretch-Rotate</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 1 — Geometric SVD</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch
+
+# Create a transformation matrix
+A = np.array([[2, 1], [1, 3]])
+
+# SVD
+U, s, Vt = np.linalg.svd(A)
+
+# Unit circle points
+theta = np.linspace(0, 2*np.pi, 100)
+circle = np.array([np.cos(theta), np.sin(theta)])
+
+# Apply transformations step by step
+step1 = Vt @ circle          # Rotate by V^T
+step2 = np.diag(s) @ step1   # Stretch by Sigma
+step3 = U @ step2            # Rotate by U
+
+fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+
+for ax, points, title, color in zip(axes, 
+    [circle, step1, step2, step3],
+    ['Original', 'After Vᵀ (rotate)', 'After Σ (stretch)', 'After U (rotate)'],
+    ['#38bdf8', '#34d399', '#fbbf24', '#f87171']):
+    ax.plot(points[0, :], points[1, :], color=color, linewidth=2)
+    ax.set_xlim(-4, 4)
+    ax.set_ylim(-4, 4)
+    ax.set_aspect('equal')
+    ax.set_title(title, fontsize=12, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+    ax.axhline(y=0, color='k', linewidth=0.5)
+    ax.axvline(x=0, color='k', linewidth=0.5)
+
+plt.suptitle('SVD = Rotate → Stretch → Rotate', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+print("Singular values:", s)
+print("U =\n", U)
+print("V^T =\n", Vt)</code></pre>
+  </div>
+
+  <h3>Experiment 2: Image Compression & Rank Visualization</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 2 — Image Compression</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+import requests
+from io import BytesIO
+
+# Load a test image (or use your own)
+url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/300px-PNG_transparency_demonstration_1.png"
+try:
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content)).convert('L')
+except:
+    # Fallback: synthetic image
+    img = Image.fromarray((np.random.rand(256, 256) * 255).astype(np.uint8))
+
+img_array = np.array(img)
+
+# SVD
+U, s, Vt = np.linalg.svd(img_array, full_matrices=False)
+
+# Reconstruct with different ranks
+fig, axes = plt.subplots(2, 3, figsize=(12, 8))
+axes = axes.flatten()
+
+ranks = [1, 5, 10, 20, 50, 100]
+for idx, k in enumerate(ranks):
+    approx = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+    axes[idx].imshow(approx, cmap='gray')
+    storage = k * (img_array.shape[0] + img_array.shape[1])
+    original = img_array.shape[0] * img_array.shape[1]
+    axes[idx].set_title(f'k={k}\nStorage: {storage:,} vs {original:,}\n({storage/original:.1%})', fontsize=10)
+    axes[idx].axis('off')
+
+plt.suptitle('Low-Rank Image Approximation', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# Plot singular values
+plt.figure(figsize=(10, 4))
+plt.semilogy(s)
+plt.xlabel('Component Index')
+plt.ylabel('Singular Value (log scale)')
+plt.title('Singular Value Spectrum')
+plt.grid(True, alpha=0.3)
+plt.show()</code></pre>
+  </div>
+
+  <h3>Experiment 3: Factor Structure in Synthetic Returns</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 3 — Detecting Hidden Factors</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Generate returns with 3 hidden factors
+T, n = 252, 30
+k_true = 3
+
+# Factor returns (systematic)
+factors = np.random.randn(T, k_true)
+factors[:, 0] *= 0.02  # Market factor: high vol
+factors[:, 1] *= 0.01  # Sector factor
+factors[:, 2] *= 0.008 # Style factor
+
+# Loadings
+loadings = np.random.randn(n, k_true)
+loadings[:, 0] = np.abs(loadings[:, 0])  # Market: all positive
+
+# Generate returns
+returns = factors @ loadings.T + np.random.randn(T, n) * 0.005
+
+# SVD
+U, s, Vt = np.linalg.svd(returns - returns.mean(axis=0), full_matrices=False)
+
+# Scree plot
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+axes[0].bar(range(1, len(s)+1), s**2 / np.sum(s**2))
+axes[0].axvline(x=k_true+0.5, color='r', linestyle='--', label=f'True rank = {k_true}')
+axes[0].set_xlabel('Component')
+axes[0].set_ylabel('Explained Variance')
+axes[0].set_title('Scree Plot')
+axes[0].legend()
+
+# PC1 loadings (should be all positive)
+axes[1].bar(range(n), Vt[0, :])
+axes[1].set_title('PC1 Loadings (Market Factor)')
+axes[1].set_xlabel('Asset')
+axes[1].axhline(y=0, color='k', linewidth=0.5)
+
+# PC2 loadings
+axes[2].bar(range(n), Vt[1, :])
+axes[2].set_title('PC2 Loadings (Sector Factor)')
+axes[2].set_xlabel('Asset')
+axes[2].axhline(y=0, color='k', linewidth=0.5)
+
+plt.tight_layout()
+plt.show()
+
+# Verify factor correlation
+true_factor_corr = np.corrcoef(factors.T, (U[:, :k_true] * s[:k_true]).T)[:k_true, k_true:]
+print("Correlation between true and extracted factors:")
+print(np.round(np.abs(true_factor_corr), 2))</code></pre>
+  </div>
+
+  <h3>Experiment 4: Covariance Regularization & Portfolio Stability</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 4 — Regularization Impact</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# High-dimensional problem
+T, n = 100, 80
+k_true = 4
+
+f = np.random.randn(T, k_true) * 0.02
+B = np.random.randn(n, k_true)
+returns = f @ B.T + np.random.randn(T, n) * 0.01
+
+sample_cov = np.cov(returns.T)
+
+# Different regularization methods
+methods = {}
+
+# 1. Sample (pseudo-inverse)
+methods['Sample'] = np.linalg.pinv(sample_cov)
+
+# 2. Ridge
+methods['Ridge'] = np.linalg.inv(sample_cov + 0.1 * np.eye(n))
+
+# 3. SVD truncation
+U, s, Vt = np.linalg.svd(returns, full_matrices=False)
+k = 5
+factor_cov = (Vt[:k, :].T * (s[:k]**2 / (T-1))) @ Vt[:k, :]
+methods['SVD-k5'] = np.linalg.inv(factor_cov + 0.05 * np.eye(n))
+
+# 4. SVD with more factors
+k = 10
+factor_cov = (Vt[:k, :].T * (s[:k]**2 / (T-1))) @ Vt[:k, :]
+methods['SVD-k10'] = np.linalg.inv(factor_cov + 0.05 * np.eye(n))
+
+# Compute min-variance weights
+mu = returns.mean(axis=0)
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+axes = axes.flatten()
+
+for idx, (name, inv_cov) in enumerate(methods.items()):
+    w = inv_cov @ mu
+    w = w / np.sum(np.abs(w))
+    axes[idx].bar(range(n), w, alpha=0.7)
+    axes[idx].set_title(f'{name}: max|w|={np.max(np.abs(w)):.2f}')
+    axes[idx].set_ylim(-1, 1)
+    axes[idx].axhline(y=0, color='k', linewidth=0.5)
+    axes[idx].set_xlabel('Asset')
+    axes[idx].set_ylabel('Weight')
+
+plt.suptitle('Minimum Variance Portfolio Weights', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+# Condition numbers
+print("Condition numbers:")
+for name, inv_cov in methods.items():
+    # Approximate condition via ratio of max/min weight
+    print(f"  {name}: max|w|/min|w| = {np.max(np.abs(w))/np.max(1e-10, np.min(np.abs(w))):.1f}")</code></pre>
+  </div>
+
+  <h3>Experiment 5: Full Stat Arb Backtest</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 5 — End-to-End Stat Arb</h4>
+    <pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Simulate realistic returns with regime changes
+T, n = 1000, 100
+regime_change = 500
+
+returns = np.zeros((T, n))
+for t in range(T):
+    if t < regime_change:
+        # Normal regime: 5 factors
+        f = np.random.randn(5) * 0.01
+        B = np.random.randn(n, 5)
+        returns[t] = B @ f + np.random.randn(n) * 0.005
+    else:
+        # Crisis regime: 1 dominant factor, high correlation
+        f = np.random.randn(1) * 0.03
+        B = np.ones((n, 1)) * 0.8 + np.random.randn(n, 1) * 0.2
+        returns[t] = B @ f + np.random.randn(n) * 0.008
+
+# Stat arb parameters
+lookback = 60
+k = 5
+z_thresh = 1.5
+
+pnls = []
+for t in range(lookback, T-1):
+    window = returns[t-lookback:t]
+    wc = window - window.mean(axis=0)
+
+    try:
+        U, s, Vt = np.linalg.svd(wc, full_matrices=False)
+        today = returns[t] - window.mean(axis=0)
+        sys = today @ Vt[:k].T @ Vt[:k]
+        resid = today - sys
+
+        # Robust z-score using MAD
+        med = np.median(resid)
+        mad = np.median(np.abs(resid - med))
+        z = 0.6745 * (resid - med) / (mad + 1e-8)
+
+        signals = np.zeros(n)
+        signals[z < -z_thresh] = 1
+        signals[z > z_thresh] = -1
+
+        # Equal weight within long/short legs
+        if signals.sum() != 0 and signals.sum() != n:
+            long_mask = signals > 0
+            short_mask = signals < 0
+            signals[long_mask] = 1 / long_mask.sum() if long_mask.sum() > 0 else 0
+            signals[short_mask] = -1 / short_mask.sum() if short_mask.sum() > 0 else 0
+
+        pnl = signals @ returns[t+1]
+        pnls.append(pnl)
+    except:
+        pnls.append(0)
+
+pnls = np.array(pnls)
+cum = np.cumsum(pnls)
+
+# Plot with regime change marked
+fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+axes[0].plot(cum, linewidth=1.5)
+axes[0].axvline(x=regime_change-lookback, color='r', linestyle='--', alpha=0.7, label='Regime Change')
+axes[0].set_title('Cumulative P&L')
+axes[0].legend()
+axes[0].grid(True, alpha=0.3)
+
+axes[1].plot(pnls, alpha=0.5, linewidth=0.5)
+axes[1].axvline(x=regime_change-lookback, color='r', linestyle='--', alpha=0.7)
+axes[1].set_title('Daily P&L')
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print(f"Pre-regime Sharpe: {np.mean(pnls[:regime_change-lookback])/np.std(pnls[:regime_change-lookback])*np.sqrt(252):.2f}")
+print(f"Post-regime Sharpe: {np.mean(pnls[regime_change-lookback:])/np.std(pnls[regime_change-lookback:])*np.sqrt(252):.2f}")
+print(f"Overall Sharpe: {np.mean(pnls)/np.std(pnls)*np.sqrt(252):.2f}")</code></pre>
+  </div>
+
+  <h3>Experiment 6: Eigenvalue Clipping & Marchenko-Pastur</h3>
+  <div class="colab-box">
+    <h4>💻 Lab 6 — Noise Filtering</h4>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Pure noise matrix
+T, n = 500, 200
+noise = np.random.randn(T, n) * 0.02
+
+# Sample covariance eigenvalues
+cov = np.cov(noise.T)
+eigenvalues = np.sort(np.linalg.eigvalsh(cov))[::-1]
+
+# Marchenko-Pastur bounds
+sigma2 = 0.02**2
+q = n / T
+lambda_plus = sigma2 * (1 + np.sqrt(q))**2
+lambda_minus = sigma2 * (1 - np.sqrt(q))**2
+
+plt.figure(figsize=(10, 6))
+plt.hist(eigenvalues, bins=50, density=True, alpha=0.7, label='Empirical eigenvalues')
+plt.axvline(x=lambda_plus, color='r', linestyle='--', linewidth=2, label=f'λ+ = {lambda_plus:.4f}')
+plt.axvline(x=lambda_minus, color='r', linestyle='--', linewidth=2, label=f'λ- = {lambda_minus:.4f}')
+plt.xlabel('Eigenvalue')
+plt.ylabel('Density')
+plt.title('Marchenko-Pastur: Pure Noise Eigenvalue Distribution')
+plt.legend()
+plt.yscale('log')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Now add signal
+k_signal = 5
+signal_eigen = [0.5, 0.3, 0.2, 0.15, 0.1]
+factors = np.random.randn(T, k_signal)
+for i, se in enumerate(signal_eigen):
+    factors[:, i] *= np.sqrt(se)
+loadings = np.random.randn(n, k_signal)
+returns = factors @ loadings.T + noise
+
+cov2 = np.cov(returns.T)
+eigenvalues2 = np.sort(np.linalg.eigvalsh(cov2))[::-1]
+
+plt.figure(figsize=(10, 6))
+plt.bar(range(1, 21), eigenvalues2[:20], alpha=0.7, label='Top 20 eigenvalues')
+plt.axhline(y=lambda_plus, color='r', linestyle='--', label='MP threshold')
+plt.xlabel('Eigenvalue Index')
+plt.ylabel('Eigenvalue')
+plt.title('Eigenvalues with Signal + Noise')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f"Eigenvalues above MP threshold: {np.sum(eigenvalues2 > lambda_plus)}")
+print(f"True signal rank: {k_signal}")</code></pre>
+  </div>
+</div>
+
+<!-- ==================== EXERCISES ==================== -->
+<div id="exercises" class="tab-content">
+  <h2>📝 Complete Exercise Compendium</h2>
+  <p>All exercises from each topic, organized by difficulty. Use this tab for review and self-testing.</p>
+
+  <h3>Prerequisites</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Given vectors <code>a = [1, 2]</code> and <code>b = [2, -1]</code>, compute their dot product. Are they orthogonal?</li>
+        <li>What is the shape of a covariance matrix for 50 assets?</li>
+        <li>If a matrix A has eigenvalue λ=3 and eigenvector v, what is A·v?</li>
+        <li>Explain in one sentence why eigenvectors are "special directions."</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Construct a 3×3 symmetric matrix. Compute its eigenvalues and eigenvectors using NumPy. Verify that A·v = λ·v for each.</li>
+        <li>Generate two correlated random time series in Python. Compute their covariance matrix. What does the off-diagonal element tell you?</li>
+        <li>Given covariance matrix Σ, show that it is always symmetric (Σ = Σᵀ). Why does this matter?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that for any real symmetric matrix, eigenvectors corresponding to distinct eigenvalues are orthogonal.</li>
+        <li>Given a covariance matrix Σ, show that it is positive semi-definite (xᵀΣx ≥ 0 for all x). What does this imply about its eigenvalues?</li>
+        <li>Explain why a covariance matrix with more assets than observations (n > T) is guaranteed to be singular. What are the implications for portfolio optimization?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>SVD Theory</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>What are the dimensions of U, Σ, and Vᵀ if A is a 100×20 matrix?</li>
+        <li>Why must singular values be non-negative?</li>
+        <li>What is the rank of A if exactly 3 singular values are non-zero?</li>
+        <li>Explain why U and V are orthogonal matrices. What does UᵀU equal?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that AᵀA = VΣᵀΣVᵀ and AAᵀ = UΣΣᵀUᵀ. What does this tell you about the relationship between SVD and eigen-decomposition?</li>
+        <li>Given a rank-1 matrix A = uvᵀ, what are its singular values and singular vectors?</li>
+        <li>Show that the Frobenius norm of A equals the square root of the sum of squared singular values: ||A||<sub>F</sub>² = Σσᵢ².</li>
+        <li>For a returns matrix X (T×N), interpret the first left singular vector u₁ in financial terms.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove the SVD existence theorem: Show that any real matrix A can be written as UΣVᵀ. (Hint: Consider AᵀA, which is symmetric positive semi-definite, and apply the spectral theorem.)</li>
+        <li>Show that the best rank-k approximation of A in Frobenius norm is obtained by keeping the top k singular values. (This previews the Eckart-Young theorem — prove it from first principles.)</li>
+        <li>Given that SVD of a covariance matrix Σ = QΛQᵀ (spectral decomposition), relate the eigenvalues of Σ to the singular values of the data matrix X.</li>
+        <li>Explain why the condition number of a matrix is σ<sub>max</sub>/σ<sub>min</sub>. How does this relate to numerical stability in solving linear systems Ax = b?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>SVD Computation</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the NumPy SVD code. Plot the singular value spectrum. How many components explain 90% of variance?</li>
+        <li>What is the difference between <code>full_matrices=True</code> and <code>full_matrices=False</code> in NumPy?</li>
+        <li>Reconstruct the matrix using only the top 3 singular values. Compute the Frobenius norm of the error.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement power iteration from scratch to find the top singular vector of a random matrix. Compare with NumPy's SVD.</li>
+        <li>Generate a returns matrix with known factor structure: r = Bf + ε, where f has 3 factors. Apply SVD and show that the top 3 singular values are much larger than the rest.</li>
+        <li>Time the execution of full SVD vs. TruncatedSVD vs. randomized_svd on matrices of size (1000, 500), (5000, 1000), and (10000, 500). Plot the results.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement the Golub-Kahan bidiagonalization algorithm for a small matrix (5×5) from scratch. Verify your bidiagonal matrix B satisfies A = UBVᵀ for orthogonal U, V.</li>
+        <li>Explain why the implicit QR algorithm is preferred over explicit QR for finding singular values. What is the "bulge chasing" procedure?</li>
+        <li>Design an incremental SVD update algorithm: given SVD of A, efficiently compute SVD of [A; a] (adding one new row). Test it on streaming returns data.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Low-Rank Approximation</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Given singular values [10, 5, 2, 1, 0.5, 0.1], what is the Frobenius norm of the rank-2 approximation error?</li>
+        <li>What is the spectral norm of the rank-3 approximation error for the same singular values?</li>
+        <li>Run the image compression code. At what k does the image become "good enough" visually? Does this match the variance threshold?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Generate a 100×50 matrix with true rank 5 (product of two random matrices). Add Gaussian noise. Apply SVD and use a scree plot to detect the true rank.</li>
+        <li>Prove that the rank-k SVD approximation is the projection of A onto the subspace spanned by the top k right singular vectors.</li>
+        <li>For a returns matrix, compute the cumulative explained variance curve. Fit a piecewise linear model to find the "elbow" automatically.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that among all rank-k matrices, the SVD truncation Aₖ minimizes both the Frobenius norm and the spectral norm of A − B. (This is the Eckart-Young theorem — prove it here as preparation.)</li>
+        <li>Weighted low-rank approximation: Given a weight matrix W, find min<sub>rank(B)=k</sub> ||W ⊙ (A − B)||<sub>F</sub>. Why is this harder than standard SVD? (Hint: SVD no longer applies directly.)</li>
+        <li>Matrix completion: Given a partially observed matrix (some entries missing), use low-rank SVD iteratively to fill in the missing values. Test on a synthetic returns matrix with 30% missing data.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Eckart-Young Theorem</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>State the Eckart-Young theorem in your own words. Why is it important?</li>
+        <li>Given singular values [100, 50, 10, 5, 1], what is the spectral norm error of the rank-2 approximation?</li>
+        <li>Run the verification code. Is the random approximation always worse? By how much on average?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove the Eckart-Young theorem for the spectral norm. (Hint: Use the Courant-Fischer min-max theorem for singular values.)</li>
+        <li>Show that if σₖ = σₖ₊₁, the optimal rank-k approximation is not unique. Construct two different optimal approximations.</li>
+        <li>For a symmetric positive definite matrix, show that the Eckart-Young theorem reduces to the standard eigenvalue truncation result.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that the Eckart-Young theorem holds for all unitarily invariant norms (Ky Fan norms). This requires Weyl's inequality and majorization theory.</li>
+        <li>Weighted Eckart-Young: For diagonal weight matrix W, characterize the solution to min<sub>rank(B)≤k</sub> ||W(A − B)||<sub>F</sub>. Show it is NOT simply weighted SVD truncation.</li>
+        <li>Tensor extension: For a 3-way tensor, explain why there is no direct analog of the Eckart-Young theorem for the CP decomposition. What goes wrong?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Factor Reduction</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the factor extraction code. How many factors explain 80% of variance?</li>
+        <li>Verify that the extracted factors are uncorrelated: compute the correlation matrix of factor_returns.</li>
+        <li>What does it mean if the first loading vector has both positive and negative values?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement rolling-window SVD: compute SVD on a 60-day rolling window and track the first singular vector over time. Plot its stability.</li>
+        <li>Given factor loadings B and factor covariance Ω, derive the portfolio weights that achieve equal risk contribution from each factor.</li>
+        <li>Generate returns with a known sector structure (e.g., 4 sectors of 5 stocks each). Show that PC2-PC4 capture sector effects.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Prove that the SVD-based factor model is equivalent to Principal Component Regression (PCR) when predicting returns. Derive the PCR estimator using SVD.</li>
+        <li>Factor timing: Use the extracted factor returns to build a momentum strategy. Backtest: go long factors with positive 20-day momentum, short negative. Compare Sharpe vs. buy-and-hold.</li>
+        <li>Sparse factor loadings: Modify the factor extraction to encourage sparsity in V (interpretable factors). Use an L1 penalty on loadings and solve via alternating minimization.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Statistical Arbitrage</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the stat arb backtest. How does Sharpe change with k=1 vs. k=5 vs. k=10?</li>
+        <li>What happens if you don't center the returns window before SVD? Why does centering matter?</li>
+        <li>Plot the distribution of Z-scores. Are they approximately normal?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Add transaction costs: assume 5 bps per trade. At what threshold does the strategy become unprofitable?</li>
+        <li>Implement a "regime filter": only trade when the top singular value is not too dominant (market not in crisis). How does this affect drawdowns?</li>
+        <li>Compare SVD-based residuals with OLS residuals (regress each stock on SPY). Which generates better Sharpe?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Build a full cross-sectional stat arb strategy: at each rebalance, rank all assets by residual Z-score, go long bottom 20%, short top 20%. Optimize the lookback window, k, and threshold using walk-forward optimization.</li>
+        <li>Model the residual process as an Ornstein-Uhlenbeck process: dε = −θ(ε − μ)dt + σdW. Estimate θ, μ, σ for each asset's residual. Use the half-life (ln(2)/θ) to set holding periods dynamically.</li>
+        <li>Multi-timeframe SVD: Combine residuals from 5-day, 20-day, and 60-day SVD windows into a composite signal using a machine learning model (e.g., random forest). Does ensemble improve Sharpe?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Covariance Regularization</h3>
+  <div class="exercise-tier tier-easy">
+    <div class="tier-header">🟢 Easy</div>
+    <div class="tier-body">
+      <ol>
+        <li>Run the covariance comparison code. How does the condition number change as n/T increases from 0.1 to 2.0?</li>
+        <li>What is the rank of the sample covariance matrix when n > T? Prove it.</li>
+        <li>Why do we add a ridge term (δI) after spectral truncation?</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-medium">
+    <div class="tier-header">🟡 Medium</div>
+    <div class="tier-body">
+      <ol>
+        <li>Implement the Marchenko-Pastur threshold: remove eigenvalues below λ₊. Compare out-of-sample risk forecasts vs. sample covariance and Ledoit-Wolf.</li>
+        <li>Generate returns with a known covariance structure. Compute the Frobenius norm ||Σ̃ − Σ<sub>true</sub>|| for sample, ridge, spectral truncation, and Ledoit-Wolf. Which wins?</li>
+        <li>Build a minimum variance portfolio using regularized covariance. Backtest: rebalance monthly using 1-year lookback. Compare turnover and Sharpe across estimators.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="exercise-tier tier-hard">
+    <div class="tier-header">🔴 Hard</div>
+    <div class="tier-body">
+      <ol>
+        <li>Derive the optimal shrinkage intensity δ for Ledoit-Wolf when shrinking toward the identity matrix. Implement the full analytical formula (not the simplified version).</li>
+        <li>Non-linear shrinkage: Instead of truncating or linearly shrinking eigenvalues, apply a non-linear function f(λ) to each eigenvalue based on the Marchenko-Pastur distribution. Implement the QuEST estimator.</li>
+        <li>Dynamic covariance: Use rolling SVD with exponential weighting (give more weight to recent observations). Compare forecasting accuracy vs. equal-weighted rolling window for a portfolio of 50 stocks during 2020.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RESOURCES ==================== -->
+<div id="resources" class="tab-content">
+  <h2>🔗 External Resources & References</h2>
+  <p>Curated resources for deeper study. All are freely available online.</p>
+
+  <h3>📚 Textbooks</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>Matrix Computations (Golub & Van Loan)</h4>
+      <p>The bible of numerical linear algebra. Chapters on SVD, bidiagonalization, and QR algorithms. Essential for understanding how SVD is actually computed.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Numerical Linear Algebra (Trefethen & Bau)</h4>
+      <p>More accessible than Golub-Van Loan. Excellent geometric intuition for SVD. Lectures 4-5 cover SVD theory and low-rank approximation beautifully.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Elements of Statistical Learning (Hastie, Tibshirani, Friedman)</h4>
+      <p>Chapter 14 covers PCA and SVD in the context of statistical learning. Great for connecting SVD to dimensionality reduction and regularization.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Active Portfolio Management (Grinold & Kahn)</h4>
+      <p>The quant portfolio management classic. Covers factor models, risk forecasting, and the practical use of PCA in equity portfolios.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Quantitative Risk Management (McNeil, Frey, Embrechts)</h4>
+      <p>Chapter on covariance matrix estimation, shrinkage, and regularization. Essential for understanding the statistical theory behind covariance regularization.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Inside the Black Box (Rishi Narang)</h4>
+      <p>Accessible overview of quant trading strategies. Good context for where SVD-based stat arb and factor models fit in the broader quant landscape.</p>
+    </div>
+  </div>
+
+  <h3>🎓 Online Courses</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>MIT 18.06 — Linear Algebra (Gilbert Strang)</h4>
+      <p>Lectures on SVD, eigenvalues, and matrix factorizations. Strang's geometric intuition is unmatched. Search "MIT 18.06 SVD lecture" on YouTube.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Stanford CS229 — Machine Learning</h4>
+      <p>Section on PCA and factor analysis. Andrew Ng explains the connection between SVD, PCA, and dimensionality reduction clearly.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Coursera: Computational Methods for Data Analysis</h4>
+      <p>Covers SVD applications in data analysis, including image compression and signal processing — directly applicable to financial signals.</p>
+    </div>
+  </div>
+
+  <h3>📄 Papers</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>"A Well-Conditioned Estimator for Large-Dimensional Covariance Matrices" (Ledoit & Wolf, 2004)</h4>
+      <p>The seminal paper on covariance shrinkage. Introduces the analytical formula for optimal shrinkage intensity.</p>
+    </div>
+    <div class="resource-card">
+      <h4>"Nonlinear Shrinkage Estimation of Large-Dimensional Covariance Matrices" (Ledoit & Wolf, 2012)</h4>
+      <p>Extends linear shrinkage to non-linear eigenvalue transformations. State-of-the-art for covariance estimation.</p>
+    </div>
+    <div class="resource-card">
+      <h4>"Random Matrix Theory and Financial Correlations" (Laloux et al., 1999)</h4>
+      <p>Applies Marchenko-Pastur to financial covariance matrices. Shows how to separate signal from noise in eigenvalue spectra.</p>
+    </div>
+    <div class="resource-card">
+      <h4>"Statistical Arbitrage in the U.S. Equities Market" (Avellaneda & Lee, 2010)</h4>
+      <p>The definitive paper on SVD-based statistical arbitrage. Introduces the risk-adjusted returns approach using PCA residuals.</p>
+    </div>
+    <div class="resource-card">
+      <h4>"Finding Structure in Randomness" (Halko, Martinsson, Tropp, 2011)</h4>
+      <p>The foundational paper on randomized SVD algorithms. Essential for scaling SVD to massive datasets.</p>
+    </div>
+  </div>
+
+  <h3>🛠️ Tools & Libraries</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>NumPy / SciPy</h4>
+      <p><code>numpy.linalg.svd</code>, <code>scipy.sparse.linalg.svds</code> for truncated SVD. The workhorses of numerical computing in Python.</p>
+    </div>
+    <div class="resource-card">
+      <h4>scikit-learn</h4>
+      <p><code>TruncatedSVD</code>, <code>PCA</code> (which uses SVD internally), <code>randomized_svd</code>. Great API for production pipelines.</p>
+    </div>
+    <div class="resource-card">
+      <h4>PyPortfolioOpt</h4>
+      <p>Open-source library for portfolio optimization. Includes covariance shrinkage estimators and risk models built on factor structures.</p>
+    </div>
+    <div class="resource-card">
+      <h4>cvxpy</h4>
+      <p>Disciplined convex programming. Useful for advanced portfolio optimization problems with regularization constraints.</p>
+    </div>
+  </div>
+
+  <h3>🌐 Websites & Blogs</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>Quantopian Lecture Series (Archive)</h4>
+      <p>Archived lectures on factor models, PCA, and statistical arbitrage. Still valuable despite Quantopian's closure.</p>
+    </div>
+    <div class="resource-card">
+      <h4>QuantStart</h4>
+      <p>Tutorials on PCA for trading strategies, covariance estimation, and portfolio optimization in Python.</p>
+    </div>
+    <div class="resource-card">
+      <h4>StackExchange: Quantitative Finance</h4>
+      <p>Q&A on SVD applications in finance. Search for "PCA portfolio optimization" or "covariance shrinkage."</p>
+    </div>
+    <div class="resource-card">
+      <h4>Gregory Gundersen's Blog</h4>
+      <p>Excellent visual explanations of SVD, PCA, and matrix factorizations with mathematical rigor.</p>
+    </div>
+  </div>
+
+  <h3>📺 Video Lectures</h3>
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>3Blue1Brown: "Eigenvalues and Eigenvectors" & "SVD"</h4>
+      <p>The best visual intuition for linear algebra concepts. Essential viewing before diving into equations.</p>
+    </div>
+    <div class="resource-card">
+      <h4>Steve Brunton: "Data-Driven Science and Engineering"</h4>
+      <p>YouTube lectures on SVD, DMD, and Koopman theory. Brunton connects SVD to dynamical systems and control — relevant for factor modeling.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <p>SVD & Dimensionality Reduction Study Guide</p>
+  <p>Built for aspiring quant engineers • Works 100% offline</p>
+  <p style="margin-top:0.5rem; font-size:0.8rem; color:#475569;">Save this HTML file to your device for anytime study.</p>
+</footer>
+
+<script>
+function showTab(tabId) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.remove('active');
+  });
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-btn').forEach(el => {
+    el.classList.remove('active');
+  });
+  // Show selected tab
+  document.getElementById(tabId).classList.add('active');
+  // Activate button
+  event.target.classList.add('active');
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Study Guide: Eigenvalues, Eigenvectors & Quantitative Applications</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --fg: #212529;
+            --card: #ffffff;
+            --accent: #2563eb;
+            --accent-light: #dbeafe;
+            --secondary: #059669;
+            --secondary-light: #d1fae5;
+            --warn: #d97706;
+            --warn-light: #fef3c7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --code-bg: #1e293b;
+            --code-fg: #e2e8f0;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.7;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        header p { opacity: 0.9; max-width: 700px; margin: 0 auto; }
+
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            background: var(--card);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn:hover { background: var(--bg); color: var(--accent); }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-light); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card h2 { color: #1e3a8a; margin-bottom: 1rem; font-size: 1.4rem; border-bottom: 2px solid var(--accent-light); padding-bottom: 0.5rem; }
+        .card h3 { color: #3730a3; margin: 1.5rem 0 0.75rem; font-size: 1.15rem; }
+        .card h4 { color: #4f46e5; margin: 1.25rem 0 0.5rem; font-size: 1rem; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+        .badge-theory { background: var(--accent-light); color: var(--accent); }
+        .badge-visual { background: var(--secondary-light); color: var(--secondary); }
+        .badge-code { background: #e0e7ff; color: #4338ca; }
+        .badge-exercise { background: var(--warn-light); color: var(--warn); }
+        .badge-prereq { background: var(--danger-light); color: var(--danger); }
+
+        .math-block {
+            background: #f1f5f9;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            font-family: "Courier New", Courier, monospace;
+            overflow-x: auto;
+        }
+        .math-inline { font-family: "Courier New", Courier, monospace; background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px; }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-fg);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+        code { font-family: "Consolas", "Monaco", "Courier New", monospace; }
+
+        .svg-container {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+        }
+        svg { max-width: 100%; height: auto; }
+
+        .exercise-tier { margin: 1.5rem 0; }
+        .tier-label { font-weight: 700; margin-bottom: 0.5rem; }
+        .tier-easy { color: var(--secondary); }
+        .tier-medium { color: var(--warn); }
+        .tier-hard { color: var(--danger); }
+
+        .exercise-box {
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .exercise-box p { margin-bottom: 0.5rem; }
+        details { margin-top: 0.5rem; }
+        summary {
+            cursor: pointer;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .solution {
+            background: white;
+            border: 1px solid var(--accent-light);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .highlight-box {
+            background: linear-gradient(to right, #eff6ff, #ffffff);
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+        .warning-box {
+            background: linear-gradient(to right, #fffbeb, #ffffff);
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+        .quant-box {
+            background: linear-gradient(to right, #f0fdf4, #ffffff);
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        th, td { border: 1px solid var(--border); padding: 0.75rem; text-align: left; }
+        th { background: #f8fafc; font-weight: 600; }
+        tr:nth-child(even) { background: #fafafa; }
+
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+            .tab-btn { min-width: 100px; font-size: 0.8rem; padding: 0.75rem 0.5rem; }
+        }
+
+        .formula-table { font-family: monospace; }
+        .formula-table td { text-align: center; }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+    <h1>🎯 Eigenvalues & Eigenvectors: The Quant Engineer's Complete Study Guide</h1>
+    <p>A self-contained, visual, and interactive guide from first principles to quantitative finance applications. Zero external dependencies required.</p>
+</header>
+
+<nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('prereq')">Prerequisites</button>
+    <button class="tab-btn" onclick="switchTab('eigen')">Eigenvalues & Vectors</button>
+    <button class="tab-btn" onclick="switchTab('char')">Characteristic Equation</button>
+    <button class="tab-btn" onclick="switchTab('diag')">Diagonalization</button>
+    <button class="tab-btn" onclick="switchTab('sym')">Symmetric vs Non-Symmetric</button>
+    <button class="tab-btn" onclick="switchTab('spectral')">Spectral Theorems</button>
+    <button class="tab-btn" onclick="switchTab('pca')">PCA</button>
+    <button class="tab-btn" onclick="switchTab('risk')">Risk Factor Decomposition</button>
+    <button class="tab-btn" onclick="switchTab('markov')">Markov Steady States</button>
+    <button class="tab-btn" onclick="switchTab('cheat')">Cheat Sheet & Resources</button>
+</nav>
+
+<div class="container">
+
+<!-- ==================== PREREQUISITES ==================== -->
+<div id="prereq" class="tab-content active">
+    <div class="card">
+        <span class="badge badge-prereq">Foundation</span>
+        <h2>Prerequisites: The Building Blocks</h2>
+        <p>Before we dive into eigenvalues, we need to speak the language of linear algebra. This section covers every concept you will need, explained from scratch with zero assumed knowledge.</p>
+
+        <h3>1. What is a Vector?</h3>
+        <p>A <strong>vector</strong> is simply an ordered list of numbers. But geometrically, it is much richer: it is an arrow pointing from the origin to a specific point in space.</p>
+        <ul>
+            <li><strong>Algebraic view:</strong> <span class="math-inline">v = [3, 2]</span> — two numbers.</li>
+            <li><strong>Geometric view:</strong> An arrow starting at (0,0) and ending at (3,2).</li>
+        </ul>
+        <div class="svg-container">
+            <svg width="300" height="220" viewBox="0 0 300 220">
+                <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker></defs>
+                <line x1="30" y1="190" x2="280" y2="190" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="30" y1="190" x2="30" y2="20" stroke="#cbd5e1" stroke-width="1"/>
+                <text x="285" y="195" font-size="12" fill="#64748b">x</text>
+                <text x="20" y="15" font-size="12" fill="#64748b">y</text>
+                <line x1="30" y1="190" x2="210" y2="70" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+                <circle cx="210" cy="70" r="4" fill="#dc2626"/>
+                <text x="215" y="65" font-size="13" fill="#dc2626" font-weight="bold">v = [3, 2]</text>
+                <line x1="30" y1="190" x2="210" y2="190" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="210" y1="190" x2="210" y2="70" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4"/>
+                <text x="215" y="205" font-size="11" fill="#64748b">3</text>
+                <text x="10" y="75" font-size="11" fill="#64748b">2</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 1: A vector as an arrow in 2D space.</p>
+        </div>
+
+        <h3>2. What is a Matrix?</h3>
+        <p>A <strong>matrix</strong> is a rectangular grid of numbers. An <span class="math-inline">m × n</span> matrix has <span class="math-inline">m</span> rows and <span class="math-inline">n</span> columns. But the deep insight is:</p>
+        <div class="highlight-box">
+            <strong>Key Insight:</strong> A matrix is a <em>linear transformation</em> — a machine that takes vectors as input and produces new vectors as output, while keeping the origin fixed and preserving straight lines.
+        </div>
+
+        <h3>3. Matrix-Vector Multiplication</h3>
+        <p>When we multiply a matrix <span class="math-inline">A</span> by a vector <span class="math-inline">v</span>, we apply the transformation to that vector.</p>
+        <div class="math-block">
+        If A = [[2, 1], [1, 3]] and v = [1, 1]<br><br>
+        Av = [2*1 + 1*1, 1*1 + 3*1] = [3, 4]
+        </div>
+        <p>The vector <span class="math-inline">[1,1]</span> was moved to <span class="math-inline">[3,4]</span>. The matrix "stretched and rotated" the original vector.</p>
+
+        <h3>4. The Determinant</h3>
+        <p>The <strong>determinant</strong> of a square matrix tells us the <em>scaling factor</em> of area (in 2D) or volume (in 3D) after the transformation.</p>
+        <ul>
+            <li><span class="math-inline">det(A) = 5</span> → Areas become 5× larger.</li>
+            <li><span class="math-inline">det(A) = 0</span> → The transformation collapses space into a lower dimension (e.g., a square becomes a line).</li>
+            <li><span class="math-inline">det(A) < 0</span> → The transformation flips orientation (like a mirror).</li>
+        </ul>
+        <div class="math-block">
+        For a 2×2 matrix A = [[a, b], [c, d]]:<br>
+        det(A) = ad − bc
+        </div>
+
+        <h3>5. Identity Matrix & Transpose</h3>
+        <p>The <strong>identity matrix</strong> <span class="math-inline">I</span> is the "do nothing" transformation. Multiplying by <span class="math-inline">I</span> leaves every vector unchanged.</p>
+        <div class="math-block">
+        I₂ = [[1, 0], [0, 1]]
+        </div>
+        <p>The <strong>transpose</strong> <span class="math-inline">Aᵀ</span> flips a matrix over its diagonal (rows become columns).</p>
+
+        <h3>6. Linear Independence & Basis</h3>
+        <p>Vectors are <strong>linearly independent</strong> if none can be written as a combination of the others. A <strong>basis</strong> is a set of independent vectors that can describe every point in the space.</p>
+        <div class="warning-box">
+            <strong>Why this matters:</strong> Eigenvectors form a basis for many important matrices. If we have a basis of eigenvectors, we can describe <em>any</em> vector in terms of these "special directions."
+        </div>
+
+        <h3>7. Vector Spaces (Intuition)</h3>
+        <p>A <strong>vector space</strong> is a collection of vectors where you can add vectors and multiply by scalars without leaving the collection. <span class="math-inline">ℝ²</span> (the 2D plane) and <span class="math-inline">ℝ³</span> (3D space) are the most common examples.</p>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Prerequisites: Practice Problems</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Let <span class="math-inline">A = [[2, 3], [1, 4]]</span> and <span class="math-inline">v = [1, 2]</span>. Compute <span class="math-inline">Av</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Av = [2(1)+3(2), 1(1)+4(2)] = [2+6, 1+8] = <strong>[8, 9]</strong>
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> Compute the determinant of <span class="math-inline">B = [[5, 2], [3, 4]]</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    det(B) = (5)(4) − (2)(3) = 20 − 6 = <strong>14</strong>
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Find the transpose of <span class="math-inline">C = [[1, 2, 3], [4, 5, 6]]</span> and state its dimensions.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Cᵀ = [[1, 4], [2, 5], [3, 6]]. Dimensions: 3×2.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Are the vectors <span class="math-inline">[1, 2]</span> and <span class="math-inline">[2, 4]</span> linearly independent? Why or why not?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    No. [2, 4] = 2×[1, 2]. One is a scalar multiple of the other, so they lie on the same line and cannot form a basis for ℝ².
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove that for any 2×2 matrix <span class="math-inline">A</span>, <span class="math-inline">det(A) = 0</span> if and only if the columns of <span class="math-inline">A</span> are linearly dependent.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Let A = [[a,b],[c,d]]. det(A)=0 → ad=bc → a/c = b/d (assuming c,d≠0), meaning column 2 is a scalar multiple of column 1. Conversely, if columns are dependent, column 2 = k×column 1, so b=ka and d=kc. Then det = a(kc) − (ka)c = kac − kac = 0.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Prerequisites: Colab Experiment</h2>
+        <p>Run this in Google Colab to visualize how a 2×2 matrix transforms the unit square.</p>
+        <pre><code># PREREQ EXPERIMENT: Visualizing Matrix Transformations
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define a matrix
+A = np.array([[2, 1], 
+              [1, 3]])
+
+# Create a grid of points
+x = np.linspace(-1, 1, 10)
+y = np.linspace(-1, 1, 10)
+X, Y = np.meshgrid(x, y)
+
+# Stack into vectors and transform
+points = np.vstack([X.ravel(), Y.ravel()])
+transformed = A @ points
+
+# Plot original and transformed
+fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+
+# Original grid
+ax[0].scatter(points[0], points[1], c='blue', s=10, alpha=0.6)
+ax[0].set_title('Original Grid')
+ax[0].set_xlim(-4, 4)
+ax[0].set_ylim(-4, 4)
+ax[0].axhline(0, color='black', linewidth=0.5)
+ax[0].axvline(0, color='black', linewidth=0.5)
+ax[0].set_aspect('equal')
+
+# Transformed grid
+ax[1].scatter(transformed[0], transformed[1], c='red', s=10, alpha=0.6)
+ax[1].set_title(f'Transformed by A = {A.tolist()}')
+ax[1].set_xlim(-4, 4)
+ax[1].set_ylim(-4, 4)
+ax[1].axhline(0, color='black', linewidth=0.5)
+ax[1].axvline(0, color='black', linewidth=0.5)
+ax[1].set_aspect('equal')
+
+plt.tight_layout()
+plt.show()
+
+print(f"Determinant of A: {np.linalg.det(A):.2f}")
+print("This is the area scaling factor.")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== EIGENVALUES & EIGENVECTORS ==================== -->
+<div id="eigen" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Core Concept</span>
+        <h2>Eigenvalues & Eigenvectors: The Core Idea</h2>
+
+        <h3>The Intuition</h3>
+        <p>Most vectors get both <em>rotated</em> and <em>stretched</em> when multiplied by a matrix. But some special vectors only get <strong>stretched</strong> — they stay on their original line. These are <strong>eigenvectors</strong>.</p>
+
+        <div class="highlight-box">
+            <strong>The Magic Equation:</strong> <span class="math-inline">Av = λv</span><br><br>
+            <span class="math-inline">A</span> = matrix, <span class="math-inline">v</span> = eigenvector, <span class="math-inline">λ</span> (lambda) = eigenvalue<br><br>
+            Translation: "When A acts on v, the result is just v scaled by λ."
+        </div>
+
+        <div class="svg-container">
+            <svg width="600" height="260" viewBox="0 0 600 260">
+                <defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker>
+                <marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/></marker></defs>
+
+                <!-- Left panel: Eigenvector -->
+                <rect x="10" y="10" width="270" height="240" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="145" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Eigenvector (Special!)</text>
+                <line x1="40" y1="210" x2="250" y2="210" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="40" y1="210" x2="40" y2="50" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="40" y1="210" x2="200" y2="90" stroke="#2563eb" stroke-width="3" marker-end="url(#arr)"/>
+                <text x="205" y="85" font-size="12" fill="#2563eb" font-weight="bold">v</text>
+                <line x1="40" y1="210" x2="240" y2="50" stroke="#dc2626" stroke-width="3" marker-end="url(#arr2)" stroke-dasharray="5,3"/>
+                <text x="245" y="45" font-size="12" fill="#dc2626" font-weight="bold">Av = 2v</text>
+                <text x="145" y="235" text-anchor="middle" font-size="11" fill="#64748b">Stays on same line! Only scaled.</text>
+
+                <!-- Arrow between panels -->
+                <text x="300" y="135" text-anchor="middle" font-size="24">→</text>
+
+                <!-- Right panel: Regular vector -->
+                <rect x="320" y="10" width="270" height="240" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="455" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Regular Vector</text>
+                <line x1="350" y1="210" x2="560" y2="210" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="350" y1="210" x2="350" y2="50" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="350" y1="210" x2="450" y2="110" stroke="#2563eb" stroke-width="3" marker-end="url(#arr)"/>
+                <text x="455" y="105" font-size="12" fill="#2563eb" font-weight="bold">w</text>
+                <line x1="350" y1="210" x2="530" y2="140" stroke="#059669" stroke-width="3" marker-end="url(#arr2)"/>
+                <text x="535" y="135" font-size="12" fill="#059669" font-weight="bold">Aw</text>
+                <text x="455" y="235" text-anchor="middle" font-size="11" fill="#64748b">Rotated AND scaled. Not special.</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 2: Eigenvectors stay on their line; regular vectors rotate.</p>
+        </div>
+
+        <h3>Why Only Square Matrices?</h3>
+        <p>Eigenvalues require <span class="math-inline">Av = λv</span>. For this to make sense, <span class="math-inline">A</span> must map a vector to a vector of the same dimension. An <span class="math-inline">m×n</span> matrix maps <span class="math-inline">ℝⁿ → ℝᵐ</span>. Only square matrices (<span class="math-inline">n×n</span>) map <span class="math-inline">ℝⁿ → ℝⁿ</span>, so only they can have eigenvectors in the traditional sense.</p>
+
+        <h3>The Eigenspace</h3>
+        <p>If <span class="math-inline">v</span> is an eigenvector with eigenvalue <span class="math-inline">λ</span>, then so is any scalar multiple <span class="math-inline">cv</span> (for <span class="math-inline">c ≠ 0</span>). The set of all such vectors is called the <strong>eigenspace</strong> for <span class="math-inline">λ</span>.</p>
+
+        <h3>Trace and Determinant Connections</h3>
+        <p>For an <span class="math-inline">n×n</span> matrix with eigenvalues <span class="math-inline">λ₁, λ₂, ..., λₙ</span>:</p>
+        <ul>
+            <li><strong>Trace:</strong> <span class="math-inline">tr(A) = λ₁ + λ₂ + ... + λₙ</span> (sum of diagonal entries)</li>
+            <li><strong>Determinant:</strong> <span class="math-inline">det(A) = λ₁ × λ₂ × ... × λₙ</span></li>
+        </ul>
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> In portfolio theory, if a covariance matrix has a very large eigenvalue, it means most assets move together (one dominant "market factor"). The trace equals total variance; each eigenvalue represents variance along a principal direction.
+        </div>
+
+        <h3>Algebraic vs Geometric Multiplicity</h3>
+        <ul>
+            <li><strong>Algebraic multiplicity:</strong> How many times <span class="math-inline">λ</span> appears as a root of the characteristic polynomial.</li>
+            <li><strong>Geometric multiplicity:</strong> The dimension of the eigenspace (number of linearly independent eigenvectors for <span class="math-inline">λ</span>).</li>
+        </ul>
+        <p>Geometric multiplicity ≤ Algebraic multiplicity always.</p>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-visual">Visual</span>
+        <h2>Visualizing Eigenvalues</h2>
+        <p>Consider the matrix <span class="math-inline">A = [[2, 0], [0, 3]]</span>. This is a simple scaling matrix. It stretches the x-direction by 2 and the y-direction by 3.</p>
+        <div class="svg-container">
+            <svg width="400" height="250" viewBox="0 0 400 250">
+                <defs><marker id="a1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/></marker></defs>
+                <rect x="20" y="20" width="160" height="200" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="100" y="40" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Before: Unit Circle</text>
+                <ellipse cx="100" cy="130" rx="50" ry="50" fill="none" stroke="#2563eb" stroke-width="2"/>
+                <line x1="50" y1="130" x2="150" y2="130" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+                <line x1="100" y1="80" x2="100" y2="180" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+                <text x="100" y="200" text-anchor="middle" font-size="11" fill="#64748b">x and y scale equally</text>
+
+                <text x="200" y="130" text-anchor="middle" font-size="20">→</text>
+
+                <rect x="220" y="20" width="160" height="200" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="300" y="40" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">After: A = [[2,0],[0,3]]</text>
+                <ellipse cx="300" cy="130" rx="100" ry="75" fill="none" stroke="#dc2626" stroke-width="2"/>
+                <line x1="200" y1="130" x2="400" y2="130" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+                <line x1="300" y1="55" x2="300" y2="205" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3"/>
+                <text x="300" y="220" text-anchor="middle" font-size="11" fill="#64748b">λ₁=2 (x), λ₂=3 (y)</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 3: A diagonal matrix scales axes independently. The eigenvalues are exactly the diagonal entries, and the eigenvectors are the coordinate axes.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Eigenvalues & Eigenvectors: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Verify that <span class="math-inline">v = [1, 1]</span> is an eigenvector of <span class="math-inline">A = [[3, 1], [1, 3]]</span>, and find the eigenvalue.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Av = [3(1)+1(1), 1(1)+3(1)] = [4, 4] = 4×[1,1]. So λ = 4.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> For <span class="math-inline">A = [[5, 0], [0, 2]]</span>, state the eigenvalues and eigenvectors by inspection.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    λ₁=5, v₁=[1,0]; λ₂=2, v₂=[0,1]. Diagonal matrices have eigenvalues on the diagonal and standard basis vectors as eigenvectors.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> A 3×3 matrix has eigenvalues 2, 3, and 5. What is its determinant? What is its trace?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    det = 2×3×5 = <strong>30</strong>. tr = 2+3+5 = <strong>10</strong>.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Show that if <span class="math-inline">λ</span> is an eigenvalue of <span class="math-inline">A</span>, then <span class="math-inline">λ²</span> is an eigenvalue of <span class="math-inline">A²</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Av = λv. Multiply both sides by A: A(Av) = A(λv) → A²v = λ(Av) = λ(λv) = λ²v. Thus λ² is an eigenvalue of A² with the same eigenvector v.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Construct a 2×2 matrix that has eigenvalue 3 with algebraic multiplicity 2 but geometric multiplicity 1. (This is called a <em>defective</em> matrix.)</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A = [[3, 1], [0, 3]]. The characteristic polynomial is (3−λ)², so algebraic multiplicity is 2. Solving (A−3I)v = 0 gives [0,1;0,0]v = 0, so v₂=0 and v₁ is free. Only one independent eigenvector [1,0], so geometric multiplicity is 1.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Eigenvalues: Interactive Exploration</h2>
+        <pre><code># EIGEN EXPERIMENT: Finding Eigenvalues Numerically
+import numpy as np
+
+# Define a symmetric matrix (common in quant finance)
+A = np.array([[4, 2], 
+              [2, 3]])
+
+# Compute eigenvalues and eigenvectors
+eigenvalues, eigenvectors = np.linalg.eig(A)
+
+print("Matrix A:")
+print(A)
+print("
+Eigenvalues:", eigenvalues)
+print("
+Eigenvectors (columns):")
+print(eigenvectors)
+
+# Verify: A @ v should equal lambda * v
+print("
+--- Verification ---")
+for i in range(len(eigenvalues)):
+    v = eigenvectors[:, i]
+    lhs = A @ v
+    rhs = eigenvalues[i] * v
+    print(f"Eigenvalue {eigenvalues[i]:.4f}:")
+    print(f"  Av   = {lhs}")
+    print(f"  λv   = {rhs}")
+    print(f"  Match: {np.allclose(lhs, rhs)}
+")
+
+# Trace and determinant check
+print(f"Trace: {np.trace(A):.4f} (should equal sum of eigenvalues: {np.sum(eigenvalues):.4f})")
+print(f"Det:   {np.linalg.det(A):.4f} (should equal product: {np.prod(eigenvalues):.4f})")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== CHARACTERISTIC EQUATION ==================== -->
+<div id="char" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Core Concept</span>
+        <h2>The Characteristic Equation</h2>
+
+        <h3>Deriving the Equation</h3>
+        <p>We want to find all <span class="math-inline">λ</span> and <span class="math-inline">v</span> such that:</p>
+        <div class="math-block">
+            Av = λv
+        </div>
+        <p>Rearrange:</p>
+        <div class="math-block">
+            Av − λv = 0<br>
+            Av − λIv = 0&nbsp;&nbsp;&nbsp;(since Iv = v)<br>
+            (A − λI)v = 0
+        </div>
+        <p>This is a homogeneous system. For a non-zero solution <span class="math-inline">v</span> to exist, the matrix <span class="math-inline">(A − λI)</span> must be singular (non-invertible). A matrix is singular when its determinant is zero:</p>
+        <div class="highlight-box">
+            <strong>The Characteristic Equation:</strong><br><br>
+            <span style="font-size:1.2em">det(A − λI) = 0</span>
+        </div>
+
+        <h3>The Characteristic Polynomial</h3>
+        <p>When we expand <span class="math-inline">det(A − λI)</span>, we get a polynomial in <span class="math-inline">λ</span> of degree <span class="math-inline">n</span> (for an <span class="math-inline">n×n</span> matrix). This is the <strong>characteristic polynomial</strong>.</p>
+
+        <div class="math-block">
+        Example for 2×2 matrix A = [[a, b], [c, d]]:<br><br>
+        A − λI = [[a−λ, b], [c, d−λ]]<br><br>
+        det(A − λI) = (a−λ)(d−λ) − bc<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= λ² − (a+d)λ + (ad−bc)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= λ² − tr(A)λ + det(A)
+        </div>
+
+        <p>By the Fundamental Theorem of Algebra, this polynomial has exactly <span class="math-inline">n</span> roots (counting multiplicities), which are the <span class="math-inline">n</span> eigenvalues.</p>
+
+        <div class="svg-container">
+            <svg width="500" height="280" viewBox="0 0 500 280">
+                <rect x="10" y="10" width="480" height="260" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="250" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Characteristic Polynomial: p(λ) = λ² − 5λ + 6</text>
+                <!-- Axes -->
+                <line x1="50" y1="230" x2="450" y2="230" stroke="#334155" stroke-width="2"/>
+                <line x1="50" y1="230" x2="50" y2="40" stroke="#334155" stroke-width="2"/>
+                <text x="460" y="235" font-size="12" fill="#334155">λ</text>
+                <text x="40" y="30" font-size="12" fill="#334155">p(λ)</text>
+                <!-- Parabola -->
+                <path d="M 100 180 Q 200 280 250 230 Q 300 180 400 80" fill="none" stroke="#2563eb" stroke-width="3"/>
+                <!-- Roots -->
+                <circle cx="150" cy="230" r="5" fill="#dc2626"/>
+                <circle cx="350" cy="230" r="5" fill="#dc2626"/>
+                <text x="150" y="250" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">λ₁=2</text>
+                <text x="350" y="250" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">λ₂=3</text>
+                <!-- Zero line label -->
+                <text x="30" y="235" font-size="11" fill="#64748b">0</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 4: The characteristic polynomial crosses zero at the eigenvalues.</p>
+        </div>
+
+        <h3>Finding Eigenvectors</h3>
+        <p>Once we know <span class="math-inline">λ</span>, we solve <span class="math-inline">(A − λI)v = 0</span> using Gaussian elimination. The solution space is the eigenspace.</p>
+
+        <h3>Multiplicity</h3>
+        <table>
+            <tr><th>Type</th><th>Definition</th><th>Significance</th></tr>
+            <tr><td>Algebraic Multiplicity</td><td>Number of times λ appears as a root</td><td>Tells us how many "slots" λ occupies</td></tr>
+            <tr><td>Geometric Multiplicity</td><td>Dimension of nullspace of (A−λI)</td><td>Tells us how many independent eigenvectors we actually get</td></tr>
+        </table>
+        <div class="warning-box">
+            <strong>Critical Rule:</strong> Geometric multiplicity ≤ Algebraic multiplicity. When strictly less, the matrix is <strong>defective</strong> and cannot be diagonalized.
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Characteristic Equation: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Write the characteristic polynomial for <span class="math-inline">A = [[4, 1], [2, 3]]</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    det(A−λI) = (4−λ)(3−λ) − 2 = 12 − 7λ + λ² − 2 = <strong>λ² − 7λ + 10</strong>
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> Find the eigenvalues of <span class="math-inline">A = [[5, 0], [0, 5]]</span> and state their algebraic multiplicities.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    det(A−λI) = (5−λ)² = 0 → λ = 5 with algebraic multiplicity <strong>2</strong>.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> For <span class="math-inline">A = [[2, 1], [1, 2]]</span>, find all eigenvalues and their corresponding eigenvectors.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Char poly: (2−λ)² − 1 = λ² − 4λ + 3 = (λ−1)(λ−3) = 0.<br>
+                    λ₁=1: (A−I)v = [[1,1],[1,1]]v=0 → v₁=[1,−1].<br>
+                    λ₂=3: (A−3I)v = [[−1,1],[1,−1]]v=0 → v₂=[1,1].
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> A matrix has characteristic polynomial <span class="math-inline">λ³ − 6λ² + 11λ − 6</span>. Find its eigenvalues.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Try λ=1: 1−6+11−6=0. Factor out (λ−1): (λ−1)(λ²−5λ+6) = (λ−1)(λ−2)(λ−3). Eigenvalues: <strong>1, 2, 3</strong>.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove the Cayley-Hamilton Theorem for a 2×2 matrix: every square matrix satisfies its own characteristic equation. That is, if <span class="math-inline">p(λ) = λ² − tr(A)λ + det(A)</span>, then <span class="math-inline">p(A) = A² − tr(A)A + det(A)I = 0</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Let A = [[a,b],[c,d]]. A² = [[a²+bc, ab+bd], [ca+dc, cb+d²]].<br>
+                    tr(A)A = (a+d)[[a,b],[c,d]] = [[a²+ad, ab+bd], [ac+cd, ad+d²]].<br>
+                    det(A)I = (ad−bc)[[1,0],[0,1]] = [[ad−bc, 0], [0, ad−bc]].<br>
+                    A² − tr(A)A + det(A)I:<br>
+                    Top-left: (a²+bc) − (a²+ad) + (ad−bc) = 0.<br>
+                    Top-right: (ab+bd) − (ab+bd) + 0 = 0.<br>
+                    Bottom-left: (ca+dc) − (ac+cd) + 0 = 0.<br>
+                    Bottom-right: (cb+d²) − (ad+d²) + (ad−bc) = 0.<br>
+                    Thus p(A) = 0.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Characteristic Equation: Numerical & Visual</h2>
+        <pre><code># CHARACTERISTIC EQUATION EXPERIMENT
+import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[2, 1], 
+              [1, 2]])
+
+# Symbolic-ish: evaluate det(A - lambda*I) across a range
+lambdas = np.linspace(-2, 5, 500)
+dets = []
+
+for lam in lambdas:
+    dets.append(np.linalg.det(A - lam * np.eye(2)))
+
+plt.figure(figsize=(10, 5))
+plt.plot(lambdas, dets, 'b-', linewidth=2, label='det(A - λI)')
+plt.axhline(0, color='black', linewidth=0.5)
+plt.axvline(0, color='black', linewidth=0.5)
+
+# Mark actual eigenvalues
+eigvals = np.linalg.eigvals(A)
+for ev in eigvals:
+    plt.axvline(ev, color='red', linestyle='--', alpha=0.7, label=f'λ={ev:.2f}')
+    plt.scatter([ev], [0], color='red', s=100, zorder=5)
+
+plt.xlabel('λ')
+plt.ylabel('det(A - λI)')
+plt.title('Characteristic Polynomial')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.ylim(-5, 8)
+plt.show()
+
+print("Eigenvalues from numpy:", eigvals)
+print("Verify: these are where the curve crosses zero.")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== DIAGONALIZATION ==================== -->
+<div id="diag" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Core Concept</span>
+        <h2>Diagonalization</h2>
+
+        <h3>The Big Idea</h3>
+        <p>Diagonal matrices are the simplest matrices. They just scale each coordinate axis independently. What if we could "transform" any matrix into a diagonal one?</p>
+        <div class="highlight-box">
+            <strong>Diagonalization:</strong> We want to write <span class="math-inline">A = PDP⁻¹</span> where <span class="math-inline">D</span> is diagonal.<br><br>
+            <span class="math-inline">P</span> = matrix whose columns are eigenvectors of A<br>
+            <span class="math-inline">D</span> = diagonal matrix of corresponding eigenvalues<br>
+            <span class="math-inline">P⁻¹</span> = inverse of P
+        </div>
+
+        <h3>Why This Works</h3>
+        <p>If <span class="math-inline">v₁, v₂, ..., vₙ</span> are eigenvectors with eigenvalues <span class="math-inline">λ₁, λ₂, ..., λₙ</span>, then:</p>
+        <div class="math-block">
+        A[v₁ | v₂ | ... | vₙ] = [λ₁v₁ | λ₂v₂ | ... | λₙvₙ] = [v₁ | v₂ | ... | vₙ] × diag(λ₁, λ₂, ..., λₙ)<br><br>
+        So: AP = PD → A = PDP⁻¹
+        </div>
+
+        <h3>When Can We Diagonalize?</h3>
+        <p>A matrix is <strong>diagonalizable</strong> if and only if it has <span class="math-inline">n</span> linearly independent eigenvectors. Equivalently:</p>
+        <ul>
+            <li>Geometric multiplicity = Algebraic multiplicity for every eigenvalue.</li>
+            <li>The matrix is not defective.</li>
+        </ul>
+
+        <div class="svg-container">
+            <svg width="650" height="220" viewBox="0 0 650 220">
+                <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+
+                <!-- Standard basis view -->
+                <rect x="10" y="10" width="180" height="200" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="100" y="35" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Standard Basis</text>
+                <line x1="50" y1="170" x2="150" y2="170" stroke="#2563eb" stroke-width="2" marker-end="url(#ar)"/>
+                <line x1="50" y1="170" x2="50" y2="70" stroke="#2563eb" stroke-width="2" marker-end="url(#ar)"/>
+                <text x="155" y="175" font-size="11" fill="#2563eb">e₁</text>
+                <text x="40" y="65" font-size="11" fill="#2563eb">e₂</text>
+                <text x="100" y="195" text-anchor="middle" font-size="11" fill="#64748b">A is complicated here</text>
+
+                <text x="210" y="115" font-size="20">P⁻¹</text>
+                <line x1="200" y1="110" x2="240" y2="110" stroke="#334155" stroke-width="2" marker-end="url(#ar)"/>
+
+                <!-- Eigenbasis view -->
+                <rect x="250" y="10" width="180" height="200" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="340" y="35" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e3a8a">Eigenbasis</text>
+                <line x1="290" y1="170" x2="390" y2="130" stroke="#059669" stroke-width="2" marker-end="url(#ar)"/>
+                <line x1="290" y1="170" x2="330" y2="70" stroke="#059669" stroke-width="2" marker-end="url(#ar)"/>
+                <text x="395" y="125" font-size="11" fill="#059669">v₁</text>
+                <text x="320" y="65" font-size="11" fill="#059669">v₂</text>
+                <text x="340" y="195" text-anchor="middle" font-size="11" fill="#64748b">D is diagonal here!</text>
+
+                <text x="450" y="115" font-size="20">P</text>
+                <line x1="440" y1="110" x2="480" y2="110" stroke="#334155" stroke-width="2" marker-end="url(#ar)"/>
+
+                <!-- Result -->
+                <rect x="490" y="10" width="150" height="200" fill="#f0fdf4" stroke="#86efac" rx="8"/>
+                <text x="565" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="#059669">A = PDP⁻¹</text>
+                <text x="565" y="110" text-anchor="middle" font-size="12" fill="#334155">In eigenbasis,</text>
+                <text x="565" y="130" text-anchor="middle" font-size="12" fill="#334155">A just scales</text>
+                <text x="565" y="150" text-anchor="middle" font-size="12" fill="#334155">each axis by λ</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 5: Diagonalization changes basis to the eigenbasis, where the matrix acts as a simple scaling.</p>
+        </div>
+
+        <h3>Why Diagonalization is Powerful</h3>
+        <table>
+            <tr><th>Operation</th><th>Direct Computation</th><th>With Diagonalization</th></tr>
+            <tr><td>Aᵏ</td><td>k matrix multiplications</td><td>PDᵏP⁻¹ (just scale diagonal!)</td></tr>
+            <tr><td>eᴬ (matrix exponential)</td><td>Infinite series</td><td>PeᴰP⁻¹ (exponentiate diagonal)</td></tr>
+            <tr><td>A⁻¹</td><td>Gaussian elimination</td><td>PD⁻¹P⁻¹ (invert diagonal)</td></tr>
+        </table>
+
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> In continuous-time finance, matrix exponentials <span class="math-inline">e^(Qt)</span> appear in option pricing (transition densities) and interest rate models. Diagonalization turns an impossible infinite series into a simple calculation.
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Diagonalization: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Given <span class="math-inline">P = [[1, 1], [1, −1]]</span> and <span class="math-inline">D = [[4, 0], [0, 2]]</span>, reconstruct <span class="math-inline">A = PDP⁻¹</span> (you may assume P⁻¹ = ½[[1, 1], [1, −1]]).</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A = [[1,1],[1,−1]] × [[4,0],[0,2]] × ½[[1,1],[1,−1]]<br>
+                    = [[4,2],[4,−2]] × ½[[1,1],[1,−1]]<br>
+                    = [[3,1],[1,3]]
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Diagonalize <span class="math-inline">A = [[3, 1], [0, 2]]</span>. Find P, D, and verify A = PDP⁻¹.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Eigenvalues: (3−λ)(2−λ)=0 → λ₁=3, λ₂=2.<br>
+                    λ₁=3: [[0,1],[0,−1]]v=0 → v₁=[1,0].<br>
+                    λ₂=2: [[1,1],[0,0]]v=0 → v₂=[1,−1].<br>
+                    P=[[1,1],[0,−1]], D=[[3,0],[0,2]].<br>
+                    P⁻¹=[[1,1],[0,−1]]. Verify: PDP⁻¹ = [[3,1],[0,2]] = A.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Use diagonalization to compute <span class="math-inline">A¹⁰</span> for <span class="math-inline">A = [[2, 1], [1, 2]]</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    From earlier: λ₁=1, v₁=[1,−1]; λ₂=3, v₂=[1,1].<br>
+                    P=[[1,1],[−1,1]], P⁻¹=½[[1,−1],[1,1]].<br>
+                    A¹⁰ = PD¹⁰P⁻¹ = [[1,1],[−1,1]] × [[1,0],[0,3¹⁰]] × ½[[1,−1],[1,1]]<br>
+                    = ½[[1+3¹⁰, −1+3¹⁰], [−1+3¹⁰, 1+3¹⁰]]
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove that if <span class="math-inline">A</span> is diagonalizable and all eigenvalues satisfy <span class="math-inline">|λ| < 1</span>, then <span class="math-inline">Aᵏ → 0</span> as <span class="math-inline">k → ∞</span>. This is crucial for stationary time series in quant finance.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A = PDP⁻¹ → Aᵏ = PDᵏP⁻¹. Dᵏ = diag(λ₁ᵏ, ..., λₙᵏ). Since |λᵢ|<1, λᵢᵏ→0 for all i. Thus Dᵏ→0, so Aᵏ→P×0×P⁻¹ = 0.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Diagonalization: Computation & Verification</h2>
+        <pre><code># DIAGONALIZATION EXPERIMENT
+import numpy as np
+
+A = np.array([[3, 1], 
+              [1, 3]])
+
+# Step 1: Get eigenvalues and eigenvectors
+eigenvalues, eigenvectors = np.linalg.eig(A)
+
+# Step 2: Construct P and D
+P = eigenvectors
+D = np.diag(eigenvalues)
+P_inv = np.linalg.inv(P)
+
+print("Original A:")
+print(A)
+print("
+P (eigenvectors as columns):")
+print(P)
+print("
+D (diagonal eigenvalues):")
+print(D)
+print("
+P @ D @ P_inv:")
+print(P @ D @ P_inv)
+print("
+Reconstruction matches A:", np.allclose(A, P @ D @ P_inv))
+
+# Step 3: Compute A^10 easily
+k = 10
+A_power = P @ (D ** k) @ P_inv
+print(f"
+A^{k} via diagonalization:")
+print(A_power)
+print(f"
+Direct A^{k}:")
+print(np.linalg.matrix_power(A, k))
+print("Match:", np.allclose(A_power, np.linalg.matrix_power(A, k)))</code></pre>
+    </div>
+</div>
+
+<!-- ==================== SYMMETRIC VS NON-SYMMETRIC ==================== -->
+<div id="sym" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Core Concept</span>
+        <h2>Symmetric vs Non-Symmetric Matrices</h2>
+
+        <h3>Symmetric Matrices: A = Aᵀ</h3>
+        <p>A matrix is <strong>symmetric</strong> if it equals its own transpose: <span class="math-inline">Aᵢⱼ = Aⱼᵢ</span> for all <span class="math-inline">i, j</span>. These matrices appear everywhere in quant finance because covariance matrices and correlation matrices are always symmetric.</p>
+
+        <div class="highlight-box">
+            <strong>The Symmetric Matrix Privilege:</strong><br>
+            1. All eigenvalues are <strong>real</strong> (no complex numbers).<br>
+            2. Eigenvectors for distinct eigenvalues are <strong>orthogonal</strong> (perpendicular).<br>
+            3. Always diagonalizable (never defective).<br>
+            4. Can be orthogonally diagonalized: <span class="math-inline">A = QΛQᵀ</span> where <span class="math-inline">Q</span> is orthogonal (<span class="math-inline">Qᵀ = Q⁻¹</span>).
+        </div>
+
+        <h3>Non-Symmetric Matrices</h3>
+        <p>For general square matrices, none of the above guarantees hold:</p>
+        <ul>
+            <li>Eigenvalues can be <strong>complex</strong> (even if all entries are real).</li>
+            <li>Eigenvectors are <strong>not orthogonal</strong> in general.</li>
+            <li>The matrix may be <strong>defective</strong> (not diagonalizable).</li>
+        </ul>
+
+        <div class="two-col">
+            <div class="card" style="margin-bottom:0;">
+                <h4 style="color:#059669;">✅ Symmetric Example</h4>
+                <div class="math-block" style="font-size:0.9rem;">
+                A = [[2, 1],<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1, 2]]<br><br>
+                λ₁ = 3, v₁ = [1, 1]<br>
+                λ₂ = 1, v₂ = [1, −1]<br><br>
+                v₁ · v₂ = 0 ✓<br>
+                Both λ real ✓
+                </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+                <h4 style="color:#dc2626;">❌ Non-Symmetric Example</h4>
+                <div class="math-block" style="font-size:0.9rem;">
+                B = [[0, −1],<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1, &nbsp;0]]<br><br>
+                λ = ±i (complex!)<br>
+                No real eigenvectors.<br><br>
+                This is a 90° rotation.<br>
+                Nothing stays on its line!
+                </div>
+            </div>
+        </div>
+
+        <div class="svg-container">
+            <svg width="600" height="260" viewBox="0 0 600 260">
+                <rect x="10" y="10" width="270" height="240" fill="#f0fdf4" stroke="#86efac" rx="8"/>
+                <text x="145" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#059669">Symmetric: Orthogonal Eigenvectors</text>
+                <line x1="40" y1="210" x2="250" y2="210" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="40" y1="210" x2="40" y2="50" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="40" y1="210" x2="200" y2="90" stroke="#059669" stroke-width="3" marker-end="url(#arr)"/>
+                <line x1="40" y1="210" x2="200" y2="210" stroke="#059669" stroke-width="3" marker-end="url(#arr)"/>
+                <text x="205" y="85" font-size="12" fill="#059669" font-weight="bold">v₁</text>
+                <text x="205" y="225" font-size="12" fill="#059669" font-weight="bold">v₂</text>
+                <text x="145" y="235" text-anchor="middle" font-size="11" fill="#64748b">Perpendicular! Angle = 90°</text>
+
+                <rect x="320" y="10" width="270" height="240" fill="#fef2f2" stroke="#fecaca" rx="8"/>
+                <text x="455" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#dc2626">Non-Symmetric: Non-orthogonal</text>
+                <line x1="350" y1="210" x2="560" y2="210" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="350" y1="210" x2="350" y2="50" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="350" y1="210" x2="510" y2="90" stroke="#dc2626" stroke-width="3" marker-end="url(#arr)"/>
+                <line x1="350" y1="210" x2="480" y2="190" stroke="#dc2626" stroke-width="3" marker-end="url(#arr)"/>
+                <text x="515" y="85" font-size="12" fill="#dc2626" font-weight="bold">v₁</text>
+                <text x="485" y="205" font-size="12" fill="#dc2626" font-weight="bold">v₂</text>
+                <text x="455" y="235" text-anchor="middle" font-size="11" fill="#64748b">Not perpendicular. Angle ≠ 90°</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 6: Symmetric matrices produce orthogonal eigenvectors; non-symmetric matrices do not guarantee this.</p>
+        </div>
+
+        <h3>Positive Definite Matrices</h3>
+        <p>A symmetric matrix is <strong>positive definite</strong> if all eigenvalues are strictly positive. It is <strong>positive semi-definite</strong> if all eigenvalues are ≥ 0.</p>
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> Every covariance matrix is positive semi-definite. Why? Because variance is always non-negative, and for any portfolio weights <span class="math-inline">w</span>, the portfolio variance is <span class="math-inline">wᵀΣw ≥ 0</span>. If a matrix had a negative eigenvalue, we could find a portfolio with negative variance — impossible!
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Symmetric vs Non-Symmetric: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Is <span class="math-inline">A = [[1, 2, 3], [2, 4, 5], [3, 5, 6]]</span> symmetric? Verify by computing <span class="math-inline">Aᵀ</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Aᵀ = [[1,2,3],[2,4,5],[3,5,6]] = A. Yes, symmetric.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> A symmetric matrix has eigenvalues −1, 2, and 4. Is it positive definite? Positive semi-definite?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Not positive definite (negative eigenvalue). Not positive semi-definite (needs all ≥ 0). It is <strong>indefinite</strong>.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Prove that eigenvectors of a symmetric matrix corresponding to distinct eigenvalues are orthogonal. <em>Hint:</em> Consider <span class="math-inline">v₁ᵀAv₂</span> in two ways.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Av₁=λ₁v₁ and Av₂=λ₂v₂. Then v₁ᵀAv₂ = v₁ᵀ(λ₂v₂) = λ₂(v₁ᵀv₂).<br>
+                    Also v₁ᵀAv₂ = (Av₁)ᵀv₂ = (λ₁v₁)ᵀv₂ = λ₁(v₁ᵀv₂).<br>
+                    So λ₂(v₁ᵀv₂) = λ₁(v₁ᵀv₂) → (λ₂−λ₁)(v₁ᵀv₂) = 0.<br>
+                    Since λ₁≠λ₂, we must have v₁ᵀv₂ = 0. ∎
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Show that if <span class="math-inline">A</span> is symmetric and invertible, then <span class="math-inline">A⁻¹</span> is also symmetric.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    (A⁻¹)ᵀ = (Aᵀ)⁻¹ = A⁻¹. Thus A⁻¹ is symmetric.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Let <span class="math-inline">Σ</span> be a covariance matrix. Prove that <span class="math-inline">Σ</span> is positive semi-definite by showing <span class="math-inline">xᵀΣx ≥ 0</span> for all vectors <span class="math-inline">x</span>. <em>Hint:</em> Write <span class="math-inline">Σ</span> as <span class="math-inline">E[(R−μ)(R−μ)ᵀ]</span> where <span class="math-inline">R</span> is the random return vector.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    xᵀΣx = xᵀ E[(R−μ)(R−μ)ᵀ] x = E[xᵀ(R−μ)(R−μ)ᵀx] = E[((R−μ)ᵀx)²] ≥ 0.<br>
+                    Since it's the expectation of a squared real number, it must be non-negative.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Symmetric vs Non-Symmetric: Numerical Comparison</h2>
+        <pre><code># SYMMETRIC VS NON-SYMMETRIC EXPERIMENT
+import numpy as np
+
+# Symmetric matrix (covariance-like)
+S = np.array([[4, 2, 1],
+              [2, 5, 3],
+              [1, 3, 6]])
+
+# Random non-symmetric matrix
+N = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])  # Note: actually this is symmetric-ish, let's perturb
+N = N + np.array([[0, 0.5, -0.3],
+                  [-0.5, 0, 0.2],
+                  [0.3, -0.2, 0]])
+
+print("=== SYMMETRIC MATRIX ===")
+eigvals_S, eigvecs_S = np.linalg.eigh(S)  # eigh is optimized for symmetric
+print("Eigenvalues (should all be real):", eigvals_S)
+print("All real?", np.all(np.isreal(eigvals_S)))
+
+# Check orthogonality of eigenvectors
+print("
+Eigenvector orthogonality check (should be identity):")
+print(np.round(eigvecs_S.T @ eigvecs_S, 6))
+
+print("
+=== NON-SYMMETRIC MATRIX ===")
+eigvals_N, eigvecs_N = np.linalg.eig(N)
+print("Eigenvalues:", eigvals_N)
+print("Any complex?", not np.all(np.isreal(eigvals_N)))
+
+# Check orthogonality (won't be identity)
+print("
+Eigenvector 'orthogonality' (NOT identity):")
+print(np.round(eigvecs_N.T @ eigvecs_N, 2))</code></pre>
+    </div>
+</div>
+
+<!-- ==================== SPECTRAL THEOREMS ==================== -->
+<div id="spectral" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Core Concept</span>
+        <h2>Spectral Theorems</h2>
+
+        <h3>The Spectral Theorem for Symmetric Matrices</h3>
+        <p>This is arguably the most important theorem in applied linear algebra for quantitative finance.</p>
+        <div class="highlight-box">
+            <strong>Spectral Theorem:</strong> Every real symmetric matrix <span class="math-inline">A</span> can be decomposed as:<br><br>
+            <span style="font-size:1.3em; display:block; text-align:center;">A = QΛQᵀ</span><br>
+            where <span class="math-inline">Q</span> is an <strong>orthogonal matrix</strong> (columns are orthonormal eigenvectors, so <span class="math-inline">QᵀQ = I</span>) and <span class="math-inline">Λ</span> is diagonal (eigenvalues).
+        </div>
+
+        <h3>Why "Spectral"?</h3>
+        <p>The <strong>spectrum</strong> of a matrix is the set of its eigenvalues. The spectral theorem tells us that a symmetric matrix is completely determined by its spectrum and its eigenvectors.</p>
+
+        <h3>What Makes Q Orthogonal Special?</h3>
+        <p>Because <span class="math-inline">Q⁻¹ = Qᵀ</span>, we don't need to compute a matrix inverse (which is numerically unstable). We just transpose! This makes spectral decomposition incredibly stable and efficient.</p>
+
+        <h3>Spectral Decomposition as a Sum</h3>
+        <p>We can also write:</p>
+        <div class="math-block">
+        A = λ₁q₁q₁ᵀ + λ₂q₂q₂ᵀ + ... + λₙqₙqₙᵀ
+        </div>
+        <p>Each term <span class="math-inline">λᵢqᵢqᵢᵀ</span> is a rank-1 matrix. The symmetric matrix is a weighted sum of these rank-1 projections!</p>
+
+        <div class="svg-container">
+            <svg width="500" height="200" viewBox="0 0 500 200">
+                <rect x="10" y="10" width="480" height="180" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="250" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Spectral Decomposition: A = λ₁q₁q₁ᵀ + λ₂q₂q₂ᵀ</text>
+
+                <rect x="40" y="70" width="80" height="80" fill="#dbeafe" stroke="#2563eb" rx="4"/>
+                <text x="80" y="115" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">A</text>
+
+                <text x="135" y="115" font-size="20" fill="#334155">=</text>
+
+                <rect x="160" y="70" width="80" height="80" fill="#d1fae5" stroke="#059669" rx="4"/>
+                <text x="200" y="105" text-anchor="middle" font-size="12" fill="#059669" font-weight="bold">λ₁</text>
+                <text x="200" y="125" text-anchor="middle" font-size="11" fill="#059669">q₁q₁ᵀ</text>
+
+                <text x="255" y="115" font-size="20" fill="#334155">+</text>
+
+                <rect x="280" y="70" width="80" height="80" fill="#fef3c7" stroke="#d97706" rx="4"/>
+                <text x="320" y="105" text-anchor="middle" font-size="12" fill="#d97706" font-weight="bold">λ₂</text>
+                <text x="320" y="125" text-anchor="middle" font-size="11" fill="#d97706">q₂q₂ᵀ</text>
+
+                <text x="375" y="115" font-size="20" fill="#334155">+ ...</text>
+
+                <text x="250" y="170" text-anchor="middle" font-size="11" fill="#64748b">Full-rank matrix = sum of rank-1 projections, weighted by eigenvalues</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 7: Any symmetric matrix decomposes into a weighted sum of rank-1 matrices formed by its eigenvectors.</p>
+        </div>
+
+        <h3>Functional Calculus</h3>
+        <p>The spectral theorem lets us apply <em>any</em> function to a matrix:</p>
+        <div class="math-block">
+        f(A) = Q f(Λ) Qᵀ = Q diag(f(λ₁), f(λ₂), ..., f(λₙ)) Qᵀ
+        </div>
+        <p>This works for <span class="math-inline">f(x) = √x</span> (matrix square root), <span class="math-inline">f(x) = eˣ</span> (matrix exponential), <span class="math-inline">f(x) = log(x)</span>, etc. In quant finance, the matrix square root of a covariance matrix is used to generate correlated random variables for Monte Carlo simulation.</p>
+
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> To simulate correlated returns with covariance Σ, find Σ = QΛQᵀ, then compute Σ^(½) = Q√Λ Qᵀ. If Z is a vector of independent standard normals, then Σ^(½)Z has exactly covariance Σ. This is the backbone of Monte Carlo methods in derivatives pricing.
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Spectral Theorems: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Given <span class="math-inline">Q = [[1/√2, 1/√2], [1/√2, −1/√2]]</span> and <span class="math-inline">Λ = [[5, 0], [0, 1]]</span>, write <span class="math-inline">A = QΛQᵀ</span> explicitly.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A = ½[[1,1],[1,−1]] × [[5,0],[0,1]] × [[1,1],[1,−1]] = ½[[6,4],[4,6]] = [[3,2],[2,3]]
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Prove that if <span class="math-inline">A = QΛQᵀ</span> is the spectral decomposition of a symmetric matrix, then <span class="math-inline">A² = QΛ²Qᵀ</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A² = (QΛQᵀ)(QΛQᵀ) = QΛ(QᵀQ)ΛQᵀ = QΛIΛQᵀ = QΛ²Qᵀ.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Let <span class="math-inline">A</span> be symmetric positive definite with spectral decomposition <span class="math-inline">A = QΛQᵀ</span>. Find the spectral decomposition of <span class="math-inline">A⁻¹</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    A⁻¹ = (QΛQᵀ)⁻¹ = QΛ⁻¹Qᵀ = Q diag(1/λ₁, ..., 1/λₙ) Qᵀ. Since A is PD, all λᵢ > 0, so inverse exists.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> (Rayleigh Quotient) For a symmetric matrix <span class="math-inline">A</span>, define <span class="math-inline">R(x) = (xᵀAx)/(xᵀx)</span>. Prove that the minimum value of <span class="math-inline">R(x)</span> over all non-zero <span class="math-inline">x</span> is the smallest eigenvalue of <span class="math-inline">A</span>, achieved when <span class="math-inline">x</span> is the corresponding eigenvector.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Write x in the eigenbasis: x = Σcᵢqᵢ. Then xᵀAx = Σλᵢcᵢ² and xᵀx = Σcᵢ². So R(x) = Σλᵢcᵢ² / Σcᵢ², a weighted average of eigenvalues. The minimum weighted average is the minimum λᵢ, achieved when c₁=1 and all others 0 (i.e., x=q₁).
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Spectral Theorem: Matrix Square Root for Monte Carlo</h2>
+        <pre><code># SPECTRAL THEOREM EXPERIMENT: Matrix Square Root
+import numpy as np
+
+# A covariance matrix (symmetric, positive semi-definite)
+Sigma = np.array([[1.0, 0.8, 0.5],
+                  [0.8, 1.0, 0.3],
+                  [0.5, 0.3, 1.0]])
+
+# Spectral decomposition
+eigenvalues, eigenvectors = np.linalg.eigh(Sigma)
+
+# Ensure non-negative (numerical safety)
+eigenvalues = np.maximum(eigenvalues, 0)
+
+# Construct Lambda^{1/2}
+Lambda_sqrt = np.diag(np.sqrt(eigenvalues))
+
+# Matrix square root: Sigma^{1/2} = Q * Lambda^{1/2} * Q^T
+Sigma_sqrt = eigenvectors @ Lambda_sqrt @ eigenvectors.T
+
+print("Original Sigma:")
+print(Sigma)
+print("
+Sigma_sqrt @ Sigma_sqrt:")
+print(Sigma_sqrt @ Sigma_sqrt)
+print("
+Matches original?", np.allclose(Sigma, Sigma_sqrt @ Sigma_sqrt))
+
+# Monte Carlo application: generate correlated returns
+np.random.seed(42)
+Z = np.random.randn(3, 10000)  # 3 assets, 10000 simulations
+returns = Sigma_sqrt @ Z       # Correlated returns
+empirical_cov = np.cov(returns)
+print("
+Empirical covariance (should match Sigma):")
+print(np.round(empirical_cov, 2))</code></pre>
+    </div>
+</div>
+
+<!-- ==================== PCA ==================== -->
+<div id="pca" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Quant Application</span>
+        <h2>Principal Component Analysis (PCA)</h2>
+
+        <h3>The Problem</h3>
+        <p>In quant finance, we often have hundreds of correlated risk factors (asset returns, interest rates, volatilities). Working with all of them is computationally expensive and statistically noisy. PCA helps us find a smaller set of uncorrelated "super-factors" that capture most of the variation.</p>
+
+        <h3>The Connection to Eigenvalues</h3>
+        <p>Given a data matrix <span class="math-inline">X</span> (observations × variables), the <strong>sample covariance matrix</strong> is:</p>
+        <div class="math-block">
+        Σ = (1/(n−1)) XᵀX
+        </div>
+        <p>Since <span class="math-inline">Σ</span> is symmetric, by the Spectral Theorem:</p>
+        <div class="math-block">
+        Σ = QΛQᵀ
+        </div>
+        <p>The columns of <span class="math-inline">Q</span> are the <strong>principal components</strong>. The diagonal entries of <span class="math-inline">Λ</span> are the <strong>variances explained</strong> by each component.</p>
+
+        <div class="svg-container">
+            <svg width="500" height="280" viewBox="0 0 500 280">
+                <rect x="10" y="10" width="480" height="260" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="250" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">PCA: Rotating to the Eigenbasis</text>
+
+                <!-- Data ellipse -->
+                <ellipse cx="150" cy="160" rx="70" ry="35" fill="none" stroke="#2563eb" stroke-width="2" transform="rotate(-30 150 160)"/>
+                <line x1="150" y1="160" x2="210" y2="120" stroke="#dc2626" stroke-width="2" marker-end="url(#arr)"/>
+                <text x="215" y="115" font-size="11" fill="#dc2626" font-weight="bold">PC1 (max variance)</text>
+                <line x1="150" y1="160" x2="120" y2="200" stroke="#059669" stroke-width="2" marker-end="url(#arr)"/>
+                <text x="95" y="210" font-size="11" fill="#059669" font-weight="bold">PC2</text>
+
+                <text x="150" y="245" text-anchor="middle" font-size="11" fill="#64748b">Original data: correlated axes</text>
+
+                <text x="300" y="160" font-size="24">→</text>
+
+                <!-- Transformed -->
+                <ellipse cx="400" cy="160" rx="70" ry="35" fill="none" stroke="#2563eb" stroke-width="2"/>
+                <line x1="330" y1="160" x2="470" y2="160" stroke="#dc2626" stroke-width="2" marker-end="url(#arr)"/>
+                <text x="400" y="150" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="bold">PC1</text>
+                <line x1="400" y1="125" x2="400" y2="195" stroke="#059669" stroke-width="2" marker-end="url(#arr)"/>
+                <text x="415" y="180" font-size="11" fill="#059669" font-weight="bold">PC2</text>
+
+                <text x="400" y="245" text-anchor="middle" font-size="11" fill="#64748b">In PC space: uncorrelated!</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 8: PCA rotates data to align with eigenvectors of the covariance matrix, making axes uncorrelated.</p>
+        </div>
+
+        <h3>Step-by-Step PCA Algorithm</h3>
+        <ol>
+            <li><strong>Center the data:</strong> Subtract the mean from each column.</li>
+            <li><strong>Compute covariance matrix:</strong> <span class="math-inline">Σ = (1/(n−1))XᵀX</span>.</li>
+            <li><strong>Eigendecomposition:</strong> Find <span class="math-inline">Σ = QΛQᵀ</span>.</li>
+            <li><strong>Sort:</strong> Order eigenvalues from largest to smallest.</li>
+            <li><strong>Project:</strong> New coordinates = <span class="math-inline">XQ</span> (data in principal component space).</li>
+            <li><strong>Select:</strong> Keep only top <span class="math-inline">k</span> components capturing, say, 95% of variance.</li>
+        </ol>
+
+        <h3>Variance Explained</h3>
+        <p>The <span class="math-inline">i</span>-th eigenvalue <span class="math-inline">λᵢ</span> tells us how much variance is captured by the <span class="math-inline">i</span>-th principal component. The proportion of total variance explained is:</p>
+        <div class="math-block">
+        Variance Explained by PCᵢ = λᵢ / (λ₁ + λ₂ + ... + λₙ)
+        </div>
+
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> In equity markets, the first principal component (largest eigenvalue) typically explains 20-40% of total variance and represents the "market factor" — the tendency of all stocks to move together. The second PC often captures sector rotation (growth vs value), and the third might capture size (small-cap vs large-cap).
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>PCA: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> A covariance matrix has eigenvalues 10, 3, 1, and 0.5. What percentage of total variance is captured by the first principal component?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Total variance = 10+3+1+0.5 = 14.5. PC1 explains 10/14.5 ≈ <strong>68.97%</strong>.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> If you keep only the first 2 principal components from the matrix above, what cumulative percentage of variance do you capture?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    (10+3)/14.5 = 13/14.5 ≈ <strong>89.66%</strong>.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Given centered data matrix <span class="math-inline">X</span> with 100 observations and 3 variables, suppose <span class="math-inline">XᵀX</span> has eigenvalues 200, 50, and 10. Write the covariance matrix and find the first principal component direction if the corresponding eigenvector is <span class="math-inline">[1/√2, 1/√2, 0]</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Σ = (1/99)XᵀX. Eigenvalues of Σ are 200/99≈2.02, 50/99≈0.505, 10/99≈0.101. First PC direction is q₁ = [1/√2, 1/√2, 0] ≈ [0.707, 0.707, 0].
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> Explain why PCA on a correlation matrix (instead of covariance matrix) might be preferred when variables have vastly different scales (e.g., stock prices vs trading volumes).</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Covariance is scale-dependent: variables with larger magnitudes dominate. Correlation standardizes each variable to unit variance first, so PCA captures pure statistical relationships without scale bias.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove that the first principal component direction <span class="math-inline">q₁</span> solves: <span class="math-inline">maximize ‖Xq‖²</span> subject to <span class="math-inline">‖q‖ = 1</span>. Show that the maximum value is the largest eigenvalue of <span class="math-inline">XᵀX</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    ‖Xq‖² = qᵀXᵀXq. By spectral theorem, XᵀX = QΛQᵀ. Let y=Qᵀq, so ‖y‖=1. Then qᵀXᵀXq = yᵀΛy = Σλᵢyᵢ². This is a weighted average of eigenvalues. Maximized when y=[1,0,...,0], giving λ₁. Then q = Qy = first column of Q = q₁.
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>PCA: Full Implementation on Synthetic Returns</h2>
+        <pre><code># PCA EXPERIMENT: Equity Returns Simulation
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# Simulate 3 assets with correlation
+# Asset 1 and 2 highly correlated, Asset 3 less so
+true_cov = np.array([[1.0, 0.9, 0.3],
+                     [0.9, 1.0, 0.2],
+                     [0.3, 0.2, 1.0]])
+
+# Generate returns
+n_days = 252
+returns = np.random.multivariate_normal([0,0,0], true_cov, n_days)
+
+# Step 1: Center data
+returns_centered = returns - returns.mean(axis=0)
+
+# Step 2: Covariance matrix
+cov_matrix = np.cov(returns_centered, rowvar=False)
+
+# Step 3: Eigendecomposition
+eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
+
+# Step 4: Sort (eigh returns ascending)
+idx = np.argsort(eigenvalues)[::-1]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+print("Eigenvalues (variances of PCs):")
+print(eigenvalues)
+print("
+Proportion of variance explained:")
+print(eigenvalues / eigenvalues.sum())
+
+# Step 5: Project data onto PCs
+pc_scores = returns_centered @ eigenvectors
+
+# Plot scree plot
+plt.figure(figsize=(10,4))
+plt.subplot(1,2,1)
+plt.bar(range(1,4), eigenvalues, color='steelblue')
+plt.xlabel('Principal Component')
+plt.ylabel('Eigenvalue (Variance)')
+plt.title('Scree Plot')
+plt.xticks([1,2,3])
+
+plt.subplot(1,2,2)
+plt.plot(range(1,4), np.cumsum(eigenvalues)/np.sum(eigenvalues), 'o-', color='darkred')
+plt.axhline(0.95, color='gray', linestyle='--')
+plt.xlabel('Number of PCs')
+plt.ylabel('Cumulative Variance Explained')
+plt.title('Cumulative Variance')
+plt.xticks([1,2,3])
+plt.ylim(0,1.1)
+plt.tight_layout()
+plt.show()
+
+print("
+First PC loadings (eigenvector):")
+print(eigenvectors[:, 0])
+print("Notice: Assets 1 and 2 have similar loadings (they move together).")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== RISK FACTOR DECOMPOSITION ==================== -->
+<div id="risk" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Quant Application</span>
+        <h2>Risk Factor Decomposition</h2>
+
+        <h3>From PCA to Risk Models</h3>
+        <p>In quantitative portfolio management, <strong>risk factor decomposition</strong> uses eigenvalue methods to break down portfolio risk into systematic (common) and idiosyncratic (asset-specific) components.</p>
+
+        <h3>The Factor Model Setup</h3>
+        <p>Asset returns <span class="math-inline">r</span> are modeled as:</p>
+        <div class="math-block">
+        r = Bf + ε
+        </div>
+        <p>where <span class="math-inline">f</span> are factor returns, <span class="math-inline">B</span> is the factor exposure matrix, and <span class="math-inline">ε</span> is idiosyncratic noise.</p>
+
+        <h3>Covariance Decomposition</h3>
+        <p>The asset return covariance <span class="math-inline">Σ</span> decomposes as:</p>
+        <div class="math-block">
+        Σ = BΣᶠBᵀ + Σᵉ
+        </div>
+        <p>Using PCA, we can set <span class="math-inline">B</span> to be the top <span class="math-inline">k</span> eigenvectors and <span class="math-inline">Σᶠ</span> to be the diagonal matrix of top <span class="math-inline">k</span> eigenvalues. This creates a <strong>statistical factor model</strong> purely from returns data — no fundamental data needed!</p>
+
+        <div class="svg-container">
+            <svg width="600" height="300" viewBox="0 0 600 300">
+                <rect x="10" y="10" width="580" height="280" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="300" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Risk Decomposition via Eigenvalues</text>
+
+                <!-- Total Risk -->
+                <rect x="40" y="60" width="120" height="80" fill="#dbeafe" stroke="#2563eb" rx="4"/>
+                <text x="100" y="90" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Total Risk</text>
+                <text x="100" y="110" text-anchor="middle" font-size="11" fill="#1e3a8a">tr(Σ) = Σλᵢ</text>
+                <text x="100" y="128" text-anchor="middle" font-size="10" fill="#64748b">All eigenvalues</text>
+
+                <line x1="160" y1="100" x2="220" y2="100" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+                <!-- Systematic -->
+                <rect x="230" y="60" width="140" height="80" fill="#d1fae5" stroke="#059669" rx="4"/>
+                <text x="300" y="85" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">Systematic Risk</text>
+                <text x="300" y="105" text-anchor="middle" font-size="11" fill="#059669">Top k eigenvalues</text>
+                <text x="300" y="123" text-anchor="middle" font-size="10" fill="#64748b">Market, sector, style</text>
+
+                <line x1="300" y1="140" x2="300" y2="180" stroke="#334155" stroke-width="2" marker-end="url(#arr)"/>
+
+                <!-- Idiosyncratic -->
+                <rect x="230" y="190" width="140" height="80" fill="#fef3c7" stroke="#d97706" rx="4"/>
+                <text x="300" y="215" text-anchor="middle" font-size="12" font-weight="bold" fill="#d97706">Idiosyncratic Risk</text>
+                <text x="300" y="235" text-anchor="middle" font-size="11" fill="#d97706">Remaining eigenvalues</text>
+                <text x="300" y="253" text-anchor="middle" font-size="10" fill="#64748b">Asset-specific noise</text>
+
+                <!-- Portfolio variance formula -->
+                <rect x="420" y="100" width="160" height="120" fill="#f0fdf4" stroke="#86efac" rx="4"/>
+                <text x="500" y="130" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">Portfolio Variance</text>
+                <text x="500" y="155" text-anchor="middle" font-size="11" fill="#334155">σₚ² = wᵀΣw</text>
+                <text x="500" y="175" text-anchor="middle" font-size="11" fill="#334155">= wᵀQΛQᵀw</text>
+                <text x="500" y="195" text-anchor="middle" font-size="11" fill="#334155">= Σλᵢ(wᵀqᵢ)²</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 9: Portfolio variance decomposes into contributions from each eigenvalue (risk factor), weighted by portfolio alignment with each eigenvector.</p>
+        </div>
+
+        <h3>Portfolio Variance in Eigenbasis</h3>
+        <p>If <span class="math-inline">w</span> is the vector of portfolio weights, then:</p>
+        <div class="math-block">
+        σₚ² = wᵀΣw = wᵀQΛQᵀw = Σᵢ λᵢ (wᵀqᵢ)²
+        </div>
+        <p>Each eigenvalue <span class="math-inline">λᵢ</span> contributes to portfolio risk, weighted by how much the portfolio aligns with that eigenvector <span class="math-inline">qᵢ</span>. If <span class="math-inline">w</span> is parallel to <span class="math-inline">q₁</span> (the market factor), the portfolio is exposed to maximum systematic risk.</p>
+
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> Risk parity strategies aim to equalize the contribution of each principal component to portfolio risk. Since λ₁ >> λ₂ >> ..., this typically requires leveraging low-volatility assets and deleveraging high-volatility assets — a direct application of spectral decomposition.
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Risk Factor Decomposition: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> A portfolio has weights <span class="math-inline">w = [0.5, 0.5]</span> and the covariance matrix has spectral decomposition with <span class="math-inline">λ₁=4, q₁=[1/√2, 1/√2]</span> and <span class="math-inline">λ₂=1, q₂=[1/√2, −1/√2]</span>. Compute the portfolio variance.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    wᵀq₁ = 0.5/√2 + 0.5/√2 = 1/√2. (wᵀq₁)² = 0.5.<br>
+                    wᵀq₂ = 0.5/√2 − 0.5/√2 = 0. (wᵀq₂)² = 0.<br>
+                    σₚ² = 4(0.5) + 1(0) = <strong>2</strong>.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> In the setup above, what weights make the portfolio variance equal to exactly <span class="math-inline">λ₁</span>? What does this portfolio represent?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    We need w = q₁ = [1/√2, 1/√2]. Then wᵀq₁ = 1, wᵀq₂ = 0, so σₚ² = λ₁(1) + λ₂(0) = λ₁ = 4. This is the maximum variance portfolio — fully exposed to the dominant risk factor.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> A covariance matrix has eigenvalues 8, 2, 0.5, 0.1. You approximate it using only the first two components. What is the approximation error in Frobenius norm squared?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    The best rank-k approximation error in Frobenius norm is the sum of omitted eigenvalues: 0.5 + 0.1 = <strong>0.6</strong>. This is the Eckart-Young-Mirsky theorem applied to covariance matrices.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove that for any portfolio weights <span class="math-inline">w</span>, the minimum possible portfolio variance over all <span class="math-inline">w</span> with <span class="math-inline">Σwᵢ = 1</span> (fully invested) is <span class="math-inline">1/(1ᵀΣ⁻¹1)</span>, where <span class="math-inline">1</span> is the vector of ones. This is the global minimum variance portfolio. <em>Hint:</em> Use Lagrange multipliers.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    Minimize ½wᵀΣw subject to 1ᵀw = 1. Lagrangian: L = ½wᵀΣw − λ(1ᵀw−1). ∇wL = Σw − λ1 = 0 → w = λΣ⁻¹1. Constraint: 1ᵀw = λ1ᵀΣ⁻¹1 = 1 → λ = 1/(1ᵀΣ⁻¹1). Thus w* = Σ⁻¹1/(1ᵀΣ⁻¹1). Variance: w*ᵀΣw* = 1/(1ᵀΣ⁻¹1).
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Risk Decomposition: Portfolio Analysis</h2>
+        <pre><code># RISK FACTOR DECOMPOSITION EXPERIMENT
+import numpy as np
+
+# 5-asset covariance matrix
+Sigma = np.array([
+    [0.04, 0.032, 0.016, 0.008, 0.004],
+    [0.032, 0.09, 0.027, 0.0135, 0.00675],
+    [0.016, 0.027, 0.0225, 0.01125, 0.005625],
+    [0.008, 0.0135, 0.01125, 0.04, 0.002813],
+    [0.004, 0.00675, 0.005625, 0.002813, 0.01]
+])
+
+# Spectral decomposition
+eigenvalues, eigenvectors = np.linalg.eigh(Sigma)
+idx = np.argsort(eigenvalues)[::-1]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+
+# Equal weight portfolio
+w = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
+
+# Portfolio variance
+total_var = w @ Sigma @ w
+print(f"Total portfolio variance: {total_var:.6f}")
+
+# Decompose by principal components
+print("
+Risk decomposition by factor:")
+for i in range(5):
+    contrib = eigenvalues[i] * (w @ eigenvectors[:, i])**2
+    pct = 100 * contrib / total_var
+    print(f"PC{i+1} (λ={eigenvalues[i]:.4f}): contrib={contrib:.6f} ({pct:.1f}%)")
+
+# Minimum variance portfolio
+ones = np.ones(5)
+Sigma_inv = np.linalg.inv(Sigma)
+w_minvar = Sigma_inv @ ones / (ones @ Sigma_inv @ ones)
+print(f"
+Minimum variance portfolio weights: {w_minvar}")
+print(f"Min variance: {w_minvar @ Sigma @ w_minvar:.6f}")
+
+# Compare: variance of equal weight vs min var
+print(f"
+Equal weight variance: {total_var:.6f}")
+print(f"Min var variance:      {w_minvar @ Sigma @ w_minvar:.6f}")
+print(f"Risk reduction:        {(1 - (w_minvar @ Sigma @ w_minvar)/total_var)*100:.1f}%")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== MARKOV CHAINS ==================== -->
+<div id="markov" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Quant Application</span>
+        <h2>Markov Chain Steady States</h2>
+
+        <h3>Markov Chains in Quant Finance</h3>
+        <p>Markov chains model systems that transition between states with probabilities depending only on the current state. In quant finance, they are used for:</p>
+        <ul>
+            <li><strong>Credit rating migrations:</strong> Probability of moving from AA to A, or default.</li>
+            <li><strong>Regime switching models:</strong> Markets switch between "bull" and "bear" states.</li>
+            <li><strong>Algorithmic trading:</strong> Order book state transitions.</li>
+        </ul>
+
+        <h3>The Transition Matrix</h3>
+        <p>A <strong>stochastic matrix</strong> <span class="math-inline">P</span> has entries <span class="math-inline">Pᵢⱼ</span> = probability of moving from state <span class="math-inline">i</span> to state <span class="math-inline">j</span>. Each row sums to 1.</p>
+        <div class="math-block">
+        Example (Credit Ratings):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AAA&nbsp;&nbsp;AA&nbsp;&nbsp;&nbsp;A&nbsp;&nbsp;Default<br>
+        P = [[0.90, 0.08, 0.02, 0.00],&nbsp;&nbsp;(from AAA)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.05, 0.85, 0.09, 0.01],&nbsp;&nbsp;(from AA)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.02, 0.10, 0.80, 0.08],&nbsp;&nbsp;(from A)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.00, 0.00, 0.00, 1.00]]&nbsp;&nbsp;(from Default - absorbing)
+        </div>
+
+        <h3>The Steady State (Stationary Distribution)</h3>
+        <p>After many transitions, the system may settle into a <strong>steady state</strong> <span class="math-inline">π</span> where the distribution no longer changes:</p>
+        <div class="highlight-box">
+            <strong>Steady State Equation:</strong> <span style="font-size:1.2em">π = πP</span><br><br>
+            Equivalently: <span class="math-inline">πP = π</span> → <span class="math-inline">π(Pᵀ) = π</span><br><br>
+            This means <span class="math-inline">π</span> is a <strong>left eigenvector</strong> of <span class="math-inline">P</span> with eigenvalue <strong>1</strong>.
+        </div>
+
+        <h3>Connection to Eigenvalues</h3>
+        <p>Since <span class="math-inline">P</span> is stochastic, it always has eigenvalue 1. The corresponding left eigenvector (normalized to sum to 1) is the steady state distribution.</p>
+        <p>We can rewrite <span class="math-inline">πP = π</span> as <span class="math-inline">π(Pᵀ − I) = 0</span> and solve for <span class="math-inline">π</span> using the nullspace of <span class="math-inline">(Pᵀ − I)</span>, subject to <span class="math-inline">Σπᵢ = 1</span>.</p>
+
+        <div class="svg-container">
+            <svg width="550" height="260" viewBox="0 0 550 260">
+                <rect x="10" y="10" width="530" height="240" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+                <text x="275" y="35" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e3a8a">Markov Chain Steady State as Eigenvector</text>
+
+                <!-- States -->
+                <circle cx="100" cy="100" r="30" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+                <text x="100" y="105" text-anchor="middle" font-size="12" fill="#1e3a8a" font-weight="bold">Bull</text>
+
+                <circle cx="275" cy="100" r="30" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+                <text x="275" y="105" text-anchor="middle" font-size="12" fill="#d97706" font-weight="bold">Bear</text>
+
+                <circle cx="450" cy="100" r="30" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+                <text x="450" y="105" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">Stag</text>
+
+                <!-- Arrows -->
+                <path d="M 130 90 Q 185 60 245 90" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="187" y="65" font-size="10" fill="#64748b">0.2</text>
+                <path d="M 245 110 Q 190 140 130 110" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="187" y="145" font-size="10" fill="#64748b">0.3</text>
+
+                <path d="M 305 90 Q 370 60 420 90" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="362" y="65" font-size="10" fill="#64748b">0.4</text>
+                <path d="M 420 110 Q 365 140 305 110" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="362" y="145" font-size="10" fill="#64748b">0.1</text>
+
+                <!-- Self loops -->
+                <path d="M 85 72 Q 60 50 100 50 Q 140 50 115 72" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="100" y="45" font-size="10" fill="#64748b">0.8</text>
+                <path d="M 260 72 Q 235 50 275 50 Q 315 50 290 72" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="275" y="45" font-size="10" fill="#64748b">0.5</text>
+                <path d="M 435 72 Q 410 50 450 50 Q 490 50 465 72" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                <text x="450" y="45" font-size="10" fill="#64748b">0.5</text>
+
+                <!-- Steady state -->
+                <text x="275" y="185" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">Steady State: π = [0.545, 0.273, 0.182]</text>
+                <text x="275" y="205" text-anchor="middle" font-size="11" fill="#64748b">Long-run probability of being in each state</text>
+                <text x="275" y="225" text-anchor="middle" font-size="11" fill="#64748b">πP = π  (left eigenvector with λ=1)</text>
+            </svg>
+            <p style="font-size:0.85rem;color:#64748b;margin-top:0.5rem;">Figure 10: A 3-state Markov chain and its steady state distribution, found as the left eigenvector with eigenvalue 1.</p>
+        </div>
+
+        <h3>Perron-Frobenius Theorem</h3>
+        <p>For a regular Markov chain (where some power of <span class="math-inline">P</span> has all positive entries):</p>
+        <ul>
+            <li>Eigenvalue 1 is strictly greater in magnitude than all other eigenvalues.</li>
+            <li>The steady state is unique and all entries are positive.</li>
+            <li>Regardless of starting state, the distribution converges to <span class="math-inline">π</span>.</li>
+        </ul>
+        <p>The <strong>rate of convergence</strong> is governed by the <strong>second largest eigenvalue</strong> (in magnitude). If it is close to 1, convergence is slow; if close to 0, convergence is fast.</p>
+
+        <div class="quant-box">
+            <strong>Quant Insight:</strong> In credit risk, the steady state of a rating migration matrix tells us the long-run proportion of bonds in each rating category. The second eigenvalue determines how quickly a portfolio "forgets" its initial rating distribution — critical for stress testing over different time horizons.
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-exercise">Exercises</span>
+        <h2>Markov Steady States: Practice</h2>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-easy">🟢 Easy</div>
+            <div class="exercise-box">
+                <p><strong>E1:</strong> Verify that <span class="math-inline">π = [0.6, 0.4]</span> is a steady state for <span class="math-inline">P = [[0.8, 0.2], [0.3, 0.7]]</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    πP = [0.6(0.8)+0.4(0.3), 0.6(0.2)+0.4(0.7)] = [0.48+0.12, 0.12+0.28] = [0.6, 0.4] = π. ✓
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>E2:</strong> What is the steady state of <span class="math-inline">P = [[1, 0], [0.5, 0.5]]</span>? Is it unique?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    State 1 is absorbing. π = [1, 0]. Yes, unique — eventually everyone ends in state 1.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-medium">🟡 Medium</div>
+            <div class="exercise-box">
+                <p><strong>M1:</strong> Find the steady state of <span class="math-inline">P = [[0.9, 0.1], [0.4, 0.6]]</span> by solving <span class="math-inline">πP = π</span> with <span class="math-inline">π₁ + π₂ = 1</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    π₁ = 0.9π₁ + 0.4π₂ → 0.1π₁ = 0.4π₂ → π₁ = 4π₂.<br>
+                    With π₁+π₂=1: 4π₂+π₂=1 → π₂=0.2, π₁=0.8.<br>
+                    Steady state: <strong>[0.8, 0.2]</strong>.
+                </div></details>
+            </div>
+            <div class="exercise-box">
+                <p><strong>M2:</strong> A Markov chain has eigenvalues 1, 0.5, and 0.2. If it starts in state distribution <span class="math-inline">π₀</span>, how quickly does it approach steady state?</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    The convergence rate is governed by the second-largest eigenvalue magnitude: 0.5. After k steps, transient terms decay like (0.5)ᵏ. So error halves each step. After 10 steps: (0.5)¹⁰ ≈ 0.001, essentially at steady state.
+                </div></details>
+            </div>
+        </div>
+
+        <div class="exercise-tier">
+            <div class="tier-label tier-hard">🔴 Hard</div>
+            <div class="exercise-box">
+                <p><strong>H1:</strong> Prove that every stochastic matrix <span class="math-inline">P</span> has eigenvalue 1. <em>Hint:</em> Consider the vector of all ones, <span class="math-inline">1 = [1, 1, ..., 1]ᵀ</span>, and examine <span class="math-inline">P1</span>.</p>
+                <details><summary>Show Solution</summary><div class="solution">
+                    (P1)ᵢ = Σⱼ Pᵢⱼ(1)ⱼ = Σⱼ Pᵢⱼ = 1 (since rows sum to 1). So P1 = 1, meaning 1 is a right eigenvector with eigenvalue 1. Since det(P−λI)=det(Pᵀ−λI), P and Pᵀ have the same eigenvalues, so 1 is also an eigenvalue of Pᵀ, giving a left eigenvector (the steady state).
+                </div></details>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="badge badge-code">Colab Experiment</span>
+        <h2>Markov Chains: Steady State & Convergence</h2>
+        <pre><code># MARKOV CHAIN EXPERIMENT
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Credit rating transition matrix (simplified)
+# States: Investment Grade (IG), High Yield (HY), Default (D)
+P = np.array([
+    [0.95, 0.04, 0.01],   # From IG
+    [0.10, 0.85, 0.05],   # From HY
+    [0.00, 0.00, 1.00]    # From D (absorbing)
+])
+
+# Find steady state via left eigenvector
+eigenvalues, eigenvectors = np.linalg.eig(P.T)
+# Find eigenvalue closest to 1
+idx = np.argmin(np.abs(eigenvalues - 1))
+steady_state = np.real(eigenvectors[:, idx])
+steady_state = steady_state / steady_state.sum()  # normalize
+
+print("Eigenvalues:", np.round(eigenvalues, 4))
+print("Steady state distribution:", np.round(steady_state, 4))
+print("Verification πP =", np.round(steady_state @ P, 4))
+
+# Simulate convergence from different starting states
+fig, ax = plt.subplots(figsize=(10, 5))
+for start_state in [0, 1]:
+    dist = np.zeros(50)
+    pi = np.array([1.0 if i==start_state else 0.0 for i in range(3)])
+    for t in range(50):
+        dist[t] = pi[0]  # Track probability of being in IG
+        pi = pi @ P
+    ax.plot(range(50), dist, label=f'Start from state {start_state}', linewidth=2)
+
+ax.axhline(steady_state[0], color='red', linestyle='--', label='Steady state IG prob')
+ax.set_xlabel('Time Step')
+ax.set_ylabel('Probability in IG')
+ax.set_title('Convergence to Steady State')
+ax.legend()
+ax.grid(True, alpha=0.3)
+plt.show()
+
+# Second eigenvalue and convergence rate
+eigenvalues_sorted = np.sort(np.abs(eigenvalues))[::-1]
+print(f"
+Second largest |eigenvalue|: {eigenvalues_sorted[1]:.4f}")
+print(f"Convergence rate per step: ~{eigenvalues_sorted[1]:.4f}")</code></pre>
+    </div>
+</div>
+
+<!-- ==================== CHEAT SHEET ==================== -->
+<div id="cheat" class="tab-content">
+    <div class="card">
+        <span class="badge badge-theory">Reference</span>
+        <h2>Master Cheat Sheet & External Resources</h2>
+
+        <h3>Formula Quick Reference</h3>
+        <table class="formula-table">
+            <tr><th>Concept</th><th>Formula</th><th>Key Property</th></tr>
+            <tr><td>Eigenvalue Equation</td><td>Av = λv</td><td>v ≠ 0</td></tr>
+            <tr><td>Characteristic Eq</td><td>det(A − λI) = 0</td><td>Degree n polynomial</td></tr>
+            <tr><td>Trace</td><td>tr(A) = Σλᵢ</td><td>Sum of diagonal entries</td></tr>
+            <tr><td>Determinant</td><td>det(A) = Πλᵢ</td><td>Product of eigenvalues</td></tr>
+            <tr><td>Diagonalization</td><td>A = PDP⁻¹</td><td>Requires n independent eigenvectors</td></tr>
+            <tr><td>Spectral (Symmetric)</td><td>A = QΛQᵀ</td><td>Q orthogonal, Λ real diagonal</td></tr>
+            <tr><td>Matrix Power</td><td>Aᵏ = PDᵏP⁻¹</td><td>Dᵏ is trivial (diagonal)</td></tr>
+            <tr><td>Matrix Square Root</td><td>A^(½) = Q√Λ Qᵀ</td><td>For PSD matrices only</td></tr>
+            <tr><td>PCA Variance</td><td>λᵢ / Σλⱼ</td><td>% variance explained by PCᵢ</td></tr>
+            <tr><td>Portfolio Variance</td><td>wᵀΣw = Σλᵢ(wᵀqᵢ)²</td><td>Spectral decomposition of risk</td></tr>
+            <tr><td>Markov Steady State</td><td>πP = π</td><td>Left eigenvector, λ=1</td></tr>
+        </table>
+
+        <h3>Decision Tree: Which Tool to Use?</h3>
+        <div class="svg-container">
+            <svg width="600" height="320" viewBox="0 0 600 320">
+                <rect x="10" y="10" width="580" height="300" fill="#f8fafc" stroke="#e2e8f0" rx="8"/>
+
+                <rect x="220" y="20" width="160" height="40" fill="#dbeafe" stroke="#2563eb" rx="20"/>
+                <text x="300" y="45" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e3a8a">Start: Square Matrix A</text>
+
+                <line x1="300" y1="60" x2="300" y2="80" stroke="#334155" stroke-width="2"/>
+                <text x="305" y="75" font-size="10" fill="#64748b">Is A symmetric?</text>
+
+                <line x1="300" y1="80" x2="150" y2="110" stroke="#334155" stroke-width="2"/>
+                <text x="210" y="95" font-size="10" fill="#059669">YES</text>
+                <rect x="70" y="110" width="160" height="50" fill="#d1fae5" stroke="#059669" rx="8"/>
+                <text x="150" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="#059669">Use Spectral Theorem</text>
+                <text x="150" y="148" text-anchor="middle" font-size="10" fill="#059669">A = QΛQᵀ</text>
+
+                <line x1="300" y1="80" x2="450" y2="110" stroke="#334155" stroke-width="2"/>
+                <text x="390" y="95" font-size="10" fill="#dc2626">NO</text>
+                <rect x="370" y="110" width="160" height="50" fill="#fee2e2" stroke="#dc2626" rx="8"/>
+                <text x="450" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="#dc2626">Try Standard Diagonalization</text>
+                <text x="450" y="148" text-anchor="middle" font-size="10" fill="#dc2626">A = PDP⁻¹ (if possible)</text>
+
+                <line x1="150" y1="160" x2="150" y2="190" stroke="#334155" stroke-width="2"/>
+                <text x="155" y="178" font-size="10" fill="#64748b">Application?</text>
+
+                <line x1="150" y1="190" x2="80" y2="220" stroke="#334155" stroke-width="2"/>
+                <rect x="20" y="220" width="120" height="50" fill="#fef3c7" stroke="#d97706" rx="8"/>
+                <text x="80" y="240" text-anchor="middle" font-size="10" font-weight="bold" fill="#d97706">PCA / Risk</text>
+                <text x="80" y="255" text-anchor="middle" font-size="9" fill="#d97706">Covariance → Eigenvalues</text>
+
+                <line x1="150" y1="190" x2="220" y2="220" stroke="#334155" stroke-width="2"/>
+                <rect x="180" y="220" width="120" height="50" fill="#fef3c7" stroke="#d97706" rx="8"/>
+                <text x="240" y="240" text-anchor="middle" font-size="10" font-weight="bold" fill="#d97706">Markov Chains</text>
+                <text x="240" y="255" text-anchor="middle" font-size="9" fill="#d97706">Steady state → λ=1</text>
+
+                <line x1="450" y1="160" x2="450" y2="190" stroke="#334155" stroke-width="2"/>
+                <text x="455" y="178" font-size="10" fill="#64748b">Complex λ?</text>
+                <rect x="390" y="200" width="120" height="50" fill="#e0e7ff" stroke="#4338ca" rx="8"/>
+                <text x="450" y="220" text-anchor="middle" font-size="10" font-weight="bold" fill="#4338ca">Use SVD instead</text>
+                <text x="450" y="235" text-anchor="middle" font-size="9" fill="#4338ca">A = UΣVᵀ</text>
+            </svg>
+        </div>
+
+        <h3>External Resources (Online Required)</h3>
+        <p>While this guide works offline, these resources provide additional interactive exploration when connected:</p>
+        <ul>
+            <li><strong>3Blue1Brown — Essence of Linear Algebra:</strong> YouTube series with the best geometric intuition for eigenvalues.</li>
+            <li><strong>Immersion Math — Eigenvalue Explorer:</strong> Interactive tool to drag vectors and see eigenvalues update in real time.</li>
+            <li><strong>Setosa.io — PCA Explained Visually:</strong> Interactive PCA visualization with draggable data points.</li>
+            <li><strong>Wolfram MathWorld:</strong> Rigorous definitions and proofs for all theorems mentioned.</li>
+            <li><strong>Quantopian Lecture Series (archived):</strong> Factor models and risk decomposition in practice.</li>
+        </ul>
+
+        <h3>Prerequisite Checklist</h3>
+        <p>Before moving to advanced topics, ensure you can:</p>
+        <ul>
+            <li>☐ Multiply matrices and vectors by hand (2×2, 3×3)</li>
+            <li>☐ Compute determinants and understand their geometric meaning</li>
+            <li>☐ Solve systems of linear equations</li>
+            <li>☐ Understand what a basis is and why linear independence matters</li>
+            <li>☐ Compute eigenvalues of a 2×2 matrix from scratch</li>
+            <li>☐ Verify if a matrix is diagonalizable</li>
+            <li>☐ Check if a matrix is positive definite</li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+<footer>
+    <p>Created as a self-contained study guide for aspiring quantitative engineers.</p>
+    <p>Covers: Eigenvalues, Eigenvectors, Characteristic Equations, Diagonalization, Spectral Theorems, PCA, Risk Decomposition, and Markov Chains.</p>
+</footer>
+
+<script>
+function switchTab(tabId) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    // Show selected tab
+    document.getElementById(tabId).classList.add('active');
+    // Activate button
+    event.target.classList.add('active');
+    // Scroll to top
+    window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>

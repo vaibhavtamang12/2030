@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Linear Algebra Masterclass: Determinants & Inverses</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [["$","$"],["\(","\)"]], displayMath: [["$$","$$"],["\[","\]"]] },
+  svg: { fontCache: "global" }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0f172a; --accent: #3b82f6; --accent-light: #eff6ff;
+  --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+  --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --text-secondary: #64748b;
+  --border: #e2e8f0; --radius: 12px; --font: "Inter", sans-serif; --font-mono: "Fira Code", monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); }
+.app-container { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 300px; background: var(--primary); color: white; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; border-right: 1px solid #1e293b; }
+.sidebar-header { padding: 30px 24px 20px; border-bottom: 1px solid #1e293b; }
+.logo { font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: #38bdf8; }
+.subtitle { font-size: 0.8rem; color: #94a3b8; margin-top: 6px; margin-bottom: 0; }
+.nav-menu { padding: 15px 0; }
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 14px 24px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s ease; color: #cbd5e1; font-size: 0.9rem; font-weight: 500; }
+.nav-item:hover { background: #1e293b; color: white; border-left-color: #38bdf8; }
+.nav-item.active { background: #1e293b; color: #38bdf8; border-left-color: #38bdf8; }
+.nav-item i { width: 20px; text-align: center; }
+.main-content { flex: 1; overflow-y: auto; padding: 0; scroll-behavior: smooth; }
+.content-wrapper { max-width: 900px; margin: 0 auto; padding: 40px 30px; }
+.tab-content { display: none; animation: fadeIn 0.4s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h1.page-title { font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; color: var(--primary); }
+.page-desc { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 40px; line-height: 1.6; }
+h2 { font-size: 1.6rem; font-weight: 700; margin-top: 50px; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+h3 { font-size: 1.25rem; font-weight: 600; margin-top: 35px; margin-bottom: 15px; color: #334155; }
+h4 { font-size: 1.05rem; font-weight: 600; margin-top: 25px; margin-bottom: 10px; color: #475569; }
+p { line-height: 1.8; margin-bottom: 16px; font-size: 1rem; }
+ul, ol { line-height: 1.8; margin-bottom: 20px; padding-left: 24px; }
+li { margin-bottom: 8px; }
+.callout { background: var(--accent-light); border-left: 4px solid var(--accent); padding: 20px 24px; border-radius: 0 var(--radius) var(--radius) 0; margin: 24px 0; }
+.callout.warning { background: #fffbeb; border-left-color: var(--warning); }
+.callout.danger { background: #fef2f2; border-left-color: var(--danger); }
+.callout.success { background: #f0fdf4; border-left-color: var(--success); }
+.callout-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.formula-box { background: #f1f5f9; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin: 24px 0; text-align: center; overflow-x: auto; }
+.code-header { display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: #94a3b8; padding: 10px 16px; border-radius: var(--radius) var(--radius) 0 0; font-size: 0.8rem; font-family: var(--font-mono); }
+.code-block { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 0 0 var(--radius) var(--radius); overflow-x: auto; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.6; margin: 0 0 24px 0; }
+.code-block code { font-family: inherit; }
+.problem-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.tier-label { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+.tier-easy { background: #dcfce7; color: #166534; }
+.tier-medium { background: #ffedd5; color: #9a3412; }
+.tier-hard { background: #fee2e2; color: #991b1b; }
+table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.95rem; }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #f8fafc; font-weight: 600; color: #475569; }
+tr:hover { background: #f8fafc; }
+.mermaid { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); margin: 24px 0; display: flex; justify-content: center; }
+.resource-link { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+.resource-link:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(59,130,246,0.1); transform: translateY(-2px); }
+.resource-link i { color: var(--accent); font-size: 1.2rem; }
+.step-box { display: flex; gap: 16px; margin: 20px 0; }
+.step-num { flex-shrink: 0; width: 36px; height: 36px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+.step-content { flex: 1; }
+.step-content p:first-child { margin-top: 0; }
+.svg-center { display: flex; justify-content: center; margin: 24px 0; }
+svg text { font-family: var(--font); }
+@media (max-width: 1024px) { .sidebar { width: 260px; } }
+@media (max-width: 768px) { .app-container { flex-direction: column; } .sidebar { width: 100%; height: auto; max-height: 50vh; } .main-content { height: auto; } }
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="app-container">
+<aside class="sidebar">
+<div class="sidebar-header"><div class="logo"><i class="fa-solid fa-chart-line"></i> QuantLA</div><p class="subtitle">Determinants & Inverses</p></div>
+<nav class="nav-menu"></nav>
+</aside>
+<main class="main-content">
+<div class="content-wrapper">
+<section id="roadmap" class="tab-content active">
+<h1 class="page-title">Roadmap & Prerequisites</h1>
+<p class="page-desc">Before we dive into determinants and inverses, we need to speak the same language. This section builds your foundation from the ground up—no prior linear algebra assumed.</p>
+<h2><i class="fa-solid fa-map" style="color:var(--accent)"></i> Learning Roadmap</h2>
+<p>Here is how the topics connect. Each block unlocks the next. Do not skip ahead until you can explain the current block to a friend.</p>
+<div class="mermaid">
+graph LR
+    A[Prerequisites] --> B[Determinants]
+    B --> C[Matrix Inverses]
+    C --> D[Adjugate Method]
+    D --> E[Properties & Connections]
+    E --> F[Numerical Pitfalls]
+    F --> G[Quant Applications]
+    G --> H[Python Labs]
+    H --> I[Practice Arena]
+    style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e293b
+    style B fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e293b
+    style C fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e293b
+    style G fill:#f0fdf4,stroke:#10b981,stroke-width:3px,color:#1e293b
+</div>
+<h2><i class="fa-solid fa-layer-group" style="color:var(--accent)"></i> Prerequisite Concepts</h2>
+<h3>1. Scalars, Vectors & Matrices</h3>
+<p>A <strong>scalar</strong> is just a number (e.g., $5$, $-3.2$). A <strong>vector</strong> is a list of numbers arranged in a column or row. Think of it as an arrow pointing somewhere in space.</p>
+<p>A <strong>matrix</strong> is a rectangular grid of numbers. We say it has dimensions $m 	imes n$ (read "m by n") if it has $m$ rows and $n$ columns.</p>
+<div class="formula-box">
+$$
+A = \begin{pmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23}
+\end{pmatrix} \quad \text{is a } 2 \times 3 \text{ matrix}
+$$
+</div>
+<p>The entry $a_{ij}$ lives in row $i$ and column $j$. In Python (NumPy), this is exactly <code>A[i, j]</code> (with zero-indexing).</p>
+<h3>2. Square Matrices</h3>
+<p>For determinants and inverses, we only care about <strong>square matrices</strong> where $m = n$. If a matrix is not square, it cannot have a determinant in the standard sense, and it cannot have a true inverse (though pseudoinverses exist, which are beyond our current scope).</p>
+<h3>3. The Identity Matrix $I$</h3>
+<p>The identity matrix is the number $1$ in matrix clothing. It is square, with $1$s on the diagonal and $0$s everywhere else. Multiplying any matrix by $I$ leaves it unchanged.</p>
+<div class="formula-box">
+$$ I_3 = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix} $$
+</div>
+<h3>4. Matrix Multiplication</h3>
+<p>To multiply $A \cdot B$, the number of <strong>columns</strong> in $A$ must equal the number of <strong>rows</strong> in $B$. The result has the rows of $A$ and columns of $B$.</p>
+<p><strong>Crucial intuition:</strong> Each entry $(i,j)$ in the product is the dot product of row $i$ of $A$ and column $j$ of $B$.</p>
+<div class="callout warning"><span class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Order Matters</span>Matrix multiplication is <strong>not</strong> commutative. Usually, $AB \neq BA$. This single fact explains why $(AB)^{-1}$ has its shoes-and-socks reversal property later.</div>
+<h3>5. Transpose $A^T$</h3>
+<p>Flipping a matrix over its diagonal. Row 1 becomes Column 1, and so on.</p>
+<div class="formula-box">
+$$ \begin{pmatrix} 1 & 2 \\ 3 & 4 \\ 5 & 6 \end{pmatrix}^T = \begin{pmatrix} 1 & 3 & 5 \\ 2 & 4 & 6 \end{pmatrix} $$
+</div>
+<h3>6. Linear Systems $Ax = b$</h3>
+<p>This is the "Hello World" of linear algebra. $A$ is a known matrix, $b$ is a known vector, and $x$ is the unknown vector we want to find. If $A$ is invertible, the solution is simply $x = A^{-1}b$.</p>
+<p>Every topic in this guide exists to help us understand when $A^{-1}$ exists and how to compute it reliably.</p>
+<div class="callout success"><span class="callout-title"><i class="fa-solid fa-check-circle"></i> Checkpoint</span>Before moving to the next tab, verify you can: (1) multiply two small matrices by hand, (2) identify a square matrix, and (3) explain why $AB \neq BA$ in your own words.</div>
+</section>
+<section id="determinants" class="tab-content">
+<h1 class="page-title">Determinants</h1>
+<p class="page-desc">The determinant is the single most important scalar we can extract from a square matrix. It tells us whether a matrix is invertible, how it scales space, and acts as a gatekeeper for nearly every advanced concept.</p>
+<h2><i class="fa-solid fa-shapes" style="color:var(--accent)"></i> What is a Determinant?</h2>
+<p>Imagine you have a perfect square of rubber sitting on a table. You apply a transformation (your matrix $A$) and the square gets stretched, squished, and sheared into a parallelogram. The <strong>determinant</strong> tells you the <em>area</em> of that parallelogram relative to the original square.</p>
+<ul>
+<li>If $\det(A) = 2$, the matrix doubles areas.</li>
+<li>If $\det(A) = 0.5$, it halves areas.</li>
+<li>If $\det(A) = 0$, it collapses everything onto a line or a point. The matrix has "flattened" space.</li>
+<li>If $\det(A)$ is negative, the matrix flips space inside-out (like a mirror).</li>
+</ul>
+<div class="svg-center">
+<svg width="420" height="220" viewBox="0 0 420 220">
+<defs><marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker></defs>
+<text x="80" y="20" font-size="14" font-weight="600" fill="#334155">Original Unit Square</text>
+<polygon points="40,180 90,180 90,130 40,130" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>
+<text x="50" y="200" font-size="12" fill="#64748b">Area = 1</text>
+<text x="210" y="20" font-size="14" font-weight="600" fill="#334155">After Transformation by A</text>
+<polygon points="220,180 340,180 370,80 250,80" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>
+<line x1="220" y1="180" x2="340" y2="180" stroke="#ef4444" stroke-width="3" marker-end="url(#arr)"/>
+<line x1="220" y1="180" x2="250" y2="80" stroke="#10b981" stroke-width="3" marker-end="url(#arr)"/>
+<text x="350" y="195" font-size="12" fill="#ef4444">Column 1</text>
+<text x="230" y="70" font-size="12" fill="#10b981">Column 2</text>
+<text x="260" y="200" font-size="12" fill="#3b82f6">Area = |det(A)|</text>
+</svg>
+</div>
+<div class="callout"><span class="callout-title"><i class="fa-solid fa-lightbulb"></i> The One-Sentence Intuition</span>The determinant measures the <strong>signed volume scaling factor</strong> of the linear transformation represented by the matrix.</div>
+<h2><i class="fa-solid fa-calculator" style="color:var(--accent)"></i> Computing Determinants</h2>
+<h3>The $2 \times 2$ Formula</h3>
+<p>This is the formula you will use thousands of times. Memorize it like your phone number.</p>
+<div class="formula-box">
+$$ \det\begin{pmatrix} a & b \\ c & d \end{pmatrix} = ad - bc $$
+</div>
+<p><strong>Memory trick:</strong> Multiply down the main diagonal ($ad$), subtract the product of the anti-diagonal ($bc$).</p>
+<h3>The $3 \times 3$ Formula (Cofactor Expansion)</h3>
+<p>For larger matrices, we use <strong>cofactor expansion</strong> (also called Laplace expansion). Pick any row or column. For each entry, multiply it by its <strong>cofactor</strong> and add them up with alternating signs.</p>
+<div class="formula-box">
+$$ \det(A) = \sum_{j=1}^{n} (-1)^{i+j} a_{ij} M_{ij} \quad \text{(expanding along row $i$)} $$
+</div>
+<p>Here, $M_{ij}$ is the <strong>minor</strong>: the determinant of the submatrix you get after deleting row $i$ and column $j$.</p>
+<h4>Worked Example: $3 \times 3$</h4>
+<p>Let us compute the determinant of:</p>
+<div class="formula-box">
+$$ A = \begin{pmatrix} 2 & -1 & 3 \\ 1 & 4 & 2 \\ 3 & 0 & 1 \end{pmatrix} $$
+</div>
+<p>Expand along the third row because it contains a zero (less work):</p>
+<ul>
+<li>$a_{31} = 3$: Minor $M_{31} = \det\begin{pmatrix}-1&3\\4&2\end{pmatrix} = (-1)(2) - (3)(4) = -14$. Cofactor $C_{31} = (+1)(-14) = -14$.</li>
+<li>$a_{32} = 0$: Skip (zero times anything is zero).</li>
+<li>$a_{33} = 1$: Minor $M_{33} = \det\begin{pmatrix}2&-1\\1&4\end{pmatrix} = (2)(4) - (-1)(1) = 9$. Cofactor $C_{33} = (+1)(9) = 9$.</li>
+</ul>
+<p>Therefore:</p>
+<div class="formula-box">
+$$ \det(A) = 3(-14) - 0 + 1(9) = -42 + 9 = -33 $$
+</div>
+<h2><i class="fa-solid fa-list-check" style="color:var(--accent)"></i> Key Properties of Determinants</h2>
+<p>These properties are your toolkit. They let you simplify calculations and prove theorems without expanding everything.</p>
+<table>
+<tr><th>Property</th><th>Math</th><th>Intuition</th></tr>
+<tr><td>Identity</td><td>$\det(I) = 1$</td><td>Doing nothing preserves volume perfectly.</td></tr>
+<tr><td>Transpose</td><td>$\det(A^T) = \det(A)$</td><td>Rows and columns are symmetric with respect to volume.</td></tr>
+<tr><td>Product</td><td>$\det(AB) = \det(A)\det(B)$</td><td>Applying two transformations scales volume by the product of their individual scalings.</td></tr>
+<tr><td>Inverse</td><td>$\det(A^{-1}) = 1/\det(A)$</td><td>Reversing a transformation must undo its scaling.</td></tr>
+<tr><td>Scalar Multiple</td><td>$\det(kA) = k^n \det(A)$</td><td>Scaling every dimension by $k$ scales $n$-dimensional volume by $k^n$.</td></tr>
+<tr><td>Row Swap</td><td>Swapping two rows flips the sign</td><td>Swapping axes reverses orientation (handedness).</td></tr>
+<tr><td>Triangular</td><td>Product of diagonal entries</td><td>A triangular matrix only stretches along axes, so volume is just the product of those stretches.</td></tr>
+</table>
+<div class="callout danger"><span class="callout-title"><i class="fa-solid fa-ban"></i> Common Myth</span>A determinant of zero means the matrix is <strong>singular</strong> (not invertible). However, a determinant <em>close</em> to zero does <strong>not</strong> automatically mean the matrix is "nearly" singular in a useful numerical sense. We will revisit this in the Numerical Pitfalls tab.</div>
+</section>
+<section id="inverses" class="tab-content">
+<h1 class="page-title">Matrix Inverses</h1>
+<p class="page-desc">If determinants tell us "how much" a matrix scales space, inverses tell us "how do we get back?" This is the mathematical "undo" button, and it is the engine behind solving linear systems in quantitative finance.</p>
+<h2><i class="fa-solid fa-rotate-left" style="color:var(--accent)"></i> The Intuition</h2>
+<p>In regular arithmetic, every non-zero number $a$ has a reciprocal $a^{-1} = 1/a$ such that $a \cdot a^{-1} = 1$.</p>
+<p>Matrices work similarly, but instead of the number $1$, we use the <strong>Identity Matrix</strong> $I$. The inverse of a matrix $A$, written $A^{-1}$, is the unique matrix that satisfies:</p>
+<div class="formula-box">
+$$ A A^{-1} = A^{-1} A = I $$
+</div>
+<p>Think of $A$ as a recipe for baking a cake. $A^{-1}$ is the recipe that turns the cake back into its raw ingredients. You can apply $A$ then $A^{-1}$ (or vice versa) and end up exactly where you started.</p>
+<div class="mermaid">
+graph LR
+    x -->|A| b
+    b -->|A^{-1}| x
+    style A fill:#eff6ff,stroke:#3b82f6,color:#1e293b
+    style A^{-1} fill:#f0fdf4,stroke:#10b981,color:#1e293b
+</div>
+<h2><i class="fa-solid fa-key" style="color:var(--accent)"></i> When Does an Inverse Exist?</h2>
+<p>Not every matrix has an inverse. A matrix must pass two tests:</p>
+<ol>
+<li><strong>Square:</strong> Only square matrices can have a true two-sided inverse. (Non-square matrices can have pseudoinverses, but that is a graduate topic.)</li>
+<li><strong>Non-Singular:</strong> The determinant must be non-zero. If $\det(A) = 0$, the matrix is <strong>singular</strong> and has no inverse.</li>
+</ol>
+<div class="callout"><span class="callout-title"><i class="fa-solid fa-lightbulb"></i> Why must det be non-zero?</span>Remember that $\det(A)$ measures volume scaling. If $\det(A) = 0$, the matrix collapses space. You cannot "uncollapse" a line back into a volume. Information is destroyed, so no inverse exists.</div>
+<h2><i class="fa-solid fa-wrench" style="color:var(--accent)"></i> Computing the Inverse</h2>
+<h3>Method 1: Gaussian Elimination (The Workhorse)</h3>
+<p>This is the algorithm that computers actually use (in a refined form). The idea is elegant: place $A$ and $I$ side-by-side to form an <strong>augmented matrix</strong> $[A \mid I]$. Then perform row operations to turn the left side into $I$. Whatever happens on the right side becomes $A^{-1}$.</p>
+<div class="step-box"><div class="step-num">1</div><div class="step-content"><p>Write the augmented matrix $[A \mid I]$.</p></div></div>
+<div class="step-box"><div class="step-num">2</div><div class="step-content"><p>Use row operations to reduce $A$ to Reduced Row Echelon Form (RREF).</p></div></div>
+<div class="step-box"><div class="step-num">3</div><div class="step-content"><p>If the left side becomes $I$, the right side is $A^{-1}$. If you get a row of zeros on the left, $A$ is singular.</p></div></div>
+<h4>Worked Example</h4>
+<p>Find the inverse of $A = \begin{pmatrix} 1 & 2 \ 3 & 4 \end{pmatrix}$.</p>
+<p><strong>Step 1:</strong> Augment with $I$:</p>
+<div class="formula-box">
+$$ \left( \begin{array}{cc|cc} 1 & 2 & 1 & 0 \\ 3 & 4 & 0 & 1 \end{array} \right) $$
+</div>
+<p><strong>Step 2:</strong> $R_2 \leftarrow R_2 - 3R_1$:</p>
+<div class="formula-box">
+$$ \left( \begin{array}{cc|cc} 1 & 2 & 1 & 0 \\ 0 & -2 & -3 & 1 \end{array} \right) $$
+</div>
+<p><strong>Step 3:</strong> $R_2 \leftarrow R_2 / (-2)$:</p>
+<div class="formula-box">
+$$ \left( \begin{array}{cc|cc} 1 & 2 & 1 & 0 \\ 0 & 1 & 1.5 & -0.5 \end{array} \right) $$
+</div>
+<p><strong>Step 4:</strong> $R_1 \leftarrow R_1 - 2R_2$:</p>
+<div class="formula-box">
+$$ \left( \begin{array}{cc|cc} 1 & 0 & -2 & 1 \\ 0 & 1 & 1.5 & -0.5 \end{array} \right) $$
+</div>
+<p>Therefore:</p>
+<div class="formula-box">
+$$ A^{-1} = \begin{pmatrix} -2 & 1 \\ 1.5 & -0.5 \end{pmatrix} $$
+</div>
+<h3>Method 2: The Adjugate Formula (Theory First)</h3>
+<p>There is a direct formula using the determinant and the <strong>adjugate</strong> matrix (also called the classical adjoint). We will explore the adjugate in depth in the next tab, but here is the headline:</p>
+<div class="formula-box">
+$$ A^{-1} = \frac{1}{\det(A)} \, \text{adj}(A) $$
+</div>
+<p>This formula is beautiful because it connects every concept: entries, cofactors, determinants, and the inverse. However, for large matrices, it is computationally expensive and numerically unstable. We use it to <em>understand</em>, not to <em>compute at scale</em>.</p>
+<h2><i class="fa-solid fa-puzzle-piece" style="color:var(--accent)"></i> Why Inverses Matter for Quants</h2>
+<p>In portfolio theory, we often need to solve systems like:</p>
+<div class="formula-box">
+$$ \Sigma w = \mathbf{1} \quad \text{or} \quad \Sigma w = \mu $$
+</div>
+<p>where $\Sigma$ is a covariance matrix, $w$ is a vector of portfolio weights, and $\mathbf{1}$ is a vector of ones. If we know $\Sigma^{-1}$, the solution is instant: $w = \Sigma^{-1}\mathbf{1}$. This is why invertibility of covariance matrices is a foundational concern for every quant.</p>
+</section>
+<section id="adjugate" class="tab-content">
+<h1 class="page-title">The Adjugate Method</h1>
+<p class="page-desc">The adjugate (or classical adjoint) is the bridge between the determinant and the inverse. It is elegant, explicit, and reveals the inner anatomy of a matrix. Every quant should see this at least once.</p>
+<h2><i class="fa-solid fa-table-cells" style="color:var(--accent)"></i> Building the Adjugate</h2>
+<p>The adjugate is built from <strong>cofactors</strong>. We already met cofactors when computing determinants. Now we organize them into a matrix.</p>
+<h3>Step 1: Matrix of Minors</h3>
+<p>For each entry $a_{ij}$, delete row $i$ and column $j$, then compute the determinant of what remains. This gives the <strong>minor</strong> $M_{ij}$.</p>
+<h3>Step 2: Matrix of Cofactors</h3>
+<p>Apply a checkerboard of signs to the minors. The cofactor is $C_{ij} = (-1)^{i+j} M_{ij}$.</p>
+<div class="svg-center">
+<svg width="200" height="200" viewBox="0 0 200 200">
+<rect x="20" y="20" width="60" height="60" fill="#f8fafc" stroke="#94a3b8"/><text x="50" y="55" font-size="20" fill="#1e293b" font-weight="600">+</text>
+<rect x="80" y="20" width="60" height="60" fill="#e2e8f0" stroke="#94a3b8"/><text x="110" y="55" font-size="20" fill="#1e293b" font-weight="600">-</text>
+<rect x="140" y="20" width="60" height="60" fill="#f8fafc" stroke="#94a3b8"/><text x="170" y="55" font-size="20" fill="#1e293b" font-weight="600">+</text>
+<rect x="20" y="80" width="60" height="60" fill="#e2e8f0" stroke="#94a3b8"/><text x="50" y="115" font-size="20" fill="#1e293b" font-weight="600">-</text>
+<rect x="80" y="80" width="60" height="60" fill="#f8fafc" stroke="#94a3b8"/><text x="110" y="115" font-size="20" fill="#1e293b" font-weight="600">+</text>
+<rect x="140" y="80" width="60" height="60" fill="#e2e8f0" stroke="#94a3b8"/><text x="170" y="115" font-size="20" fill="#1e293b" font-weight="600">-</text>
+<rect x="20" y="140" width="60" height="60" fill="#f8fafc" stroke="#94a3b8"/><text x="50" y="175" font-size="20" fill="#1e293b" font-weight="600">+</text>
+<rect x="80" y="140" width="60" height="60" fill="#e2e8f0" stroke="#94a3b8"/><text x="110" y="175" font-size="20" fill="#1e293b" font-weight="600">-</text>
+<rect x="140" y="140" width="60" height="60" fill="#f8fafc" stroke="#94a3b8"/><text x="170" y="175" font-size="20" fill="#1e293b" font-weight="600">+</text>
+</svg>
+</div>
+<h3>Step 3: Transpose</h3>
+<p>The <strong>adjugate</strong> is the transpose of the cofactor matrix.</p>
+<div class="formula-box">
+$$ \text{adj}(A) = C^T $$
+</div>
+<h3>Step 4: The Grand Formula</h3>
+<div class="formula-box">
+$$ A^{-1} = \frac{1}{\det(A)} \, \text{adj}(A) $$
+</div>
+<h2><i class="fa-solid fa-hammer" style="color:var(--accent)"></i> Complete Worked Example</h2>
+<p>Let $A = \begin{pmatrix} 1 & 2 & 3 \\ 0 & 1 & 4 \\ 5 & 6 & 0 \end{pmatrix}$.</p>
+<h4>Step 1: Minors</h4>
+<ul>
+<li>$M_{11} = \det\begin{pmatrix}1&4\\6&0\end{pmatrix} = -24$</li>
+<li>$M_{12} = \det\begin{pmatrix}0&4\\5&0\end{pmatrix} = -20$</li>
+<li>$M_{13} = \det\begin{pmatrix}0&1\\5&6\end{pmatrix} = -5$</li>
+<li>$M_{21} = \det\begin{pmatrix}2&3\\6&0\end{pmatrix} = -18$</li>
+<li>$M_{22} = \det\begin{pmatrix}1&3\\5&0\end{pmatrix} = -15$</li>
+<li>$M_{23} = \det\begin{pmatrix}1&2\\5&6\end{pmatrix} = -4$</li>
+<li>$M_{31} = \det\begin{pmatrix}2&3\\1&4\end{pmatrix} = 5$</li>
+<li>$M_{32} = \det\begin{pmatrix}1&3\\0&4\end{pmatrix} = 4$</li>
+<li>$M_{33} = \det\begin{pmatrix}1&2\\0&1\end{pmatrix} = 1$</li>
+</ul>
+<h4>Step 2: Cofactors (Apply Signs)</h4>
+<p>$C = \begin{pmatrix} -24 & 20 & -5 \\ 18 & -15 & 4 \\ 5 & -4 & 1 \end{pmatrix}$</p>
+<h4>Step 3: Adjugate (Transpose)</h4>
+<p>$\text{adj}(A) = C^T = \begin{pmatrix} -24 & 18 & 5 \\ 20 & -15 & -4 \\ -5 & 4 & 1 \end{pmatrix}$</p>
+<h4>Step 4: Determinant</h4>
+<p>Expand along first row: $\det(A) = 1(-24) - 2(-20) + 3(-5) = -24 + 40 - 15 = 1$.</p>
+<h4>Step 5: Inverse</h4>
+<p>Since $\det(A)=1$, $A^{-1} = \text{adj}(A)$. You can verify by multiplying $A \\cdot A^{-1}$ to get $I$.</p>
+<div class="callout warning"><span class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Computational Cost</span>For an $n \times n$ matrix, the adjugate method requires computing $n^2$ determinants of $(n-1) \times (n-1)$ matrices. This makes it $O(n!)$ or $O(n^4)$ depending on implementation—far too slow for large matrices. It is primarily a theoretical tool and useful for symbolic manipulation.</div>
+</section>
+<section id="properties" class="tab-content">
+<h1 class="page-title">Properties & Connections</h1>
+<p class="page-desc">Determinants and inverses are not isolated islands. They are deeply intertwined. This section maps the highway between them and collects the essential identities you will use daily.</p>
+<h2><i class="fa-solid fa-link" style="color:var(--accent)"></i> The Determinant-Inverse Bridge</h2>
+<p>The most fundamental relationship is the one we used for the adjugate method:</p>
+<div class="formula-box">
+$$ A^{-1} = \frac{1}{\det(A)} \text{adj}(A) \quad \Longleftrightarrow \quad A \cdot \text{adj}(A) = \det(A) I $$
+</div>
+<p>This identity is powerful. It tells us that a matrix commutes with its own adjugate, and the result is a scalar multiple of the identity.</p>
+<h2><i class="fa-solid fa-shoe-prints" style="color:var(--accent)"></i> The Socks-and-Shoes Rule</h2>
+<p>When you put on socks and then shoes, to undo it you must first remove the shoes, then the socks. Matrix inverses work the same way.</p>
+<div class="formula-box">
+$$ (AB)^{-1} = B^{-1} A^{-1} $$
+</div>
+<p><strong>Proof sketch:</strong> Multiply $AB$ by $B^{-1}A^{-1}$. The $B$ and $B^{-11}$ cancel in the middle, leaving $AA^{-1} = I$.</p>
+<h2><i class="fa-solid fa-list" style="color:var(--accent)"></i> Essential Inverse Properties</h2>
+<table>
+<tr><th>Property</th><th>Formula</th><th>Note</th></tr>
+<tr><td>Inverse of Inverse</td><td>$(A^{-1})^{-1} = A$</td><td>The undo of the undo is the original.</td></tr>
+<tr><td>Transpose of Inverse</td><td>$(A^{-1})^T = (A^T)^{-1}$</td><td>Inverting and transposing commute.</td></tr>
+<tr><td>Scalar Multiple</td><td>$(kA)^{-1} = rac{1}{k} A^{-1}$</td><td>For $k \neq 0$.</td></tr>
+<tr><td>Product</td><td>$(AB)^{-1} = B^{-1}A^{-1}$</td><td>Order reverses.</td></tr>
+<tr><td>Determinant of Inverse</td><td>$\det(A^{-1}) = 1/\det(A)$</td><td>Directly from $\det(AA^{-1}) = \det(I) = 1$.</td></tr>
+<tr><td>Diagonal Inverse</td><td>$\text{diag}(d_1, \dots, d_n)^{-1} = \text{diag}(1/d_1, \dots, 1/d_n)$</td><td>Just flip each diagonal entry.</td></tr>
+</table>
+<h2><i class="fa-solid fa-diagram-project" style="color:var(--accent)"></i> Concept Map</h2>
+<div class="mermaid">
+graph TD
+    A[Matrix A] -->|compute| B[Determinant det(A)]
+    A -->|compute| C[Cofactor Matrix C]
+    C -->|transpose| D[Adjugate adj(A)]
+    B -->|divide| E[Inverse A^{-1}]
+    D -->|multiply by 1/det| E
+    E -->|verify| F[A * A^{-1} = I]
+    style E fill:#f0fdf4,stroke:#10b981,stroke-width:2px,color:#1e293b
+    style F fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e293b
+</div>
+<div class="callout success"><span class="callout-title"><i class="fa-solid fa-check-circle"></i> Mnemonic</span>For any valid operation on an inverse, imagine doing the opposite operation on the original matrix, then inverting. The only exception is the transpose, which plays nicely with the inverse.</div>
+</section>
+<section id="pitfalls" class="tab-content">
+<h1 class="page-title">Numerical Pitfalls</h1>
+<p class="page-desc">In the real world, matrices are large and computers use finite precision. A beautiful theoretical formula can crumble when implemented. This tab is your survival guide.</p>
+<h2><i class="fa-solid fa-bug" style="color:var(--danger)"></i> Floating-Point Reality</h2>
+<p>Computers store numbers with a fixed number of bits (usually 64). This means:</p>
+<ul>
+<li>Numbers like $1/3$ or $\sqrt{2}$ are approximated.</li>
+<li>Adding a very small number to a very large number can cause the small number to be swallowed (loss of significance).</li>
+<li>Subtracting two nearly equal numbers causes <strong>catastrophic cancellation</strong>.</li>
+</ul>
+<h2><i class="fa-solid fa-temperature-empty" style="color:var(--warning)"></i> Ill-Conditioned Matrices</h2>
+<p>A matrix is <strong>ill-conditioned</strong> if a tiny change in its entries causes a huge change in its inverse or in the solution to $Ax=b$.</p>
+<p>The <strong>condition number</strong> $\kappa(A)$ measures this sensitivity:</p>
+<div class="formula-box">
+$$ \kappa(A) = \|A\| \cdot \|A^{-1}\| $$
+</div>
+<ul>
+<li>$\kappa(A) \approx 1$: The matrix is well-conditioned. Life is good.</li>
+<li>$\kappa(A) \gg 1$ (e.g., $10^6$ or higher): The matrix is ill-conditioned. Results are unreliable.</li>
+<li>$\kappa(A) = \infty$: The matrix is singular.</li>
+</ul>
+<div class="callout danger"><span class="callout-title"><i class="fa-solid fa-skull-crossbones"></i> The Determinant Trap</span>Never use $|\det(A)| \approx 0$ as your sole measure of near-singularity. If you multiply a matrix by $0.001$, its determinant drops by $0.001^n$, but its conditioning does not change at all! Always use the condition number.</div>
+<h2><i class="fa-solid fa-gauge-high" style="color:var(--accent)"></i> Why the Adjugate Fails at Scale</h2>
+<p>The adjugate method requires:</p>
+<ol>
+<li>Computing $n^2$ minors, each of size $(n-1) \times (n-1)$.</li>
+<li>Multiplying many terms together, accumulating round-off error at every step.</li>
+<li>Dividing by the determinant, which magnifies any errors if the determinant is small.</li>
+</ol>
+<p>For $n=50$, this is already impractical. For $n=500$ (common in finance), it is a disaster.</p>
+<h2><i class="fa-solid fa-microchip" style="color:var(--accent)"></i> What the Pros Use</h2>
+<p>Professional libraries (NumPy, MATLAB, LAPACK) use <strong>LU Decomposition with Partial Pivoting</strong>. This is essentially Gaussian elimination rewritten to minimize error:</p>
+<ol>
+<li>Factor $A = LU$, where $L$ is lower triangular and $U$ is upper triangular.</li>
+<li>Solve $Ly = b$ by forward substitution.</li>
+<li>Solve $Ux = y$ by backward substitution.</li>
+</ol>
+<p>This avoids computing $A^{-1}$ explicitly. If you only need $x$ in $Ax=b$, <strong>never compute $A^{-1}$</strong>. It is slower and less accurate.</p>
+<div class="callout warning"><span class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Golden Rule</span>Computing an inverse to solve a linear system is like demolishing a house to get inside. Use factorization methods (LU, Cholesky for covariance matrices) instead.</div>
+</section>
+<section id="quant" class="tab-content">
+<h1 class="page-title">Quant Applications</h1>
+<p class="page-desc">This is why we learned everything above. We now connect determinants and inverses to portfolio optimization and risk decomposition—the bread and butter of quantitative finance.</p>
+<h2><i class="fa-solid fa-chart-pie" style="color:var(--accent)"></i> The Setup: Returns & Covariance</h2>
+<p>We have $n$ assets. Let $R$ be the random vector of returns. We define:</p>
+<ul>
+<li>$\mu = \mathbb{E}[R]$: Vector of expected returns.</li>
+<li>$\Sigma = \text{Cov}(R)$: Covariance matrix, where $\Sigma_{ij} = \text{Cov}(R_i, R_j)$.</li>
+</ul>
+<p><strong>Key facts about $\Sigma$:</strong></p>
+<ul>
+<li>It is <strong>symmetric</strong>: $\Sigma = \Sigma^T$.</li>
+<li>It is <strong>positive semi-definite</strong> (PSD): $w^T \Sigma w \ge 0$ for all $w$.</li>
+<li>For invertibility, we need it to be <strong>positive definite</strong> (PD): $w^T \Sigma w > 0$ for all $w \neq 0$.</li>
+</ul>
+<div class="callout"><span class="callout-title"><i class="fa-solid fa-lightbulb"></i> Why must $\Sigma$ be invertible?</span>If $\Sigma$ were singular, there would exist a portfolio $w$ with zero variance ($w^T \Sigma w = 0$). This means a riskless portfolio exists that is not just cash—a rare and usually artificial situation. In practice, we ensure invertibility by using enough data and regularization.</div>
+<h2><i class="fa-solid fa-bullseye" style="color:var(--accent)"></i> Markowitz Mean-Variance Optimization</h2>
+<p>The goal is to find portfolio weights $w$ that minimize risk for a given level of expected return.</p>
+<h3>The Optimization Problem</h3>
+<div class="formula-box">
+$$ \min_w \; \frac{1}{2} w^T \Sigma w \quad \text{subject to} \quad w^T \mathbf{1} = 1 \; \text{and} \; w^T \mu = r_{\text{target}} $$
+</div>
+<p>The $\frac{1}{2}$ is just a mathematical convenience that disappears when we differentiate.</p>
+<h3>The Lagrangian</h3>
+<p>We introduce Lagrange multipliers $\lambda$ (budget constraint) and $\gamma$ (return constraint):</p>
+<div class="formula-box">
+$$ \mathcal{L} = \frac{1}{2} w^T \Sigma w - \lambda (w^T \mathbf{1} - 1) - \gamma (w^T \mu - r_{\text{target}}) $$
+</div>
+<h3>Taking Derivatives</h3>
+<p>Differentiate with respect to $w$ and set to zero:</p>
+<div class="formula-box">
+$$ \frac{\partial \mathcal{L}}{\partial w} = \Sigma w - \lambda \mathbf{1} - \gamma \mu = 0 \quad \Longrightarrow \quad w = \Sigma^{-1} (\lambda \mathbf{1} + \gamma \mu) $$
+</div>
+<p><strong>There it is:</strong> the inverse of the covariance matrix, $\Sigma^{-1}$, is the heart of the solution.</p>
+<h3>Global Minimum Variance Portfolio (GMVP)</h3>
+<p>If we ignore the return constraint and simply minimize variance subject to full investment ($w^T \mathbf{1} = 1$), we get the <strong>GMVP</strong>:</p>
+<div class="formula-box">
+$$ w_{\text{GMVP}} = \frac{\Sigma^{-1} \mathbf{1}}{\mathbf{1}^T \Sigma^{-1} \mathbf{1}} $$
+</div>
+<p>The numerator is $\Sigma^{-1} \mathbf{1}$, and the denominator is just a scaling constant to ensure the weights sum to 1. This formula is used billions of times a day in trading systems.</p>
+<h2><i class="fa-solid fa-layer-group" style="color:var(--accent)"></i> Risk Decomposition</h2>
+<p>Once we have a portfolio, we want to know: <em>Which assets are driving my risk?</em> We cannot just look at individual asset volatilities because diversification reduces risk.</p>
+<h3>Portfolio Volatility</h3>
+<div class="formula-box">
+$$ \sigma_p = \sqrt{w^T \Sigma w} $$
+</div>
+<h3>Marginal Contribution to Risk (MCTR)</h3>
+<p>How much does portfolio risk change if we slightly increase the weight of asset $i$?</p>
+<div class="formula-box">
+$$ \text{MCTR} = \frac{\partial \sigma_p}{\partial w} = \frac{\Sigma w}{\sigma_p} $$
+</div>
+<h3>Component Contribution to Risk (CCoR)</h3>
+<p>Multiply the marginal contribution by the actual weight to get the total contribution from asset $i$:</p>
+<div class="formula-box">
+$$ \text{CCoR}_i = w_i \cdot \frac{(\Sigma w)_i}{\sigma_p} $$
+</div>
+<h3>Euler&apos;s Theorem &amp; The Sum Check</h3>
+<p>Portfolio volatility is a <strong>homogeneous function of degree 1</strong> in weights. By Euler&apos;s theorem for homogeneous functions:</p>
+<div class="formula-box">
+$$ \sum_{i=1}^n \text{CCoR}_i = \sigma_p $$
+</div>
+<p>This is a beautiful sanity check: the sum of each asset&apos;s risk contribution equals the total portfolio risk.</p>
+<div class="callout success"><span class="callout-title"><i class="fa-solid fa-check-circle"></i> Key Takeaway</span>Inverting the covariance matrix is not an abstract exercise. It is the mathematical operation that converts raw market data into optimal portfolio weights and reveals the hidden architecture of portfolio risk.</div>
+</section>
+<section id="labs" class="tab-content">
+<h1 class="page-title">Python Labs</h1>
+<p class="page-desc">Run these experiments in Google Colab or any Jupyter environment. Each lab connects theory to computation. Copy, paste, and tweak.</p>
+<h2><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Lab 1: Determinant as Area Scaling</h2>
+<p>Visualize how a $2 \times 2$ matrix transforms the unit square and confirm the area equals $|\det(A)|$.</p>
+<div class="code-header"><span>determinant_geometry.py</span><i class="fa-brands fa-python"></i></div>
+<pre class="code-block"><code>import numpy as np
+import matplotlib.pyplot as plt
+
+A = np.array([[2, 1],
+              [1, 3]])
+
+# Unit square corners
+unit = np.array([[0,0],[1,0],[1,1],[0,1],[0,0]])
+transformed = unit @ A.T  # multiply each row by A^T
+
+fig, ax = plt.subplots(1,2, figsize=(10,4))
+ax[0].fill(unit[:,0], unit[:,1], alpha=0.3, label="Unit Square")
+ax[0].set_title("Before: Area = 1")
+ax[0].set_xlim(-0.5, 3.5); ax[0].set_ylim(-0.5, 3.5)
+ax[0].axhline(0, color="black", linewidth=0.5); ax[0].axvline(0, color="black", linewidth=0.5)
+ax[0].set_aspect("equal")
+
+ax[1].fill(transformed[:,0], transformed[:,1], alpha=0.3, color="red", label="Transformed")
+ax[1].set_title(f"After: Area = |det(A)| = {abs(np.linalg.det(A)):.2f}")
+ax[1].set_xlim(-0.5, 3.5); ax[1].set_ylim(-0.5, 3.5)
+ax[1].axhline(0, color="black", linewidth=0.5); ax[1].axvline(0, color="black", linewidth=0.5)
+ax[1].set_aspect("equal")
+plt.show()</code></pre>
+<h2><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Lab 2: Inverse via Adjugate</h2>
+<p>Implement the adjugate method from scratch and compare with NumPy&apos;s <code>linalg.inv</code>.</p>
+<div class="code-header"><span>adjugate_inverse.py</span><i class="fa-brands fa-python"></i></div>
+<pre class="code-block"><code>import numpy as np
+
+def cofactor_matrix(M):
+    n = M.shape[0]
+    C = np.zeros_like(M, dtype=float)
+    for i in range(n):
+        for j in range(n):
+            minor = np.delete(np.delete(M, i, axis=0), j, axis=1)
+            C[i,j] = ((-1)**(i+j)) * np.linalg.det(minor)
+    return C
+
+def adjugate_inverse(M):
+    d = np.linalg.det(M)
+    if abs(d) &lt; 1e-12:
+        raise ValueError("Matrix is singular")
+    adj = cofactor_matrix(M).T
+    return adj / d
+
+A = np.array([[4, 7, 2],
+              [3, 9, 5],
+              [8, 1, 6]], dtype=float)
+
+A_inv_manual = adjugate_inverse(A)
+A_inv_numpy = np.linalg.inv(A)
+
+print("Manual adjugate inverse:")
+print(A_inv_manual)
+print("\nNumPy inverse:")
+print(A_inv_numpy)
+print("\nDifference (Frobenius norm):", np.linalg.norm(A_inv_manual - A_inv_numpy))</code></pre>
+<h2><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Lab 3: Condition Numbers &amp; the Hilbert Matrix</h2>
+<p>The Hilbert matrix is the classic example of an ill-conditioned matrix. Watch the determinant and inverse fall apart as $n$ grows.</p>
+<div class="code-header"><span>hilbert_pitfall.py</span><i class="fa-brands fa-python"></i></div>
+<pre class="code-block"><code>import numpy as np
+from scipy.linalg import hilbert
+
+for n in [4, 8, 12, 16]:
+    H = hilbert(n)
+    cond = np.linalg.cond(H)
+    det = np.linalg.det(H)
+    print(f"n={n:2d} | cond={cond:.2e} | det={det:.2e}")
+
+# Try solving Hx = b with a tiny perturbation
+n = 12
+H = hilbert(n)
+x_true = np.ones(n)
+b = H @ x_true
+x_solved = np.linalg.solve(H, b)
+print("\nError in solution:", np.linalg.norm(x_true - x_solved))</code></pre>
+<h2><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Lab 4: Global Minimum Variance Portfolio</h2>
+<p>Simulate asset returns, estimate covariance, and compute GMVP weights.</p>
+<div class="code-header"><span>gmvp.py</span><i class="fa-brands fa-python"></i></div>
+<pre class="code-block"><code>import numpy as np
+
+np.random.seed(42)
+n_assets = 5
+n_days = 252
+
+# Simulate returns (Gaussian)
+returns = np.random.randn(n_days, n_assets) * 0.02
+Sigma = np.cov(returns, rowvar=False)  # Covariance matrix
+
+ones = np.ones(n_assets)
+Sigma_inv = np.linalg.inv(Sigma)
+
+w_gmvp = Sigma_inv @ ones
+w_gmvp = w_gmvp / (ones @ w_gmvp)  # Normalize to sum=1
+
+print("GMVP weights:", w_gmvp.round(4))
+print("Sum of weights:", w_gmvp.sum().round(6))
+print("Portfolio variance:", (w_gmvp @ Sigma @ w_gmvp).round(6))</code></pre>
+<h2><i class="fa-solid fa-flask" style="color:var(--accent)"></i> Lab 5: Risk Decomposition</h2>
+<p>Compute MCTR and component contributions for a portfolio. Verify they sum to total volatility.</p>
+<div class="code-header"><span>risk_decomp.py</span><i class="fa-brands fa-python"></i></div>
+<pre class="code-block"><code>import numpy as np
+
+Sigma = np.array([[0.04, 0.02, 0.01],
+                  [0.02, 0.05, 0.015],
+                  [0.01, 0.015, 0.03]])
+w = np.array([0.5, 0.3, 0.2])
+
+port_var = w @ Sigma @ w
+port_vol = np.sqrt(port_var)
+
+MCTR = (Sigma @ w) / port_vol
+CCoR = w * MCTR
+
+print(f"Portfolio volatility: {port_vol:.4f}")
+print(f"Marginal contributions: {MCTR.round(4)}")
+print(f"Component contributions: {CCoR.round(4)}")
+print(f"Sum of components: {CCoR.sum():.4f} (should equal {port_vol:.4f})")
+print(f"% contributions: {(CCoR/port_vol*100).round(2)}")</code></pre>
+</section>
+<section id="practice" class="tab-content">
+<h1 class="page-title">Practice Arena</h1>
+<p class="page-desc">Three tiers of difficulty for every topic. Start where you are comfortable, then climb. Answers are hidden in collapsible sections (use the browser&apos;s find function or a separate sheet).</p>
+<h2><i class="fa-solid fa-shapes" style="color:var(--accent)"></i> Determinants</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Compute by hand</h4>
+<p>Find the determinant of $\begin{pmatrix} 3 & 5 \ 2 & 4 \end{pmatrix}$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use the $2 \times 2$ formula $ad-bc$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Sign check</h4>
+<p>If you swap two rows of a matrix, what happens to the determinant?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Think about orientation.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>3x3 expansion</h4>
+<p>Compute $\det\begin{pmatrix} 1 & 2 & 3 \ 0 & 4 & 5 \ 0 & 0 & 6 \end{pmatrix}$. Then verify using the triangular property.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Expand along the first column.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Product property</h4>
+<p>Given $\det(A)=3$ and $\det(B)=-2$, find $\det(AB)$ and $\det(A^T B^{-1})$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use $\det(AB)=\det(A)\det(B)$ and $\det(B^{-1})=1/\det(B)$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Vandermonde</h4>
+<p>Show that $\det\begin{pmatrix} 1 & a & a^2 \ 1 & b & b^2 \ 1 & c & c^2 \end{pmatrix} = (b-a)(c-a)(c-b)$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use row operations $R_2 \leftarrow R_2 - R_1$ and $R_3 \leftarrow R_3 - R_1$, then expand.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Block matrix</h4>
+<p>Let $M = \begin{pmatrix} A & B \ 0 & D \end{pmatrix}$ where $A$ and $D$ are square. Prove $\det(M) = \det(A)\det(D)$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use induction on the size of $A$ and cofactor expansion.</p>
+</div>
+<h2><i class="fa-solid fa-rotate-left" style="color:var(--accent)"></i> Matrix Inverses</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>2x2 inverse formula</h4>
+<p>Find the inverse of $\begin{pmatrix} 4 & 7 \ 2 & 6 \end{pmatrix}$ using the $2 \times 2$ shortcut: $A^{-1} = \frac{1}{ad-bc}\begin{pmatrix} d & -b \ -c & a \end{pmatrix}$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Existence check</h4>
+<p>Does $\begin{pmatrix} 2 & 4 \ 1 & 2 \end{pmatrix}$ have an inverse? Why or why not?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Compute the determinant first.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Gauss-Jordan</h4>
+<p>Find the inverse of $\begin{pmatrix} 1 & 2 & 1 \ 0 & 1 & 2 \ 1 & 0 & 3 \end{pmatrix}$ using Gaussian elimination on $[A|I]$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Verify identity</h4>
+<p>If $A^{-1} = \begin{pmatrix} 3 & -1 \ -5 & 2 \end{pmatrix}$, compute $(A^{-1})^{-1}$ and verify it equals $A$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Diagonal dominance</h4>
+<p>Let $A$ be a strictly diagonally dominant matrix ( $|a_{ii}| > \sum_{j \neq i} |a_{ij}|$ ). Argue why $A$ must be invertible without computing the inverse.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Consider what happens if $Ax=0$ had a non-zero solution.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Nilpotent inverse</h4>
+<p>A matrix $N$ is nilpotent if $N^k = 0$ for some $k$. Show that $I - N$ is invertible and find its inverse as a finite series.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Consider the geometric series $I + N + N^2 + \dots + N^{k-1}$.</p>
+</div>
+<h2><i class="fa-solid fa-link" style="color:var(--accent)"></i> Properties & Connections</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Transpose of inverse</h4>
+<p>Show that $(A^{-1})^T = (A^T)^{-1}$ by multiplying $A^T$ by $(A^{-1})^T$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Determinant of inverse</h4>
+<p>Using $\det(AA^{-1}) = \det(I)$, derive $\det(A^{-1}) = 1/\det(A)$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Socks and shoes</h4>
+<p>Prove $(ABC)^{-1} = C^{-1} B^{-1} A^{-1}$ for invertible matrices $A, B, C$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Symmetric inverse</h4>
+<p>If $A$ is symmetric and invertible, show $A^{-1}$ is also symmetric.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Take the transpose of $AA^{-1}=I$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Sherman-Morrison</h4>
+<p>Let $A$ be invertible and $u, v$ be column vectors. Prove the Sherman-Morrison formula: $(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^T A^{-1}}{1 + v^T A^{-1} u}$, assuming the denominator is non-zero.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Multiply the right-hand side by $(A + uv^T)$ and simplify.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Determinant of sum</h4>
+<p>Give a counterexample showing $\det(A+B) \neq \det(A) + \det(B)$ in general. Then find a special case where equality holds.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Try $2 \times 2$ diagonal matrices.</p>
+</div>
+<h2><i class="fa-solid fa-table-cells" style="color:var(--accent)"></i> Adjugate Method</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Cofactor sign</h4>
+<p>What is the sign of the cofactor $C_{23}$ in a $3 \times 3$ matrix?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Compute $(-1)^{2+3}$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Adjugate of identity</h4>
+<p>What is $\text{adj}(I_3)$?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> All minors of $I$ are 0 or 1.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Adjugate by hand</h4>
+<p>For $A = \begin{pmatrix} 2 & 0 \ 0 & 5 \end{pmatrix}$, compute $\text{adj}(A)$ and verify $A \cdot \text{adj}(A) = \det(A) I$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Adjugate of inverse</h4>
+<p>Prove that $\text{adj}(A^{-1}) = \text{adj}(A)^{-1}$ for invertible $A$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use $A^{-1} = \text{adj}(A)/\det(A)$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Rank-1 update adjugate</h4>
+<p>If $A$ is $n \times n$ and rank $n-1$, show that $\text{adj}(A)$ has rank 1.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use the fact that $A \cdot \text{adj}(A) = \det(A) I = 0$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Derivative of determinant</h4>
+<p>For invertible $A$, prove $\frac{d}{dt} \det(A(t)) = \det(A(t)) \cdot \text{tr}(A(t)^{-1} A&apos;(t))$.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use the adjugate formula and properties of trace.</p>
+</div>
+<h2><i class="fa-solid fa-bug" style="color:var(--danger)"></i> Numerical Pitfalls</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Condition number meaning</h4>
+<p>If $\kappa(A) = 10^8$, how many digits of accuracy might you lose when solving $Ax=b$ in double precision (16 digits)?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Roughly $\log_{10}(\kappa)$ digits are lost.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Determinant vs condition</h4>
+<p>Give a $2 \times 2$ diagonal matrix with a very small determinant but a condition number of 1. What does this teach us?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Try $D = \text{diag}(10^{-8}, 10^{-8})$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Catastrophic cancellation</h4>
+<p>Consider $A = \begin{pmatrix} 1 & 1 \ 1 & 1.0001 \end{pmatrix}$. Compute its condition number and explain why solving $Ax=b$ is sensitive to small changes in $b$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Hilbert experiment</h4>
+<p>In Python, compute the inverse of the $10 \times 10$ Hilbert matrix using NumPy. Then compute $H \cdot H^{-1}$. How close is it to $I$?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use <code>scipy.linalg.hilbert</code>.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Cholesky vs Inverse</h4>
+<p>Explain why solving $\Sigma w = \mathbf{1}$ via Cholesky decomposition ($\Sigma = LL^T$) is superior to computing $\Sigma^{-1}$ explicitly for a positive definite covariance matrix.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Cholesky is $O(n^3/3)$ and numerically stable; explicit inverse is slower and amplifies errors.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Regularization</h4>
+<p>A covariance matrix estimated from $T$ time periods and $n$ assets with $n > T$ is singular. Describe how ridge regularization $\Sigma + \lambda I$ fixes invertibility and what it does to the eigenvalues.</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Adding $\lambda I$ shifts all eigenvalues up by $\lambda$.</p>
+</div>
+<h2><i class="fa-solid fa-chart-pie" style="color:var(--accent)"></i> Quant Applications</h2>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>GMVP formula</h4>
+<p>Write the formula for the Global Minimum Variance Portfolio weights $w_{\text{GMVP}}$ using $\Sigma^{-1}$. What constraint does it satisfy?</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-easy"><i class="fa-solid fa-star"></i> Easy</span>
+<h4>Risk contribution</h4>
+<p>If asset $i$ has $w_i = 0$, what is its component contribution to risk $\text{CCoR}_i$? Explain intuitively.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Two-asset portfolio</h4>
+<p>For two assets with covariance matrix $\Sigma = \begin{pmatrix} \sigma_1^2 & \rho\sigma_1\sigma_2 \ \rho\sigma_1\sigma_2 & \sigma_2^2 \end{pmatrix}$, derive the GMVP weights analytically using $\Sigma^{-1}$.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-medium"><i class="fa-solid fa-star"></i> Medium</span>
+<h4>Leverage constraint</h4>
+<p>In mean-variance optimization, if we replace $w^T \mathbf{1} = 1$ with $w^T \mathbf{1} = 0$ (dollar-neutral), how does the Lagrangian change and what does $\Sigma^{-1}$ still provide?</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Eigenportfolio</h4>
+<p>Show that the eigenvectors of $\Sigma$ define uncorrelated portfolios (eigenportfolios). If $\Sigma = Q \Lambda Q^T$, what is $\Sigma^{-1}$ in terms of $Q$ and $\Lambda$? How does this simplify risk decomposition?</p>
+<p style="color:#64748b;font-size:0.9rem;margin-top:8px;"><strong>Hint:</strong> Use the spectral decomposition.</p>
+</div>
+<div class="problem-box"><span class="tier-label tier-hard"><i class="fa-solid fa-star"></i> Hard</span>
+<h4>Ledoit-Wolf shrinkage</h4>
+<p>Explain why sample covariance matrices are noisy and how shrinkage estimators blend the sample covariance with a structured target (e.g., identity) to improve conditioning and invertibility.</p>
+</div>
+</section>
+<section id="resources" class="tab-content">
+<h1 class="page-title">External Resources</h1>
+<p class="page-desc">Curated links to deepen your understanding. All resources are free and high-quality. Bookmark these.</p>
+<h2><i class="fa-solid fa-book-open" style="color:var(--accent)"></i> Textbooks &amp; Lecture Notes</h2>
+<a class="resource-link" href="https://math.mit.edu/~gs/linearalgebra/" target="_blank"><i class="fa-solid fa-book"></i><div><strong>MIT 18.06 Linear Algebra</strong> — Gilbert Strang</div></a>
+<a class="resource-link" href="https://www.khanacademy.org/math/linear-algebra" target="_blank"><i class="fa-solid fa-graduation-cap"></i><div><strong>Khan Academy: Linear Algebra</strong> — Video series from basics to eigenvalues</div></a>
+<a class="resource-link" href="https://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf" target="_blank"><i class="fa-solid fa-file-pdf"></i><div><strong>CMU Linear Algebra Review</strong> — Concise reference for ML/Quant students</div></a>
+<h2><i class="fa-solid fa-laptop-code" style="color:var(--accent)"></i> Interactive Tools</h2>
+<a class="resource-link" href="https://www.desmos.com/matrix" target="_blank"><i class="fa-solid fa-calculator"></i><div><strong>Desmos Matrix Calculator</strong> — Visual matrix operations</div></a>
+<a class="resource-link" href="https://matrixcalc.org/" target="_blank"><i class="fa-solid fa-calculator"></i><div><strong>Matrix Calculator</strong> — Step-by-step determinant, inverse, adjugate</div></a>
+<a class="resource-link" href="https://setosa.io/ev/eigenvectors-and-eigenvalues/" target="_blank"><i class="fa-solid fa-eye"></i><div><strong>Setosa: Eigenvectors &amp; Eigenvalues</strong> — Beautiful interactive visualization</div></a>
+<h2><i class="fa-solid fa-chart-line" style="color:var(--accent)"></i> Quant Finance Specific</h2>
+<a class="resource-link" href="https://quant.stackexchange.com/" target="_blank"><i class="fa-brands fa-stack-exchange"></i><div><strong>Quantitative Finance Stack Exchange</strong> — Community Q&amp;A</div></a>
+<a class="resource-link" href="https://www.quantopian.com/lectures" target="_blank"><i class="fa-solid fa-university"></i><div><strong>Quantopian Lectures (Archive)</strong> — Portfolio theory and risk models</div></a>
+<a class="resource-link" href="https://arxiv.org/list/q-fin.PM/recent" target="_blank"><i class="fa-solid fa-file-lines"></i><div><strong>arXiv q-fin.PM</strong> — Latest portfolio management research</div></a>
+<h2><i class="fa-solid fa-code" style="color:var(--accent)"></i> Python &amp; NumPy References</h2>
+<a class="resource-link" href="https://numpy.org/doc/stable/reference/routines.linalg.html" target="_blank"><i class="fa-brands fa-python"></i><div><strong>NumPy Linear Algebra</strong> — Official documentation</div></a>
+<a class="resource-link" href="https://docs.scipy.org/doc/scipy/reference/linalg.html" target="_blank"><i class="fa-brands fa-python"></i><div><strong>SciPy Linear Algebra</strong> — Advanced solvers and decompositions</div></a>
+<h2><i class="fa-solid fa-video" style="color:var(--accent)"></i> YouTube Channels</h2>
+<a class="resource-link" href="https://www.youtube.com/@3blue1brown" target="_blank"><i class="fa-brands fa-youtube"></i><div><strong>3Blue1Brown</strong> — Essence of Linear Algebra series</div></a>
+<a class="resource-link" href="https://www.youtube.com/@patrickjmt" target="_blank"><i class="fa-brands fa-youtube"></i><div><strong>PatrickJMT</strong> — Determinants and matrix examples</div></a>
+</section>
+</div>
+</main>
+</div>
+<script>
+const tabs = [
+  {id:"roadmap", label:"Roadmap & Prerequisites", icon:"fa-map"},
+  {id:"determinants", label:"Determinants", icon:"fa-shapes"},
+  {id:"inverses", label:"Matrix Inverses", icon:"fa-rotate-left"},
+  {id:"adjugate", label:"Adjugate Method", icon:"fa-table-cells"},
+  {id:"properties", label:"Properties & Connections", icon:"fa-link"},
+  {id:"pitfalls", label:"Numerical Pitfalls", icon:"fa-bug"},
+  {id:"quant", label:"Quant Applications", icon:"fa-chart-pie"},
+  {id:"labs", label:"Python Labs", icon:"fa-flask"},
+  {id:"practice", label:"Practice Arena", icon:"fa-dumbbell"},
+  {id:"resources", label:"External Resources", icon:"fa-book-open"}
+];
+
+const navMenu = document.querySelector(".nav-menu");
+tabs.forEach((tab, idx) => {
+  const div = document.createElement("div");
+  div.className = "nav-item" + (idx===0?" active":"");
+  div.dataset.target = tab.id;
+  div.innerHTML = `<i class="fa-solid ${tab.icon}"></i><span>${tab.label}</span>`;
+  div.addEventListener("click", () => switchTab(tab.id));
+  navMenu.appendChild(div);
+});
+
+function switchTab(targetId) {
+  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+  document.getElementById(targetId).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+  document.querySelector(`.nav-item[data-target="${targetId}"]`).classList.add("active");
+  document.querySelector(".main-content").scrollTop = 0;
+}
+
+// Keyboard navigation: arrow keys cycle tabs
+document.addEventListener("keydown", e => {
+  const active = document.querySelector(".nav-item.active");
+  const items = Array.from(document.querySelectorAll(".nav-item"));
+  let idx = items.indexOf(active);
+  if (e.key === "ArrowDown") { idx = (idx + 1) % items.length; switchTab(items[idx].dataset.target); }
+  if (e.key === "ArrowUp") { idx = (idx - 1 + items.length) % items.length; switchTab(items[idx].dataset.target); }
+});
+
+// Initialize Mermaid diagrams
+mermaid.initialize({ startOnLoad: true, theme: "default" });
+</script>
+</body>
+</html>

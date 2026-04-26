@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orthogonality & Gram-Schmidt: Complete Quant Study Guide</title>
+<style>
+:root {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --bg-code: #0b1220;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --accent: #38bdf8;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --border: #334155;
+  --gradient: linear-gradient(135deg, #38bdf8 0%, #a78bfa 100%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+header {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(180deg, rgba(56,189,248,0.1) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+header h1 {
+  font-size: 2.5rem;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+header p { color: var(--text-dim); font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+
+/* Tabs */
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 30px;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tab-btn {
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+}
+.tab-btn:hover { color: var(--text); background: rgba(56,189,248,0.1); }
+.tab-btn.active { 
+  background: var(--gradient); 
+  color: #fff; 
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(56,189,248,0.3);
+}
+.tab-content { display: none; animation: fadeIn 0.4s; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+.card h2 {
+  color: var(--accent);
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card h3 {
+  color: var(--accent2);
+  font-size: 1.25rem;
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.card h4 { color: var(--accent3); margin: 20px 0 10px; font-size: 1.1rem; }
+
+/* Math blocks */
+.math-block {
+  background: var(--bg-code);
+  border-left: 4px solid var(--accent);
+  padding: 16px 20px;
+  margin: 16px 0;
+  border-radius: 0 8px 8px 0;
+  font-family: 'Courier New', monospace;
+  font-size: 1.05rem;
+  overflow-x: auto;
+  color: #f0f9ff;
+}
+.math-inline {
+  background: rgba(56,189,248,0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  color: var(--accent);
+}
+
+/* Code blocks */
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 16px 0;
+  position: relative;
+}
+code {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(56,189,248,0.1);
+  padding: 8px 16px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+.code-block-wrapper { margin: 16px 0; border-radius: 10px; overflow: hidden; }
+
+/* Diagrams */
+.diagram-container {
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  text-align: center;
+}
+.diagram-title {
+  color: var(--accent2);
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+/* Exercise tiers */
+.exercise-tier {
+  margin: 20px 0;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.tier-easy { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); }
+.tier-medium { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); }
+.tier-hard { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.3); }
+.tier-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.tier-easy .tier-label { background: rgba(52,211,153,0.2); color: var(--accent3); }
+.tier-medium .tier-label { background: rgba(251,191,36,0.2); color: var(--warn); }
+.tier-hard .tier-label { background: rgba(248,113,113,0.2); color: var(--danger); }
+.exercise { margin: 12px 0; padding-left: 20px; }
+.exercise::marker { color: var(--accent); }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.95rem;
+}
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  background: rgba(56,189,248,0.1);
+  color: var(--accent);
+  font-weight: 600;
+}
+tr:hover { background: rgba(255,255,255,0.02); }
+
+/* Lists */
+ul, ol { margin: 12px 0 12px 24px; }
+li { margin: 8px 0; }
+
+/* Callouts */
+.callout {
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin: 16px 0;
+  border-left: 4px solid;
+}
+.callout-info { background: rgba(56,189,248,0.1); border-color: var(--accent); }
+.callout-warn { background: rgba(251,191,36,0.1); border-color: var(--warn); }
+.callout-success { background: rgba(52,211,153,0.1); border-color: var(--accent3); }
+.callout-danger { background: rgba(248,113,113,0.1); border-color: var(--danger); }
+.callout-title { font-weight: 700; margin-bottom: 6px; }
+
+/* Roadmap */
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 24px 0;
+}
+.roadmap-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.roadmap-step::before {
+  content: attr(data-step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--gradient);
+  border-radius: 50%;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.roadmap-content h4 { margin: 0 0 4px; color: var(--accent); }
+.roadmap-content p { margin: 0; color: var(--text-dim); font-size: 0.95rem; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.8rem; }
+  .tab-btn { padding: 8px 12px; font-size: 0.8rem; }
+  .card { padding: 18px; }
+}
+
+/* Print */
+@media print {
+  .tab-nav { display: none; }
+  .tab-content { display: block !important; }
+  body { background: #fff; color: #000; }
+}
+
+/* Interactive SVG hover */
+svg .hover-group { cursor: pointer; transition: opacity 0.3s; }
+svg .hover-group:hover { opacity: 0.8; }
+.tooltip {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Orthogonality & Gram-Schmidt</h1>
+  <p>A comprehensive, visual, and interactive study guide for aspiring quant engineers. From inner products to QR decomposition, risk factor orthogonalization, and stable regression — fully offline-capable.</p>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab(0)">Prerequisites</button>
+  <button class="tab-btn" onclick="showTab(1)">Inner Products</button>
+  <button class="tab-btn" onclick="showTab(2)">Orthogonal Vectors</button>
+  <button class="tab-btn" onclick="showTab(3)">Projections</button>
+  <button class="tab-btn" onclick="showTab(4)">Gram-Schmidt</button>
+  <button class="tab-btn" onclick="showTab(5)">QR Decomposition</button>
+  <button class="tab-btn" onclick="showTab(6)">Quant Applications</button>
+  <button class="tab-btn" onclick="showTab(7)">Colab Labs</button>
+  <button class="tab-btn" onclick="showTab(8)">Exercises</button>
+</nav>
+
+<!-- ==================== TAB 0: PREREQUISITES ==================== -->
+<div class="tab-content active" id="tab-0">
+  <div class="card">
+    <h2>Prerequisites & Learning Roadmap</h2>
+    <p>Before diving into orthogonality, you need a solid foundation. Think of these as the "alphabet" before you can read the "sentences" of linear algebra. Each concept below is explained in the simplest possible terms.</p>
+
+    <div class="roadmap">
+      <div class="roadmap-step" data-step="0">
+        <div class="roadmap-content">
+          <h4>Vectors & Vector Spaces</h4>
+          <p>A <strong>vector</strong> is just an arrow with magnitude and direction, or a list of numbers. A <strong>vector space</strong> is a collection of vectors where you can add them and scale them, and the result stays in the collection. Think of it as a "playground" where vectors live.</p>
+        </div>
+      </div>
+      <div class="roadmap-step" data-step="1">
+        <div class="roadmap-content">
+          <h4>Linear Independence</h4>
+          <p>Vectors are <strong>linearly independent</strong> if none of them can be built from the others. If one vector is just a scaled copy of another, they are <strong>dependent</strong>. Independence means each vector brings genuinely new information.</p>
+        </div>
+      </div>
+      <div class="roadmap-step" data-step="2">
+        <div class="roadmap-content">
+          <h4>Span & Basis</h4>
+          <p>The <strong>span</strong> of vectors is all possible vectors you can reach by combining them. A <strong>basis</strong> is the smallest set of independent vectors that can reach every point in the space. It is like a coordinate system.</p>
+        </div>
+      </div>
+      <div class="roadmap-step" data-step="3">
+        <div class="roadmap-content">
+          <h4>Matrices as Transformations</h4>
+          <p>A <strong>matrix</strong> is a grid of numbers that acts like a function: it takes a vector and transforms it (rotates, stretches, projects). Matrix multiplication is applying one transformation after another.</p>
+        </div>
+      </div>
+      <div class="roadmap-step" data-step="4">
+        <div class="roadmap-content">
+          <h4>Transpose (A<sup>T</sup>)</h4>
+          <p>The <strong>transpose</strong> flips a matrix over its diagonal: rows become columns. It is crucial because <span class="math-inline">(AB)<sup>T</sup> = B<sup>T</sup>A<sup>T</sup></span>, and it connects dot products to matrix form: <span class="math-inline">u<sup>T</sup>v</span>.</p>
+        </div>
+      </div>
+      <div class="roadmap-step" data-step="5">
+        <div class="roadmap-content">
+          <h4>Norms (Length of a Vector)</h4>
+          <p>The <strong>norm</strong> (or length) of a vector <span class="math-inline">v</span> is <span class="math-inline">||v|| = sqrt(v<sub>1</sub><sup>2</sup> + v<sub>2</sub><sup>2</sup> + ...)</span>. It measures "how big" a vector is. A vector with norm 1 is called a <strong>unit vector</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">Why this order matters</div>
+      <p>You cannot understand orthogonality without knowing what a dot product is. You cannot understand projections without orthogonality. You cannot understand Gram-Schmidt without projections. And you cannot understand QR without Gram-Schmidt. This guide follows this exact dependency chain.</p>
+    </div>
+
+    <h3>Quick Reference: Notation</h3>
+    <table>
+      <tr><th>Symbol</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td><span class="math-inline">v, u, w</span></td><td>Vectors (bold in texts, plain here)</td><td><span class="math-inline">v = [1, 2, 3]</span></td></tr>
+      <tr><td><span class="math-inline">A, B, Q, R</span></td><td>Matrices</td><td><span class="math-inline">A is m x n</span></td></tr>
+      <tr><td><span class="math-inline">v<sup>T</sup></span></td><td>Transpose of v (row vector)</td><td><span class="math-inline">[1,2]<sup>T</sup> = [[1],[2]]</span></td></tr>
+      <tr><td><span class="math-inline">||v||</span></td><td>Norm (length) of v</td><td><span class="math-inline">||[3,4]|| = 5</span></td></tr>
+      <tr><td><span class="math-inline">R<sup>n</sup></span></td><td>n-dimensional real space</td><td><span class="math-inline">R<sup>2</sup> is the plane</span></td></tr>
+      <tr><td><span class="math-inline">span{v<sub>1</sub>,...,v<sub>k</sub>}</span></td><td>All linear combinations of these vectors</td><td>Like a subspace "sheet"</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== TAB 1: INNER PRODUCTS ==================== -->
+<div class="tab-content" id="tab-1">
+  <div class="card">
+    <h2>1. Inner Products: The Foundation of Everything</h2>
+    <p>The <strong>inner product</strong> is the single most important operation in this entire guide. It is a way to multiply two vectors and get a single number. That number tells you "how much" the vectors point in the same direction.</p>
+
+    <h3>1.1 What is an Inner Product?</h3>
+    <p>Formally, an inner product is a function that takes two vectors and returns a scalar (a number), satisfying four rules:</p>
+    <ol>
+      <li><strong>Symmetry:</strong> <span class="math-inline">&lt;u, v&gt; = &lt;v, u&gt;</span></li>
+      <li><strong>Linearity:</strong> <span class="math-inline">&lt;au + bw, v&gt; = a&lt;u,v&gt; + b&lt;w,v&gt;</span></li>
+      <li><strong>Positive-definite:</strong> <span class="math-inline">&lt;v, v&gt; >= 0</span>, and equals 0 only if <span class="math-inline">v = 0</span></li>
+    </ol>
+
+    <h3>1.2 The Dot Product (Standard Inner Product)</h3>
+    <p>In <span class="math-inline">R<sup>n</sup></span>, the most common inner product is the <strong>dot product</strong>:</p>
+    <div class="math-block">
+      u · v = u<sup>T</sup>v = u<sub>1</sub>v<sub>1</sub> + u<sub>2</sub>v<sub>2</sub> + ... + u<sub>n</sub>v<sub>n</sub>
+    </div>
+    <p><strong>Intuition:</strong> Multiply matching components and sum. If both vectors point "the same way," the sum is large and positive. If they point "opposite ways," it is negative. If they are perpendicular, it is zero.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Figure 1.1: Geometric Meaning of Dot Product</div>
+      <svg width="500" height="280" viewBox="0 0 500 280">
+        <!-- Grid -->
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="500" height="280" fill="url(#grid)" />
+
+        <!-- Axes -->
+        <line x1="40" y1="240" x2="480" y2="240" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="40" y1="240" x2="40" y2="20" stroke="#94a3b8" stroke-width="2"/>
+        <text x="470" y="260" fill="#94a3b8" font-size="14">x</text>
+        <text x="25" y="25" fill="#94a3b8" font-size="14">y</text>
+
+        <!-- Vector u -->
+        <line x1="40" y1="240" x2="200" y2="120" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrow)"/>
+        <text x="210" y="115" fill="#38bdf8" font-weight="bold" font-size="16">u</text>
+
+        <!-- Vector v -->
+        <line x1="40" y1="240" x2="320" y2="180" stroke="#a78bfa" stroke-width="3" marker-end="url(#arrow)"/>
+        <text x="330" y="185" fill="#a78bfa" font-weight="bold" font-size="16">v</text>
+
+        <!-- Angle arc -->
+        <path d="M 90 240 A 50 50 0 0 0 75 210" fill="none" stroke="#fbbf24" stroke-width="2"/>
+        <text x="100" y="225" fill="#fbbf24" font-size="14">θ</text>
+
+        <!-- Projection line -->
+        <line x1="200" y1="120" x2="260" y2="150" stroke="#34d399" stroke-width="2" stroke-dasharray="5,5"/>
+        <text x="265" y="145" fill="#34d399" font-size="13">projection</text>
+
+        <!-- Formula box -->
+        <rect x="280" y="30" width="190" height="60" rx="8" fill="#1e293b" stroke="#334155"/>
+        <text x="295" y="55" fill="#e2e8f0" font-size="14">u·v = ||u|| ||v|| cos(θ)</text>
+        <text x="295" y="78" fill="#94a3b8" font-size="12">= u₁v₁ + u₂v₂</text>
+
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;">
+        <strong>Key insight:</strong> The dot product encodes both lengths and the angle between vectors. When θ = 90°, cos(θ) = 0, so u·v = 0. This is the geometric origin of orthogonality.
+      </p>
+    </div>
+
+    <h3>1.3 Inner Product as "Overlap"</h3>
+    <p>Think of the dot product as measuring <strong>overlap</strong> or <strong>agreement</strong>:</p>
+    <ul>
+      <li><span class="math-inline">u·v &gt; 0</span>: Vectors point in generally the same direction (acute angle)</li>
+      <li><span class="math-inline">u·v &lt; 0</span>: Vectors point in generally opposite directions (obtuse angle)</li>
+      <li><span class="math-inline">u·v = 0</span>: Vectors are perpendicular (orthogonal) — <strong>no overlap at all</strong></li>
+    </ul>
+
+    <h3>1.4 General Inner Products (Beyond Dot Product)</h3>
+    <p>In quant finance, we often need weighted inner products. For example, if different assets have different variances, we might define:</p>
+    <div class="math-block">
+      &lt;u, v&gt;<sub>W</sub> = u<sup>T</sup>Wv
+    </div>
+    <p>where <span class="math-inline">W</span> is a positive-definite weight matrix (often the inverse covariance matrix in portfolio theory). This is called a <strong>Mahalanobis-like inner product</strong>.</p>
+
+    <div class="callout callout-success">
+      <div class="callout-title">Quant Connection</div>
+      <p>In portfolio theory, the "overlap" between two return streams is their covariance. Covariance is essentially an inner product centered at the mean. When we orthogonalize risk factors, we are making their covariances (inner products) equal to zero.</p>
+    </div>
+
+    <h3>1.5 Properties You Must Memorize</h3>
+    <table>
+      <tr><th>Property</th><th>Formula</th><th>Why it matters</th></tr>
+      <tr><td>Cauchy-Schwarz</td><td>|<span class="math-inline">&lt;u,v&gt;</span>| ≤ ||u|| ||v||</td><td>Bounds correlation; equality when vectors are parallel</td></tr>
+      <tr><td>Relation to norm</td><td>||v||<sup>2</sup> = <span class="math-inline">&lt;v,v&gt;</span></td><td>Length comes from inner product with itself</td></tr>
+      <tr><td>Matrix form</td><td><span class="math-inline">&lt;u,v&gt;</span> = u<sup>T</sup>v</td><td>Lets us use matrix algebra tools</td></tr>
+      <tr><td>Bilinearity</td><td><span class="math-inline">&lt;au+bv, w&gt;</span> = a<span class="math-inline">&lt;u,w&gt;</span> + b<span class="math-inline">&lt;v,w&gt;</span></td><td>Foundation for linear regression projections</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>1.6 Worked Example: Computing a Dot Product</h3>
+    <p>Let <span class="math-inline">u = [2, 3]</span> and <span class="math-inline">v = [4, 1]</span> in R<sup>2</sup>.</p>
+    <div class="math-block">
+      u·v = (2)(4) + (3)(1) = 8 + 3 = 11
+    </div>
+    <p>Now compute norms:</p>
+    <div class="math-block">
+      ||u|| = sqrt(4 + 9) = sqrt(13) ≈ 3.606<br>
+      ||v|| = sqrt(16 + 1) = sqrt(17) ≈ 4.123
+    </div>
+    <p>Therefore, the angle between them:</p>
+    <div class="math-block">
+      cos(θ) = 11 / (3.606 × 4.123) ≈ 11 / 14.87 ≈ 0.739<br>
+      θ ≈ arccos(0.739) ≈ 42.3°
+    </div>
+    <p>Since the dot product is positive, the angle is acute (less than 90°).</p>
+  </div>
+</div>
+
+<!-- ==================== TAB 2: ORTHOGONAL VECTORS ==================== -->
+<div class="tab-content" id="tab-2">
+  <div class="card">
+    <h2>2. Orthogonal & Orthonormal Vectors</h2>
+    <p>Now that we understand inner products, we can define the core concepts of this guide. <strong>Orthogonal</strong> means "perpendicular" in higher dimensions. <strong>Orthonormal</strong> means "perpendicular AND unit length."</p>
+
+    <h3>2.1 Definition: Orthogonal Vectors</h3>
+    <p>Two vectors <span class="math-inline">u</span> and <span class="math-inline">v</span> are <strong>orthogonal</strong> if their inner product is zero:</p>
+    <div class="math-block">
+      u ⊥ v  ⟺  &lt;u, v&gt; = 0
+    </div>
+    <p><strong>Intuition:</strong> They have "nothing in common." No component of one lies along the other. In 2D, this means a 90° angle. In 100D, it means the same thing — just harder to visualize.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Figure 2.1: Orthogonal vs Non-Orthogonal Vectors</div>
+      <svg width="600" height="280" viewBox="0 0 600 280">
+        <rect width="600" height="280" fill="#0b1220"/>
+
+        <!-- Left panel: Orthogonal -->
+        <text x="130" y="30" fill="#34d399" font-weight="bold" font-size="16">ORTHOGONAL (90°)</text>
+        <line x1="60" y1="240" x2="220" y2="240" stroke="#475569" stroke-width="1"/>
+        <line x1="60" y1="240" x2="60" y2="60" stroke="#475569" stroke-width="1"/>
+        <rect x="55" y="235" width="10" height="10" fill="none" stroke="#fbbf24" stroke-width="2"/>
+
+        <!-- e1 -->
+        <line x1="60" y1="240" x2="200" y2="240" stroke="#38bdf8" stroke-width="3" marker-end="url(#arr2)"/>
+        <text x="205" y="245" fill="#38bdf8" font-weight="bold">e₁ = [1,0]</text>
+        <!-- e2 -->
+        <line x1="60" y1="240" x2="60" y2="90" stroke="#a78bfa" stroke-width="3" marker-end="url(#arr2)"/>
+        <text x="35" y="85" fill="#a78bfa" font-weight="bold">e₂ = [0,1]</text>
+
+        <text x="60" y="265" fill="#94a3b8" font-size="13">e₁·e₂ = 0</text>
+
+        <!-- Right panel: Not orthogonal -->
+        <text x="430" y="30" fill="#f87171" font-weight="bold" font-size="16">NOT ORTHOGONAL</text>
+        <line x1="360" y1="240" x2="520" y2="240" stroke="#475569" stroke-width="1"/>
+        <line x1="360" y1="240" x2="360" y2="60" stroke="#475569" stroke-width="1"/>
+
+        <line x1="360" y1="240" x2="500" y2="240" stroke="#38bdf8" stroke-width="3" marker-end="url(#arr2)"/>
+        <text x="505" y="245" fill="#38bdf8" font-weight="bold">a = [2,0]</text>
+        <line x1="360" y1="240" x2="460" y2="120" stroke="#a78bfa" stroke-width="3" marker-end="url(#arr2)"/>
+        <text x="465" y="115" fill="#a78bfa" font-weight="bold">b = [1,1]</text>
+
+        <path d="M 390 240 A 30 30 0 0 0 380 220" fill="none" stroke="#fbbf24" stroke-width="2"/>
+        <text x="395" y="225" fill="#fbbf24" font-size="13">45°</text>
+        <text x="360" y="265" fill="#94a3b8" font-size="13">a·b = 2 ≠ 0</text>
+
+        <defs>
+          <marker id="arr2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3>2.2 Definition: Orthonormal Vectors</h3>
+    <p>A set of vectors is <strong>orthonormal</strong> if:</p>
+    <ol>
+      <li>Every pair is orthogonal: <span class="math-inline">&lt;q<sub>i</sub>, q<sub>j</sub>&gt; = 0</span> for <span class="math-inline">i ≠ j</span></li>
+      <li>Every vector has unit length: <span class="math-inline">||q<sub>i</sub>|| = 1</span> for all <span class="math-inline">i</span></li>
+    </ol>
+    <div class="math-block">
+      &lt;q<sub>i</sub>, q<sub>j</sub>&gt; = δ<sub>ij</sub> = { 1 if i=j, 0 if i≠j }
+    </div>
+    <p>The symbol <span class="math-inline">δ<sub>ij</sub></span> is the <strong>Kronecker delta</strong>. It is a compact way to write both conditions at once.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">The Standard Basis is Orthonormal</div>
+      <p>In R<sup>3</sup>, the vectors <span class="math-inline">e<sub>1</sub> = [1,0,0]</span>, <span class="math-inline">e<sub>2</sub> = [0,1,0]</span>, <span class="math-inline">e<sub>3</sub> = [0,0,1]</span> are orthonormal. They are the "default" coordinate axes. But orthonormal bases are not unique — there are infinitely many rotated versions!</p>
+    </div>
+
+    <h3>2.3 Why Orthonormal Bases Are Magical</h3>
+    <p>Suppose <span class="math-inline">{q<sub>1</sub>, q<sub>2</sub>, ..., q<sub>n</sub>}</span> is an orthonormal basis. Any vector <span class="math-inline">v</span> can be written as:</p>
+    <div class="math-block">
+      v = c<sub>1</sub>q<sub>1</sub> + c<sub>2</sub>q<sub>2</sub> + ... + c<sub>n</sub>q<sub>n</sub>
+    </div>
+    <p>Here is the magic: to find any coefficient <span class="math-inline">c<sub>i</sub></span>, just take the inner product!</p>
+    <div class="math-block">
+      c<sub>i</sub> = &lt;v, q<sub>i</sub>&gt;
+    </div>
+    <p><strong>Why?</strong> Because all cross-terms vanish due to orthogonality:</p>
+    <div class="math-block">
+      &lt;v, q<sub>i</sub>&gt; = &lt;c<sub>1</sub>q<sub>1</sub> + ... + c<sub>n</sub>q<sub>n</sub>, q<sub>i</sub>&gt;<br>
+      = c<sub>1</sub>&lt;q<sub>1</sub>,q<sub>i</sub>&gt; + ... + c<sub>i</sub>&lt;q<sub>i</sub>,q<sub>i</sub>&gt; + ... + c<sub>n</sub>&lt;q<sub>n</sub>,q<sub>i</sub>&gt;<br>
+      = 0 + ... + c<sub>i</sub>(1) + ... + 0 = c<sub>i</sub>
+    </div>
+    <p>This makes computations <strong>stable and simple</strong>. No need to solve a system of equations.</p>
+
+    <h3>2.4 Orthogonal Matrices</h3>
+    <p>A square matrix <span class="math-inline">Q</span> is <strong>orthogonal</strong> if its columns are orthonormal. This gives it extraordinary properties:</p>
+    <div class="math-block">
+      Q<sup>T</sup>Q = QQ<sup>T</sup> = I  ⟹  Q<sup>-1</sup> = Q<sup>T</sup>
+    </div>
+    <p><strong>Key implications:</strong></p>
+    <ul>
+      <li><strong>Preserves length:</strong> <span class="math-inline">||Qx|| = ||x||</span> for any vector <span class="math-inline">x</span></li>
+      <li><strong>Preserves angles:</strong> <span class="math-inline">&lt;Qx, Qy&gt; = &lt;x,y&gt;</span></li>
+      <li><strong>Determinant is ±1:</strong> Represents pure rotation or reflection</li>
+      <li><strong>Easy inverse:</strong> Just transpose! No expensive matrix inversion needed</li>
+    </ul>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">Don't confuse "orthogonal matrix" with "orthogonal vectors"</div>
+      <p>An <strong>orthogonal matrix</strong> is a matrix whose <em>columns</em> are orthonormal (not just orthogonal). The naming is slightly misleading — some texts call them "orthonormal matrices" to be precise, but "orthogonal matrix" is standard.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2.5 Worked Example: Checking Orthonormality</h3>
+    <p>Consider these two vectors in R<sup>2</sup>:</p>
+    <div class="math-block">
+      q₁ = [1/√2, 1/√2] ≈ [0.707, 0.707]<br>
+      q₂ = [-1/√2, 1/√2] ≈ [-0.707, 0.707]
+    </div>
+    <p><strong>Step 1:</strong> Check orthogonality (dot product):</p>
+    <div class="math-block">
+      q₁·q₂ = (1/√2)(-1/√2) + (1/√2)(1/√2) = -1/2 + 1/2 = 0 ✓
+    </div>
+    <p><strong>Step 2:</strong> Check unit length:</p>
+    <div class="math-block">
+      ||q₁||² = (1/√2)² + (1/√2)² = 1/2 + 1/2 = 1 ✓<br>
+      ||q₂||² = (-1/√2)² + (1/√2)² = 1/2 + 1/2 = 1 ✓
+    </div>
+    <p>They are orthonormal. They form a 45° rotated coordinate system.</p>
+  </div>
+</div>
+
+<!-- ==================== TAB 3: PROJECTIONS ==================== -->
+<div class="tab-content" id="tab-3">
+  <div class="card">
+    <h2>3. Projections: Decomposing Vectors</h2>
+    <p>A <strong>projection</strong> is the "shadow" that one vector casts onto another (or onto a subspace). Projections are the engine behind Gram-Schmidt, least squares regression, and hedging ratios.</p>
+
+    <h3>3.1 Projection onto a Vector</h3>
+    <p>Given vectors <span class="math-inline">a</span> and <span class="math-inline">b</span>, the projection of <span class="math-inline">b</span> onto <span class="math-inline">a</span> is the closest point to <span class="math-inline">b</span> that lies on the line through <span class="math-inline">a</span>.</p>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Figure 3.1: Projection of b onto a</div>
+      <svg width="500" height="300" viewBox="0 0 500 300">
+        <rect width="500" height="300" fill="#0b1220"/>
+
+        <!-- Line along a -->
+        <line x1="50" y1="250" x2="450" y2="50" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="460" y="45" fill="#334155" font-size="13">line through a</text>
+
+        <!-- Vector a -->
+        <line x1="50" y1="250" x2="350" y2="100" stroke="#38bdf8" stroke-width="3" marker-end="url(#arr3)"/>
+        <text x="360" y="95" fill="#38bdf8" font-weight="bold" font-size="16">a</text>
+
+        <!-- Vector b -->
+        <line x1="50" y1="250" x2="280" y2="80" stroke="#a78bfa" stroke-width="3" marker-end="url(#arr3)"/>
+        <text x="285" y="75" fill="#a78bfa" font-weight="bold" font-size="16">b</text>
+
+        <!-- Projection proj_a(b) -->
+        <line x1="50" y1="250" x2="230" y2="160" stroke="#34d399" stroke-width="4" marker-end="url(#arr3)"/>
+        <text x="180" y="145" fill="#34d399" font-weight="bold" font-size="16">projₐ(b)</text>
+
+        <!-- Error vector e -->
+        <line x1="230" y1="160" x2="280" y2="80" stroke="#f87171" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arr3)"/>
+        <text x="260" y="115" fill="#f87171" font-weight="bold" font-size="14">e = b - projₐ(b)</text>
+
+        <!-- Right angle marker -->
+        <line x1="230" y1="160" x2="245" y2="175" stroke="#fbbf24" stroke-width="2"/>
+        <line x1="245" y1="175" x2="260" y2="160" stroke="#fbbf24" stroke-width="2"/>
+
+        <!-- Formula -->
+        <rect x="280" y="200" width="200" height="80" rx="8" fill="#1e293b" stroke="#334155"/>
+        <text x="295" y="225" fill="#e2e8f0" font-size="14">projₐ(b) = [(a·b)/(a·a)] a</text>
+        <text x="295" y="248" fill="#94a3b8" font-size="12">Error e is ⊥ to a</text>
+        <text x="295" y="268" fill="#94a3b8" font-size="12">a·e = 0</text>
+
+        <defs>
+          <marker id="arr3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+      <p style="color: var(--text-dim); font-size: 0.9rem; margin-top: 10px;">
+        The projection is the component of <strong>b</strong> that lies along <strong>a</strong>. The error vector <strong>e</strong> is what remains — it is orthogonal to <strong>a</strong> by construction. This orthogonality of the error is the key to least squares.
+      </p>
+    </div>
+
+    <h3>3.2 The Projection Formula</h3>
+    <div class="math-block">
+      proj<sub>a</sub>(b) = [(a<sup>T</sup>b) / (a<sup>T</sup>a)] a
+    </div>
+    <p>The scalar <span class="math-inline">(a<sup>T</sup>b)/(a<sup>T</sup>a)</span> is the "amount" of <span class="math-inline">a</span> needed to best approximate <span class="math-inline">b</span>. It is exactly the coefficient you would get in simple linear regression of <span class="math-inline">b</span> on <span class="math-inline">a</span>.</p>
+
+    <h3>3.3 Projection onto a Subspace</h3>
+    <p>What if we want to project onto a <em>plane</em> (or higher-dimensional subspace) spanned by multiple vectors? Let <span class="math-inline">A</span> be a matrix whose columns are the basis vectors of the subspace. The projection of <span class="math-inline">b</span> onto <span class="math-inline">col(A)</span> is:</p>
+    <div class="math-block">
+      proj<sub>col(A)</sub>(b) = A(A<sup>T</sup>A)<sup>-1</sup>A<sup>T</sup>b
+    </div>
+    <p>The matrix <span class="math-inline">P = A(A<sup>T</sup>A)<sup>-1</sup>A<sup>T</sup></span> is called the <strong>projection matrix</strong>. It has special properties:</p>
+    <ul>
+      <li><span class="math-inline">P<sup>2</sup> = P</span> (idempotent: projecting twice is the same as projecting once)</li>
+      <li><span class="math-inline">P<sup>T</sup> = P</span> (symmetric)</li>
+      <li>Eigenvalues are only 0 or 1</li>
+    </ul>
+
+    <div class="callout callout-success">
+      <div class="callout-title">Quant Connection: Hedging Ratios</div>
+      <p>In quant finance, if <span class="math-inline">b</span> is a portfolio return and <span class="math-inline">A</span> contains factor returns (market, size, value), then <span class="math-inline">proj<sub>A</sub>(b)</span> is the <strong>systematic (hedgeable) component</span>, and <span class="math-inline">e = b - proj<sub>A</sub>(b)</span> is the <strong>idiosyncratic (alpha) component</strong>. The coefficients <span class="math-inline">(A<sup>T</sup>A)<sup>-1</sup>A<sup>T</sup>b</span> are the <strong>hedging ratios</strong> — how much of each factor to hold to replicate the portfolio.</p>
+    </div>
+
+    <h3>3.4 When Columns Are Orthonormal</h3>
+    <p>If the columns of <span class="math-inline">A</span> are orthonormal (call it <span class="math-inline">Q</span>), the formula becomes trivially simple:</p>
+    <div class="math-block">
+      Q<sup>T</sup>Q = I  ⟹  proj<sub>col(Q)</sub>(b) = QQ<sup>T</sup>b
+    </div>
+    <p>No matrix inversion needed! This numerical stability is why we orthogonalize before projecting in quant models.</p>
+  </div>
+
+  <div class="card">
+    <h3>3.5 Worked Example: Projection in R²</h3>
+    <p>Let <span class="math-inline">a = [3, 4]</span> and <span class="math-inline">b = [2, 5]</span>.</p>
+    <p><strong>Step 1:</strong> Compute dot products</p>
+    <div class="math-block">
+      a·b = 3(2) + 4(5) = 6 + 20 = 26<br>
+      a·a = 3(3) + 4(4) = 9 + 16 = 25
+    </div>
+    <p><strong>Step 2:</strong> Compute scalar coefficient</p>
+    <div class="math-block">
+      c = 26/25 = 1.04
+    </div>
+    <p><strong>Step 3:</strong> Multiply by a</p>
+    <div class="math-block">
+      proj<sub>a</sub>(b) = 1.04 × [3, 4] = [3.12, 4.16]
+    </div>
+    <p><strong>Step 4:</strong> Compute error and verify orthogonality</p>
+    <div class="math-block">
+      e = b - proj<sub>a</sub>(b) = [2,5] - [3.12,4.16] = [-1.12, 0.84]<br>
+      a·e = 3(-1.12) + 4(0.84) = -3.36 + 3.36 = 0 ✓
+    </div>
+    <p>The error is indeed orthogonal to <span class="math-inline">a</span>. This verifies our projection is correct.</p>
+  </div>
+</div>
+
+<!-- ==================== TAB 4: GRAM-SCHMIDT ==================== -->
+<div class="tab-content" id="tab-4">
+  <div class="card">
+    <h2>4. Gram-Schmidt Process: Building Orthonormal Bases</h2>
+    <p>The <strong>Gram-Schmidt process</strong> is an algorithm that takes a set of linearly independent vectors and converts them into an orthonormal set with the same span. It is the bridge from "any basis" to "a perfect basis."</p>
+
+    <h3>4.1 The Core Idea</h3>
+    <p>Given vectors <span class="math-inline">{a<sub>1</sub>, a<sub>2</sub>, ..., a<sub>n</sub>}</span>, we want to produce <span class="math-inline">{q<sub>1</sub>, q<sub>2</sub>, ..., q<sub>n</sub>}</span> such that:</p>
+    <ul>
+      <li>Each <span class="math-inline">q<sub>i</sub></span> has unit length</li>
+      <li><span class="math-inline">q<sub>i</sub> ⊥ q<sub>j</sub></span> for all <span class="math-inline">i ≠ j</span></li>
+      <li><span class="math-inline">span{a<sub>1</sub>,...,a<sub>k</sub>} = span{q<sub>1</sub>,...,q<sub>k</sub>}</span> for every <span class="math-inline">k</span></li>
+    </ul>
+    <p><strong>The strategy:</strong> Process vectors one by one. For each new vector, subtract its projection onto all previously built q's. What remains is orthogonal to everything before it. Then normalize.</p>
+
+    <h3>4.2 The Algorithm (Step by Step)</h3>
+    <div class="math-block">
+      <strong>Step 1:</strong> u₁ = a₁,   q₁ = u₁ / ||u₁||<br><br>
+      <strong>Step 2:</strong> u₂ = a₂ - proj<sub>q₁</sub>(a₂) = a₂ - (q₁<sup>T</sup>a₂)q₁,   q₂ = u₂ / ||u₂||<br><br>
+      <strong>Step 3:</strong> u₃ = a₃ - proj<sub>q₁</sub>(a₃) - proj<sub>q₂</sub>(a₃) = a₃ - (q₁<sup>T</sup>a₃)q₁ - (q₂<sup>T</sup>a₃)q₂,   q₃ = u₃ / ||u₃||<br><br>
+      <strong>Step k:</strong> u<sub>k</sub> = a<sub>k</sub> - Σ<sub>i=1</sub><sup>k-1</sup> (q<sub>i</sub><sup>T</sup>a<sub>k</sub>)q<sub>i</sub>,   q<sub>k</sub> = u<sub>k</sub> / ||u<sub>k</sub>||
+    </div>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Figure 4.1: Gram-Schmidt Visualization in R²</div>
+      <svg width="650" height="320" viewBox="0 0 650 320">
+        <rect width="650" height="320" fill="#0b1220"/>
+
+        <!-- Panel 1: Original vectors -->
+        <text x="110" y="30" fill="#e2e8f0" font-weight="bold" font-size="14">1. Start with a₁, a₂</text>
+        <line x1="50" y1="280" x2="180" y2="120" stroke="#38bdf8" stroke-width="3" marker-end="url(#arr4)"/>
+        <text x="185" y="115" fill="#38bdf8" font-weight="bold">a₁</text>
+        <line x1="50" y1="280" x2="220" y2="200" stroke="#a78bfa" stroke-width="3" marker-end="url(#arr4)"/>
+        <text x="225" y="205" fill="#a78bfa" font-weight="bold">a₂</text>
+
+        <!-- Panel 2: First orthonormal -->
+        <text x="330" y="30" fill="#e2e8f0" font-weight="bold" font-size="14">2. Normalize: q₁ = a₁/||a₁||</text>
+        <line x1="300" y1="280" x2="400" y2="160" stroke="#34d399" stroke-width="3" marker-end="url(#arr4)"/>
+        <text x="405" y="155" fill="#34d399" font-weight="bold">q₁</text>
+        <line x1="300" y1="280" x2="470" y2="200" stroke="#a78bfa" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr4)"/>
+        <text x="475" y="205" fill="#a78bfa" font-size="12">a₂</text>
+
+        <!-- Panel 3: Subtract projection -->
+        <text x="540" y="30" fill="#e2e8f0" font-weight="bold" font-size="14">3. Subtract projection</text>
+        <line x1="520" y1="280" x2="620" y2="160" stroke="#34d399" stroke-width="3" marker-end="url(#arr4)"/>
+        <text x="625" y="155" fill="#34d399" font-weight="bold" font-size="12">q₁</text>
+        <!-- projection of a2 on q1 -->
+        <line x1="520" y1="280" x2="590" y2="220" stroke="#fbbf24" stroke-width="2" marker-end="url(#arr4)"/>
+        <text x="595" y="225" fill="#fbbf24" font-size="11">proj</text>
+        <!-- residual u2 -->
+        <line x1="590" y1="220" x2="630" y2="180" stroke="#f87171" stroke-width="3" marker-end="url(#arr4)"/>
+        <text x="635" y="175" fill="#f87171" font-weight="bold" font-size="12">u₂</text>
+
+        <!-- Arrow showing flow -->
+        <text x="230" y="300" fill="#94a3b8" font-size="20">→</text>
+        <text x="480" y="300" fill="#94a3b8" font-size="20">→</text>
+
+        <text x="50" y="300" fill="#94a3b8" font-size="12">Step 1</text>
+        <text x="300" y="300" fill="#94a3b8" font-size="12">Step 2</text>
+        <text x="520" y="300" fill="#94a3b8" font-size="12">Step 3 (then normalize u₂→q₂)</text>
+
+        <defs>
+          <marker id="arr4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3>4.3 Why Gram-Schmidt Works</h3>
+    <p>At each step <span class="math-inline">k</span>, we take <span class="math-inline">a<sub>k</sub></span> and remove all components that lie in the direction of previously constructed <span class="math-inline">q<sub>1</sub>,...,q<sub>k-1</sub></span>. By the projection theorem, the residual <span class="math-inline">u<sub>k</sub></span> is orthogonal to the entire subspace spanned by previous q's. Normalizing just scales it to unit length without changing direction.</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">Numerical Stability Warning</div>
+      <p>Classical Gram-Schmidt is <strong>numerically unstable</strong> when vectors are nearly linearly dependent. In quant finance, where risk factors are often highly correlated, use <strong>Modified Gram-Schmidt</strong> or <strong>Householder reflections</strong> instead. Modified GS orthogonalizes iteratively rather than all-at-once, reducing roundoff error accumulation.</p>
+    </div>
+
+    <h3>4.4 Modified Gram-Schmidt (MGS)</h3>
+    <p>The difference is subtle but crucial for numerical accuracy:</p>
+    <div class="math-block">
+      <strong>Classical:</strong> u<sub>k</sub> = a<sub>k</sub> - Σ<sub>i&lt;k</sub> proj<sub>q<sub>i</sub></sub>(a<sub>k</sub>)  (all projections computed from original a<sub>k</sub>)<br><br>
+      <strong>Modified:</strong> For each i from 1 to k-1:  a<sub>k</sub> ← a<sub>k</sub> - proj<sub>q<sub>i</sub></sub>(a<sub>k</sub>)  (update a<sub>k</sub> in place)<br>
+      Then q<sub>k</sub> = a<sub>k</sub> / ||a<sub>k</sub>||
+    </div>
+    <p>MGS is the standard in numerical libraries (LAPACK, numpy's QR).</p>
+
+    <h3>4.5 Worked Example: Gram-Schmidt in R³</h3>
+    <p>Given:</p>
+    <div class="math-block">
+      a₁ = [1, 1, 0]<br>
+      a₂ = [1, 0, 1]<br>
+      a₃ = [0, 1, 1]
+    </div>
+
+    <p><strong>Step 1:</strong> q₁ from a₁</p>
+    <div class="math-block">
+      ||a₁|| = sqrt(1+1+0) = sqrt(2)<br>
+      q₁ = [1/√2, 1/√2, 0] ≈ [0.707, 0.707, 0]
+    </div>
+
+    <p><strong>Step 2:</strong> q₂ from a₂</p>
+    <div class="math-block">
+      q₁<sup>T</sup>a₂ = (1/√2)(1) + (1/√2)(0) + 0 = 1/√2<br>
+      u₂ = a₂ - (1/√2)q₁ = [1,0,1] - [1/2, 1/2, 0] = [1/2, -1/2, 1]<br>
+      ||u₂|| = sqrt(1/4 + 1/4 + 1) = sqrt(1.5) ≈ 1.225<br>
+      q₂ = [0.408, -0.408, 0.816]
+    </div>
+
+    <p><strong>Step 3:</strong> q₃ from a₃</p>
+    <div class="math-block">
+      q₁<sup>T</sup>a₃ = 1/√2,  q₂<sup>T</sup>a₃ = -0.408 + 0.816 = 0.408<br>
+      u₃ = a₃ - (1/√2)q₁ - 0.408q₂<br>
+      = [0,1,1] - [0.5,0.5,0] - [0.167, -0.167, 0.333]<br>
+      = [-0.667, 0.667, 0.667]<br>
+      ||u₃|| = sqrt(0.444+0.444+0.444) = sqrt(1.333) ≈ 1.155<br>
+      q₃ = [-0.577, 0.577, 0.577]
+    </div>
+
+    <p><strong>Verification:</strong> q₁·q₂ = 0, q₁·q₃ = 0, q₂·q₃ = 0. All unit length. ✓</p>
+  </div>
+</div>
+
+<!-- ==================== TAB 5: QR DECOMPOSITION ==================== -->
+<div class="tab-content" id="tab-5">
+  <div class="card">
+    <h2>5. QR Decomposition</h2>
+    <p><strong>QR decomposition</strong> factorizes any matrix <span class="math-inline">A</span> into an orthogonal matrix <span class="math-inline">Q</span> and an upper triangular matrix <span class="math-inline">R</span>. It is one of the most important matrix factorizations in numerical computing and quantitative finance.</p>
+
+    <h3>5.1 The Factorization</h3>
+    <div class="math-block">
+      A = QR<br><br>
+      where Q<sup>T</sup>Q = I (Q has orthonormal columns)<br>
+      and R is upper triangular (all entries below diagonal are zero)
+    </div>
+
+    <div class="diagram-container">
+      <div class="diagram-title">Figure 5.1: QR Decomposition Structure</div>
+      <svg width="600" height="220" viewBox="0 0 600 220">
+        <rect width="600" height="220" fill="#0b1220"/>
+
+        <!-- A matrix -->
+        <rect x="30" y="60" width="80" height="100" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <text x="50" y="115" fill="#38bdf8" font-weight="bold" font-size="18">A</text>
+        <text x="40" y="180" fill="#94a3b8" font-size="12">m × n</text>
+
+        <!-- Equals -->
+        <text x="130" y="115" fill="#e2e8f0" font-size="24">=</text>
+
+        <!-- Q matrix -->
+        <rect x="170" y="60" width="80" height="100" rx="4" fill="#1e293b" stroke="#34d399" stroke-width="2"/>
+        <text x="190" y="115" fill="#34d399" font-weight="bold" font-size="18">Q</text>
+        <text x="175" y="180" fill="#94a3b8" font-size="12">m × n</text>
+        <text x="175" y="200" fill="#34d399" font-size="11">orthonormal cols</text>
+
+        <!-- Times -->
+        <text x="270" y="115" fill="#e2e8f0" font-size="20">×</text>
+
+        <!-- R matrix -->
+        <rect x="310" y="60" width="80" height="100" rx="4" fill="#1e293b" stroke="#a78bfa" stroke-width="2"/>
+        <!-- Upper triangular pattern -->
+        <line x1="310" y1="85" x2="390" y2="85" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <line x1="310" y1="110" x2="390" y2="110" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <line x1="310" y1="135" x2="390" y2="135" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <line x1="335" y1="60" x2="335" y2="160" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <line x1="360" y1="60" x2="360" y2="160" stroke="#a78bfa" stroke-width="1" opacity="0.3"/>
+        <!-- Zero out lower triangle visually -->
+        <polygon points="310,160 390,160 390,135 335,135 335,85 310,85" fill="#0b1220" opacity="0.7"/>
+        <text x="335" y="115" fill="#a78bfa" font-weight="bold" font-size="18">R</text>
+        <text x="315" y="180" fill="#94a3b8" font-size="12">n × n</text>
+        <text x="315" y="200" fill="#a78bfa" font-size="11">upper triangular</text>
+
+        <!-- Annotation -->
+        <rect x="430" y="50" width="150" height="120" rx="8" fill="#1e293b" stroke="#334155"/>
+        <text x="445" y="75" fill="#e2e8f0" font-size="13" font-weight="bold">Key Properties:</text>
+        <text x="445" y="100" fill="#94a3b8" font-size="12">• Q<sup>T</sup>Q = I</text>
+        <text x="445" y="120" fill="#94a3b8" font-size="12">• R<sub>ij</sub> = q<sub>i</sub><sup>T</sup>a<sub>j</sub></text>
+        <text x="445" y="140" fill="#94a3b8" font-size="12">• diag(R) > 0</text>
+        <text x="445" y="160" fill="#94a3b8" font-size="12">• Unique if A full rank</text>
+      </svg>
+    </div>
+
+    <h3>5.2 How Gram-Schmidt Produces QR</h3>
+    <p>Run Gram-Schmidt on the columns of <span class="math-inline">A</span>. The resulting orthonormal vectors form <span class="math-inline">Q</span>. The upper triangular matrix <span class="math-inline">R</span> captures the "recipe" of how each original column is built from the q's:</p>
+    <div class="math-block">
+      a₁ = (q₁<sup>T</sup>a₁) q₁ + 0 + 0 + ...<br>
+      a₂ = (q₁<sup>T</sup>a₂) q₁ + (q₂<sup>T</sup>a₂) q₂ + 0 + ...<br>
+      a₃ = (q₁<sup>T</sup>a₃) q₁ + (q₂<sup>T</sup>a₃) q₂ + (q₃<sup>T</sup>a₃) q₃ + ...<br>
+      ...<br><br>
+      In matrix form: A = QR where R<sub>ij</sub> = q<sub>i</sub><sup>T</sup>a<sub>j</sub> for i ≤ j, and R<sub>ij</sub> = 0 for i > j
+    </div>
+
+    <h3>5.3 Solving Linear Systems with QR</h3>
+    <p>Given <span class="math-inline">Ax = b</span>, substitute <span class="math-inline">A = QR</span>:</p>
+    <div class="math-block">
+      QRx = b<br>
+      Multiply both sides by Q<sup>T</sup>:  Rx = Q<sup>T</sup>b<br>
+      Solve for x by back-substitution (R is triangular)
+    </div>
+    <p><strong>Advantages over Gaussian elimination:</strong></p>
+    <ul>
+      <li>No need to compute <span class="math-inline">A<sup>-1</sup></span> explicitly</li>
+      <li>Q<sup>T</sup> is trivial to compute (just transpose)</li>
+      <li>Numerically stable (orthogonal transformations preserve conditioning)</li>
+      <li>Works for rectangular matrices (least squares)</li>
+    </ul>
+
+    <h3>5.4 Least Squares via QR</h3>
+    <p>For overdetermined systems (more equations than unknowns), the least squares solution minimizes <span class="math-inline">||Ax - b||²</span>:</p>
+    <div class="math-block">
+      x* = R<sup>-1</sup>Q<sup>T</sup>b  (solve Rx = Q<sup>T</sup>b by back-substitution)
+    </div>
+    <p>This is numerically far superior to the normal equations <span class="math-inline">(A<sup>T</sup>A)x = A<sup>T</sup>b</span>, which square the condition number and amplify errors.</p>
+
+    <div class="callout callout-success">
+      <div class="callout-title">Quant Connection: Stable Regression</div>
+      <p>In quant finance, regressing returns on correlated factors using <span class="math-inline">(X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y</span> can be numerically unstable when factors are collinear. Using QR decomposition (as numpy.linalg.lstsq does internally) gives the same coefficients but with much better numerical stability. The Q matrix represents <strong>orthogonalized risk factors</strong>, and R contains the <strong>regression coefficients in the orthogonalized basis</strong>.</p>
+    </div>
+
+    <h3>5.5 Worked Example: QR of a 2×2 Matrix</h3>
+    <p>Let <span class="math-inline">A = [[3, 1], [4, 2]]</span>. Columns are <span class="math-inline">a₁ = [3,4]</span> and <span class="math-inline">a₂ = [1,2]</span>.</p>
+    <p><strong>Step 1:</strong> q₁ from a₁</p>
+    <div class="math-block">
+      ||a₁|| = 5<br>
+      q₁ = [3/5, 4/5] = [0.6, 0.8]
+    </div>
+    <p><strong>Step 2:</strong> Orthogonalize a₂ against q₁</p>
+    <div class="math-block">
+      q₁<sup>T</sup>a₂ = 0.6(1) + 0.8(2) = 0.6 + 1.6 = 2.2<br>
+      u₂ = a₂ - 2.2q₁ = [1,2] - [1.32, 1.76] = [-0.32, 0.24]<br>
+      ||u₂|| = sqrt(0.1024 + 0.0576) = sqrt(0.16) = 0.4<br>
+      q₂ = [-0.32/0.4, 0.24/0.4] = [-0.8, 0.6]
+    </div>
+    <p><strong>Step 3:</strong> Build R</p>
+    <div class="math-block">
+      R₁₁ = q₁<sup>T</sup>a₁ = 5<br>
+      R₁₂ = q₁<sup>T</sup>a₂ = 2.2<br>
+      R₂₂ = q₂<sup>T</sup>a₂ = (-0.8)(1) + (0.6)(2) = -0.8 + 1.2 = 0.4<br><br>
+      Q = [[0.6, -0.8], [0.8, 0.6]]<br>
+      R = [[5, 2.2], [0, 0.4]]
+    </div>
+    <p><strong>Verify:</strong> QR = [[0.6×5 + (-0.8)×0, 0.6×2.2 + (-0.8)×0.4], [0.8×5 + 0.6×0, 0.8×2.2 + 0.6×0.4]] = [[3, 1], [4, 2]] = A ✓</p>
+  </div>
+</div>
+
+<!-- ==================== TAB 6: QUANT APPLICATIONS ==================== -->
+<div class="tab-content" id="tab-6">
+  <div class="card">
+    <h2>6. Quantitative Finance Applications</h2>
+    <p>Now we connect the mathematics to real quant engineering problems. These are not toy examples — they reflect actual workflows in systematic trading, risk management, and portfolio construction.</p>
+
+    <h3>6.1 Application 1: Orthogonalizing Risk Factors</h3>
+    <p>In multi-factor risk models (like Barra, Axioma, or custom quant models), factors like Market, Size, Value, Momentum, and Industry exposures are often <strong>correlated</strong>. Correlated factors make it impossible to cleanly attribute risk: if Value and Momentum are correlated, how much risk comes from each?</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">The Problem</div>
+      <p>Given correlated factor returns <span class="math-inline">F = [f₁, f₂, ..., fₖ]</span>, we want uncorrelated (orthogonal) factors <span class="math-inline">F̃ = [f̃₁, f̃₂, ..., f̃ₖ]</span> such that each f̃ᵢ represents a <strong>pure, independent source of risk</strong>.</p>
+    </div>
+
+    <h4>The Gram-Schmidt Solution</h4>
+    <p>Treat each factor's historical return series as a vector in <span class="math-inline">R<sup>T</sup></span> (where T is the number of time periods). Apply Gram-Schmidt:</p>
+    <div class="math-block">
+      f̃₁ = f₁ / ||f₁||<br>
+      f̃₂ = [f₂ - proj<sub>f̃₁</sub>(f₂)] / ||...||<br>
+      f̃₃ = [f₃ - proj<sub>f̃₁</sub>(f₃) - proj<sub>f̃₂</sub>(f₃)] / ||...||<br>
+      ...
+    </div>
+    <p>The resulting factors have <strong>zero sample covariance</strong> (their dot products are zero). Now risk attribution is clean: the variance of a portfolio along f̃ᵢ is purely from that factor, with no double-counting.</p>
+
+    <h4>Ordering Matters</h4>
+    <p>In Gram-Schmidt, the first vector is unchanged (except normalized). So if you put "Market" first, it remains "Market." Subsequent factors are purified of Market exposure. This lets you build a <strong>hierarchical risk model</strong>:</p>
+    <ol>
+      <li>f̃₁ = Market (raw market return)</li>
+      <li>f̃₂ = Size orthogonal to Market (size effect with market beta removed)</li>
+      <li>f̃₃ = Value orthogonal to Market and Size</li>
+      <li>f̃₄ = Momentum orthogonal to Market, Size, and Value</li>
+    </ol>
+
+    <div class="callout callout-success">
+      <div class="callout-title">Alternative: Schweinler-Wigner / Löwdin Orthogonalization</div>
+      <p>Unlike Gram-Schmidt, which is sequential and order-dependent, the <strong>Schweinler-Wigner (SW) method</strong> [^6^] orthogonalizes all factors symmetrically. It finds the orthonormal basis closest to the original factors in a least-squares sense. This is useful when no factor should be privileged over another.</p>
+    </div>
+
+    <h3>6.2 Application 2: Stable Regression (Multicollinearity)</h3>
+    <p>When regressing stock returns on multiple factors, <strong>multicollinearity</strong> (high correlation among regressors) makes the normal equations <span class="math-inline">(X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y</span> unstable. The matrix <span class="math-inline">X<sup>T</sup>X</span> becomes nearly singular, and small changes in data cause huge swings in coefficients.</p>
+
+    <h4>QR-Based Regression</h4>
+    <p>Decompose the design matrix <span class="math-inline">X = QR</span>:</p>
+    <div class="math-block">
+      β = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y  ←  Unstable when X<sup>T</sup>X is ill-conditioned<br><br>
+      Better:  X = QR<br>
+      β = R<sup>-1</sup>Q<sup>T</sup>y  ←  Stable! Q<sup>T</sup>Q = I, no squaring of condition number
+    </div>
+    <p><strong>Why is this stable?</strong> The condition number of Q is 1 (perfect). The condition number of R equals that of X. We never form <span class="math-inline">X<sup>T</sup>X</span>, whose condition number is the <strong>square</strong> of X's. In quant terms: if your factors have correlation 0.99, X<sup>T</sup>X has effective correlation 0.9801, but QR works directly with the 0.99 level.</p>
+
+    <h4>Geometric Interpretation</h4>
+    <p>Q represents the same factor space as X, but with axes at right angles to each other. Regression in the Q-basis is trivial: each coefficient is just <span class="math-inline">q<sub>i</sub><sup>T</sup>y</span>. The R matrix then transforms these orthogonal coefficients back to the original (interpretable) factor loadings.</p>
+
+    <h3>6.3 Application 3: Hedging Ratios via Projections</h3>
+    <p>A portfolio manager holds a complex position (e.g., an exotic option, a basket of illiquid stocks, or a custom index). They want to hedge it using liquid instruments (futures, ETFs, or standard options).</p>
+
+    <h4>The Projection Framework</h4>
+    <p>Let <span class="math-inline">b</span> be the P&L vector of the position to hedge. Let <span class="math-inline">A = [a₁, a₂, ..., aₖ]</span> be the P&L vectors of available hedging instruments. The optimal hedge is the <strong>projection of b onto the span of A</strong>:</p>
+    <div class="math-block">
+      hedge = proj<sub>col(A)</sub>(b) = A(A<sup>T</sup>A)<sup>-1</sup>A<sup>T</sup>b = Aβ<br>
+      where β = (A<sup>T</sup>A)<sup>-1</sup>A<sup>T</sup>b are the hedging ratios
+    </div>
+    <p>The <strong>residual</strong> <span class="math-inline">e = b - Aβ</span> is the unhedgeable risk (the "alpha" or idiosyncratic component). By the projection theorem, this residual is orthogonal to all hedging instruments — you cannot hedge it further with the given tools.</p>
+
+    <h4>Using QR for Hedging</h4>
+    <p>If hedging instruments are correlated (e.g., SPY and QQQ are highly correlated), compute <span class="math-inline">A = QR</span> first:</p>
+    <div class="math-block">
+      β = R<sup>-1</sup>Q<sup>T</sup>b<br>
+      hedge = Q(Q<sup>T</sup>b) = QQ<sup>T</sup>b
+    </div>
+    <p>The coefficients in the Q-basis (<span class="math-inline">Q<sup>T</sup>b</span>) tell you how much of each <strong>independent risk dimension</strong> to hold. R then maps these back to actual instrument notionals.</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">Practical Note: Hedging Frequency</div>
+      <p>In practice, hedging ratios β are re-estimated daily or weekly using rolling windows. Using QR instead of normal equations prevents numerical blow-ups when markets become highly correlated during stress events (when X<sup>T</sup>X becomes nearly singular).</p>
+    </div>
+
+    <h3>6.4 Summary Table</h3>
+    <table>
+      <tr><th>Application</th><th>Math Tool</th><th>Quant Interpretation</th></tr>
+      <tr><td>Risk Factor Orthogonalization</td><td>Gram-Schmidt on factor returns</td><td>Clean risk attribution; hierarchical decomposition</td></tr>
+      <tr><td>Stable Regression</td><td>QR decomposition of design matrix</td><td>Avoid multicollinearity; numerically stable β's</td></tr>
+      <tr><td>Hedging Ratios</td><td>Projection onto hedge space</td><td>Minimum-variance replication; residual = unhedgeable risk</td></tr>
+      <tr><td>Portfolio Variance</td><td>Orthonormal basis expansion</td><td>Decompose variance into independent contributions</td></tr>
+      <tr><td>Principal Components</td><td>Eigendecomposition of covariance</td><td>PCA is essentially finding an orthonormal basis of maximum variance</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== TAB 7: COLAB LABS ==================== -->
+<div class="tab-content" id="tab-7">
+  <div class="card">
+    <h2>7. Google Colab Experiments</h2>
+    <p>Each experiment is designed to be copy-pasted into a Colab notebook. Run them cell by cell, modify parameters, and observe how the math behaves in practice.</p>
+
+    <h3>Experiment 1: Visualizing Dot Products & Angles</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+# Define two vectors
+u = np.array([3, 4])
+v = np.array([4, 1])
+
+# Compute dot product
+dot = np.dot(u, v)
+norm_u = np.linalg.norm(u)
+norm_v = np.linalg.norm(v)
+cos_theta = dot / (norm_u * norm_v)
+theta = np.arccos(np.clip(cos_theta, -1, 1))
+
+print(f"u·v = {dot}")
+print(f"||u|| = {norm_u:.3f}, ||v|| = {norm_v:.3f}")
+print(f"cos(θ) = {cos_theta:.3f}")
+print(f"θ = {np.degrees(theta):.1f}°")
+
+# Plot
+fig, ax = plt.subplots(figsize=(6,6))
+ax.quiver(0, 0, u[0], u[1], angles='xy', scale_units='xy', scale=1, color='#38bdf8', label='u')
+ax.quiver(0, 0, v[0], v[1], angles='xy', scale_units='xy', scale=1, color='#a78bfa', label='v')
+ax.set_xlim(-1, 6)
+ax.set_ylim(-1, 6)
+ax.set_aspect('equal')
+ax.grid(True, alpha=0.3)
+ax.legend()
+ax.set_title(f'Dot Product = {dot}, Angle = {np.degrees(theta):.1f}°')
+plt.show()</code></pre>
+    </div>
+    <p><strong>Try:</strong> Change vectors to [1,0] and [0,1] (orthogonal). Then to [1,1] and [-1,1] (also orthogonal). Then to [1,2] and [2,4] (parallel, dot product maximal).</p>
+
+    <h3>Experiment 2: Gram-Schmidt from Scratch</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+
+def gram_schmidt(A):
+    """
+    Classical Gram-Schmidt on columns of A.
+    Returns Q (orthonormal) and R (upper triangular).
+    """
+    m, n = A.shape
+    Q = np.zeros((m, n))
+    R = np.zeros((n, n))
+
+    for j in range(n):
+        v = A[:, j].copy()
+        for i in range(j):
+            R[i, j] = np.dot(Q[:, i], A[:, j])
+            v -= R[i, j] * Q[:, i]
+        R[j, j] = np.linalg.norm(v)
+        Q[:, j] = v / R[j, j]
+
+    return Q, R
+
+# Test with a 3x3 matrix
+A = np.array([[1, 1, 0],
+              [1, 0, 1],
+              [0, 1, 1]], dtype=float)
+
+Q, R = gram_schmidt(A)
+print("Q:
+", np.round(Q, 4))
+print("
+R:
+", np.round(R, 4))
+print("
+Q^T Q (should be identity):
+", np.round(Q.T @ Q, 4))
+print("
+QR (should equal A):
+", np.round(Q @ R, 4))
+
+# Check orthogonality
+print("
+Dot products between columns of Q:")
+for i in range(3):
+    for j in range(i+1, 3):
+        print(f"  q{i+1}·q{j+1} = {np.dot(Q[:,i], Q[:,j]):.2e}")</code></pre>
+    </div>
+    <p><strong>Try:</strong> Make the third column nearly dependent on the first two (e.g., [2, 1, 1] which is a₁+a₂). Watch how the norm of u₃ becomes very small — a sign of near-collinearity.</p>
+
+    <h3>Experiment 3: Modified Gram-Schmidt vs Classical</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+
+def modified_gram_schmidt(A):
+    m, n = A.shape
+    Q = A.copy()
+    R = np.zeros((n, n))
+
+    for i in range(n):
+        R[i, i] = np.linalg.norm(Q[:, i])
+        Q[:, i] /= R[i, i]
+        for j in range(i+1, n):
+            R[i, j] = np.dot(Q[:, i], Q[:, j])
+            Q[:, j] -= R[i, j] * Q[:, i]
+
+    return Q, R
+
+# Create nearly dependent columns
+eps = 1e-10
+A = np.array([[1, 1, 1],
+              [1, 1, 1],
+              [1, 1, 1+eps]], dtype=float)
+
+Q_classical, _ = gram_schmidt(A)
+Q_modified, _ = modified_gram_schmidt(A)
+
+print("Classical GS orthogonality error:", 
+      np.linalg.norm(Q_classical.T @ Q_classical - np.eye(3)))
+print("Modified GS orthogonality error:", 
+      np.linalg.norm(Q_modified.T @ Q_modified - np.eye(3)))</code></pre>
+    </div>
+    <p><strong>Observation:</strong> Modified GS should have dramatically smaller orthogonality error for ill-conditioned matrices.</p>
+
+    <h3>Experiment 4: QR Regression vs Normal Equations</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+
+np.random.seed(42)
+n = 100  # observations
+p = 5    # factors
+
+# Create highly correlated design matrix
+X_base = np.random.randn(n, 2)
+X = np.hstack([X_base, X_base[:,0:1] + 0.01*np.random.randn(n,1),
+               X_base[:,1:2] + 0.01*np.random.randn(n,1),
+               0.5*X_base[:,0] + 0.5*X_base[:,1] + 0.01*np.random.randn(n,1)])
+y = X @ np.array([1,2,3,4,5]) + 0.1*np.random.randn(n)
+
+# Method 1: Normal equations
+beta_normal = np.linalg.inv(X.T @ X) @ X.T @ y
+
+# Method 2: QR decomposition
+Q, R = np.linalg.qr(X)
+beta_qr = np.linalg.solve(R, Q.T @ y)
+
+print("Normal equations coefficients:", np.round(beta_normal, 3))
+print("QR coefficients:             ", np.round(beta_qr, 3))
+print("
+Condition number of X:       ", np.linalg.cond(X))
+print("Condition number of X^T X:   ", np.linalg.cond(X.T @ X))
+print("Condition number of R:       ", np.linalg.cond(R))</code></pre>
+    </div>
+    <p><strong>Observation:</strong> Note how cond(X<sup>T</sup>X) ≈ cond(X)². When cond(X) is large, normal equations amplify numerical errors.</p>
+
+    <h3>Experiment 5: Orthogonalizing Fama-French Factors</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+import pandas as pd
+
+# Simulate factor returns (in practice, load from Ken French's website)
+np.random.seed(42)
+T = 252  # trading days
+market = np.random.randn(T) * 0.01 + 0.0003
+size = 0.3 * market + np.random.randn(T) * 0.008  # correlated with market
+value = 0.2 * market + 0.1 * size + np.random.randn(T) * 0.007
+momentum = 0.15 * market - 0.1 * size + np.random.randn(T) * 0.009
+
+F = np.column_stack([market, size, value, momentum])
+
+# Classical Gram-Schmidt on factors
+Q, R = modified_gram_schmidt(F)
+
+# Compare covariance matrices
+cov_original = np.cov(F.T)
+cov_orthogonal = np.cov(Q.T)
+
+print("Original factor correlations:")
+print(np.round(np.corrcoef(F.T), 3))
+print("
+Orthogonalized factor correlations (should be ~0 off-diagonal):")
+print(np.round(np.corrcoef(Q.T), 3))
+
+# Risk attribution example
+portfolio_beta = np.array([1.0, 0.5, 0.3, 0.2])
+original_risk = portfolio_beta @ cov_original @ portfolio_beta
+# In orthogonal basis: variance is sum of squares
+orthogonal_betas = R @ portfolio_beta  # transform to Q-basis
+orthogonal_risk = np.sum(orthogonal_betas**2)  # since cov(Q)=I/T
+print(f"
+Original portfolio variance: {original_risk:.6f}")
+print(f"Orthogonalized variance decomposition: {orthogonal_betas**2}")</code></pre>
+    </div>
+    <p><strong>Try:</strong> Download real Fama-French 5-factor data and apply this. Observe how the hierarchical orthogonalization (Market → Size → Value → Momentum) creates interpretable pure factors.</p>
+
+    <h3>Experiment 6: Hedging a Synthetic Asset</h3>
+    <div class="code-block-wrapper">
+      <div class="code-header">Python · Colab</div>
+      <pre><code>import numpy as np
+
+np.random.seed(42)
+T = 252
+
+# Synthetic target: combination of 3 factors + noise
+f1 = np.random.randn(T)
+f2 = np.random.randn(T)
+f3 = np.random.randn(T)
+target = 2*f1 + 1.5*f2 - 0.5*f3 + 0.3*np.random.randn(T)
+
+# But we only observe f1, f2, f3 as hedge instruments
+A = np.column_stack([f1, f2, f3])
+
+# Method 1: Projection (normal equations)
+beta_proj = np.linalg.inv(A.T @ A) @ A.T @ target
+hedge_proj = A @ beta_proj
+residual_proj = target - hedge_proj
+
+# Method 2: QR-based hedge
+Q, R = np.linalg.qr(A)
+beta_qr = np.linalg.solve(R, Q.T @ target)
+hedge_qr = A @ beta_qr
+residual_qr = target - hedge_qr
+
+print("True coefficients: [2.0, 1.5, -0.5]")
+print("Projection betas:  ", np.round(beta_proj, 3))
+print("QR betas:          ", np.round(beta_qr, 3))
+print(f"
+Projection residual variance: {np.var(residual_proj):.4f}")
+print(f"QR residual variance:         {np.var(residual_qr):.4f}")
+print(f"Unhedged target variance:     {np.var(target):.4f}")
+print(f"Variance explained:           {(1-np.var(residual_qr)/np.var(target))*100:.1f}%")</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TAB 8: EXERCISES ==================== -->
+<div class="tab-content" id="tab-8">
+  <div class="card">
+    <h2>8. Practice Exercises</h2>
+    <p>Three tiers for each topic. Do them in order. Solutions are embedded in the HTML (hidden by default; click to reveal).</p>
+
+    <h3>Topic 1: Inner Products</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">Compute the dot product of u = [2, -1, 3] and v = [0, 4, 2].</li>
+        <li class="exercise">If ||u|| = 3, ||v|| = 5, and u·v = 12, find the angle between them.</li>
+        <li class="exercise">Show that the standard basis vectors e₁ = [1,0,0], e₂ = [0,1,0], e₃ = [0,0,1] are mutually orthogonal.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. u·v = 2(0) + (-1)(4) + 3(2) = 0 - 4 + 6 = 2<br><br>
+          2. cos(θ) = 12/(3×5) = 12/15 = 0.8, so θ = arccos(0.8) ≈ 36.87°<br><br>
+          3. e₁·e₂ = 0, e₁·e₃ = 0, e₂·e₃ = 0. All pairs orthogonal.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">Prove the Cauchy-Schwarz inequality |u·v| ≤ ||u|| ||v|| for vectors in R². (Hint: consider ||u - tv||² ≥ 0 and minimize over t.)</li>
+        <li class="exercise">Let u = [1, 2, 2]. Find all vectors v such that u·v = 0 and ||v|| = 1. Describe this set geometrically.</li>
+        <li class="exercise">In a weighted inner product &lt;x,y&gt; = xᵀWy where W = diag(2, 3), compute &lt;[1,1], [2,-1]&gt; and the induced norm of [1,1].</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. ||u-tv||² = (u-tv)·(u-tv) = ||u||² - 2t(u·v) + t²||v||² ≥ 0. This quadratic in t is always non-negative, so its discriminant ≤ 0: (2u·v)² - 4||v||²||u||² ≤ 0 → |u·v| ≤ ||u|| ||v||.<br><br>
+          2. u·v = v₁ + 2v₂ + 2v₃ = 0 defines a plane through origin. Unit vectors on this plane form a circle (unit circle in that plane). Parametrize: v = [-2s-2t, s, t]/||...|| for parameters s,t with constraint.<br><br>
+          3. &lt;[1,1],[2,-1]&gt; = [1,1] diag(2,3) [2,-1]ᵀ = 1(2)(2) + 1(3)(-1) = 4-3 = 1. Norm² = [1,1] diag(2,3) [1,1]ᵀ = 2+3 = 5, so norm = √5.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">Show that for any inner product, the parallelogram law holds: ||u+v||² + ||u-v||² = 2(||u||² + ||v||²). Interpret geometrically.</li>
+        <li class="exercise">Let V be the space of continuous functions on [0,1] with inner product &lt;f,g&gt; = ∫₀¹ f(x)g(x)dx. Show that f(x)=1 and g(x)=x are not orthogonal, and find the angle between them.</li>
+        <li class="exercise">Prove that if &lt;u,v&gt; = 0 for all v in a subspace W, then u is orthogonal to every vector in W. Use this to show that the orthogonal complement W⊥ is a subspace.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Expand both sides using &lt;u+v,u+v&gt; = ||u||²+2&lt;u,v&gt;+||v||² and &lt;u-v,u-v&gt; = ||u||²-2&lt;u,v&gt;+||v||². Sum = 2||u||²+2||v||². Geometric: sum of squares of diagonals equals sum of squares of all four sides.<br><br>
+          2. &lt;1,x&gt; = ∫₀¹ x dx = 1/2. ||1||² = 1, ||x||² = ∫₀¹ x² dx = 1/3. cos(θ) = (1/2)/√(1/3) = √3/2, so θ = 30°.<br><br>
+          3. If &lt;u,v&gt;=0 ∀v∈W, then for any w₁,w₂∈W and scalars a,b: &lt;u, aw₁+bw₂&gt; = a&lt;u,w₁&gt;+b&lt;u,w₂&gt; = 0, so u⊥(aw₁+bw₂). Thus W⊥ closed under linear combinations, making it a subspace.
+        </div>
+      </details>
+    </div>
+
+    <h3>Topic 2: Orthogonal & Orthonormal Vectors</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">Normalize v = [3, 4] to make it a unit vector.</li>
+        <li class="exercise">Verify that q₁ = [1/√2, 1/√2] and q₂ = [1/√2, -1/√2] are orthonormal.</li>
+        <li class="exercise">If Q is a 3×3 orthogonal matrix, what is det(Q)? What does this imply geometrically?</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. ||v|| = 5, so v̂ = [3/5, 4/5] = [0.6, 0.8]<br><br>
+          2. q₁·q₂ = 1/2 - 1/2 = 0. ||q₁||² = 1/2+1/2 = 1. ||q₂||² = 1/2+1/2 = 1.<br><br>
+          3. det(Q) = ±1. +1 means pure rotation; -1 means reflection.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">Show that if {q₁, q₂, q₃} is orthonormal, then any vector v can be written as v = (v·q₁)q₁ + (v·q₂)q₂ + (v·q₃)q₃. Verify this for v = [1,2,3] using the standard basis.</li>
+        <li class="exercise">Construct an orthonormal basis for R² where the first basis vector points in the direction of [2, 1].</li>
+        <li class="exercise">Prove that the columns of an orthogonal matrix Q are linearly independent.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Let v = Σcᵢqᵢ. Take inner product with qⱼ: &lt;v,qⱼ&gt; = Σcᵢ&lt;qᵢ,qⱼ&gt; = cⱼ by orthonormality. For v=[1,2,3] and standard basis: c₁=1, c₂=2, c₃=3, so v = 1e₁+2e₂+3e₃. ✓<br><br>
+          2. q₁ = [2,1]/√5 = [2/√5, 1/√5]. Need q₂ ⊥ q₁ with ||q₂||=1. q₂ = [-1/√5, 2/√5] works (rotate 90°).<br><br>
+          3. Suppose Qc = 0. Then cᵀQᵀQc = cᵀc = ||c||² = 0, so c = 0. Thus columns are independent.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">Show that the set of all orthogonal 2×2 matrices forms a group under matrix multiplication (the orthogonal group O(2)). Identify the subgroup with determinant +1 (SO(2), the rotation group).</li>
+        <li class="exercise">Let Q be orthogonal. Show that ||Qx|| = ||x|| for all x (preserves lengths) and that &lt;Qx, Qy&gt; = &lt;x,y&gt; (preserves angles).</li>
+        <li class="exercise">Given a subspace W of Rⁿ with orthonormal basis {q₁,...,qₖ}, define the orthogonal projection matrix P = QQᵀ where Q = [q₁ ... qₖ]. Prove P² = P and Pᵀ = P.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Closure: if Q₁,Q₂ orthogonal, (Q₁Q₂)ᵀ(Q₁Q₂) = Q₂ᵀQ₁ᵀQ₁Q₂ = I. Identity is orthogonal. Inverse exists: Q⁻¹=Qᵀ, and (Qᵀ)ᵀQᵀ = QQᵀ = I. SO(2) matrices: [[cosθ,-sinθ],[sinθ,cosθ]], det=cos²θ+sin²θ=1.<br><br>
+          2. ||Qx||² = (Qx)ᵀ(Qx) = xᵀQᵀQx = xᵀx = ||x||². For angles: &lt;Qx,Qy&gt; = (Qx)ᵀ(Qy) = xᵀQᵀQy = xᵀy = &lt;x,y&gt;.<br><br>
+          3. P² = (QQᵀ)(QQᵀ) = Q(QᵀQ)Qᵀ = QIQᵀ = QQᵀ = P. Pᵀ = (QQᵀ)ᵀ = QQᵀ = P.
+        </div>
+      </details>
+    </div>
+
+    <h3>Topic 3: Projections</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">Find the projection of b = [4, 0] onto a = [1, 1].</li>
+        <li class="exercise">If projₐ(b) = 0, what does this tell you about a and b?</li>
+        <li class="exercise">Compute the projection matrix P = a(aᵀa)⁻¹aᵀ for a = [1, 2]ᵀ. Verify P² = P.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. a·b = 4, a·a = 2, proj = (4/2)[1,1] = [2, 2]<br><br>
+          2. They are orthogonal (a ⊥ b), since a·b = 0.<br><br>
+          3. aᵀa = 5. P = (1/5)[[1],[2]][[1,2]] = (1/5)[[1,2],[2,4]]. P² = (1/25)[[5,10],[10,20]] = (1/5)[[1,2],[2,4]] = P.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">Project b = [1, 2, 3] onto the plane spanned by a₁ = [1, 0, 0] and a₂ = [0, 1, 0]. What is the error vector? Verify it is orthogonal to both a₁ and a₂.</li>
+        <li class="exercise">Show that the projection matrix onto col(A) is unique, even if the basis for col(A) is not.</li>
+        <li class="exercise">In least squares, the normal equations are AᵀAβ = Aᵀy. Show that the residual r = y - Aβ is orthogonal to every column of A.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Projection onto xy-plane: drop z-component → [1,2,0]. Error e = [0,0,3]. e·a₁ = 0, e·a₂ = 0. ✓<br><br>
+          2. The projection depends only on the subspace, not the basis. If A and B have the same column space, there exists invertible C such that B=AC. Then P_B = B(BᵀB)⁻¹Bᵀ = AC(CᵀAᵀAC)⁻¹CᵀAᵀ = A(AᵀA)⁻¹Aᵀ = P_A.<br><br>
+          3. From normal equations: Aᵀ(y-Aβ) = Aᵀy - AᵀAβ = 0. Thus each column aᵢ satisfies aᵢᵀr = 0, so r ⊥ col(A).
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">Prove the Orthogonal Decomposition Theorem: for any subspace W of Rⁿ, every vector y can be written uniquely as y = ŷ + z where ŷ ∈ W and z ∈ W⊥.</li>
+        <li class="exercise">Let W be a subspace with orthonormal basis {u₁,...,uₚ}. Show that the projection of y onto W is ŷ = (y·u₁)u₁ + ... + (y·uₚ)uₚ, and that this is the closest point in W to y.</li>
+        <li class="exercise">(Quant application) A portfolio has returns r. You can trade two hedging instruments with returns h₁, h₂. Set up and solve the minimum-variance hedge using projections. Show that the hedged portfolio's variance equals the squared norm of the residual.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Existence: Let ŷ = proj_W(y), z = y-ŷ. By projection properties, z ⊥ W. Uniqueness: if y = ŷ₁+z₁ = ŷ₂+z₂, then ŷ₁-ŷ₂ = z₂-z₁ ∈ W ∩ W⊥ = {0}, so ŷ₁=ŷ₂ and z₁=z₂.<br><br>
+          2. ŷ = Σ(y·uᵢ)uᵢ is in W. For any w∈W, ||y-w||² = ||y-ŷ||² + ||ŷ-w||² (Pythagorean) ≥ ||y-ŷ||², with equality iff w=ŷ.<br><br>
+          3. Minimize Var(r - β₁h₁ - β₂h₂) = ||r - Hβ||² where H=[h₁ h₂]. Solution β = (HᵀH)⁻¹Hᵀr. Hedged return = r - Hβ = residual. Variance = ||residual||²/T (for T periods).
+        </div>
+      </details>
+    </div>
+
+    <h3>Topic 4: Gram-Schmidt</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">Apply Gram-Schmidt to a₁ = [1, 0] and a₂ = [1, 1] in R².</li>
+        <li class="exercise">Why must the input vectors to Gram-Schmidt be linearly independent? What would happen if a₂ = 2a₁?</li>
+        <li class="exercise">Given q₁ = [3/5, 4/5], find a vector q₂ such that {q₁, q₂} is orthonormal.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. u₁ = [1,0], q₁ = [1,0]. u₂ = [1,1] - (1)[1,0] = [0,1], q₂ = [0,1]. Result: standard basis.<br><br>
+          2. If a₂ = 2a₁, then u₂ = a₂ - proj_{q₁}(a₂) = 2a₁ - 2a₁ = 0. Cannot normalize zero vector.<br><br>
+          3. q₂ must satisfy q₁·q₂ = 0 and ||q₂|| = 1. q₂ = [-4/5, 3/5] works (and its negative).
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">Apply Gram-Schmidt to a₁ = [1, 1, 1], a₂ = [1, 1, 0], a₃ = [1, 0, 0]. Verify your result is orthonormal.</li>
+        <li class="exercise">Explain why Modified Gram-Schmidt is more numerically stable than Classical Gram-Schmidt. Give a concrete example where they differ significantly.</li>
+        <li class="exercise">Show that Gram-Schmidt preserves span: span{a₁,...,aₖ} = span{q₁,...,qₖ} for each k.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. q₁ = [1,1,1]/√3. u₂ = [1,1,0] - (2/√3)q₁ = [1/3,1/3,-2/3], q₂ = [1,1,-2]/√6. u₃ = [1,0,0] - (1/√3)q₁ - (1/√6)q₂ = [1/2,-1/2,0], q₃ = [1,-1,0]/√2. Verify dot products = 0 and norms = 1.<br><br>
+          2. In MGS, each projection is computed using the most recently orthogonalized vector, reducing roundoff. Example: nearly dependent columns [1,ε,0], [1,0,ε], [1,ε,ε] with ε=1e-10. Classical GS loses orthogonality; MGS preserves it.<br><br>
+          3. By construction, each qₖ is a linear combination of a₁,...,aₖ, so span{q's} ⊆ span{a's}. Since both sets are independent and have k vectors, dimensions match, so spans are equal.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">Prove that the Gram-Schmidt process produces an orthonormal set. Use induction on the number of vectors.</li>
+        <li class="exercise">Show that if A = QR via Gram-Schmidt, then R is upper triangular with positive diagonal entries. What is the geometric meaning of Rᵢᵢ?</li>
+        <li class="exercise">(Computational) Count the exact number of floating point operations (flops) for Gram-Schmidt on an m×n matrix. Compare to the cost of Householder QR.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Base case: q₁ = a₁/||a₁|| has norm 1. Inductive step: assume {q₁,...,qₖ₋₁} orthonormal. uₖ = aₖ - Σ&lt;qᵢ,aₖ&gt;qᵢ. For any j&lt;k: &lt;uₖ,qⱼ&gt; = &lt;aₖ,qⱼ&gt; - Σ&lt;qᵢ,aₖ&gt;&lt;qᵢ,qⱼ&gt; = &lt;aₖ,qⱼ&gt; - &lt;qⱼ,aₖ&gt; = 0. So uₖ ⊥ all previous q's. Normalizing preserves orthogonality.<br><br>
+          2. Rᵢⱼ = qᵢᵀaⱼ for i≤j, and 0 for i&gt;j by construction (upper triangular). Rᵢᵢ = ||uᵢ|| &gt; 0 since aᵢ ∉ span{a₁,...,aᵢ₋₁}. Geometrically, Rᵢᵢ is the length of the component of aᵢ orthogonal to previous columns.<br><br>
+          3. For each j, inner products cost ~2m(j-1) flops, updates cost ~2m(j-1), normalization ~3m. Total ~ Σⱼ 4mj = 2mn² flops. Householder QR costs ~2mn² - (2/3)n³, comparable for m≫n but Householder is more stable.
+        </div>
+      </details>
+    </div>
+
+    <h3>Topic 5: QR Decomposition</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">Find the QR decomposition of A = [[1, 1], [0, 1]].</li>
+        <li class="exercise">If A = QR, what is AᵀA in terms of R? Simplify using properties of Q.</li>
+        <li class="exercise">Use QR to solve Ax = b where A = [[1,1],[0,1],[1,0]] and b = [1,2,3]ᵀ.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. q₁ = [1,0], u₂ = [1,1] - 1·[1,0] = [0,1], q₂ = [0,1]. Q = I, R = [[1,1],[0,1]].<br><br>
+          2. AᵀA = (QR)ᵀ(QR) = RᵀQᵀQR = RᵀR. This is the Cholesky factorization of AᵀA.<br><br>
+          3. Q = [[1/√2, 1/√6], [0, 2/√6], [1/√2, -1/√6]], R = [[√2, 1/√2], [0, √(3/2)]]. Solve Rx = Qᵀb by back-substitution.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">Prove that the QR decomposition of a full-rank matrix is unique if we require R to have positive diagonal entries.</li>
+        <li class="exercise">Show that for any orthogonal matrix Q, ||QA||_F = ||A||_F where ||·||_F is the Frobenius norm.</li>
+        <li class="exercise">Explain how QR decomposition can be used to find eigenvalues via the QR algorithm (basic idea).</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Suppose A = Q₁R₁ = Q₂R₂. Then Q₂ᵀQ₁ = R₂R₁⁻¹. Left side orthogonal, right side upper triangular with positive diagonals. The only such matrix is I. Thus Q₁=Q₂, R₁=R₂.<br><br>
+          2. ||QA||_F² = tr((QA)ᵀ(QA)) = tr(AᵀQᵀQA) = tr(AᵀA) = ||A||_F². Orthogonal transformations preserve Frobenius norm.<br><br>
+          3. QR algorithm: iterate Aₖ = QₖRₖ, then Aₖ₊₁ = RₖQₖ. Each Aₖ is similar to A (same eigenvalues). Under conditions, Aₖ converges to upper triangular (Schur form), revealing eigenvalues on diagonal.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">Let A be m×n with rank n. Show that the least squares solution via QR minimizes ||Ax-b||² and that the minimum value is ||(I-QQᵀ)b||².</li>
+        <li class="exercise">Prove that cond(R) = cond(A) when A = QR, but cond(AᵀA) = cond(A)². Explain why this makes QR-based least squares superior.</li>
+        <li class="exercise">(Givens rotations) Show how to construct a 2×2 rotation matrix G such that G[a,b]ᵀ = [√(a²+b²), 0]ᵀ. Explain how to use this to zero out subdiagonal entries and compute QR.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Ax-b = QRx-b. Let c=Qᵀb. ||QRx-b||² = ||Rx-c||² + ||(I-QQᵀ)b||² (Pythagorean). Minimized when Rx=c, giving residual norm ||(I-QQᵀ)b||.<br><br>
+          2. cond(R) = ||R|| ||R⁻¹|| = ||QᵀA|| ||A⁻¹Q|| = ||A|| ||A⁻¹|| = cond(A) (since Q preserves norms). cond(AᵀA) = cond(RᵀR) = cond(R)² = cond(A)². Squaring amplifies numerical errors.<br><br>
+          3. G = [[c, s], [-s, c]] where c=a/√(a²+b²), s=b/√(a²+b²). Then G[a,b]ᵀ = [√(a²+b²), 0]ᵀ. For m×n A, apply Givens rotations to zero out (2,1), (3,1), ..., (m,1), then (3,2), ..., building Q as product of rotations.
+        </div>
+      </details>
+    </div>
+
+    <h3>Topic 6: Quant Applications</h3>
+    <div class="exercise-tier tier-easy">
+      <div class="tier-label">Easy</div>
+      <ol>
+        <li class="exercise">You have two correlated factors: Market (std=15%) and Size (std=10%, correlation with Market = 0.8). After orthogonalizing Size against Market, what is the standard deviation of the purified Size factor?</li>
+        <li class="exercise">In a regression of stock returns on three factors, the R² is 0.64. What percentage of variance is idiosyncratic (unexplained)?</li>
+        <li class="exercise">A hedge fund wants to hedge a $10M position using SPY. The beta of the position to SPY is 1.2. What notional of SPY should they short?</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Var(Size|Market) = Var(Size)(1-ρ²) = 100(1-0.64) = 36. Std = 6%.<br><br>
+          2. Unexplained variance = 1 - R² = 0.36, so 36% is idiosyncratic.<br><br>
+          3. Hedge notional = $10M × 1.2 = $12M short in SPY.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-medium">
+      <div class="tier-label">Medium</div>
+      <ol>
+        <li class="exercise">You have factor returns with covariance matrix Σ = [[4, 3.6], [3.6, 9]] (Market and Value). Find an orthogonal transformation (Gram-Schmidt) and express a portfolio with weights [1, 1] in the new basis. What is its variance?</li>
+        <li class="exercise">Explain why using QR for regression is equivalent to first orthogonalizing regressors, running univariate regressions, and then transforming back.</li>
+        <li class="exercise">A portfolio has exposure vector w = [100, -50, 30] to three orthogonal risk factors with variances [25, 16, 9]. Compute the total portfolio variance and the percentage contribution of each factor.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. f₁ = Market, q₁ = f₁/2. f₂ = Value, proj = (3.6/4)f₁ = 0.9f₁. u₂ = f₂ - 0.9f₁, Var(u₂) = 9 - 3.6²/4 = 9-3.24 = 5.76. Portfolio [1,1] in original = [1+0.9, 1] in new basis after accounting for R. Variance = (1.9)²×4 + 1²×5.76 = 14.44+5.76 = 20.2.<br><br>
+          2. X = QR. Regression on X: y = Xβ + ε = QRβ + ε. Let γ = Rβ. Then y = Qγ + ε. Since Q has orthonormal columns, γᵢ = qᵢᵀy (univariate regression). Then β = R⁻¹γ transforms back.<br><br>
+          3. Variance = 100²×25 + (-50)²×16 + 30²×9 = 250000 + 40000 + 8100 = 298100. Contributions: Market 83.9%, Factor2 13.4%, Factor3 2.7%.
+        </div>
+      </details>
+    </div>
+    <div class="exercise-tier tier-hard">
+      <div class="tier-label">Hard</div>
+      <ol>
+        <li class="exercise">(Factor risk model) Let X be the T×k matrix of factor returns. Show that the sample covariance of factors is (1/T)XᵀX if factors are centered. If X = QR, express the covariance in terms of R and discuss the implications for portfolio optimization.</li>
+        <li class="exercise">(Hedging with transaction costs) Suppose hedging instrument i has transaction cost cᵢ per dollar traded. Formulate the optimal hedge as a constrained optimization problem and show how QR preprocessing simplifies the solution.</li>
+        <li class="exercise">(Eigenfactor decomposition) Show that if Σ is the covariance matrix of returns, then Σ = QΛQᵀ where Q is orthogonal and Λ is diagonal. Relate this to PCA and explain how it differs from Gram-Schmidt orthogonalization of factors.</li>
+      </ol>
+      <details style="margin-top: 12px;">
+        <summary style="color: var(--accent); cursor: pointer; font-weight: 600;">Show Solutions</summary>
+        <div class="math-block" style="margin-top: 10px;">
+          1. Cov = (1/T)XᵀX = (1/T)RᵀQᵀQR = (1/T)RᵀR. Portfolio variance with weights w: wᵀCov w = (1/T)||Rw||². Optimization becomes minimizing ||Rw||² subject to return constraint — a quadratic program with triangular structure.<br><br>
+          2. Minimize ||b - Aβ||² + λΣcᵢ|βᵢ|. With A=QR, let γ=Rβ. Problem becomes ||Qᵀb - γ||² + λΣcᵢ|(R⁻¹γ)ᵢ|. Still complex, but QR reveals the effective dimensionality and condition number.<br><br>
+          3. Σ is symmetric positive semi-definite, so by spectral theorem Σ = QΛQᵀ (eigendecomposition). Q contains eigenvectors (principal components), Λ contains eigenvalues (variances). PCA finds directions of maximum variance; Gram-Schmidt preserves original factor identities but removes correlations. PCA is variance-optimal but less interpretable; GS is interpretable but order-dependent.
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+function showTab(n) {
+  const tabs = document.querySelectorAll('.tab-content');
+  const btns = document.querySelectorAll('.tab-btn');
+  tabs.forEach(t => t.classList.remove('active'));
+  btns.forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + n).classList.add('active');
+  btns[n].classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  const btns = document.querySelectorAll('.tab-btn');
+  let current = Array.from(btns).findIndex(b => b.classList.contains('active'));
+  if (e.key === 'ArrowRight' && current < btns.length - 1) showTab(current + 1);
+  if (e.key === 'ArrowLeft' && current > 0) showTab(current - 1);
+});
+</script>
+
+</body>
+</html>
