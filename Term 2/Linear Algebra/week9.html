@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Factorizations Study Guide: LU & Cholesky for Quant Engineers</title>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+:root {
+  --primary: #1a237e;
+  --secondary: #0d47a1;
+  --accent: #00acc1;
+  --success: #2e7d32;
+  --warning: #f57c00;
+  --danger: #c62828;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #212121;
+  --text-light: #616161;
+  --border: #e0e0e0;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+header h1 { font-size: 2.4rem; margin-bottom: 0.5rem; font-weight: 700; }
+header p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+/* Tabs */
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--card);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tab-btn {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  background: #e8eaf6;
+  color: var(--primary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+.tab-btn:hover { background: #c5cae9; }
+.tab-btn.active { background: var(--primary); color: white; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  border-left: 5px solid var(--accent);
+}
+.card h2 { color: var(--primary); margin-bottom: 1rem; font-size: 1.6rem; }
+.card h3 { color: var(--secondary); margin: 1.5rem 0 0.8rem; font-size: 1.25rem; }
+.card h4 { color: var(--text); margin: 1.2rem 0 0.5rem; font-size: 1.1rem; }
+
+/* Highlight boxes */
+.def-box {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-left: 4px solid var(--secondary);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+.warn-box {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border-left: 4px solid var(--warning);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+.tip-box {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-left: 4px solid var(--success);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+.quant-box {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  border-left: 4px solid #7b1fa2;
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+.code-box {
+  background: #263238;
+  color: #aed581;
+  padding: 1.2rem;
+  border-radius: 8px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  white-space: pre-wrap;
+}
+
+/* SVG Diagrams */
+.svg-container {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+/* Exercise tiers */
+.tier { margin: 1.5rem 0; padding: 1.2rem; border-radius: 10px; }
+.tier-easy { background: #e8f5e9; border: 2px solid var(--success); }
+.tier-medium { background: #fff8e1; border: 2px solid var(--warning); }
+.tier-hard { background: #ffebee; border: 2px solid var(--danger); }
+.tier-label {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.tier-easy .tier-label { background: var(--success); color: white; }
+.tier-medium .tier-label { background: var(--warning); color: white; }
+.tier-hard .tier-label { background: var(--danger); color: white; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #e8eaf6; color: var(--primary); font-weight: 600; }
+tr:hover { background: #f5f5f5; }
+
+/* Progress tracker */
+.progress-bar {
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Checklist */
+.checklist { list-style: none; }
+.checklist li {
+  padding: 0.5rem 0;
+  padding-left: 2rem;
+  position: relative;
+}
+.checklist li::before {
+  content: "☐";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+
+/* Math styling */
+.math-block {
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+  border: 1px dashed var(--border);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.6rem; }
+  .tab-btn { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
+  .card { padding: 1.2rem; }
+}
+
+/* Print */
+@media print {
+  .tab-nav { display: none; }
+  .tab-content { display: block !important; }
+}
+
+/* Interactive elements */
+.interactive-demo {
+  background: #fafafa;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* External link badge */
+.ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin: 0.2rem;
+  transition: transform 0.2s;
+}
+.ext-link:hover { transform: translateY(-2px); }
+
+/* Two column layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Step by step */
+.step { 
+  display: flex; 
+  gap: 1rem; 
+  margin: 1rem 0; 
+  align-items: flex-start;
+}
+.step-num {
+  background: var(--primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.step-content { flex: 1; }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<header>
+  <h1>Matrix Factorizations Study Guide</h1>
+  <p>LU & Cholesky Decomposition for Aspiring Quant Engineers — A Complete, Self-Contained, Offline-Ready Reference</p>
+</header>
+
+<div class="container">
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="openTab('prereq')">Prerequisites</button>
+  <button class="tab-btn" onclick="openTab('lu')">LU Decomposition</button>
+  <button class="tab-btn" onclick="openTab('pd')">Positive Definite</button>
+  <button class="tab-btn" onclick="openTab('chol')">Cholesky</button>
+  <button class="tab-btn" onclick="openTab('quant')">Quant Applications</button>
+  <button class="tab-btn" onclick="openTab('colab')">Colab Experiments</button>
+  <button class="tab-btn" onclick="openTab('exercises')">Practice Exercises</button>
+  <button class="tab-btn" onclick="openTab('resources')">Resources</button>
+</div>
+
+<!-- ==================== PREREQUISITES ==================== -->
+<div id="prereq" class="tab-content active">
+
+<div class="card">
+  <h2>Prerequisites: Building Your Foundation</h2>
+  <p>Before diving into matrix factorizations, you need a solid grasp of these concepts. Think of these as the "alphabet" before you can read the "sentences" of numerical linear algebra. Each prerequisite is explained in plain English with visual intuition.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+
+  <h3>1. What is a Matrix? (The Spreadsheet View)</h3>
+  <p>A matrix is simply a rectangular array of numbers arranged in <strong>rows</strong> and <strong>columns</strong>. If you've ever used Excel or Google Sheets, you already understand the layout.</p>
+
+  <div class="math-block">
+    $$ A = \begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix} $$
+    <p style="margin-top:0.5rem;color:var(--text-light)">A 3×3 matrix. The entry $a_{ij}$ lives in row $i$, column $j$.</p>
+  </div>
+
+  <div class="def-box">
+    <strong>Key Vocabulary:</strong>
+    <ul>
+      <li><strong>Dimension:</strong> An $m \times n$ matrix has $m$ rows and $n$ columns.</li>
+      <li><strong>Square matrix:</strong> $m = n$ (same number of rows and columns). Most factorizations work on square matrices.</li>
+      <li><strong>Diagonal:</strong> The entries $a_{11}, a_{22}, a_{33}, ...$ where row = column.</li>
+      <li><strong>Trace:</strong> Sum of diagonal entries.</li>
+    </ul>
+  </div>
+
+  <h3>2. Matrix Multiplication (Row × Column)</h3>
+  <p>To multiply two matrices $A$ and $B$, take the <strong>dot product</strong> of each row of $A$ with each column of $B$.</p>
+
+  <div class="svg-container">
+    <svg width="500" height="220" viewBox="0 0 500 220">
+      <!-- Matrix A -->
+      <rect x="20" y="40" width="100" height="140" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="4"/>
+      <text x="70" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">A (2×3)</text>
+      <text x="45" y="70" font-size="13" fill="#333">a₁₁</text><text x="85" y="70" font-size="13" fill="#333">a₁₂</text><text x="125" y="70" font-size="13" fill="#333" opacity="0">.</text>
+      <text x="45" y="100" font-size="13" fill="#333">a₂₁</text><text x="85" y="100" font-size="13" fill="#333">a₂₂</text>
+      <text x="45" y="130" font-size="13" fill="#333">a₃₁</text><text x="85" y="130" font-size="13" fill="#333">a₃₂</text>
+
+      <!-- Times -->
+      <text x="155" y="115" font-size="24" fill="#666">×</text>
+
+      <!-- Matrix B -->
+      <rect x="190" y="40" width="100" height="140" fill="#fff3e0" stroke="#ef6c00" stroke-width="2" rx="4"/>
+      <text x="240" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef6c00">B (3×2)</text>
+      <text x="215" y="70" font-size="13" fill="#333">b₁₁</text><text x="255" y="70" font-size="13" fill="#333">b₁₂</text>
+      <text x="215" y="100" font-size="13" fill="#333">b₂₁</text><text x="255" y="100" font-size="13" fill="#333">b₂₂</text>
+      <text x="215" y="130" font-size="13" fill="#333">b₃₁</text><text x="255" y="130" font-size="13" fill="#333">b₃₂</text>
+
+      <!-- Equals -->
+      <text x="325" y="115" font-size="24" fill="#666">=</text>
+
+      <!-- Result -->
+      <rect x="360" y="40" width="100" height="140" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+      <text x="410" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">C (2×2)</text>
+      <text x="385" y="85" font-size="13" fill="#333">Σa₁ₖbₖ₁</text>
+      <text x="385" y="125" font-size="13" fill="#333">Σa₂ₖbₖ₁</text>
+      <text x="425" y="85" font-size="13" fill="#333">Σa₁ₖbₖ₂</text>
+      <text x="425" y="125" font-size="13" fill="#333">Σa₂ₖbₖ₂</text>
+
+      <!-- Highlight row and column -->
+      <rect x="20" y="60" width="100" height="25" fill="#1565c0" opacity="0.2"/>
+      <rect x="190" y="40" width="40" height="140" fill="#ef6c00" opacity="0.2"/>
+      <text x="250" y="200" text-anchor="middle" font-size="12" fill="#666">Row of A × Column of B = Entry of C</text>
+    </svg>
+  </div>
+
+  <div class="tip-box">
+    <strong>Memory Trick:</strong> Matrix multiplication is <em>not</em> commutative! $AB \neq BA$ in general. But it <em>is</em> associative: $(AB)C = A(BC)$.
+  </div>
+
+  <h3>3. Linear Systems of Equations $Ax = b$</h3>
+  <p>This is the <strong>central problem</strong> of numerical linear algebra. We have a system of equations, and we want to find the unknown vector $x$.</p>
+
+  <div class="two-col">
+    <div>
+      <p><strong>System form:</strong></p>
+      <div class="math-block" style="text-align:left">
+        $2x + 3y = 8$<br>
+        $4x + 9y = 21$
+      </div>
+    </div>
+    <div>
+      <p><strong>Matrix form:</strong></p>
+      <div class="math-block" style="text-align:left">
+        $$\begin{bmatrix} 2 & 3 \\ 4 & 9 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 8 \\ 21 \end{bmatrix}$$
+      </div>
+    </div>
+  </div>
+
+  <p>In quant finance, $A$ might be a covariance matrix, $x$ a portfolio weight vector, and $b$ a target return vector.</p>
+
+  <h3>4. Triangular Matrices (The "Half-Full" Matrices)</h3>
+  <p>Triangular matrices have zeros either below or above the diagonal. They are <strong>extremely easy</strong> to solve.</p>
+
+  <div class="two-col">
+    <div class="def-box">
+      <strong>Lower Triangular (L)</strong>
+      <div class="math-block">
+        $$L = \begin{bmatrix} l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\ l_{31} & l_{32} & l_{33} \end{bmatrix}$$
+      </div>
+      <p>All entries <em>above</em> diagonal are zero.</p>
+    </div>
+    <div class="def-box">
+      <strong>Upper Triangular (U)</strong>
+      <div class="math-block">
+        $$U = \begin{bmatrix} u_{11} & u_{12} & u_{13} \\ 0 & u_{22} & u_{23} \\ 0 & 0 & u_{33} \end{bmatrix}$$
+      </div>
+      <p>All entries <em>below</em> diagonal are zero.</p>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Why Triangular is Beautiful:</strong> To solve $Ux = b$, you just <strong>back-substitute</strong> starting from the bottom. To solve $Lx = b$, you <strong>forward-substitute</strong> starting from the top. No elimination needed!
+  </div>
+
+  <h3>5. Gaussian Elimination (The "Row Operation" Game)</h3>
+  <p>Gaussian elimination is the process of transforming a matrix into upper triangular form using three allowed row operations:</p>
+  <ol>
+    <li>Swap two rows</li>
+    <li>Multiply a row by a non-zero constant</li>
+    <li>Add a multiple of one row to another row</li>
+  </ol>
+
+  <div class="interactive-demo">
+    <h4>Example: Eliminate below the first pivot</h4>
+    <p>Starting matrix:</p>
+    <div class="math-block">
+      $$\begin{bmatrix} 2 & 1 & -1 \\ 4 & 3 & -1 \\ -2 & 1 & 5 \end{bmatrix}$$
+    </div>
+    <p><strong>Step 1:</strong> Row 2 ← Row 2 − 2×Row 1 &nbsp;&nbsp;(multiplier = 4/2 = <strong>2</strong>)</p>
+    <p><strong>Step 2:</strong> Row 3 ← Row 3 − (−1)×Row 1 &nbsp;&nbsp;(multiplier = −2/2 = <strong>−1</strong>)</p>
+    <div class="math-block">
+      $$\begin{bmatrix} 2 & 1 & -1 \\ 0 & 1 & 1 \\ 0 & 2 & 4 \end{bmatrix}$$
+    </div>
+    <p><strong>Step 3:</strong> Row 3 ← Row 3 − 2×Row 2 &nbsp;&nbsp;(multiplier = 2/1 = <strong>2</strong>)</p>
+    <div class="math-block">
+      $$\begin{bmatrix} 2 & 1 & -1 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{bmatrix} = U$$
+    </div>
+  </div>
+
+  <h3>6. Transpose and Symmetric Matrices</h3>
+  <p>The <strong>transpose</strong> $A^T$ flips a matrix over its diagonal (rows become columns).</p>
+
+  <div class="def-box">
+    <strong>Symmetric Matrix:</strong> $A = A^T$. The entries are mirrored across the diagonal: $a_{ij} = a_{ji}$.
+    <div class="math-block">
+      $$A = \begin{bmatrix} 4 & 2 & 1 \\ 2 & 5 & 3 \\ 1 & 3 & 6 \end{bmatrix}$$
+    </div>
+  </div>
+
+  <p>Symmetric matrices appear everywhere in quant finance because <strong>covariance matrices</strong> and <strong>correlation matrices</strong> are always symmetric.</p>
+
+  <h3>7. Determinant and Invertibility</h3>
+  <p>A matrix $A$ is <strong>invertible</strong> (non-singular) if there exists $A^{-1}$ such that $AA^{-1} = I$. Key facts:</p>
+  <ul>
+    <li>$\det(A) \neq 0$ ↔ $A$ is invertible</li>
+    <li>For triangular matrices, $\det = $ product of diagonal entries</li>
+    <li>If any diagonal entry of $U$ is zero, $A$ is singular</li>
+  </ul>
+
+  <h3>8. The Identity Matrix $I$</h3>
+  <p>The "do nothing" matrix. Ones on the diagonal, zeros elsewhere. $AI = IA = A$.</p>
+  <div class="math-block">
+    $$I = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+  </div>
+
+  <h3>Prerequisite Checklist</h3>
+  <ul class="checklist">
+    <li>I can multiply two matrices by hand</li>
+    <li>I understand what $Ax = b$ means geometrically and algebraically</li>
+    <li>I can identify upper and lower triangular matrices</li>
+    <li>I can perform Gaussian elimination to get an upper triangular matrix</li>
+    <li>I know what a transpose is and can recognize symmetric matrices</li>
+    <li>I understand when a matrix is invertible</li>
+  </ul>
+</div>
+
+</div>
+
+<!-- ==================== LU DECOMPOSITION ==================== -->
+<div id="lu" class="tab-content">
+
+<div class="card">
+  <h2>LU Decomposition: The Foundation of Fast Solvers</h2>
+  <p>LU decomposition is the process of factoring a matrix $A$ into the product of a lower triangular matrix $L$ and an upper triangular matrix $U$. It is the <strong>backbone</strong> of numerical linear algebra and the first factorization every quant engineer must master.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:35%"></div></div>
+
+  <div class="def-box">
+    <strong>Definition:</strong> For a square matrix $A$, the LU decomposition is:
+    $$A = LU$$
+    where $L$ is lower triangular with 1's on the diagonal (unit lower triangular), and $U$ is upper triangular.
+  </div>
+
+  <h3>The Big Idea: "Remember Your Steps"</h3>
+  <p>Gaussian elimination transforms $A \rightarrow U$. But <em>what if we could remember the elimination steps?</em> Each elimination step is equivalent to multiplying by a lower triangular matrix. The product of all these matrices (in reverse) gives us $L$.</p>
+
+  <div class="svg-container">
+    <svg width="700" height="300" viewBox="0 0 700 300">
+      <!-- Title -->
+      <text x="350" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a237e">LU Decomposition: Gaussian Elimination in Disguise</text>
+
+      <!-- A box -->
+      <rect x="30" y="60" width="80" height="80" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="4"/>
+      <text x="70" y="105" text-anchor="middle" font-size="18" font-weight="bold" fill="#1565c0">A</text>
+
+      <!-- Arrow -->
+      <path d="M 120 100 L 160 100" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#666"/></marker></defs>
+      <text x="140" y="90" text-anchor="middle" font-size="11" fill="#666">Eliminate</text>
+
+      <!-- L3 L2 L1 -->
+      <rect x="170" y="60" width="50" height="50" fill="#fff3e0" stroke="#ef6c00" stroke-width="2" rx="4"/>
+      <text x="195" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef6c00">L₁⁻¹</text>
+      <rect x="170" y="120" width="50" height="50" fill="#fff3e0" stroke="#ef6c00" stroke-width="2" rx="4"/>
+      <text x="195" y="150" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef6c00">L₂⁻¹</text>
+      <text x="195" y="185" text-anchor="middle" font-size="12" fill="#666">...</text>
+
+      <!-- Arrow -->
+      <path d="M 230 100 L 270 100" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+      <text x="250" y="90" text-anchor="middle" font-size="11" fill="#666">Apply</text>
+
+      <!-- U box -->
+      <rect x="280" y="60" width="80" height="80" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+      <text x="320" y="105" text-anchor="middle" font-size="18" font-weight="bold" fill="#2e7d32">U</text>
+
+      <!-- Equation -->
+      <text x="400" y="105" font-size="18" fill="#333">=</text>
+
+      <!-- L box -->
+      <rect x="420" y="60" width="80" height="80" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="4"/>
+      <text x="460" y="105" text-anchor="middle" font-size="18" font-weight="bold" fill="#7b1fa2">L</text>
+
+      <!-- Times -->
+      <text x="520" y="105" font-size="18" fill="#333">×</text>
+
+      <!-- U box again -->
+      <rect x="540" y="60" width="80" height="80" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+      <text x="580" y="105" text-anchor="middle" font-size="18" font-weight="bold" fill="#2e7d32">U</text>
+
+      <!-- Bottom explanation -->
+      <rect x="30" y="220" width="640" height="60" fill="#fafafa" stroke="#e0e0e0" stroke-width="1" rx="4"/>
+      <text x="350" y="245" text-anchor="middle" font-size="13" fill="#333">L = L₁ × L₂ × L₃ (product of elimination matrices)</text>
+      <text x="350" y="265" text-anchor="middle" font-size="13" fill="#666">Each Lᵢ contains the multipliers used in elimination below the diagonal</text>
+    </svg>
+  </div>
+
+  <h3>Step-by-Step: Computing LU by Hand (Doolittle's Method)</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Start with your matrix A.</strong> Let's use a concrete example:
+      <div class="math-block">
+        $$A = \begin{bmatrix} 2 & 1 & 1 \\ 4 & 3 & 3 \\ 8 & 7 & 9 \end{bmatrix}$$
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Eliminate below the first pivot (row 1, column 1).</strong><br>
+      Multiplier for Row 2: $m_{21} = 4/2 = 2$<br>
+      Multiplier for Row 3: $m_{31} = 8/2 = 4$<br><br>
+      Store these multipliers in $L$ at positions $(2,1)$ and $(3,1)$.<br>
+      Perform: Row 2 ← Row 2 − 2×Row 1, Row 3 ← Row 3 − 4×Row 1
+      <div class="math-block">
+        $$\begin{bmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 3 & 5 \end{bmatrix}$$
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Eliminate below the second pivot (row 2, column 2).</strong><br>
+      Multiplier for Row 3: $m_{32} = 3/1 = 3$<br>
+      Store in $L$ at position $(3,2)$.<br>
+      Perform: Row 3 ← Row 3 − 3×Row 2
+      <div class="math-block">
+        $$U = \begin{bmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{bmatrix}$$
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>Construct L.</strong> Put 1's on diagonal, stored multipliers below, zeros above:
+      <div class="math-block">
+        $$L = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 4 & 3 & 1 \end{bmatrix}$$
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-content">
+      <strong>Verify:</strong> Multiply $L \times U$ and check you get $A$ back.
+      <div class="math-block">
+        $$LU = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 4 & 3 & 1 \end{bmatrix} \begin{bmatrix} 2 & 1 & 1 \\ 0 & 1 & 1 \\ 0 & 0 & 2 \end{bmatrix} = \begin{bmatrix} 2 & 1 & 1 \\ 4 & 3 & 3 \\ 8 & 7 & 9 \end{bmatrix} = A \checkmark$$
+      </div>
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <strong>When LU Fails (Partial Pivoting):</strong> If a pivot is zero (or very small), we can't divide by it. Solution: <strong>Partial Pivoting</strong> — swap rows to move the largest element to the pivot position. This gives $PA = LU$ where $P$ is a permutation matrix.
+  </div>
+
+  <h3>Why LU is Revolutionary for Solving $Ax = b$</h3>
+  <p>Once you have $A = LU$, solving $Ax = b$ becomes trivial:</p>
+
+  <div class="interactive-demo">
+    <h4>The Two-Step Solve</h4>
+    <p>Given $Ax = b$ and $A = LU$:</p>
+    <ol>
+      <li><strong>Forward substitution:</strong> Solve $Ly = b$ for $y$ (go top to bottom)</li>
+      <li><strong>Back substitution:</strong> Solve $Ux = y$ for $x$ (go bottom to top)</li>
+    </ol>
+
+    <div class="two-col">
+      <div>
+        <p><strong>Step 1: $Ly = b$</strong></p>
+        <div class="math-block" style="text-align:left;font-size:0.9rem">
+          $y_1 = b_1$<br>
+          $y_2 = b_2 - l_{21}y_1$<br>
+          $y_3 = b_3 - l_{31}y_1 - l_{32}y_2$<br>
+          ... and so on
+        </div>
+      </div>
+      <div>
+        <p><strong>Step 2: $Ux = y$</strong></p>
+        <div class="math-block" style="text-align:left;font-size:0.9rem">
+          $x_n = y_n / u_{nn}$<br>
+          $x_{n-1} = (y_{n-1} - u_{n-1,n}x_n) / u_{n-1,n-1}$<br>
+          ... and so on upward
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quant-box">
+    <strong>Quant Insight:</strong> If you need to solve $Ax = b$ for <em>many different</em> $b$ vectors (e.g., different portfolio scenarios), you factor $A = LU$ <strong>once</strong> ($O(n^3)$), then each solve is only $O(n^2)$. For a 1000×1000 matrix, that's the difference between hours and milliseconds!
+  </div>
+
+  <h3>Computational Complexity</h3>
+  <table>
+    <tr><th>Operation</th><th>Complexity</th><th>Why it matters</th></tr>
+    <tr><td>LU Factorization</td><td>$O(n^3)$</td><td>Do once, cache the result</td></tr>
+    <tr><td>Forward/Back Solve</td><td>$O(n^2)$</td><td>Fast per right-hand side</td></tr>
+    <tr><td>Matrix Inverse $A^{-1}$</td><td>$O(n^3)$</td><td>Never compute explicitly! Use LU instead</td></tr>
+    <tr><td>Naive Gaussian Elimination per $b$</td><td>$O(n^3)$</td><td>Wasteful if $b$ changes</td></tr>
+  </table>
+
+  <h3>LU with Partial Pivoting ($PA = LU$)</h3>
+  <p>In practice, we always use partial pivoting for numerical stability. The permutation matrix $P$ tracks row swaps.</p>
+
+  <div class="code-box"># Python/NumPy implementation
+import numpy as np
+from scipy.linalg import lu
+
+A = np.array([[2, 1, 1],
+              [4, 3, 3],
+              [8, 7, 9]], dtype=float)
+
+P, L, U = lu(A)
+
+# Verify: P @ A == L @ U
+print("P@A equals L@U:", np.allclose(P @ A, L @ U))
+
+# Solve Ax = b using LU
+b = np.array([1, 2, 3])
+# scipy.linalg.lu_solve or manual forward/back substitution</div>
+
+  <h3>Key Properties Summary</h3>
+  <ul>
+    <li><strong>Existence:</strong> LU exists if all leading principal minors are non-zero (no zero pivots without pivoting)</li>
+    <li><strong>Uniqueness:</strong> With the constraint that $L$ has 1's on diagonal (Doolittle), the factorization is unique</li>
+    <li><strong>Storage:</strong> $L$ and $U$ can overwrite $A$ — only $n^2$ storage needed!</li>
+    <li><strong>Determinant:</strong> $\det(A) = \det(U) = u_{11} \times u_{22} \times ... \times u_{nn}$</li>
+  </ul>
+</div>
+
+</div>
+
+<!-- ==================== POSITIVE DEFINITE ==================== -->
+<div id="pd" class="tab-content">
+
+<div class="card">
+  <h2>Positive Definite Matrices: The "Nice" Matrices</h2>
+  <p>Positive definite matrices are the <strong>gold standard</strong> of numerical linear algebra. They guarantee that Cholesky decomposition exists, that optimization problems have unique solutions, and that random sampling behaves well. In quant finance, covariance matrices <em>must</em> be positive definite.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+
+  <h3>What Does "Positive Definite" Mean?</h3>
+
+  <div class="def-box">
+    <strong>Definition:</strong> A symmetric matrix $A$ is <strong>positive definite</strong> if for <em>every</em> non-zero vector $x$:
+    $$x^T A x > 0$$
+    It is <strong>positive semi-definite</strong> if $x^T A x \geq 0$.
+  </div>
+
+  <p>Let's unpack this. The expression $x^T A x$ is called a <strong>quadratic form</strong>. It takes a vector $x$ and produces a single number. For a positive definite matrix, this number is always positive (unless $x$ is the zero vector).</p>
+
+  <h3>Geometric Intuition: The "Bowl" Shape</h3>
+  <p>Think of $f(x) = x^T A x$ as a surface in 3D space. For positive definite $A$, this surface looks like a <strong>bowl</strong> that opens upward — it has a unique minimum at $x = 0$.</p>
+
+  <div class="svg-container">
+    <svg width="600" height="280" viewBox="0 0 600 280">
+      <!-- Title -->
+      <text x="300" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a237e">Quadratic Form: $f(x,y) = x^T A x$</text>
+
+      <!-- Positive Definite Bowl -->
+      <text x="150" y="50" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">Positive Definite (Bowl)</text>
+      <ellipse cx="150" cy="200" rx="80" ry="25" fill="none" stroke="#2e7d32" stroke-width="2"/>
+      <ellipse cx="150" cy="180" rx="65" ry="20" fill="none" stroke="#2e7d32" stroke-width="1.5" opacity="0.7"/>
+      <ellipse cx="150" cy="160" rx="50" ry="15" fill="none" stroke="#2e7d32" stroke-width="1" opacity="0.5"/>
+      <ellipse cx="150" cy="145" rx="35" ry="10" fill="none" stroke="#2e7d32" stroke-width="0.8" opacity="0.4"/>
+      <ellipse cx="150" cy="135" rx="20" ry="6" fill="none" stroke="#2e7d32" stroke-width="0.6" opacity="0.3"/>
+      <text x="150" y="245" text-anchor="middle" font-size="11" fill="#2e7d32">$x^T A x > 0$ for all $x \neq 0$</text>
+      <text x="150" y="260" text-anchor="middle" font-size="11" fill="#666">Unique minimum at origin</text>
+
+      <!-- Arrow -->
+      <text x="300" y="170" text-anchor="middle" font-size="20" fill="#666">vs</text>
+
+      <!-- Indefinite Saddle -->
+      <text x="450" y="50" text-anchor="middle" font-size="13" font-weight="bold" fill="#c62828">Indefinite (Saddle)</text>
+      <path d="M 370 180 Q 450 120 530 180" fill="none" stroke="#c62828" stroke-width="2"/>
+      <path d="M 370 180 Q 450 240 530 180" fill="none" stroke="#c62828" stroke-width="2"/>
+      <line x1="450" y1="130" x2="450" y2="230" stroke="#c62828" stroke-width="1.5" stroke-dasharray="4"/>
+      <text x="450" y="245" text-anchor="middle" font-size="11" fill="#c62828">$x^T A x$ can be + or −</text>
+      <text x="450" y="260" text-anchor="middle" font-size="11" fill="#666">Saddle point at origin</text>
+    </svg>
+  </div>
+
+  <h3>Equivalent Conditions (Pick Your Favorite!)</h3>
+  <p>For a symmetric matrix $A$, these are <strong>all equivalent</strong> — any one implies all the others:</p>
+
+  <table>
+    <tr><th>#</th><th>Condition</th><th>Intuition</th></tr>
+    <tr><td>1</td><td>$x^T A x > 0$ for all $x \neq 0$</td><td>The "definition" — quadratic form is always positive</td></tr>
+    <tr><td>2</td><td>All eigenvalues $\lambda_i > 0$</td><td>Matrix "stretches" space in positive directions only</td></tr>
+    <tr><td>3</td><td>All leading principal minors $\det(A_k) > 0$</td><td>Top-left k×k submatrices have positive determinant</td></tr>
+    <tr><td>4</td><td>Cholesky decomposition exists: $A = LL^T$</td><td>Can be factored into triangular times transpose</td></tr>
+    <tr><td>5</td><td>$A = B^T B$ for some invertible $B$</td><td>"Gram matrix" of linearly independent vectors</td></tr>
+    <tr><td>6</td><td>$A^{-1}$ exists and is also positive definite</td><td>Inverse preserves positive definiteness</td></tr>
+  </table>
+
+  <h3>Testing Positive Definiteness: The Eigenvalue Test</h3>
+  <p>The most reliable numerical test: compute all eigenvalues. If they're all strictly positive, $A$ is positive definite.</p>
+
+  <div class="code-box">import numpy as np
+
+A = np.array([[4, 2, 1],
+              [2, 5, 3],
+              [1, 3, 6]])
+
+eigenvalues = np.linalg.eigvalsh(A)  # eigvalsh for symmetric matrices
+print("Eigenvalues:", eigenvalues)
+print("Is positive definite:", np.all(eigenvalues > 0))
+# Output: [1.38, 3.00, 10.62] -> Yes, all positive!</div>
+
+  <h3>The Leading Principal Minor Test (Sylvester's Criterion)</h3>
+  <p>For small matrices, this is elegant and requires no eigenvalue computation:</p>
+
+  <div class="interactive-demo">
+    <h4>Example: Test if $A$ is positive definite</h4>
+    <div class="math-block">
+      $$A = \begin{bmatrix} 4 & 2 & 1 \\ 2 & 5 & 3 \\ 1 & 3 & 6 \end{bmatrix}$$
+    </div>
+    <p><strong>1×1 minor:</strong> $\det([4]) = 4 > 0$ ✓</p>
+    <p><strong>2×2 minor:</strong> $\det\begin{bmatrix} 4 & 2 \\ 2 & 5 \end{bmatrix} = 20 - 4 = 16 > 0$ ✓</p>
+    <p><strong>3×3 minor:</strong> $\det(A) = 4(30-9) - 2(12-3) + 1(6-5) = 84 - 18 + 1 = 67 > 0$ ✓</p>
+    <p><strong>Conclusion:</strong> All leading principal minors are positive → $A$ is positive definite!</p>
+  </div>
+
+  <h3>Positive Definite in Quant Finance: Covariance Matrices</h3>
+
+  <div class="quant-box">
+    <strong>The Covariance Matrix $\Sigma$</strong>
+    <p>For random returns $R = (R_1, R_2, ..., R_n)$, the covariance matrix is:</p>
+    <div class="math-block">
+      $$\Sigma_{ij} = \text{Cov}(R_i, R_j) = \mathbb{E}[(R_i - \mu_i)(R_j - \mu_j)]$$
+    </div>
+    <p><strong>Why $\Sigma$ must be positive semi-definite:</strong></p>
+    <p>For any portfolio weights $w$, the portfolio variance is $w^T \Sigma w = \text{Var}(w^T R) \geq 0$.</p>
+    <p>Since variance can never be negative, $w^T \Sigma w \geq 0$ for all $w$. This is exactly the definition of positive semi-definite!</p>
+    <p><strong>For positive definite:</strong> We need no non-trivial portfolio to have zero variance (no perfect arbitrage). This requires linearly independent assets.</p>
+  </div>
+
+  <h3>What Happens When a Covariance Matrix is NOT Positive Definite?</h3>
+  <p>In real-world data, due to estimation errors, missing data, or asynchronous prices, a "covariance matrix" computed from historical returns might fail to be positive definite. This is a <strong>disaster</strong> because:</p>
+  <ul>
+    <li>Cholesky decomposition fails (no square root matrix)</li>
+    <li>Monte Carlo simulation produces complex/NaN numbers</li>
+    <li>Portfolio optimization gives nonsensical results (negative variance portfolios)</li>
+    <li>Mean-variance optimization crashes or gives infinite leverage</li>
+  </ul>
+
+  <div class="warn-box">
+    <strong>Fixing an Indefinite Covariance Matrix:</strong>
+    <ol>
+      <li><strong>Nearest Correlation Matrix:</strong> Find the closest positive definite matrix (Higham's algorithm)</li>
+      <li><strong>Eigenvalue Clipping:</strong> Set negative eigenvalues to a small positive number</li>
+      <li><strong>Shrinkage Estimation:</strong> Blend sample covariance with a well-conditioned target (Ledoit-Wolf)</li>
+      <li><strong>Factor Models:</strong> Build covariance from a low-rank factor structure plus diagonal</li>
+    </ol>
+  </div>
+
+  <h3>Visual Summary: The Spectrum of Definiteness</h3>
+
+  <div class="svg-container">
+    <svg width="700" height="200" viewBox="0 0 700 200">
+      <!-- Spectrum line -->
+      <line x1="50" y1="100" x2="650" y2="100" stroke="#333" stroke-width="3"/>
+
+      <!-- Labels -->
+      <text x="120" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#c62828">Negative Definite</text>
+      <text x="120" y="130" text-anchor="middle" font-size="11" fill="#666">All $\lambda < 0$</text>
+
+      <text x="300" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#f57c00">Indefinite</text>
+      <text x="300" y="130" text-anchor="middle" font-size="11" fill="#666">Mixed signs $\lambda$</text>
+
+      <text x="480" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">Positive Semi-Definite</text>
+      <text x="480" y="130" text-anchor="middle" font-size="11" fill="#666">All $\lambda \geq 0$</text>
+
+      <text x="600" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#1565c0">Positive Definite</text>
+      <text x="600" y="130" text-anchor="middle" font-size="11" fill="#666">All $\lambda > 0$</text>
+
+      <!-- Arrows -->
+      <polygon points="640,95 650,100 640,105" fill="#333"/>
+      <text x="350" y="170" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">← Cholesky needs this region →</text>
+      <rect x="420" y="155" width="260" height="22" fill="#e8f5e9" opacity="0.4" rx="4"/>
+    </svg>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== CHOLESKY ==================== -->
+<div id="chol" class="tab-content">
+
+<div class="card">
+  <h2>Cholesky Decomposition: The Square Root of a Matrix</h2>
+  <p>If LU is the Swiss Army knife, Cholesky is the <strong>scalpel</strong> — faster, more stable, but only works on positive definite matrices. For quant engineers, Cholesky is indispensable because covariance and correlation matrices are symmetric positive definite.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+
+  <div class="def-box">
+    <strong>Definition:</strong> For a symmetric positive definite matrix $A$, the Cholesky decomposition is:
+    $$A = LL^T$$
+    where $L$ is a <strong>lower triangular</strong> matrix with <strong>strictly positive</strong> diagonal entries.
+    <br><br>
+    Alternative form: $A = R^T R$ where $R$ is upper triangular (some libraries use this convention).
+  </div>
+
+  <h3>The Analogy: Square Root of a Number</h3>
+  <p>Just as $a = \sqrt{a} \times \sqrt{a}$ for positive numbers, Cholesky gives us $A = L \times L^T$. The matrix $L$ is literally the "square root" of $A$.</p>
+
+  <div class="svg-container">
+    <svg width="600" height="180" viewBox="0 0 600 180">
+      <!-- Scalar analogy -->
+      <text x="150" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Scalar Analogy</text>
+      <text x="150" y="80" text-anchor="middle" font-size="18" fill="#1565c0">$a = \sqrt{a} \times \sqrt{a}$</text>
+      <text x="150" y="110" text-anchor="middle" font-size="13" fill="#666">For $a > 0$</text>
+      <text x="150" y="140" text-anchor="middle" font-size="13" fill="#666">Example: $9 = 3 \times 3$</text>
+
+      <!-- Arrow -->
+      <text x="300" y="90" text-anchor="middle" font-size="24" fill="#666">⇔</text>
+
+      <!-- Matrix analogy -->
+      <text x="450" y="40" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Matrix Analogy</text>
+      <text x="450" y="80" text-anchor="middle" font-size="18" fill="#7b1fa2">$A = L \times L^T$</text>
+      <text x="450" y="110" text-anchor="middle" font-size="13" fill="#666">For $A$ positive definite</text>
+      <text x="450" y="140" text-anchor="middle" font-size="13" fill="#666">$L$ is lower triangular</text>
+    </svg>
+  </div>
+
+  <h3>Why Cholesky Beats LU (When Applicable)</h3>
+
+  <table>
+    <tr><th>Aspect</th><th>LU Decomposition</th><th>Cholesky Decomposition</th></tr>
+    <tr><td>Applies to</td><td>Any invertible matrix</td><td>Symmetric positive definite only</td></tr>
+    <tr><td>Storage</td><td>$n^2$ (store L and U)</td><td>$\approx n^2/2$ (only L, exploit symmetry)</td></tr>
+    <tr><td>Operations</td><td>$\frac{2}{3}n^3$</td><td>$\frac{1}{3}n^3$ (half the work!)</td></tr>
+    <tr><td>Numerical stability</td><td>Needs pivoting</td><td>Stable without pivoting</td></tr>
+    <tr><td>Unique?</td><td>Yes (with unit diagonal on L)</td><td>Yes (with positive diagonal)</td></tr>
+  </table>
+
+  <h3>Step-by-Step: Computing Cholesky by Hand</h3>
+  <p>We compute $L$ column by column using the formula derived from $A = LL^T$.</p>
+
+  <div class="interactive-demo">
+    <h4>Example: Cholesky of a 3×3 Matrix</h4>
+    <div class="math-block">
+      $$A = \begin{bmatrix} 4 & 2 & 1 \\ 2 & 5 & 3 \\ 1 & 3 & 6 \end{bmatrix}$$
+    </div>
+    <p>We want $L = \begin{bmatrix} l_{11} & 0 & 0 \\ l_{21} & l_{22} & 0 \\ l_{31} & l_{32} & l_{33} \end{bmatrix}$ such that $A = LL^T$.</p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>First column of L:</strong><br>
+        $l_{11} = \sqrt{a_{11}} = \sqrt{4} = 2$<br>
+        $l_{21} = a_{21}/l_{11} = 2/2 = 1$<br>
+        $l_{31} = a_{31}/l_{11} = 1/2 = 0.5$
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Second column of L:</strong><br>
+        $l_{22} = \sqrt{a_{22} - l_{21}^2} = \sqrt{5 - 1} = \sqrt{4} = 2$<br>
+        $l_{32} = (a_{32} - l_{31}l_{21})/l_{22} = (3 - 0.5\times1)/2 = 2.5/2 = 1.25$
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Third column of L:</strong><br>
+        $l_{33} = \sqrt{a_{33} - l_{31}^2 - l_{32}^2} = \sqrt{6 - 0.25 - 1.5625} = \sqrt{4.1875} \approx 2.046$
+      </div>
+    </div>
+
+    <div class="math-block">
+      $$L = \begin{bmatrix} 2 & 0 & 0 \\ 1 & 2 & 0 \\ 0.5 & 1.25 & 2.046 \end{bmatrix}$$
+    </div>
+
+    <p><strong>Verify:</strong> Compute $LL^T$ and confirm it equals $A$.</p>
+  </div>
+
+  <h3>The General Algorithm (Cholesky-Banachiewicz)</h3>
+  <p>For each $i = 1, ..., n$ and $j = 1, ..., i$:</p>
+  <div class="math-block">
+    $$l_{ii} = \sqrt{a_{ii} - \sum_{k=1}^{i-1} l_{ik}^2}$$
+    $$l_{ji} = \frac{1}{l_{ii}}\left(a_{ji} - \sum_{k=1}^{i-1} l_{jk}l_{ik}\right) \quad \text{for } j > i$$
+  </div>
+  <p>(Note: Different indexing conventions exist; this is the column-wise version.)</p>
+
+  <h3>What If Cholesky Fails?</h3>
+  <p>If at any step you need to take the square root of a negative number, the algorithm fails. This means:</p>
+  <ul>
+    <li>$A$ is <strong>not</strong> positive definite</li>
+    <li>In quant finance: your covariance matrix is broken</li>
+  </ul>
+
+  <div class="warn-box">
+    <strong>Cholesky as a Diagnostic Tool:</strong> Try to compute Cholesky. If it fails, your matrix is not positive definite. This is often the fastest way to check!
+  </div>
+
+  <h3>Cholesky in Python</h3>
+
+  <div class="code-box">import numpy as np
+
+A = np.array([[4, 2, 1],
+              [2, 5, 3],
+              [1, 3, 6]], dtype=float)
+
+# Method 1: NumPy (returns lower triangular)
+L = np.linalg.cholesky(A)
+print("L =\n", L)
+print("L@L.T =\n", L @ L.T)  # Should equal A
+
+# Method 2: SciPy (more options)
+from scipy.linalg import cholesky
+R = cholesky(A, lower=False)  # Upper triangular R where A = R.T @ R
+print("R =\n", R)
+
+# Method 3: Check if positive definite
+def is_positive_definite(A):
+    try:
+        np.linalg.cholesky(A)
+        return True
+    except np.linalg.LinAlgError:
+        return False
+
+print("Is PD?", is_positive_definite(A))</div>
+
+  <h3>Cholesky vs LU: A Direct Comparison</h3>
+
+  <div class="two-col">
+    <div class="card" style="border-left-color:#1565c0">
+      <h4>LU on a Symmetric PD Matrix</h4>
+      <p>$A = LU$ where $U \neq L^T$</p>
+      <p>Storage: $n^2$ elements</p>
+      <p>Operations: $\frac{2}{3}n^3$</p>
+      <p>Needs pivoting for stability</p>
+    </div>
+    <div class="card" style="border-left-color:#7b1fa2">
+      <h4>Cholesky on Same Matrix</h4>
+      <p>$A = LL^T$</p>
+      <p>Storage: $\frac{n(n+1)}{2} \approx \frac{n^2}{2}$ elements</p>
+      <p>Operations: $\frac{1}{3}n^3$</p>
+      <p>No pivoting needed — always stable</p>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>Rule of Thumb:</strong> If your matrix is symmetric and you know (or can prove) it's positive definite, <strong>always use Cholesky</strong>. It's twice as fast and uses half the memory.
+  </div>
+
+  <h3>Cholesky for Solving Linear Systems</h3>
+  <p>Just like LU, once you have $A = LL^T$, solving $Ax = b$ is a two-step process:</p>
+  <ol>
+    <li><strong>Forward substitution:</strong> Solve $Ly = b$ for $y$</li>
+    <li><strong>Back substitution:</strong> Solve $L^T x = y$ for $x$</li>
+  </ol>
+
+  <div class="code-box"># Solve Ax = b using Cholesky
+b = np.array([1, 2, 3])
+
+# Step 1: Factor
+L = np.linalg.cholesky(A)
+
+# Step 2: Forward solve Ly = b
+y = np.linalg.solve(L, b)
+
+# Step 3: Back solve L.T x = y
+x = np.linalg.solve(L.T, y)
+
+print("Solution x:", x)
+print("Verification A@x:", A @ x)</div>
+</div>
+
+</div>
+
+<!-- ==================== QUANT APPLICATIONS ==================== -->
+<div id="quant" class="tab-content">
+
+<div class="card">
+  <h2>Quantitative Applications: Where Theory Meets Money</h2>
+  <p>This is where everything comes together. Matrix factorizations aren't abstract math exercises — they power the algorithms that manage trillions of dollars. We'll explore three core quant applications with code, intuition, and real-world context.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+
+  <h3>Application 1: Fast Linear Solvers in Quant Finance</h3>
+
+  <div class="quant-box">
+    <strong>The Problem:</strong> In risk management, you often need to solve $\Sigma w = \mu$ where $\Sigma$ is a covariance matrix and $\mu$ is expected returns. Or in finite difference methods for PDEs (Black-Scholes, Heston), you solve large sparse linear systems at every time step.
+  </div>
+
+  <h4>Scenario: Multi-Asset Risk Attribution</h4>
+  <p>A portfolio has $n = 500$ assets. You need to compute the minimum variance portfolio weights daily. The covariance matrix $\Sigma$ is 500×500.</p>
+
+  <div class="interactive-demo">
+    <h4>Performance Comparison</h4>
+    <table>
+      <tr><th>Method</th><th>Time for 500×500</th><th>Time for 2000×2000</th></tr>
+      <tr><td>Naïve $A^{-1}b$</td><td>~50 ms</td><td>~3 seconds</td></tr>
+      <tr><td>LU + solve</td><td>~15 ms</td><td>~800 ms</td></tr>
+      <tr><td>Cholesky + solve</td><td>~8 ms</td><td>~400 ms</td></tr>
+      <tr><td>Cholesky (cached) + solve only</td><td>~0.5 ms</td><td>~8 ms</td></tr>
+    </table>
+    <p><em>Approximate timings on modern CPU. Cholesky is ~2× faster than LU for the same PD matrix.</em></p>
+  </div>
+
+  <div class="code-box"># Quant Example: Fast Portfolio Risk Attribution
+import numpy as np
+
+np.random.seed(42)
+n = 500  # number of assets
+
+# Simulate a positive definite covariance matrix
+X = np.random.randn(n, 252)  # 1 year of daily returns
+Sigma = np.cov(X)  # Sample covariance (should be PD with enough data)
+
+# Ensure PD (in practice, use shrinkage)
+Sigma += 0.001 * np.eye(n)
+
+# Target: solve Sigma @ w = mu for portfolio weights
+mu = np.random.randn(n) * 0.001  # Daily expected returns
+
+# --- METHOD 1: Naive inverse (DON'T DO THIS) ---
+# w = np.linalg.inv(Sigma) @ mu  # Slow and numerically unstable
+
+# --- METHOD 2: Cholesky (THE RIGHT WAY) ---
+import time
+
+# Factor once (O(n^3))
+t0 = time.time()
+L = np.linalg.cholesky(Sigma)
+factor_time = time.time() - t0
+
+# Solve twice (O(n^2) each)
+t0 = time.time()
+y = np.linalg.solve(L, mu)
+w = np.linalg.solve(L.T, y)
+solve_time = time.time() - t0
+
+print(f"Factorization time: {factor_time*1000:.2f} ms")
+print(f"Solve time: {solve_time*1000:.2f} ms")
+print(f"Portfolio variance: {w @ Sigma @ w:.6f}")</div>
+
+  <h3>Application 2: Monte Carlo Correlation Sampling</h3>
+
+  <div class="quant-box">
+    <strong>The Problem:</strong> To simulate correlated asset returns for risk analysis or derivative pricing, you need to generate random vectors $X \sim N(0, \Sigma)$ where $\Sigma$ is the covariance matrix.
+  </div>
+
+  <h4>The Mathematics</h4>
+  <p>If $Z \sim N(0, I)$ (standard normal, independent), then:</p>
+  <div class="math-block">
+    $$X = L Z \sim N(0, LL^T) = N(0, \Sigma)$$
+  </div>
+  <p>where $L$ is the Cholesky factor of $\Sigma$. This is the <strong>fundamental trick</strong> of correlated Monte Carlo simulation.</p>
+
+  <div class="svg-container">
+    <svg width="700" height="250" viewBox="0 0 700 250">
+      <!-- Title -->
+      <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a237e">Correlated Sampling via Cholesky</text>
+
+      <!-- Independent Z -->
+      <rect x="30" y="60" width="120" height="80" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="6"/>
+      <text x="90" y="85" text-anchor="middle" font-size="13" font-weight="bold" fill="#1565c0">Independent</text>
+      <text x="90" y="105" text-anchor="middle" font-size="13" font-weight="bold" fill="#1565c0">$Z \sim N(0, I)$</text>
+      <text x="90" y="125" text-anchor="middle" font-size="11" fill="#666">No correlation</text>
+
+      <!-- Arrow -->
+      <path d="M 160 100 L 220 100" stroke="#7b1fa2" stroke-width="3" marker-end="url(#arrowhead2)"/>
+      <defs><marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#7b1fa2"/></marker></defs>
+      <text x="190" y="90" text-anchor="middle" font-size="11" fill="#7b1fa2" font-weight="bold">$X = LZ$</text>
+
+      <!-- Cholesky L -->
+      <rect x="230" y="60" width="100" height="80" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="6"/>
+      <text x="280" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#7b1fa2">Cholesky</text>
+      <text x="280" y="110" text-anchor="middle" font-size="14" font-weight="bold" fill="#7b1fa2">$L$</text>
+      <text x="280" y="130" text-anchor="middle" font-size="10" fill="#666">Precomputed</text>
+
+      <!-- Arrow -->
+      <path d="M 340 100 L 400 100" stroke="#2e7d32" stroke-width="3" marker-end="url(#arrowhead3)"/>
+      <defs><marker id="arrowhead3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2e7d32"/></marker></defs>
+
+      <!-- Correlated X -->
+      <rect x="410" y="60" width="120" height="80" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="6"/>
+      <text x="470" y="85" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">Correlated</text>
+      <text x="470" y="105" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">$X \sim N(0, \Sigma)$</text>
+      <text x="470" y="125" text-anchor="middle" font-size="11" fill="#666">$\text{Cov}(X) = \Sigma$</text>
+
+      <!-- Math explanation -->
+      <rect x="30" y="170" width="640" height="60" fill="#fafafa" stroke="#e0e0e0" stroke-width="1" rx="4"/>
+      <text x="350" y="195" text-anchor="middle" font-size="13" fill="#333">$\text{Cov}(X) = \text{Cov}(LZ) = L \cdot \text{Cov}(Z) \cdot L^T = L I L^T = LL^T = \Sigma$</text>
+      <text x="350" y="215" text-anchor="middle" font-size="12" fill="#666">The Cholesky factor "injects" the correlation structure into independent random variables</text>
+    </svg>
+  </div>
+
+  <div class="code-box"># Monte Carlo Correlated Sampling Example
+import numpy as np
+
+# Define correlation structure (3 assets)
+corr = np.array([[1.0, 0.8, 0.5],
+                 [0.8, 1.0, 0.3],
+                 [0.5, 0.3, 1.0]])
+
+# Volatilities (annual)
+vols = np.array([0.20, 0.25, 0.15])
+
+# Build covariance matrix: Sigma = D @ Corr @ D
+D = np.diag(vols)
+Sigma = D @ corr @ D
+
+# Cholesky decomposition
+L = np.linalg.cholesky(Sigma)
+
+# Generate 10,000 independent standard normals
+n_samples = 10000
+Z = np.random.randn(3, n_samples)
+
+# Transform to correlated returns
+X = L @ Z  # Each column is one simulated scenario
+
+# Verify sample covariance matches target
+sample_cov = np.cov(X)
+print("Target covariance:\n", Sigma)
+print("Sample covariance:\n", sample_cov)
+print("Relative error:", np.max(np.abs(sample_cov - Sigma) / Sigma))
+
+# Use case: Price a basket option
+# payoff = max(mean(X) - K, 0) averaged over all samples</div>
+
+  <div class="tip-box">
+    <strong>Pro Tip:</strong> For very large correlation matrices (e.g., 10,000+ assets in basket options or CDO pricing), Cholesky can be slow. Alternatives include:
+    <ul>
+      <li><strong>Spectral decomposition:</strong> $\Sigma = Q\Lambda Q^T$, sample using $X = Q\sqrt{\Lambda}Z$</li>
+      <li><strong>PCA sampling:</strong> Use only top $k$ eigencomponents for speed</li>
+      <li><strong>Factor models:</strong> $\Sigma = BB^T + D$ where $B$ is $n \times k$ with $k \ll n$</li>
+    </ul>
+  </div>
+
+  <h3>Application 3: Portfolio Optimization Solvers</h3>
+
+  <div class="quant-box">
+    <strong>The Problem:</strong> Markowitz mean-variance optimization finds portfolio weights $w$ that minimize variance for a target return:
+    $$\min_w \frac{1}{2} w^T \Sigma w \quad \text{subject to} \quad \mu^T w = R_{target}, \quad \mathbf{1}^T w = 1$$
+  </div>
+
+  <h4>Why Cholesky/LU Appear Here</h4>
+  <p>The optimality conditions (KKT conditions) form a linear system:</p>
+  <div class="math-block">
+    $$\begin{bmatrix} \Sigma & \mu & \mathbf{1} \\ \mu^T & 0 & 0 \\ \mathbf{1}^T & 0 & 0 \end{bmatrix} \begin{bmatrix} w \\ \lambda_1 \\ \lambda_2 \end{bmatrix} = \begin{bmatrix} 0 \\ R_{target} \\ 1 \end{bmatrix}$$
+  </div>
+  <p>This is a <strong>saddle point system</strong>. The top-left block $\Sigma$ is positive definite, so we can use block elimination with Cholesky on $\Sigma$.</p>
+
+  <h4>Efficient Frontier Computation</h4>
+  <p>To trace the entire efficient frontier, you solve the above system for <strong>many</strong> values of $R_{target}$. Factor $\Sigma = LL^T$ <strong>once</strong>, then each frontier point is cheap.</p>
+
+  <div class="code-box"># Efficient Frontier using Cholesky
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+n = 50  # assets
+
+# Simulate returns and covariance
+returns = np.random.randn(n, 252) * 0.01
+mu = returns.mean(axis=1)
+Sigma = np.cov(returns)
+Sigma += 0.001 * np.eye(n)  # Regularization
+
+# Cholesky factor (computed once!)
+L = np.linalg.cholesky(Sigma)
+
+# Precompute useful quantities
+Sigma_inv_mu = np.linalg.solve(L.T, np.linalg.solve(L, mu))
+Sigma_inv_1 = np.linalg.solve(L.T, np.linalg.solve(L, np.ones(n)))
+
+a = mu @ Sigma_inv_mu
+b = mu @ Sigma_inv_1
+c = np.ones(n) @ Sigma_inv_1
+
+# Efficient frontier: parametric in target return
+target_returns = np.linspace(mu.min(), mu.max(), 100)
+frontier_risk = []
+
+for R in target_returns:
+    det = a*c - b*b
+    lam1 = (c*R - b) / det
+    lam2 = (a - b*R) / det
+    w = lam1 * Sigma_inv_mu + lam2 * Sigma_inv_1
+    var = w @ Sigma @ w
+    frontier_risk.append(np.sqrt(var))
+
+# Plot (saved to file for offline viewing)
+plt.figure(figsize=(10, 6))
+plt.plot(frontier_risk, target_returns, 'b-', linewidth=2, label='Efficient Frontier')
+plt.xlabel('Portfolio Risk (Std Dev)')
+plt.ylabel('Expected Return')
+plt.title('Mean-Variance Efficient Frontier')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.savefig('efficient_frontier.png', dpi=150, bbox_inches='tight')
+print("Saved efficient_frontier.png")
+print("Key insight: Cholesky factorization of Sigma is computed once")
+print("and reused for every point on the frontier.")</div>
+
+  <h3>Summary: When to Use What</h3>
+  <table>
+    <tr><th>Scenario</th><th>Matrix Type</th><th>Recommended Factorization</th><th>Why</th></tr>
+    <tr><td>General linear solve</td><td>Any invertible</td><td>LU with partial pivoting</td><td>Always works</td></tr>
+    <tr><td>Covariance/correlation solve</td><td>Symmetric PD</td><td>Cholesky</td><td>2× faster, no pivoting</td></tr>
+    <tr><td>Monte Carlo sampling</td><td>Symmetric PD</td><td>Cholesky</td><td>$X = LZ$ is the standard</td></tr>
+    <tr><td>Large sparse PDE systems</td><td>Sparse</td><td>Sparse LU / Cholesky</td><td>Exploit sparsity pattern</td></tr>
+    <tr><td>Iterative refinement</td><td>Ill-conditioned</td><td>LU/Cholesky + iterative</td><td>Improve accuracy</td></tr>
+  </table>
+</div>
+
+</div>
+
+<!-- ==================== COLAB EXPERIMENTS ==================== -->
+<div id="colab" class="tab-content">
+
+<div class="card">
+  <h2>Hands-On Colab Experiments</h2>
+  <p>Each experiment is designed to be copy-pasted into a Google Colab notebook. Run them, modify parameters, and build intuition through experimentation. All experiments use only NumPy and SciPy.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:85%"></div></div>
+
+  <h3>Experiment 1: Visualizing LU Step-by-Step</h3>
+  <p><strong>Goal:</strong> Watch how Gaussian elimination builds $L$ and $U$ simultaneously.</p>
+
+  <div class="code-box"># Experiment 1: LU Decomposition Step-by-Step
+import numpy as np
+
+def lu_step_by_step(A):
+    """Manually compute LU with printed intermediate steps."""
+    n = A.shape[0]
+    U = A.copy().astype(float)
+    L = np.eye(n)
+
+    print("Original A:")
+    print(U)
+    print()
+
+    for i in range(n-1):
+        pivot = U[i, i]
+        print(f"=== Step {i+1}: Pivot at ({i},{i}) = {pivot:.4f} ===")
+
+        for j in range(i+1, n):
+            multiplier = U[j, i] / pivot
+            L[j, i] = multiplier
+            U[j, :] -= multiplier * U[i, :]
+            print(f"  Row {j} ← Row {j} - {multiplier:.4f}×Row {i}")
+
+        print(f"  Current U:")
+        print(U)
+        print(f"  Current L (multipliers stored):")
+        print(L)
+        print()
+
+    print("=== FINAL RESULT ===")
+    print("L =")
+    print(L)
+    print("U =")
+    print(U)
+    print("Verification L@U =")
+    print(L @ U)
+    print("Matches A?", np.allclose(L @ U, A))
+    return L, U
+
+# Run it
+A = np.array([[2, 1, 1],
+              [4, 3, 3],
+              [8, 7, 9]], dtype=float)
+L, U = lu_step_by_step(A)
+
+# TRY: Change A to a 4x4 matrix. What happens if a pivot is zero?</div>
+
+  <h3>Experiment 2: Cholesky Failure Detection</h3>
+  <p><strong>Goal:</strong> Learn to recognize when a matrix is not positive definite and see how Cholesky fails.</p>
+
+  <div class="code-box"># Experiment 2: Cholesky as a PD Detector
+import numpy as np
+
+# Case 1: Clearly positive definite
+A_pd = np.array([[4, 2, 1],
+                 [2, 5, 3],
+                 [1, 3, 6]], dtype=float)
+
+print("=== Case 1: Positive Definite ===")
+try:
+    L = np.linalg.cholesky(A_pd)
+    print("Cholesky succeeded!")
+    print("L =")
+    print(L)
+except np.linalg.LinAlgError as e:
+    print(f"Cholesky failed: {e}")
+
+# Case 2: Not positive definite (indefinite)
+A_ind = np.array([[1, 2, 3],
+                  [2, 1, 4],
+                  [3, 4, 1]], dtype=float)
+
+print("\n=== Case 2: Indefinite ===")
+eigenvalues = np.linalg.eigvalsh(A_ind)
+print(f"Eigenvalues: {eigenvalues}")
+try:
+    L = np.linalg.cholesky(A_ind)
+    print("Cholesky succeeded!")
+except np.linalg.LinAlgError as e:
+    print(f"Cholesky failed: {e}")
+    print("This matrix is NOT positive definite!")
+
+# Case 3: "Almost" PD — numerical issues
+A_nearly = np.array([[1, 0.999, 0.999],
+                     [0.999, 1, 0.999],
+                     [0.999, 0.999, 1]], dtype=float)
+
+print("\n=== Case 3: Nearly Singular ===")
+eigenvalues = np.linalg.eigvalsh(A_nearly)
+print(f"Eigenvalues: {eigenvalues}")
+print(f"Condition number: {np.linalg.cond(A_nearly):.2e}")
+
+# TRY: Create a covariance matrix from 3 assets where 2 are perfectly correlated.
+# What happens to Cholesky?</div>
+
+  <h3>Experiment 3: Speed Benchmark — LU vs Cholesky</h3>
+  <p><strong>Goal:</strong> Quantify the 2× speedup of Cholesky over LU for positive definite matrices.</p>
+
+  <div class="code-box"># Experiment 3: Speed Benchmark
+import numpy as np
+import time
+from scipy.linalg import lu
+
+sizes = [100, 200, 500, 1000]
+results = []
+
+for n in sizes:
+    # Create a random positive definite matrix
+    X = np.random.randn(n, n)
+    A = X @ X.T + 0.1 * np.eye(n)  # Guaranteed PD
+    b = np.random.randn(n)
+
+    # Time LU
+    t0 = time.time()
+    for _ in range(5):
+        P, L, U = lu(A)
+    lu_time = (time.time() - t0) / 5
+
+    # Time Cholesky
+    t0 = time.time()
+    for _ in range(5):
+        L_chol = np.linalg.cholesky(A)
+    chol_time = (time.time() - t0) / 5
+
+    results.append((n, lu_time*1000, chol_time*1000))
+    print(f"n={n:4d}: LU={lu_time*1000:8.2f}ms, Cholesky={chol_time*1000:8.2f}ms, Speedup={lu_time/chol_time:.2f}x")
+
+# TRY: Increase sizes to 2000, 5000. Does the speedup remain consistent?
+# TRY: Make A sparse and compare with sparse solvers.</div>
+
+  <h3>Experiment 4: Correlated Random Walks</h3>
+  <p><strong>Goal:</strong> Generate and visualize correlated asset price paths using Cholesky.</p>
+
+  <div class="code-box"># Experiment 4: Correlated Random Walks
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+# 3-asset model
+n_assets = 3
+n_days = 252
+n_sims = 5
+
+# Correlation matrix
+corr = np.array([[1.0, 0.9, 0.3],
+                 [0.9, 1.0, 0.2],
+                 [0.3, 0.2, 1.0]])
+vols = np.array([0.20, 0.25, 0.15])  # Annual vols
+mu = np.array([0.08, 0.10, 0.06])    # Annual returns
+
+# Covariance and Cholesky
+D = np.diag(vols)
+Sigma = D @ corr @ D
+L = np.linalg.cholesky(Sigma)
+
+dt = 1/252  # Daily
+
+plt.figure(figsize=(12, 8))
+for sim in range(n_sims):
+    # Independent Brownian increments
+    dW = np.random.randn(n_assets, n_days) * np.sqrt(dt)
+
+    # Correlated increments via Cholesky
+    dX = L @ dW
+
+    # Geometric Brownian Motion: dS/S = mu*dt + sigma*dW
+    log_returns = (mu[:, None] * dt) + dX
+    prices = 100 * np.exp(np.cumsum(log_returns, axis=1))
+
+    for i in range(n_assets):
+        plt.subplot(n_sims, n_assets, sim * n_assets + i + 1)
+        plt.plot(prices[i], alpha=0.7)
+        if sim == 0:
+            plt.title(f'Asset {i+1}')
+        plt.xticks([])
+        plt.yticks([])
+
+plt.suptitle('Correlated Asset Price Paths (Cholesky Sampling)', fontsize=14)
+plt.tight_layout()
+plt.savefig('correlated_walks.png', dpi=150, bbox_inches='tight')
+print("Saved correlated_walks.png")
+
+# TRY: Change correlation to 0.99 between Asset 1 and 2. Do they move together?
+# TRY: Add a negative correlation. What does the plot look like?</div>
+
+  <h3>Experiment 5: Portfolio Optimization with Cholesky</h3>
+  <p><strong>Goal:</strong> Implement a complete mean-variance optimizer using Cholesky for the covariance matrix.</p>
+
+  <div class="code-box"># Experiment 5: Complete Portfolio Optimizer
+import numpy as np
+
+class PortfolioOptimizer:
+    def __init__(self, returns_data):
+        """returns_data: (n_assets, n_periods) array"""
+        self.mu = returns_data.mean(axis=1)
+        self.Sigma = np.cov(returns_data)
+        self.n = len(self.mu)
+
+        # Cache Cholesky factor!
+        self.Sigma += 1e-6 * np.eye(self.n)  # Regularization
+        self.L = np.linalg.cholesky(self.Sigma)
+
+    def solve(self, target_return):
+        """Solve Markowitz problem for given target return."""
+        # Using cached Cholesky: solve Sigma @ x = b efficiently
+        Sigma_inv_mu = np.linalg.solve(self.L.T, 
+                                        np.linalg.solve(self.L, self.mu))
+        Sigma_inv_1 = np.linalg.solve(self.L.T, 
+                                       np.linalg.solve(self.L, np.ones(self.n)))
+
+        a = self.mu @ Sigma_inv_mu
+        b = self.mu @ Sigma_inv_1
+        c = np.ones(self.n) @ Sigma_inv_1
+
+        det = a*c - b*b
+        lam1 = (c * target_return - b) / det
+        lam2 = (a - b * target_return) / det
+
+        w = lam1 * Sigma_inv_mu + lam2 * Sigma_inv_1
+        risk = np.sqrt(w @ self.Sigma @ w)
+        return w, risk
+
+    def efficient_frontier(self, n_points=50):
+        """Compute full efficient frontier."""
+        targets = np.linspace(self.mu.min(), self.mu.max(), n_points)
+        weights, risks = [], []
+        for t in targets:
+            w, r = self.solve(t)
+            weights.append(w)
+            risks.append(r)
+        return np.array(weights), np.array(risks), targets
+
+# Run
+np.random.seed(123)
+n_assets = 20
+returns = np.random.randn(n_assets, 252) * 0.02
+
+opt = PortfolioOptimizer(returns)
+weights, risks, targets = opt.efficient_frontier()
+
+print("Efficient Frontier Points:")
+for i in range(0, len(targets), 10):
+    print(f"  Return={targets[i]:.4f}, Risk={risks[i]:.4f}")
+
+# Global minimum variance portfolio
+min_var_idx = np.argmin(risks)
+print(f"\nMinimum Variance Portfolio:")
+print(f"  Return: {targets[min_var_idx]:.4f}")
+print(f"  Risk: {risks[min_var_idx]:.4f}")
+print(f"  Weights sum: {weights[min_var_idx].sum():.6f}")
+
+# TRY: Add a no-shorting constraint (w >= 0). This requires quadratic programming!
+# TRY: Compare speed with and without cached Cholesky.</div>
+
+  <h3>Experiment 6: Fixing a Broken Covariance Matrix</h3>
+  <p><strong>Goal:</strong> Learn practical techniques to repair a non-PD covariance matrix.</p>
+
+  <div class="code-box"># Experiment 6: Repairing Non-PD Covariance Matrices
+import numpy as np
+
+# Create a problematic covariance matrix
+# (e.g., from asynchronous data or missing values)
+np.random.seed(42)
+
+# Start with a valid covariance
+X = np.random.randn(5, 100)
+Sigma_good = np.cov(X)
+
+# Corrupt it: make two assets perfectly correlated
+Sigma_bad = Sigma_good.copy()
+Sigma_bad[0, 1] = Sigma_bad[1, 0] = np.sqrt(Sigma_bad[0,0] * Sigma_bad[1,1])
+
+print("Eigenvalues of bad matrix:", np.linalg.eigvalsh(Sigma_bad))
+print("Is PD?", end=" ")
+try:
+    np.linalg.cholesky(Sigma_bad)
+    print("Yes")
+except:
+    print("No — matrix is singular or indefinite!")
+
+# Method 1: Eigenvalue Clipping
+def clip_eigenvalues(Sigma, eps=1e-6):
+    eigvals, eigvecs = np.linalg.eigh(Sigma)
+    eigvals = np.maximum(eigvals, eps)
+    return eigvecs @ np.diag(eigvals) @ eigvecs.T
+
+Sigma_clipped = clip_eigenvalues(Sigma_bad)
+print("\nAfter eigenvalue clipping:")
+print("Eigenvalues:", np.linalg.eigvalsh(Sigma_clipped))
+L = np.linalg.cholesky(Sigma_clipped)
+print("Cholesky succeeds!")
+
+# Method 2: Ledoit-Wolf Shrinkage
+def shrinkage_covariance(returns, shrinkage=0.5):
+    """Simple shrinkage toward identity."""
+    sample = np.cov(returns)
+    target = np.eye(sample.shape[0]) * np.trace(sample) / sample.shape[0]
+    return (1 - shrinkage) * sample + shrinkage * target
+
+Sigma_shrunk = shrinkage_covariance(np.random.randn(5, 100), 0.3)
+print("\nAfter shrinkage:")
+print("Eigenvalues:", np.linalg.eigvalsh(Sigma_shrunk))
+
+# TRY: What shrinkage parameter makes the clipped matrix closest to original?</div>
+</div>
+
+</div>
+
+<!-- ==================== PRACTICE EXERCISES ==================== -->
+<div id="exercises" class="tab-content">
+
+<div class="card">
+  <h2>Practice Exercises</h2>
+  <p>Three tiers for each topic. Start with Easy, progress to Medium, then challenge yourself with Hard. Solutions are provided after each tier — try to solve before looking!</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div>
+
+  <h3>Topic A: LU Decomposition</h3>
+
+  <div class="tier tier-easy">
+    <span class="tier-label">Easy</span>
+    <ol>
+      <li>Compute the LU decomposition (without pivoting) of $A = \begin{bmatrix} 3 & 1 \\ 6 & 4 \end{bmatrix}$. Verify by multiplying $L \times U$.</li>
+      <li>Given $L = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}$ and $U = \begin{bmatrix} 3 & 2 \\ 0 & 5 \end{bmatrix}$, solve $Ly = \begin{bmatrix} 5 \\ 12 \end{bmatrix}$ using forward substitution.</li>
+      <li>Why does the first diagonal entry of $L$ always equal 1 in Doolittle's method?</li>
+      <li>Solve $Ux = \begin{bmatrix} 6 \\ 10 \end{bmatrix}$ where $U = \begin{bmatrix} 2 & 3 \\ 0 & 5 \end{bmatrix}$ using back substitution.</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#1565c0;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $m_{21} = 6/3 = 2$. Row 2 ← Row 2 − 2×Row 1 gives $U = \begin{bmatrix} 3 & 1 \\ 0 & 2 \end{bmatrix}$. So $L = \begin{bmatrix} 1 & 0 \\ 2 & 1 \end{bmatrix}$. Check: $LU = \begin{bmatrix} 3 & 1 \\ 6 & 4 \end{bmatrix} = A$ ✓</p>
+        <p><strong>2.</strong> Forward substitution: $y_1 = 5$, then $2y_1 + y_2 = 12 \Rightarrow y_2 = 2$. So $y = \begin{bmatrix} 5 \\ 2 \end{bmatrix}$.</p>
+        <p><strong>3.</strong> Doolittle's method fixes the diagonal of $L$ to 1's to ensure uniqueness. Without this constraint, infinitely many LU factorizations exist (e.g., scale $L$ by $c$ and $U$ by $1/c$).</p>
+        <p><strong>4.</strong> Back substitution: $5x_2 = 10 \Rightarrow x_2 = 2$. Then $2x_1 + 3(2) = 6 \Rightarrow x_1 = 0$. So $x = \begin{bmatrix} 0 \\ 2 \end{bmatrix}$.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-medium">
+    <span class="tier-label">Medium</span>
+    <ol>
+      <li>Compute the LU decomposition of $A = \begin{bmatrix} 2 & 1 & 0 \\ 4 & 5 & 2 \\ 6 & 9 & 8 \end{bmatrix}$. Use it to solve $Ax = \begin{bmatrix} 3 \\ 11 \\ 23 \end{bmatrix}$.</li>
+      <li>Show that if $A = LU$, then $\det(A) = \det(U)$. Use this to find $\det(A)$ for the matrix in problem 1 without computing the determinant directly.</li>
+      <li>Explain why partial pivoting ($PA = LU$) is necessary. Give a specific 2×2 example where LU without pivoting fails.</li>
+      <li>Suppose you have factored $A = LU$ and now want to solve $A^T x = b$. How can you do this efficiently without refactoring?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#f57c00;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $m_{21}=2, m_{31}=3$. After first elimination: $\begin{bmatrix} 2 & 1 & 0 \\ 0 & 3 & 2 \\ 0 & 6 & 8 \end{bmatrix}$. Then $m_{32}=2$. $U = \begin{bmatrix} 2 & 1 & 0 \\ 0 & 3 & 2 \\ 0 & 0 & 4 \end{bmatrix}$, $L = \begin{bmatrix} 1 & 0 & 0 \\ 2 & 1 & 0 \\ 3 & 2 & 1 \end{bmatrix}$. Forward solve $Ly=b$: $y_1=3, y_2=5, y_3=4$. Back solve $Ux=y$: $x_3=1, x_2=1, x_1=1$.</p>
+        <p><strong>2.</strong> $\det(A) = \det(L)\det(U)$. Since $L$ is unit triangular, $\det(L) = 1$. Thus $\det(A) = \det(U) = 2 \times 3 \times 4 = 24$.</p>
+        <p><strong>3.</strong> Example: $A = \begin{bmatrix} 0 & 1 \\ 1 & 1 \end{bmatrix}$. The first pivot is 0, so division by zero occurs. With partial pivoting, swap rows: $PA = \begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$ which is already upper triangular.</p>
+        <p><strong>4.</strong> $A^T = U^T L^T$. Solve $U^T y = b$ (forward substitution, since $U^T$ is lower triangular), then $L^T x = y$ (back substitution, since $L^T$ is upper triangular).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-hard">
+    <span class="tier-label">Hard</span>
+    <ol>
+      <li>Prove that the LU factorization of an invertible matrix is unique if we require $L$ to have 1's on the diagonal. (Hint: Assume two factorizations and show they must be equal.)</li>
+      <li>Let $A$ be tridiagonal: $A = \begin{bmatrix} 2 & -1 & 0 & 0 \\ -1 & 2 & -1 & 0 \\ 0 & -1 & 2 & -1 \\ 0 & 0 & -1 & 2 \end{bmatrix}$. Show that the LU factorization of a tridiagonal matrix has $L$ and $U$ with only one sub/super-diagonal respectively. This is the Thomas algorithm — why is it $O(n)$ instead of $O(n^3)$?</li>
+      <li>Given $A = LU$ and a rank-1 update $A' = A + uv^T$, derive the Sherman-Morrison formula to solve $A'x = b$ without refactoring $A'$. What is the computational cost?</li>
+      <li>In quant finance, you need to solve $Ax = b$ for 10,000 different $b$ vectors where $A$ is 500×500. Compare the total cost of (a) computing $A^{-1}$ once and multiplying, (b) LU factorization once + 10,000 solves, (c) Cholesky once + 10,000 solves (if $A$ is PD). Which is best and why?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#c62828;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> Suppose $A = L_1 U_1 = L_2 U_2$. Then $L_2^{-1} L_1 = U_2 U_1^{-1}$. The left side is lower triangular, the right side is upper triangular. The only matrix that is both is diagonal. Since $L_2^{-1}L_1$ has 1's on diagonal (product of unit lower triangular matrices), it must be $I$. Thus $L_1 = L_2$ and $U_1 = U_2$.</p>
+        <p><strong>2.</strong> For tridiagonal $A$, elimination only affects the immediate sub-diagonal. $L$ has sub-diagonal entries $l_i$ and $U$ has diagonal $u_i$ and super-diagonal entries. The Thomas algorithm solves tridiagonal systems in $O(n)$ because each elimination step only touches 2 entries, not the entire row.</p>
+        <p><strong>3.</strong> Sherman-Morrison: $(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1 + v^TA^{-1}u}$. But using LU: solve $Ay = u$ and $Az = b$ (both $O(n^2)$ with cached LU), then $x = z - \frac{v^T z}{1 + v^T y} y$. Total cost: $O(n^2)$ vs $O(n^3)$ for refactoring.</p>
+        <p><strong>4.</strong> (a) $A^{-1}$ costs $O(n^3)$, each multiply costs $O(n^2)$, total $O(n^3 + 10000n^2) = O(2.5 \times 10^9)$ ops. (b) LU costs $O(n^3)$, each solve $O(n^2)$, total same order but with larger constant for inverse. (c) Cholesky costs $\frac{1}{3}n^3$, solves same $O(n^2)$. Best: (c) if PD, else (b). Never compute explicit inverse in practice due to numerical stability and cache efficiency.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3>Topic B: Positive Definite Matrices</h3>
+
+  <div class="tier tier-easy">
+    <span class="tier-label">Easy</span>
+    <ol>
+      <li>Compute $x^T A x$ for $A = \begin{bmatrix} 2 & 1 \\ 1 & 3 \end{bmatrix}$ and $x = \begin{bmatrix} 1 \\ 2 \end{bmatrix}$. Is the result positive?</li>
+      <li>Check if $A = \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix}$ is positive definite using Sylvester's criterion.</li>
+      <li>Explain in one sentence why every covariance matrix is at least positive semi-definite.</li>
+      <li>For $A = \begin{bmatrix} 5 & 2 \\ 2 & 3 \end{bmatrix}$, compute the eigenvalues and confirm they are both positive.</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#1565c0;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $x^T A x = [1, 2] \begin{bmatrix} 4 \\ 7 \end{bmatrix} = 4 + 14 = 18 > 0$.</p>
+        <p><strong>2.</strong> First minor: $\det([4]) = 4 > 0$. Second minor: $\det(A) = 4 - 4 = 0$. Not strictly positive definite — it is positive <em>semi</em>-definite.</p>
+        <p><strong>3.</strong> For any weights $w$, portfolio variance $w^T \Sigma w = \text{Var}(w^T R) \geq 0$ since variance is always non-negative.</p>
+        <p><strong>4.</strong> Characteristic polynomial: $(5-\lambda)(3-\lambda) - 4 = \lambda^2 - 8\lambda + 11 = 0$. $\lambda = \frac{8 \pm \sqrt{64-44}}{2} = \frac{8 \pm \sqrt{20}}{2} > 0$. Both positive ✓</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-medium">
+    <span class="tier-label">Medium</span>
+    <ol>
+      <li>Show that if $A$ is positive definite, then all its diagonal entries are positive. (Hint: Use $x = e_i$, the $i$-th standard basis vector.)</li>
+      <li>Let $B$ be any $m \times n$ matrix with full column rank. Prove that $A = B^T B$ is positive definite.</li>
+      <li>A "correlation matrix" has 1's on the diagonal and off-diagonals in $[-1, 1]$. Construct a 3×3 symmetric matrix with 1's on diagonal that is <strong>not</strong> positive definite. What does this mean financially?</li>
+      <li>Prove that the inverse of a positive definite matrix is also positive definite.</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#f57c00;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> Take $x = e_i$ (1 in position $i$, 0 elsewhere). Then $x^T A x = a_{ii} > 0$ by definition of positive definite.</p>
+        <p><strong>2.</strong> For any $x \neq 0$, $x^T A x = x^T B^T B x = (Bx)^T (Bx) = ||Bx||^2 \geq 0$. Since $B$ has full column rank, $Bx = 0$ only when $x = 0$. Thus $||Bx||^2 > 0$ for $x \neq 0$.</p>
+        <p><strong>3.</strong> Example: $\begin{bmatrix} 1 & 0.9 & 0.9 \\ 0.9 & 1 & 0.9 \\ 0.9 & 0.9 & 1 \end{bmatrix}$. Eigenvalues: $\approx 2.8, 0.1, 0.1$. Actually this is PD. Try $\begin{bmatrix} 1 & -0.9 & -0.9 \\ -0.9 & 1 & -0.9 \\ -0.9 & -0.9 & 1 \end{bmatrix}$. Better: $\begin{bmatrix} 1 & 0.99 & 0.99 \\ 0.99 & 1 & 0.99 \\ 0.99 & 0.99 & 1 \end{bmatrix}$ has eigenvalues $\approx 2.98, 0.01, 0.01$ (still PD). To make it fail: $\begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}$ — rank 1, not PD. Financially: perfect correlation between all assets is impossible (would imply redundancy).</p>
+        <p><strong>4.</strong> If $A$ is PD, it has eigendecomposition $A = Q\Lambda Q^T$ with $\Lambda > 0$. Then $A^{-1} = Q \Lambda^{-1} Q^T$. Since $\lambda_i > 0$, we have $1/\lambda_i > 0$. For any $x \neq 0$: $x^T A^{-1} x = x^T Q \Lambda^{-1} Q^T x = y^T \Lambda^{-1} y = \sum y_i^2 / \lambda_i > 0$ where $y = Q^T x \neq 0$.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-hard">
+    <span class="tier-label">Hard</span>
+    <ol>
+      <li>Prove Sylvester's Criterion: A symmetric matrix is positive definite if and only if all its leading principal minors are positive. (This is a classic result — sketch the proof by induction.)</li>
+      <li>Let $\Sigma$ be a covariance matrix. Show that $\Sigma + \lambda I$ is positive definite for any $\lambda > 0$. This is the mathematical basis for ridge regression and covariance regularization.</li>
+      <li>Given a positive definite matrix $A$, define the $A$-inner product $\langle x, y \rangle_A = x^T A y$. Show this satisfies all inner product axioms. What does the Cauchy-Schwarz inequality look like in this inner product?</li>
+      <li>In high dimensions, sample covariance matrices from $n < p$ observations are always singular (not positive definite). Explain why using the rank of $XX^T$ where $X$ is $p \times n$. How does this affect portfolio optimization with many assets and limited data?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#c62828;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> Sketch: ($\Rightarrow$) If $A$ is PD, any principal submatrix $A_k$ is PD on the subspace where last $n-k$ coordinates are zero. Thus $\det(A_k) > 0$. ($\Leftarrow$) By induction: for $n=1$, obvious. Assume true for $n-1$. Using block form and Schur complement, show $A$ is congruent to $\text{diag}(A_{n-1}, s)$ where $s > 0$ by determinant condition. Congruence preserves definiteness.</p>
+        <p><strong>2.</strong> For any $x \neq 0$: $x^T(\Sigma + \lambda I)x = x^T \Sigma x + \lambda x^T x = x^T \Sigma x + \lambda ||x||^2 > 0$ since $x^T \Sigma x \geq 0$ and $\lambda ||x||^2 > 0$.</p>
+        <p><strong>3.</strong> Bilinearity: follows from matrix multiplication. Symmetry: $\langle x, y \rangle_A = x^T A y = (x^T A y)^T = y^T A^T x = y^T A x = \langle y, x \rangle_A$. Positive definiteness: given by $A$ being PD. Cauchy-Schwarz: $|x^T A y| \leq \sqrt{x^T A x} \sqrt{y^T A y}$.</p>
+        <p><strong>4.</strong> $XX^T$ is $p \times p$ but $\text{rank}(XX^T) = \text{rank}(X) \leq \min(p, n) = n < p$. Thus $XX^T$ has at least $p-n$ zero eigenvalues, making it singular. In portfolio optimization, this means infinite optimal portfolios exist (the efficient frontier is not strictly convex), leading to extreme weights and overfitting. Solution: shrinkage or factor models.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3>Topic C: Cholesky Decomposition</h3>
+
+  <div class="tier tier-easy">
+    <span class="tier-label">Easy</span>
+    <ol>
+      <li>Compute the Cholesky factor of $A = \begin{bmatrix} 9 & 3 \\ 3 & 5 \end{bmatrix}$ by hand.</li>
+      <li>Given $L = \begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix}$, reconstruct $A = LL^T$.</li>
+      <li>Why can't we compute Cholesky for $A = \begin{bmatrix} 1 & 2 \\ 2 & 1 \end{bmatrix}$? What goes wrong in the algorithm?</li>
+      <li>How many floating point operations does Cholesky require for an $n \times n$ matrix compared to LU?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#1565c0;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $l_{11} = \sqrt{9} = 3$. $l_{21} = 3/3 = 1$. $l_{22} = \sqrt{5 - 1^2} = \sqrt{4} = 2$. So $L = \begin{bmatrix} 3 & 0 \\ 1 & 2 \end{bmatrix}$.</p>
+        <p><strong>2.</strong> $LL^T = \begin{bmatrix} 2 & 0 \\ 1 & 3 \end{bmatrix} \begin{bmatrix} 2 & 1 \\ 0 & 3 \end{bmatrix} = \begin{bmatrix} 4 & 2 \\ 2 & 10 \end{bmatrix}$.</p>
+        <p><strong>3.</strong> $l_{11} = \sqrt{1} = 1$. $l_{21} = 2/1 = 2$. $l_{22} = \sqrt{1 - 2^2} = \sqrt{-3}$. Square root of negative number! Matrix is indefinite (eigenvalues are 3 and -1).</p>
+        <p><strong>4.</strong> Cholesky: $\frac{1}{3}n^3 + O(n^2)$. LU: $\frac{2}{3}n^3 + O(n^2)$. Cholesky is exactly half the operations.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-medium">
+    <span class="tier-label">Medium</span>
+    <ol>
+      <li>Compute the Cholesky factor of $A = \begin{bmatrix} 4 & 2 & 1 \\ 2 & 5 & 3 \\ 1 & 3 & 6 \end{bmatrix}$. Use it to solve $Ax = \begin{bmatrix} 7 \\ 10 \\ 10 \end{bmatrix}$.</li>
+      <li>Show that the Cholesky factorization of a positive definite matrix is unique if we require positive diagonal entries in $L$.</li>
+      <li>Given $A = LL^T$, how would you efficiently compute $\det(A)$? What about $\det(A^{-1})$?</li>
+      <li>Explain the connection between Cholesky and the "square root" of a matrix. Is $L$ the only matrix square root of $A$?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#f57c00;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $l_{11}=2, l_{21}=1, l_{31}=0.5$. $l_{22}=\sqrt{5-1}=2, l_{32}=(3-0.5)/2=1.25$. $l_{33}=\sqrt{6-0.25-1.5625}=\sqrt{4.1875}\approx 2.046$. Forward solve $Ly=b$: $y_1=3.5, y_2=3.25, y_3=2.046$. Back solve $L^Tx=y$: $x_3=1, x_2=1, x_1=1$.</p>
+        <p><strong>2.</strong> Suppose $A = L_1 L_1^T = L_2 L_2^T$. Then $L_2^{-1} L_1 = L_2^T (L_1^T)^{-1}$. Left side lower triangular, right side upper triangular. So $L_2^{-1} L_1 = D$ diagonal. Then $L_1 = L_2 D$ and $A = L_2 D D L_2^T = L_2 D^2 L_2^T = L_2 L_2^T$. Thus $D^2 = I$. With positive diagonals, $D = I$.</p>
+        <p><strong>3.</strong> $\det(A) = \det(L)\det(L^T) = (\prod l_{ii})^2$. For inverse: $\det(A^{-1}) = 1/\det(A) = (\prod l_{ii})^{-2}$.</p>
+        <p><strong>4.</strong> $L$ is <em>a</em> square root but not the only one. Any $Q$ such that $QQ^T = A$ works. For example, if $A = Q\Lambda Q^T$, then $B = Q\sqrt{\Lambda}Q^T$ is symmetric square root, while $L$ is triangular. There are infinitely many square roots (e.g., $L \times$ any orthogonal matrix).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-hard">
+    <span class="tier-label">Hard</span>
+    <ol>
+      <li>Implement the Cholesky-Banachiewicz algorithm from scratch (no NumPy cholesky). Test it on random positive definite matrices and compare accuracy with NumPy's implementation.</li>
+      <li>Let $A$ be block diagonal: $A = \begin{bmatrix} A_{11} & 0 \\ 0 & A_{22} \end{bmatrix}$ where $A_{11}$ and $A_{22}$ are positive definite. Show that the Cholesky factor of $A$ is $L = \begin{bmatrix} L_{11} & 0 \\ 0 & L_{22} \end{bmatrix}$ where $A_{ii} = L_{ii} L_{ii}^T$. How does this help with parallel computation?</li>
+      <li>Given the Cholesky factor $L$ of $A$, derive an $O(n^2)$ algorithm to update the factorization when $A$ is modified by a rank-1 update $A' = A + vv^T$ (assuming $A'$ remains PD). This is the Cholesky rank-1 update.</li>
+      <li>In a multi-period portfolio optimization, you need to solve $\Sigma_t w_t = \mu_t$ for each day $t = 1, ..., T$ where $\Sigma_t$ changes slowly. Describe how you could use the previous day's Cholesky factor as a warm start to speed up today's factorization.</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#c62828;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> See Colab Experiment section for implementation pattern. Key: loop $i$ from 0 to $n-1$, compute $l_{ii} = \sqrt{a_{ii} - \sum_{k=0}^{i-1} l_{ik}^2}$, then for $j > i$: $l_{ji} = (a_{ji} - \sum_{k=0}^{i-1} l_{jk} l_{ik}) / l_{ii}$.</p>
+        <p><strong>2.</strong> $LL^T = \begin{bmatrix} L_{11}L_{11}^T & 0 \\ 0 & L_{22}L_{22}^T \end{bmatrix} = \begin{bmatrix} A_{11} & 0 \\ 0 & A_{22} \end{bmatrix} = A$. The blocks are independent, so they can be factored in parallel on separate CPU cores.</p>
+        <p><strong>3.</strong> Cholesky rank-1 update: Given $A = LL^T$, find $L'$ such that $A + vv^T = L'L'^T$. Algorithm: solve $Lx = v$ (forward substitution). Then apply a sequence of Givens rotations or use the hyperbolic rotation method to update $L$. Complexity is $O(n^2)$ vs $O(n^3)$ for full refactorization.</p>
+        <p><strong>4.</strong> Warm start strategies: (1) Use previous $L_{t-1}$ as initial guess for iterative refinement. (2) If $\Sigma_t = \Sigma_{t-1} + \Delta$, use rank-$k$ update where $\Delta$ is approximated as low-rank. (3) In Kalman filtering, the covariance update naturally uses Cholesky updates. (4) For small changes, iterative methods (conjugate gradient) with $L_{t-1}$ as preconditioner converge very fast.</p>
+      </div>
+    </details>
+  </div>
+
+  <h3>Topic D: Quant Applications</h3>
+
+  <div class="tier tier-easy">
+    <span class="tier-label">Easy</span>
+    <ol>
+      <li>You have a covariance matrix $\Sigma$ and want to generate 1000 correlated return scenarios. Write the 3-step process using Cholesky.</li>
+      <li>Why is computing $A^{-1}$ explicitly considered bad practice in numerical computing? Give two reasons.</li>
+      <li>In mean-variance optimization, the objective is $\min_w \frac{1}{2}w^T \Sigma w$. What does the $\frac{1}{2}$ do? Is it necessary?</li>
+      <li>If you need to solve $Ax = b_1, Ax = b_2, ..., Ax = b_{100}$ for the same $A$, what is the most efficient approach?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#1565c0;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> Step 1: Compute $L = \text{cholesky}(\Sigma)$. Step 2: Generate $Z \sim N(0, I)$ of size $n \times 1000$. Step 3: Return $X = LZ$.</p>
+        <p><strong>2.</strong> (1) Computing inverse costs $O(n^3)$ same as factorization but then multiplying by $b$ is $O(n^2)$ — same as solve, but inverse is less numerically stable. (2) Matrix inverse destroys sparsity patterns. (3) In practice, you rarely need all entries of $A^{-1}$.</p>
+        <p><strong>3.</strong> The $\frac{1}{2}$ cancels the factor of 2 when taking the derivative: $\nabla_w (\frac{1}{2}w^T \Sigma w) = \Sigma w$. It makes the math cleaner but doesn't change the optimal $w$.</p>
+        <p><strong>4.</strong> Factor $A = LU$ (or Cholesky if symmetric PD) <strong>once</strong>, then use forward/back substitution for each $b_i$. Total cost: $O(n^3 + 100n^2)$ instead of $O(100n^3)$.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-medium">
+    <span class="tier-label">Medium</span>
+    <ol>
+      <li>You have a basket option on 3 assets with correlation matrix $C = \begin{bmatrix} 1 & 0.5 & 0.3 \\ 0.5 & 1 & 0.2 \\ 0.3 & 0.2 & 1 \end{bmatrix}$. Generate 5 correlated standard normal samples using Cholesky.</li>
+      <li>In risk parity, weights satisfy $w_i (\Sigma w)_i = \text{constant}$ for all $i$. This leads to solving a nonlinear system. Explain how Newton's method would use the Cholesky factor of $\Sigma$ at each iteration.</li>
+      <li>A quant trader claims: "I don't need Cholesky — I can just use eigendecomposition $\Sigma = Q\Lambda Q^T$ and sample with $X = Q\sqrt{\Lambda}Z$." When might this be better than Cholesky? When worse?</li>
+      <li>Explain why in high-frequency trading, sparse Cholesky or sparse LU factorizations are essential for pricing American options via PDE methods.</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#f57c00;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> $L = \begin{bmatrix} 1 & 0 & 0 \\ 0.5 & \sqrt{0.75} & 0 \\ 0.3 & 0.0577 & \sqrt{0.9067} \end{bmatrix} \approx \begin{bmatrix} 1 & 0 & 0 \\ 0.5 & 0.866 & 0 \\ 0.3 & 0.058 & 0.952 \end{bmatrix}$. Multiply by $Z$ columns.</p>
+        <p><strong>2.</strong> Newton's method solves $J \Delta w = -F(w)$ where $J$ is Jacobian. For risk parity, $J$ involves $\Sigma$ and diagonal terms. At each iteration, factor the system matrix (which contains $\Sigma$) using Cholesky, then solve for the Newton step.</p>
+        <p><strong>3.</strong> Eigendecomposition is better when: (1) You need only top $k$ principal components (PCA sampling), reducing dimension. (2) $\Sigma$ is nearly low-rank. Worse when: (1) Eigendecomposition costs $O(n^3)$ same as Cholesky but with larger constant. (2) For repeated sampling, Cholesky's $L$ is reused; eigendecomposition also reusable but $Q\sqrt{\Lambda}$ requires dense storage.</p>
+        <p><strong>4.</strong> PDE discretization (e.g., Crank-Nicolson) gives tridiagonal or banded linear systems at each time step. Sparse factorizations exploit the banded structure, reducing $O(n^3)$ to $O(n)$ or $O(n \cdot \text{bandwidth}^2)$. In HFT, microseconds matter.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="tier tier-hard">
+    <span class="tier-label">Hard</span>
+    <ol>
+      <li>Derive the closed-form solution for the global minimum variance portfolio: $w_{GMV} = \frac{\Sigma^{-1} \mathbf{1}}{\mathbf{1}^T \Sigma^{-1} \mathbf{1}}$. Show that using Cholesky, you never need to compute $\Sigma^{-1}$ explicitly.</li>
+      <li>In Monte Carlo for CDO pricing, you may need 20,000 correlated default times. The correlation matrix is 20,000×20,000. Standard Cholesky is infeasible. Describe a factor model approach: $\Sigma = BB^T + D$ where $B$ is $n \times k$ with $k \ll n$. How do you sample correlated variables using this structure?</li>
+      <li>Consider the constrained optimization: $\min_w \frac{1}{2}w^T \Sigma w$ subject to $\mu^T w = R$ and $w \geq 0$. This is a quadratic program. The KKT conditions form a linear complementarity problem. Explain how an active-set method would use Cholesky factorization of a submatrix of $\Sigma$ at each iteration.</li>
+      <li>Prove that for a symmetric positive definite tridiagonal matrix, the Cholesky factor is bidiagonal (only one sub-diagonal). Derive the explicit $O(n)$ formulas for the entries of $L$ and use them to solve a 1,000,000×1,000,000 tridiagonal system. This is the Thomas algorithm — why is it the backbone of finite difference PDE solvers?</li>
+    </ol>
+
+    <details>
+      <summary style="cursor:pointer;color:#c62828;font-weight:bold;margin-top:1rem;">Show Solutions</summary>
+      <div style="margin-top:1rem;padding:1rem;background:#f5f5f5;border-radius:8px;">
+        <p><strong>1.</strong> Using Lagrange multipliers for $\min \frac{1}{2}w^T \Sigma w$ s.t. $\mathbf{1}^T w = 1$: $\Sigma w = \lambda \mathbf{1}$. Thus $w = \lambda \Sigma^{-1} \mathbf{1}$. Constraint gives $\lambda = 1/(\mathbf{1}^T \Sigma^{-1} \mathbf{1})$. With Cholesky $\Sigma = LL^T$: solve $LL^T x = \mathbf{1}$ via two triangular solves to get $x = \Sigma^{-1}\mathbf{1}$. Then $w = x / (\mathbf{1}^T x)$. No explicit inverse needed.</p>
+        <p><strong>2.</strong> Factor model: $\Sigma = BB^T + D$ where $D$ is diagonal (idiosyncratic variances). Sample $X = BZ_{factor} + \sqrt{D}Z_{idio}$ where $Z_{factor} \sim N(0, I_k)$ and $Z_{idio} \sim N(0, I_n)$ independent. Then $\text{Cov}(X) = B\text{Cov}(Z_{factor})B^T + \sqrt{D}\text{Cov}(Z_{idio})\sqrt{D} = BB^T + D = \Sigma$. Cost: $O(nk)$ instead of $O(n^2)$ for Cholesky storage and $O(n^3)$ for factorization.</p>
+        <p><strong>3.</strong> Active-set method: At each iteration, some constraints $w_i \geq 0$ are active (binding). The working set defines a reduced problem on free variables. The KKT system for free variables involves a submatrix $\Sigma_{free}$ which is PD (principal submatrix of PD matrix). Cholesky factor $\Sigma_{free} = LL^T$ is used to compute the Newton step. When constraints change, the factorization is updated (rank-1 Cholesky update/downdate).</p>
+        <p><strong>4.</strong> For tridiagonal $A$ with diagonals $a_i$, sub-diagonals $b_i$: $L$ has diagonals $l_i = \sqrt{a_i - c_{i-1}^2}$ (with $c_0 = 0$) and sub-diagonals $c_i = b_i / l_i$. Forward solve: $y_1 = b_1/l_1$, $y_i = (b_i - c_{i-1}y_{i-1})/l_i$. Back solve: $x_n = y_n/l_n$, $x_i = (y_i - c_i x_{i+1})/l_i$. Total: $O(n)$ operations and $O(n)$ memory. For 1M×1M: milliseconds instead of years. This is essential for PDEs because discretization matrices are tridiagonal (1D) or block-tridiagonal (higher dimensions).</p>
+      </div>
+    </details>
+  </div>
+</div>
+
+</div>
+
+<!-- ==================== RESOURCES ==================== -->
+<div id="resources" class="tab-content">
+
+<div class="card">
+  <h2>Resources & Cheat Sheet</h2>
+  <p>External references, quick-reference formulas, and a visual map connecting all concepts. Use this tab as your quick-reference when reviewing.</p>
+
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+
+  <h3>Concept Map: How Everything Connects</h3>
+
+  <div class="svg-container">
+    <svg width="800" height="500" viewBox="0 0 800 500">
+      <!-- Background -->
+      <rect width="800" height="500" fill="#fafafa" rx="12"/>
+
+      <!-- Nodes -->
+      <!-- Gaussian Elimination -->
+      <rect x="50" y="50" width="140" height="50" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="8"/>
+      <text x="120" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#1565c0">Gaussian Elimination</text>
+
+      <!-- Triangular Matrices -->
+      <rect x="50" y="150" width="140" height="50" fill="#fff3e0" stroke="#ef6c00" stroke-width="2" rx="8"/>
+      <text x="120" y="180" text-anchor="middle" font-size="13" font-weight="bold" fill="#ef6c00">Triangular Matrices</text>
+
+      <!-- LU -->
+      <rect x="280" y="100" width="120" height="50" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="8"/>
+      <text x="340" y="130" text-anchor="middle" font-size="13" font-weight="bold" fill="#7b1fa2">LU Decomposition</text>
+
+      <!-- PD Matrices -->
+      <rect x="280" y="220" width="140" height="50" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="8"/>
+      <text x="350" y="250" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">Positive Definite</text>
+
+      <!-- Cholesky -->
+      <rect x="520" y="160" width="120" height="50" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="8"/>
+      <text x="580" y="190" text-anchor="middle" font-size="13" font-weight="bold" fill="#c62828">Cholesky</text>
+
+      <!-- Fast Solvers -->
+      <rect x="520" y="50" width="120" height="50" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="8"/>
+      <text x="580" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#00695c">Fast Solvers</text>
+
+      <!-- Monte Carlo -->
+      <rect x="520" y="280" width="140" height="50" fill="#fff8e1" stroke="#f9a825" stroke-width="2" rx="8"/>
+      <text x="590" y="310" text-anchor="middle" font-size="13" font-weight="bold" fill="#f9a825">MC Correlation</text>
+
+      <!-- Portfolio Opt -->
+      <rect x="280" y="350" width="160" height="50" fill="#e8eaf6" stroke="#1a237e" stroke-width="2" rx="8"/>
+      <text x="360" y="380" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a237e">Portfolio Optimization</text>
+
+      <!-- Covariance -->
+      <rect x="50" y="280" width="140" height="50" fill="#fce4ec" stroke="#ad1457" stroke-width="2" rx="8"/>
+      <text x="120" y="310" text-anchor="middle" font-size="13" font-weight="bold" fill="#ad1457">Covariance Matrix</text>
+
+      <!-- Arrows -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#666"/></marker>
+      </defs>
+
+      <!-- GE -> LU -->
+      <path d="M 190 75 L 280 125" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="220" y="95" font-size="10" fill="#666">leads to</text>
+
+      <!-- Triangular -> LU -->
+      <path d="M 190 175 L 280 135" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="210" y="165" font-size="10" fill="#666">enables</text>
+
+      <!-- LU -> Fast Solvers -->
+      <path d="M 400 110 L 520 75" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="450" y="85" font-size="10" fill="#666">powers</text>
+
+      <!-- PD -> Cholesky -->
+      <path d="M 420 245 L 520 185" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="460" y="205" font-size="10" fill="#666">enables</text>
+
+      <!-- Cholesky -> Fast Solvers -->
+      <path d="M 580 160 L 580 100" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="595" y="135" font-size="10" fill="#666">2× faster</text>
+
+      <!-- Cholesky -> MC -->
+      <path d="M 580 210 L 590 280" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="600" y="250" font-size="10" fill="#666">$X = LZ$</text>
+
+      <!-- Covariance -> PD -->
+      <path d="M 190 305 L 280 255" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="210" y="285" font-size="10" fill="#666">is always</text>
+
+      <!-- PD -> Portfolio -->
+      <path d="M 350 270 L 360 350" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="365" y="315" font-size="10" fill="#666">required for</text>
+
+      <!-- Fast Solvers -> Portfolio -->
+      <path d="M 520 90 L 440 350" stroke="#666" stroke-width="1.5" marker-end="url(#arr)" opacity="0.4"/>
+
+      <!-- MC -> Portfolio -->
+      <path d="M 520 305 L 440 375" stroke="#666" stroke-width="1.5" marker-end="url(#arr)" opacity="0.4"/>
+
+      <!-- Legend -->
+      <text x="400" y="450" text-anchor="middle" font-size="12" fill="#333" font-weight="bold">Study Path: Prerequisites → LU → PD → Cholesky → Quant Apps</text>
+      <text x="400" y="470" text-anchor="middle" font-size="11" fill="#666">Each concept builds on the previous. Master them in order!</text>
+    </svg>
+  </div>
+
+  <h3>Formula Cheat Sheet</h3>
+
+  <table>
+    <tr><th>Topic</th><th>Formula / Fact</th><th>When to Use</th></tr>
+    <tr><td>LU Decomposition</td><td>$A = LU$, $L$ unit lower, $U$ upper</td><td>General invertible matrix, multiple RHS</td></tr>
+    <tr><td>LU with Pivoting</td><td>$PA = LU$</td><td>When pivots are small or zero</td></tr>
+    <tr><td>Cholesky</td><td>$A = LL^T$ for $A$ symmetric PD</td><td>Covariance matrices, 2× faster than LU</td></tr>
+    <tr><td>Forward Substitution</td><td>$y_i = (b_i - \sum_{j<i} l_{ij}y_j) / l_{ii}$</td><td>Solving $Ly = b$</td></tr>
+    <tr><td>Back Substitution</td><td>$x_i = (y_i - \sum_{j>i} u_{ij}x_j) / u_{ii}$</td><td>Solving $Ux = y$</td></tr>
+    <tr><td>PD Test (Eigenvalues)</td><td>All $\lambda_i > 0$</td><td>Most reliable numerical test</td></tr>
+    <tr><td>PD Test (Sylvester)</td><td>All leading principal minors $> 0$</td><td>Hand calculations, small matrices</td></tr>
+    <tr><td>MC Sampling</td><td>$X = LZ$ where $Z \sim N(0,I)$</td><td>Correlated random variables</td></tr>
+    <tr><td>GMV Portfolio</td><td>$w = \Sigma^{-1}\mathbf{1} / (\mathbf{1}^T \Sigma^{-1}\mathbf{1})$</td><td>Use Cholesky, never explicit inverse</td></tr>
+    <tr><td>Complexity</td><td>LU: $\frac{2}{3}n^3$, Cholesky: $\frac{1}{3}n^3$, Solve: $n^2$</td><td>Estimate computation time</td></tr>
+  </table>
+
+  <h3>External Resources</h3>
+
+  <div class="two-col">
+    <div>
+      <h4>Video Lectures</h4>
+      <a class="ext-link" href="https://www.youtube.com/watch?v=UlWjwOaV6kY" target="_blank">📺 Gilbert Strang: LU Factorization</a>
+      <a class="ext-link" href="https://www.youtube.com/watch?v=4ihL1v3m3Zw" target="_blank">📺 Cholesky Decomposition</a>
+      <a class="ext-link" href="https://www.youtube.com/watch?v=vF7T2wbFxsw" target="_blank">📺 Positive Definite Matrices</a>
+      <a class="ext-link" href="https://www.youtube.com/watch?v=Z98zVzB5U3c" target="_blank">📺 Monte Carlo Methods in Finance</a>
+    </div>
+    <div>
+      <h4>Textbooks & Papers</h4>
+      <a class="ext-link" href="https://math.mit.edu/~gs/linearalgebra/" target="_blank">📖 Strang: Introduction to Linear Algebra</a>
+      <a class="ext-link" href="https://www.degruyter.com/document/doi/10.1515/9783110857788/html" target="_blank">📖 Golub & Van Loan: Matrix Computations</a>
+      <a class="ext-link" href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3469961" target="_blank">📄 Ledoit-Wolf Shrinkage</a>
+      <a class="ext-link" href="https://nhigham.com/books/handbook-of-writing-for-the-mathematical-sciences/" target="_blank">📄 Higham: Nearest Correlation Matrix</a>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:1rem">
+    <div>
+      <h4>Online Courses</h4>
+      <a class="ext-link" href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank">🎓 MIT 18.06 Linear Algebra</a>
+      <a class="ext-link" href="https://www.coursera.org/learn/matrix-algebra-engineers" target="_blank">🎓 Matrix Algebra for Engineers</a>
+      <a class="ext-link" href="https://www.coursera.org/specializations/computational-finance" target="_blank">🎓 Computational Finance (Columbia)</a>
+    </div>
+    <div>
+      <h4>Code & Tools</h4>
+      <a class="ext-link" href="https://numpy.org/doc/stable/reference/routines.linalg.html" target="_blank">💻 NumPy Linear Algebra</a>
+      <a class="ext-link" href="https://docs.scipy.org/doc/scipy/reference/linalg.html" target="_blank">💻 SciPy Linalg Module</a>
+      <a class="ext-link" href="https://colab.research.google.com/" target="_blank">💻 Google Colab</a>
+    </div>
+  </div>
+
+  <h3>Common Mistakes & How to Avoid Them</h3>
+
+  <table>
+    <tr><th>Mistake</th><th>Why It's Wrong</th><th>The Right Way</th></tr>
+    <tr><td>Computing $A^{-1}$ explicitly</td><td>$O(n^3)$ cost, numerically unstable, destroys sparsity</td><td>Factor $A = LU$ or $LL^T$, then solve</td></tr>
+    <tr><td>Using LU when Cholesky applies</td><td>2× slower, needs pivoting, uses more memory</td><td>Check symmetry + PD, then use Cholesky</td></tr>
+    <tr><td>Ignoring pivoting in LU</td><td>Division by zero or catastrophic cancellation</td><td>Always use partial pivoting ($PA = LU$)</td></tr>
+    <tr><td>Assuming sample covariance is PD</td><td>High-dimensional data gives singular matrices</td><td>Use shrinkage, factor models, or eigenvalue clipping</td></tr>
+    <tr><td>Cholesky on indefinite matrix</td><td>Square root of negative number → crash</td><td>Test PD first (eigenvalues or try-catch)</td></tr>
+    <tr><td>Refactoring for each new $b$</td><td>Wasteful $O(n^3)$ per solve</td><td>Factor once ($O(n^3)$), solve many ($O(n^2)$ each)</td></tr>
+  </table>
+
+  <h3>Python Quick Reference</h3>
+
+  <div class="code-box">import numpy as np
+from scipy.linalg import lu
+
+# LU Decomposition
+P, L, U = lu(A)           # P@A == L@U
+x = np.linalg.solve(A, b) # Uses LU internally
+
+# Cholesky Decomposition
+L = np.linalg.cholesky(A) # A == L@L.T
+# Solve using Cholesky
+y = np.linalg.solve(L, b)
+x = np.linalg.solve(L.T, y)
+
+# Check Positive Definite
+def is_pd(A):
+    try:
+        np.linalg.cholesky(A)
+        return True
+    except np.linalg.LinAlgError:
+        return False
+
+# Eigenvalue check
+eigs = np.linalg.eigvalsh(A)  # For symmetric matrices
+is_pd = np.all(eigs > 1e-10)
+
+# Monte Carlo Correlated Sampling
+L = np.linalg.cholesky(Sigma)
+Z = np.random.randn(n_assets, n_samples)
+X = L @ Z  # X ~ N(0, Sigma)</div>
+
+  <h3>Study Checklist</h3>
+  <ul class="checklist">
+    <li>I can perform Gaussian elimination by hand and identify the multipliers</li>
+    <li>I can compute LU decomposition for 3×3 matrices</li>
+    <li>I understand when and why partial pivoting is needed</li>
+    <li>I can solve triangular systems using forward/back substitution</li>
+    <li>I can test if a matrix is positive definite using multiple methods</li>
+    <li>I understand why covariance matrices are positive semi-definite</li>
+    <li>I can compute Cholesky decomposition by hand for 3×3 matrices</li>
+    <li>I can use Cholesky to generate correlated random variables</li>
+    <li>I can implement a portfolio optimizer using Cholesky</li>
+    <li>I know when to use LU vs Cholesky in quant applications</li>
+    <li>I can fix a non-positive-definite covariance matrix</li>
+    <li>I understand the computational complexity of each operation</li>
+  </ul>
+
+  <div class="tip-box" style="margin-top:2rem">
+    <strong>Final Words:</strong> Matrix factorizations are not just math — they are the computational engine of quantitative finance. Every time you optimize a portfolio, simulate correlated assets, or solve a PDE for option pricing, you're using these ideas. Master them, and you master the machinery of modern quant finance.
+  </div>
+</div>
+
+</div>
+
+</div>
+
+<footer style="text-align:center;padding:3rem 2rem;background:#1a237e;color:white;margin-top:2rem;">
+  <p style="font-size:1.1rem;margin-bottom:0.5rem">Matrix Factorizations Study Guide</p>
+  <p style="opacity:0.7">Built for aspiring Quant Engineers | Offline-Ready HTML</p>
+  <p style="opacity:0.5;font-size:0.9rem;margin-top:1rem">Save this file and open it anytime — no internet required after first load.</p>
+</footer>
+
+<script>
+function openTab(tabId) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  // Show selected tab and activate button
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Allow keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+    const activeIndex = tabs.findIndex(t => t.classList.contains('active'));
+    let newIndex = e.key === 'ArrowRight' 
+      ? (activeIndex + 1) % tabs.length 
+      : (activeIndex - 1 + tabs.length) % tabs.length;
+    tabs[newIndex].click();
+  }
+});
+</script>
+
+</body>
+</html>

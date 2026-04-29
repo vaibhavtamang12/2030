@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Study Guide — Foundations for Quant Engineers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
+  :root {
+    --bg: #08090d;
+    --surface: #0f1117;
+    --surface2: #161820;
+    --border: #1e2130;
+    --accent: #00e5c0;
+    --accent2: #5c6bff;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #e8eaf0;
+    --text-muted: #7a7f99;
+    --text-dim: #4a4f6a;
+    --easy: #00c896;
+    --medium: #ffd166;
+    --hard: #ff6b6b;
+    --grad1: linear-gradient(135deg, #00e5c0 0%, #5c6bff 100%);
+    --grad2: linear-gradient(135deg, #5c6bff 0%, #ff6b6b 100%);
+    --grad3: linear-gradient(135deg, #ffd166 0%, #ff6b6b 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .site-header .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    background: var(--grad1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  .site-header .subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-badge {
+    margin-left: auto;
+    background: rgba(0,229,192,0.1);
+    border: 1px solid rgba(0,229,192,0.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* TAB NAV */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 16px 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* TAB CONTENT */
+  .tab-panel { display: none; padding: 48px 40px; max-width: 1100px; margin: 0 auto; }
+  .tab-panel.active { display: block; }
+
+  /* SECTION COMPONENTS */
+  .hero-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,229,192,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .hero-desc {
+    font-size: 17px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    max-width: 720px;
+  }
+
+  h2.section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.5px;
+  }
+  h2.section-title .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(0,229,192,0.1);
+    border: 1px solid rgba(0,229,192,0.25);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  h3.sub-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 32px 0 12px;
+    color: var(--text);
+  }
+
+  p.body-text {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #c8cad8;
+    margin-bottom: 20px;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    border-left: 3px solid;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .callout.info { background: rgba(92,107,255,0.08); border-color: var(--accent2); color: #b0b8ff; }
+  .callout.tip { background: rgba(0,229,192,0.07); border-color: var(--accent); color: #a0f0e0; }
+  .callout.quant { background: rgba(255,209,102,0.07); border-color: var(--accent4); color: #ffe8a0; }
+  .callout.warning { background: rgba(255,107,107,0.07); border-color: var(--accent3); color: #ffb0b0; }
+  .callout strong { font-family: 'Syne', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px; }
+
+  /* DIAGRAM CONTAINERS */
+  .diagram-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    margin: 28px 0;
+    overflow-x: auto;
+  }
+  .diagram-box .diagram-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* SVG DIAGRAMS */
+  svg.diagram { width: 100%; height: auto; display: block; }
+
+  /* CARD GRIDS */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .card .card-body { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+  .card.accent-1 { border-top: 2px solid var(--accent); }
+  .card.accent-2 { border-top: 2px solid var(--accent2); }
+  .card.accent-3 { border-top: 2px solid var(--accent3); }
+  .card.accent-4 { border-top: 2px solid var(--accent4); }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #0a0b10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .code-block pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #a0f0e0;
+    white-space: pre;
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 28px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px; top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 10px rgba(0,229,192,0.4);
+  }
+  .timeline-year {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .timeline-event {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .timeline-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+  /* EXERCISES */
+  .exercise-section { margin: 32px 0; }
+  .exercise-tier {
+    margin-bottom: 28px;
+  }
+  .tier-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .tier-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .tier-badge.easy { background: rgba(0,200,150,0.15); color: var(--easy); border: 1px solid rgba(0,200,150,0.3); }
+  .tier-badge.medium { background: rgba(255,209,102,0.12); color: var(--medium); border: 1px solid rgba(255,209,102,0.3); }
+  .tier-badge.hard { background: rgba(255,107,107,0.12); color: var(--hard); border: 1px solid rgba(255,107,107,0.3); }
+  .exercise-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .exercise-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #c8cad8;
+    line-height: 1.7;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .exercise-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 24px;
+    margin-top: 2px;
+  }
+
+  /* COLAB BUTTON */
+  .colab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,209,102,0.1);
+    border: 1px solid rgba(255,209,102,0.35);
+    color: var(--accent4);
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 8px 8px 8px 0;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .colab-btn:hover { background: rgba(255,209,102,0.18); transform: translateY(-1px); }
+  .colab-btn svg { width: 16px; height: 16px; }
+
+  /* RESOURCE LINKS */
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .resource-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    transition: all 0.2s;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+  }
+  .resource-link:hover { border-color: var(--accent2); color: var(--accent); transform: translateY(-1px); }
+  .resource-link .icon { font-size: 18px; }
+  .resource-link .meta { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; display: block; margin-top: 2px; text-transform: uppercase; }
+
+  /* ANALOGY BOX */
+  .analogy {
+    background: linear-gradient(135deg, rgba(92,107,255,0.08), rgba(0,229,192,0.06));
+    border: 1px solid rgba(92,107,255,0.2);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #c0c8e8;
+  }
+  .analogy .analogy-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+  .data-table th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(30,33,48,0.7);
+    color: #c8cad8;
+    line-height: 1.6;
+  }
+  .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* PROGRESS BAR */
+  .topic-progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .progress-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .progress-pill.done { background: rgba(0,229,192,0.12); color: var(--accent); border: 1px solid rgba(0,229,192,0.3); }
+  .progress-pill.current { background: rgba(92,107,255,0.15); color: var(--accent2); border: 1px solid rgba(92,107,255,0.4); }
+  .progress-pill.upcoming { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* MATH FORMULA */
+  .formula {
+    background: #0a0b10;
+    border: 1px solid rgba(0,229,192,0.2);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin: 20px 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .formula .formula-caption {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-family: 'Lora', serif;
+    font-style: italic;
+  }
+
+  /* SEPARATOR */
+  .sep { height: 1px; background: var(--border); margin: 40px 0; }
+
+  /* HIGHLIGHT INLINE */
+  code.inline {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,229,192,0.1);
+    border: 1px solid rgba(0,229,192,0.2);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ANIMATION */
+  .tab-panel.active { animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .site-header { padding: 16px 20px; }
+    .tab-nav { padding: 0 20px; }
+    .tab-panel { padding: 28px 20px; }
+    .hero-section { padding: 28px; }
+    .hero-title { font-size: 26px; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+
+  /* VENN DIAGRAM */
+  .venn-wrapper { display: flex; justify-content: center; padding: 20px; }
+
+  /* BRAIN DIAGRAM SVG Circles */
+  .ai-circle { transition: opacity 0.3s; cursor: pointer; }
+  .ai-circle:hover { opacity: 0.85; }
+
+  /* COLAB SECTION */
+  .colab-section {
+    background: linear-gradient(135deg, rgba(255,209,102,0.06), rgba(255,107,107,0.04));
+    border: 1px solid rgba(255,209,102,0.2);
+    border-radius: 14px;
+    padding: 28px;
+    margin: 28px 0;
+  }
+  .colab-section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent4);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .colab-section p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+
+  /* COMPARISON ROW */
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 768px) { .compare-row { grid-template-columns: 1fr; } }
+  .compare-col {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .compare-col .col-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-col ul { list-style: none; }
+  .compare-col ul li {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(30,33,48,0.5);
+    line-height: 1.5;
+  }
+  .compare-col ul li::before { content: '→ '; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <div class="logo">AI Foundations</div>
+    <div class="subtitle">Study Guide for Quantitative Engineers</div>
+  </div>
+  <div class="header-badge">100% Offline</div>
+</header>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="prerequisites">📚 Prerequisites</button>
+  <button class="tab-btn" data-tab="intro">🤖 AI Defined</button>
+  <button class="tab-btn" data-tab="history">🕰️ History of AI</button>
+  <button class="tab-btn" data-tab="winters">❄️ AI Winters</button>
+  <button class="tab-btn" data-tab="types">🧠 AI Types</button>
+  <button class="tab-btn" data-tab="exercises">✍️ Exercises</button>
+  <button class="tab-btn" data-tab="resources">🔗 Resources</button>
+</nav>
+
+<!-- ===================== TAB 0: PREREQUISITES ===================== -->
+<section id="prerequisites" class="tab-panel active">
+  <div class="hero-section">
+    <span class="hero-tag">Before You Begin</span>
+    <h1 class="hero-title">Prerequisites &amp; Foundation Concepts</h1>
+    <p class="hero-desc">These are the building blocks. You don't need deep expertise, just a working mental model of each concept. Read these first — every topic in the main guide depends on at least one of them.</p>
+  </div>
+
+  <div class="topic-progress">
+    <span class="progress-pill current">Prerequisites</span>
+    <span class="progress-pill upcoming">AI Defined</span>
+    <span class="progress-pill upcoming">History</span>
+    <span class="progress-pill upcoming">AI Winters</span>
+    <span class="progress-pill upcoming">AI Types</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">P1</span>What is an Algorithm?</h2>
+  <p class="body-text">An <strong>algorithm</strong> is simply a step-by-step recipe for solving a problem. Think of it like a cooking recipe: given certain ingredients (inputs), you follow specific steps (process), and end up with a dish (output). Algorithms are deterministic — the same inputs always produce the same outputs.</p>
+
+  <div class="analogy">
+    <span class="analogy-label">🍳 Real-world Analogy</span>
+    Imagine you're making chai. You boil water → add tea leaves → add milk → add sugar → strain → serve. That's an algorithm. In programming, this becomes: <code class="inline">INPUT: water, tea, milk, sugar</code> → <code class="inline">STEPS: boil, mix, strain</code> → <code class="inline">OUTPUT: chai</code>.
+  </div>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🔷 Algorithm Structure</div>
+    <svg class="diagram" viewBox="0 0 700 120">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#00e5c0"/>
+        </marker>
+      </defs>
+      <rect x="10" y="30" width="140" height="60" rx="10" fill="#0f1117" stroke="#1e2130"/>
+      <text x="80" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a7f99">INPUT</text>
+      <text x="80" y="78" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#4a4f6a">Raw Data</text>
+      <line x1="152" y1="60" x2="200" y2="60" stroke="#00e5c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="202" y="20" width="200" height="80" rx="10" fill="rgba(0,229,192,0.07)" stroke="rgba(0,229,192,0.3)"/>
+      <text x="302" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#00e5c0">ALGORITHM</text>
+      <text x="302" y="70" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#7a7f99">Step-by-step Instructions</text>
+      <text x="302" y="86" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#4a4f6a">Rules + Logic</text>
+      <line x1="404" y1="60" x2="452" y2="60" stroke="#00e5c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="454" y="30" width="140" height="60" rx="10" fill="#0f1117" stroke="#1e2130"/>
+      <text x="524" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#7a7f99">OUTPUT</text>
+      <text x="524" y="78" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#4a4f6a">Result / Prediction</text>
+    </svg>
+  </div>
+
+  <h2 class="section-title"><span class="num">P2</span>What is Data?</h2>
+  <p class="body-text">Data is any recorded information. In finance and quant work, data is your stock prices, order books, sentiment scores, economic indicators. In AI, data is the "experience" from which machines learn. The more quality data, the smarter the AI can become.</p>
+  <div class="card-grid">
+    <div class="card accent-1">
+      <div class="card-icon">🔢</div>
+      <div class="card-title">Structured Data</div>
+      <div class="card-body">Organized in rows and columns. Examples: CSV files, stock price tables, spreadsheets. Easy for machines to process.</div>
+    </div>
+    <div class="card accent-2">
+      <div class="card-icon">🖼️</div>
+      <div class="card-title">Unstructured Data</div>
+      <div class="card-body">Text, images, audio, video. Harder to process but rich in signal. E.g., earnings call transcripts, news articles.</div>
+    </div>
+    <div class="card accent-3">
+      <div class="card-icon">⏱️</div>
+      <div class="card-title">Time-Series Data</div>
+      <div class="card-body">Data indexed by time. The bread and butter of quant finance — OHLCV bars, tick data, economic indicators.</div>
+    </div>
+  </div>
+
+  <h2 class="section-title"><span class="num">P3</span>What is a Model?</h2>
+  <p class="body-text">A <strong>model</strong> is a simplified mathematical representation of reality. Think of a map — it's not the actual terrain, but a useful simplification. In finance, you've used models like Black-Scholes. In AI, models are mathematical functions that take inputs (data) and produce outputs (predictions).</p>
+  <div class="formula">
+    f(x) = y
+    <div class="formula-caption">A model is simply a function: given input x, produce output y</div>
+  </div>
+
+  <h2 class="section-title"><span class="num">P4</span>What is Statistics &amp; Probability (Basics)?</h2>
+  <p class="body-text">AI and machine learning are deeply rooted in statistics. You need to understand these core ideas:</p>
+  <table class="data-table">
+    <thead>
+      <tr><th>Concept</th><th>Simple Explanation</th><th>Quant Relevance</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Mean / Variance</strong></td><td>Average value and spread of data</td><td>Expected return, volatility</td></tr>
+      <tr><td><strong>Probability</strong></td><td>Likelihood of an event (0 to 1)</td><td>P(win trade), risk of default</td></tr>
+      <tr><td><strong>Distribution</strong></td><td>How values are spread out</td><td>Returns are often assumed normal</td></tr>
+      <tr><td><strong>Correlation</strong></td><td>How two variables move together</td><td>Portfolio diversification</td></tr>
+      <tr><td><strong>Bayes' Theorem</strong></td><td>Update beliefs with new evidence</td><td>Bayesian signal updating</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title"><span class="num">P5</span>What is Python (briefly)?</h2>
+  <p class="body-text">Python is the dominant language in both AI research and quantitative finance. Throughout this guide, you'll see Python code. The Colab experiments use Python. Here's the bare minimum you need to follow along:</p>
+  <div class="code-block">
+    <span class="code-lang">Python — bare minimum you need</span>
+    <pre>
+# Variables store values
+price = 100.5
+name = "AI Model"
+
+# Lists store sequences
+prices = [100, 102, 99, 105]
+
+# Functions do things
+def average(numbers):
+    return sum(numbers) / len(numbers)
+
+print(average(prices))  # Output: 101.5
+
+# Loops repeat actions
+for p in prices:
+    print(p)
+
+# Libraries give you superpowers
+import numpy as np              # Math
+import pandas as pd             # Data tables
+import matplotlib.pyplot as plt # Charts</pre>
+  </div>
+
+  <div class="callout tip">
+    <strong>💡 Quant Engineer Note</strong>
+    If you already know R, MATLAB, or Excel VBA, Python will feel familiar. NumPy is like MATLAB arrays. Pandas is like Excel. You'll pick it up quickly. All Colab experiments in this guide include detailed comments explaining each line.
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">P6</span>What is a Neural Network (Very Basic Preview)?</h2>
+  <p class="body-text">A neural network is a type of AI model loosely inspired by how the human brain works. The brain has neurons that send signals to each other. A neural network has <em>artificial neurons</em> (just numbers and math) that pass values through layers. We'll cover this in depth in the AI Defined tab.</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🧠 Simplest Neural Network Preview</div>
+    <svg class="diagram" viewBox="0 0 600 200">
+      <!-- Input layer -->
+      <circle cx="80" cy="60" r="20" fill="rgba(0,229,192,0.15)" stroke="#00e5c0" stroke-width="1.5"/>
+      <text x="80" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#00e5c0">x₁</text>
+      <circle cx="80" cy="120" r="20" fill="rgba(0,229,192,0.15)" stroke="#00e5c0" stroke-width="1.5"/>
+      <text x="80" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#00e5c0">x₂</text>
+      <circle cx="80" cy="180" r="20" fill="rgba(0,229,192,0.15)" stroke="#00e5c0" stroke-width="1.5"/>
+      <text x="80" y="185" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#00e5c0">x₃</text>
+      <!-- Lines -->
+      <line x1="100" y1="60" x2="210" y2="80" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="60" x2="210" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="60" x2="210" y2="160" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="120" x2="210" y2="80" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="120" x2="210" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="120" x2="210" y2="160" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="180" x2="210" y2="80" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="180" x2="210" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <line x1="100" y1="180" x2="210" y2="160" stroke="#1e2130" stroke-width="1"/>
+      <!-- Hidden layer -->
+      <circle cx="230" cy="80" r="20" fill="rgba(92,107,255,0.15)" stroke="#5c6bff" stroke-width="1.5"/>
+      <circle cx="230" cy="120" r="20" fill="rgba(92,107,255,0.15)" stroke="#5c6bff" stroke-width="1.5"/>
+      <circle cx="230" cy="160" r="20" fill="rgba(92,107,255,0.15)" stroke="#5c6bff" stroke-width="1.5"/>
+      <!-- Output lines -->
+      <line x1="250" y1="80" x2="360" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <line x1="250" y1="120" x2="360" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <line x1="250" y1="160" x2="360" y2="120" stroke="#1e2130" stroke-width="1"/>
+      <!-- Output -->
+      <circle cx="380" cy="120" r="20" fill="rgba(255,107,107,0.15)" stroke="#ff6b6b" stroke-width="1.5"/>
+      <text x="380" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ff6b6b">y</text>
+      <!-- Labels -->
+      <text x="80" y="18" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a7f99">INPUT</text>
+      <text x="230" y="45" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a7f99">HIDDEN</text>
+      <text x="380" y="88" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a7f99">OUTPUT</text>
+      <!-- Right side labels -->
+      <text x="460" y="70" font-family="Lora,serif" font-size="12" fill="#c8cad8">Input: stock features</text>
+      <text x="460" y="90" font-family="Lora,serif" font-size="12" fill="#7a7f99">(price, volume, RSI)</text>
+      <text x="460" y="120" font-family="Lora,serif" font-size="12" fill="#c8cad8">Hidden: learned patterns</text>
+      <text x="460" y="160" font-family="Lora,serif" font-size="12" fill="#c8cad8">Output: prediction</text>
+      <text x="460" y="178" font-family="Lora,serif" font-size="12" fill="#7a7f99">(buy / sell / hold)</text>
+    </svg>
+  </div>
+
+  <div class="callout quant">
+    <strong>🎯 Why This Matters for Quant Engineering</strong>
+    Every quantitative strategy relies on models. The jump from traditional quant models (linear regression on factor returns) to AI models (neural networks on raw price data) is smaller than you think — it's the same idea of finding patterns in data, just with much more flexible functions.
+  </div>
+</section>
+
+<!-- ===================== TAB 1: AI DEFINED ===================== -->
+<section id="intro" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">Topic 1</span>
+    <h1 class="hero-title">Defining AI, Machine Learning &amp; Deep Learning</h1>
+    <p class="hero-desc">These three terms are the foundation. They're often used interchangeably in the news — but they're not the same thing. Understanding the relationship between them is critical before studying anything else.</p>
+  </div>
+
+  <div class="topic-progress">
+    <span class="progress-pill done">Prerequisites ✓</span>
+    <span class="progress-pill current">AI Defined</span>
+    <span class="progress-pill upcoming">History</span>
+    <span class="progress-pill upcoming">AI Winters</span>
+    <span class="progress-pill upcoming">AI Types</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span>What is Artificial Intelligence?</h2>
+  <p class="body-text"><strong>Artificial Intelligence (AI)</strong> is the broad field of making machines perform tasks that would normally require human intelligence. This includes things like: recognizing faces in photos, translating languages, playing chess, or detecting fraud in financial transactions.</p>
+
+  <div class="analogy">
+    <span class="analogy-label">🎭 Simple Analogy</span>
+    Imagine you're hiring an employee. If that employee is a human, they use intelligence to complete tasks. Now imagine you could "teach" a machine to do the same tasks — automatically, without being explicitly programmed for every edge case. That's AI. The goal is to give machines the ability to "think" and "decide" the way humans do.
+  </div>
+
+  <p class="body-text">The formal definition from John McCarthy (one of AI's founding fathers): <em>"AI is the science and engineering of making intelligent machines."</em></p>
+
+  <p class="body-text">Notice what the definition does NOT say — it doesn't say "conscious" machines or "human-like" machines. AI is about solving problems intelligently, not necessarily the way humans do it.</p>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">02</span>What is Machine Learning?</h2>
+  <p class="body-text"><strong>Machine Learning (ML)</strong> is a <em>subset</em> of AI. It's the idea that instead of explicitly programming rules, you give a machine <strong>data</strong> and let it <strong>learn the rules itself</strong>.</p>
+
+  <p class="body-text">Traditional programming vs. Machine Learning — this is the key conceptual shift:</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🔄 Traditional Programming vs Machine Learning</div>
+    <svg class="diagram" viewBox="0 0 700 200">
+      <!-- Traditional -->
+      <rect x="10" y="10" width="310" height="175" rx="12" fill="rgba(255,107,107,0.05)" stroke="rgba(255,107,107,0.2)"/>
+      <text x="165" y="35" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#ff6b6b">Traditional Programming</text>
+      <rect x="25" y="50" width="100" height="35" rx="7" fill="#161820" stroke="#1e2130"/>
+      <text x="75" y="73" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#c8cad8">Data</text>
+      <rect x="25" y="100" width="100" height="35" rx="7" fill="#161820" stroke="#1e2130"/>
+      <text x="75" y="123" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#c8cad8">Rules (code)</text>
+      <line x1="130" y1="67" x2="195" y2="100" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="130" y1="117" x2="195" y2="100" stroke="#ff6b6b" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="200" y="83" width="100" height="35" rx="7" fill="rgba(255,107,107,0.12)" stroke="rgba(255,107,107,0.3)"/>
+      <text x="250" y="106" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#ff6b6b">Output</text>
+      <!-- ML -->
+      <rect x="380" y="10" width="310" height="175" rx="12" fill="rgba(0,229,192,0.04)" stroke="rgba(0,229,192,0.2)"/>
+      <text x="535" y="35" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#00e5c0">Machine Learning</text>
+      <rect x="395" y="50" width="100" height="35" rx="7" fill="#161820" stroke="#1e2130"/>
+      <text x="445" y="73" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#c8cad8">Data</text>
+      <rect x="395" y="100" width="100" height="35" rx="7" fill="#161820" stroke="#1e2130"/>
+      <text x="445" y="123" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#c8cad8">Desired Output</text>
+      <line x1="498" y1="67" x2="540" y2="100" stroke="#00e5c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="498" y1="117" x2="540" y2="100" stroke="#00e5c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="547" y="83" width="100" height="35" rx="7" fill="rgba(0,229,192,0.1)" stroke="rgba(0,229,192,0.3)"/>
+      <text x="597" y="106" text-anchor="middle" font-family="Lora,serif" font-size="11" fill="#00e5c0">Rules (learned)</text>
+      <text x="165" y="170" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a7f99">You write the rules</text>
+      <text x="535" y="170" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7a7f99">Machine discovers rules</text>
+    </svg>
+  </div>
+
+  <div class="analogy">
+    <span class="analogy-label">💡 Quant Analogy — Learning a Trading Rule</span>
+    <strong>Traditional:</strong> You say "BUY if RSI &lt; 30 AND price &gt; 200-day MA."<br><br>
+    <strong>Machine Learning:</strong> You show the machine 10 years of historical data with labels ("this trade worked", "this didn't") and let it figure out which conditions predict profitable trades — including rules you might never have thought of.
+  </div>
+
+  <h3 class="sub-title">The 3 Main Types of Machine Learning</h3>
+  <div class="card-grid">
+    <div class="card accent-1">
+      <div class="card-icon">🏷️</div>
+      <div class="card-title">Supervised Learning</div>
+      <div class="card-body">You give the machine labelled examples. "Here are 1000 emails, each tagged SPAM or NOT-SPAM. Learn to classify new ones."<br><br><strong>Quant use:</strong> Predict next-day return (label = actual return).</div>
+    </div>
+    <div class="card accent-2">
+      <div class="card-icon">🔍</div>
+      <div class="card-title">Unsupervised Learning</div>
+      <div class="card-body">No labels. The machine finds hidden structure on its own. "Here are 1000 stocks — group them by similarity."<br><br><strong>Quant use:</strong> Clustering stocks into regimes, factor discovery.</div>
+    </div>
+    <div class="card accent-4">
+      <div class="card-icon">🎮</div>
+      <div class="card-title">Reinforcement Learning</div>
+      <div class="card-body">Machine takes actions, gets rewards or penalties, and learns a strategy over time. Like training a dog with treats.<br><br><strong>Quant use:</strong> Optimal execution, algorithmic trading agents.</div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">03</span>What is Deep Learning?</h2>
+  <p class="body-text"><strong>Deep Learning (DL)</strong> is a <em>subset of machine learning</em> that uses large neural networks with many layers (hence "deep"). The "depth" comes from stacking many layers of artificial neurons.</p>
+
+  <p class="body-text">The key breakthrough of deep learning: instead of hand-crafting features (telling the machine "look at RSI, MACD, Bollinger Bands"), deep learning models <strong>automatically learn what features matter</strong> from raw data.</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🔵 The AI → ML → DL Hierarchy (Nested Structure)</div>
+    <div class="venn-wrapper">
+      <svg class="diagram" viewBox="0 0 500 340" style="max-width:500px">
+        <!-- AI outer -->
+        <ellipse cx="250" cy="180" rx="230" ry="150" fill="rgba(92,107,255,0.06)" stroke="#5c6bff" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <text x="60" y="80" font-family="Syne,sans-serif" font-size="15" font-weight="700" fill="#5c6bff">Artificial Intelligence</text>
+        <text x="60" y="98" font-family="Lora,serif" font-size="11" fill="#7a7f99">Rule-based systems, Expert systems,</text>
+        <text x="60" y="112" font-family="Lora,serif" font-size="11" fill="#7a7f99">Search algorithms, Planning, NLP...</text>
+        <!-- ML middle -->
+        <ellipse cx="270" cy="210" rx="155" ry="100" fill="rgba(0,229,192,0.07)" stroke="#00e5c0" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="150" y="155" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#00e5c0">Machine Learning</text>
+        <text x="150" y="172" font-family="Lora,serif" font-size="10" fill="#7a7f99">Decision Trees, SVMs,</text>
+        <text x="150" y="185" font-family="Lora,serif" font-size="10" fill="#7a7f99">Random Forests, Linear Models...</text>
+        <!-- DL inner -->
+        <ellipse cx="295" cy="235" rx="90" ry="60" fill="rgba(255,107,107,0.1)" stroke="#ff6b6b" stroke-width="1.5"/>
+        <text x="250" y="224" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#ff6b6b">Deep</text>
+        <text x="250" y="240" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#ff6b6b">Learning</text>
+        <text x="250" y="258" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb0b0">CNNs, RNNs,</text>
+        <text x="250" y="272" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffb0b0">Transformers...</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <strong>📌 Key Insight: Scope</strong>
+    Deep Learning ⊂ Machine Learning ⊂ Artificial Intelligence. All deep learning is machine learning, and all machine learning is AI — but not all AI is machine learning, and not all ML is deep learning. A simple if-then rule is AI but not ML. A decision tree is ML but not DL.
+  </div>
+
+  <h3 class="sub-title">How Do Neural Networks Actually Learn?</h3>
+  <p class="body-text">This is the "magic" of deep learning. The learning process has 4 steps, repeated thousands of times:</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">⚙️ The Training Loop</div>
+    <svg class="diagram" viewBox="0 0 680 130">
+      <defs>
+        <marker id="arr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5c6bff"/>
+        </marker>
+      </defs>
+      <rect x="10" y="20" width="130" height="80" rx="10" fill="rgba(0,229,192,0.07)" stroke="rgba(0,229,192,0.3)"/>
+      <text x="75" y="52" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#00e5c0">1. FORWARD</text>
+      <text x="75" y="66" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#00e5c0">PASS</text>
+      <text x="75" y="85" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Data → Prediction</text>
+      <line x1="142" y1="60" x2="172" y2="60" stroke="#5c6bff" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <rect x="175" y="20" width="130" height="80" rx="10" fill="rgba(92,107,255,0.07)" stroke="rgba(92,107,255,0.3)"/>
+      <text x="240" y="52" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#5c6bff">2. COMPUTE</text>
+      <text x="240" y="66" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#5c6bff">LOSS</text>
+      <text x="240" y="85" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">How wrong were we?</text>
+      <line x1="307" y1="60" x2="337" y2="60" stroke="#5c6bff" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <rect x="340" y="20" width="130" height="80" rx="10" fill="rgba(255,209,102,0.07)" stroke="rgba(255,209,102,0.3)"/>
+      <text x="405" y="52" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#ffd166">3. BACKWARD</text>
+      <text x="405" y="66" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#ffd166">PASS</text>
+      <text x="405" y="85" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Backpropagation</text>
+      <line x1="472" y1="60" x2="502" y2="60" stroke="#5c6bff" stroke-width="1.5" marker-end="url(#arr2)"/>
+
+      <rect x="505" y="20" width="130" height="80" rx="10" fill="rgba(255,107,107,0.07)" stroke="rgba(255,107,107,0.3)"/>
+      <text x="570" y="52" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#ff6b6b">4. UPDATE</text>
+      <text x="570" y="66" text-anchor="middle" font-family="Syne,sans-serif" font-size="11" font-weight="700" fill="#ff6b6b">WEIGHTS</text>
+      <text x="570" y="85" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Gradient Descent</text>
+    </svg>
+  </div>
+
+  <div class="analogy">
+    <span class="analogy-label">🎯 The Dart-Throwing Analogy</span>
+    Imagine throwing darts at a board blindfolded. After each throw, someone tells you "too far left, and a bit high." You adjust. You throw again. After 1000 throws, you're hitting the bullseye. That's gradient descent — each throw is a forward pass, the feedback is the loss function, and adjusting your arm is backpropagation.
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">04</span>Scope &amp; Limitations of AI</h2>
+  <p class="body-text">AI is powerful — but it has real limitations that every quant engineer must internalize to avoid expensive mistakes:</p>
+
+  <table class="data-table">
+    <thead><tr><th>Limitation</th><th>Explanation</th><th>Quant Engineering Impact</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Data Hungry</strong></td>
+        <td>Deep learning needs massive amounts of labelled data to perform well</td>
+        <td>Financial data is scarce — only ~250 trading days/year. Models can overfit easily.</td>
+      </tr>
+      <tr>
+        <td><strong>Black Box</strong></td>
+        <td>Hard to explain why a model made a prediction</td>
+        <td>Regulators (MiFID II, SEC) demand explainability in trading systems</td>
+      </tr>
+      <tr>
+        <td><strong>Non-stationarity</strong></td>
+        <td>Models trained on past data may fail when market regimes change</td>
+        <td>A model trained pre-COVID may fail post-COVID. Constant retraining needed.</td>
+      </tr>
+      <tr>
+        <td><strong>Correlation ≠ Causation</strong></td>
+        <td>ML finds patterns that correlate, not necessarily causal relationships</td>
+        <td>A spurious correlation might work in backtest but fail in live trading</td>
+      </tr>
+      <tr>
+        <td><strong>Adversarial</strong></td>
+        <td>Small deliberate changes in input can fool AI completely</td>
+        <td>Market manipulation can fool AI trading systems if not robust</td>
+      </tr>
+      <tr>
+        <td><strong>No Common Sense</strong></td>
+        <td>AI has no understanding of the world — only patterns in numbers</td>
+        <td>AI won't "know" that war causes oil prices to spike unless that pattern is in training data</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout warning">
+    <strong>⚠️ Critical Quant Warning</strong>
+    The biggest mistake quant engineers make with AI: overfitting. A model that memorizes your training data perfectly will fail miserably on new data. Always use proper walk-forward validation, not random cross-validation, for financial time series.
+  </div>
+
+  <!-- COLAB EXPERIMENT -->
+  <div class="colab-section">
+    <h3>🧪 Colab Experiment #1 — Your First ML Model</h3>
+    <p>Build a simple supervised ML model that tries to predict whether tomorrow's stock return will be positive or negative, using basic technical indicators. This will give you a concrete feel for the AI/ML pipeline end to end.</p>
+    <a class="colab-btn" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Open End-to-End ML Colab
+    </a>
+    <a class="colab-btn" href="https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/05.02-Introducing-Scikit-Learn.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Scikit-Learn Introduction
+    </a>
+    <div class="code-block">
+      <span class="code-lang">Python — Run this in Google Colab</span>
+      <pre>
+# ============================================
+# EXPERIMENT 1: Your First ML Model in Finance
+# ============================================
+# Install required libraries (run once)
+# !pip install yfinance scikit-learn pandas matplotlib
+
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+
+# Step 1: Download data
+print("📥 Downloading stock data...")
+data = yf.download("SPY", start="2018-01-01", end="2023-12-31")
+df = data[['Close', 'Volume']].copy()
+
+# Step 2: Create features (what we use to predict)
+df['Return_1d'] = df['Close'].pct_change()       # 1-day return
+df['Return_5d'] = df['Close'].pct_change(5)       # 5-day return
+df['MA_ratio'] = df['Close'] / df['Close'].rolling(20).mean()  # Price vs MA20
+
+# Step 3: Create target (what we want to predict)
+# Target: will tomorrow's return be positive?
+df['Target'] = (df['Return_1d'].shift(-1) > 0).astype(int)
+
+# Step 4: Clean up (remove NaN rows)
+df.dropna(inplace=True)
+
+# Step 5: Split into features (X) and target (y)
+features = ['Return_1d', 'Return_5d', 'MA_ratio']
+X = df[features]
+y = df['Target']
+
+# Step 6: Time-based train/test split (IMPORTANT for finance!)
+# Never use random split for time series — future data leaks into past!
+split = int(len(df) * 0.8)
+X_train, X_test = X.iloc[:split], X.iloc[split:]
+y_train, y_test = y.iloc[:split], y.iloc[split:]
+
+# Step 7: Train the model
+print("\n🤖 Training Decision Tree...")
+model = DecisionTreeClassifier(max_depth=3, random_state=42)
+model.fit(X_train, y_train)
+
+# Step 8: Evaluate
+predictions = model.predict(X_test)
+accuracy = accuracy_score(y_test, predictions)
+print(f"\n✅ Accuracy: {accuracy:.1%}")
+print(f"   Baseline (always predict UP): {y_test.mean():.1%}")
+print(f"\n💡 If accuracy > baseline, the model has learned something!")
+
+# Step 9: Feature importance
+importance = pd.Series(model.feature_importances_, index=features)
+print("\n📊 Feature Importance (how much each feature helped):")
+for feat, imp in importance.sort_values(ascending=False).items():
+    bar = '█' * int(imp * 30)
+    print(f"  {feat:20s} {bar} {imp:.1%}")
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 2: HISTORY ===================== -->
+<section id="history" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">Topic 2</span>
+    <h1 class="hero-title">The History of AI: From Turing to Transformers</h1>
+    <p class="hero-desc">Understanding AI history isn't just academic — it teaches you why certain approaches work, what has been tried before, and how we arrived at today's models. Every "new" idea in AI has roots in decades of prior work.</p>
+  </div>
+
+  <div class="topic-progress">
+    <span class="progress-pill done">Prerequisites ✓</span>
+    <span class="progress-pill done">AI Defined ✓</span>
+    <span class="progress-pill current">History</span>
+    <span class="progress-pill upcoming">AI Winters</span>
+    <span class="progress-pill upcoming">AI Types</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span>The Turing Test — Where It All Began (1950)</h2>
+  <p class="body-text">In 1950, mathematician Alan Turing asked a deceptively simple question in his paper "Computing Machinery and Intelligence": <em>"Can machines think?"</em> Since "thinking" is hard to define, he proposed a practical test.</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🧪 The Turing Test — How It Works</div>
+    <svg class="diagram" viewBox="0 0 680 200">
+      <!-- Human evaluator -->
+      <rect x="280" y="20" width="120" height="70" rx="10" fill="rgba(0,229,192,0.08)" stroke="rgba(0,229,192,0.3)"/>
+      <text x="340" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#00e5c0">HUMAN</text>
+      <text x="340" y="68" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#7a7f99">Evaluator / Judge</text>
+      <text x="340" y="82" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#7a7f99">asks questions</text>
+      <!-- Person A -->
+      <rect x="30" y="110" width="140" height="70" rx="10" fill="rgba(255,209,102,0.08)" stroke="rgba(255,209,102,0.25)"/>
+      <text x="100" y="143" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#ffd166">HUMAN</text>
+      <text x="100" y="160" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#7a7f99">Room A — responds</text>
+      <!-- Machine -->
+      <rect x="510" y="110" width="140" height="70" rx="10" fill="rgba(92,107,255,0.08)" stroke="rgba(92,107,255,0.25)"/>
+      <text x="580" y="143" text-anchor="middle" font-family="Syne,sans-serif" font-size="12" font-weight="700" fill="#5c6bff">MACHINE</text>
+      <text x="580" y="160" text-anchor="middle" font-family="Lora,serif" font-size="10" fill="#7a7f99">Room B — responds</text>
+      <!-- Lines -->
+      <line x1="280" y1="68" x2="175" y2="115" stroke="#ffd166" stroke-width="1" stroke-dasharray="5,3"/>
+      <line x1="400" y1="68" x2="510" y2="115" stroke="#5c6bff" stroke-width="1" stroke-dasharray="5,3"/>
+      <!-- Judge result -->
+      <text x="340" y="165" text-anchor="middle" font-family="Lora,serif" font-size="12" fill="#c8cad8">Can the judge tell</text>
+      <text x="340" y="182" text-anchor="middle" font-family="Lora,serif" font-size="12" fill="#c8cad8">which is the machine?</text>
+      <text x="340" y="198" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#00e5c0">If not → machine "passes"</text>
+    </svg>
+  </div>
+
+  <div class="callout info">
+    <strong>🧩 Why Does This Matter?</strong>
+    The Turing Test set the agenda for AI for decades. It said: intelligence is about <em>behavior</em>, not about being biological. This behaviorist view drove early AI research toward language, reasoning, and problem-solving. Today, LLMs like GPT-4 arguably pass the Turing Test in conversation — Turing's question is no longer theoretical.
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">02</span>The Full AI Timeline</h2>
+  <p class="body-text">Here's the complete journey from Turing's paper to today's AI renaissance, with every major milestone explained:</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">1936 — Foundation</div>
+      <div class="timeline-event">Turing Machine (Theoretical)</div>
+      <div class="timeline-desc">Alan Turing describes a theoretical machine that can compute anything computable. This is the mathematical foundation of all computers and, later, all AI.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1943</div>
+      <div class="timeline-event">First Neural Network Model — McCulloch &amp; Pitts</div>
+      <div class="timeline-desc">Warren McCulloch and Walter Pitts create a mathematical model of a biological neuron. They show that simple neuron-like units can compute logical operations. This is the ancestor of all neural networks.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1950</div>
+      <div class="timeline-event">Turing Test Proposed</div>
+      <div class="timeline-desc">Alan Turing publishes "Computing Machinery and Intelligence." He proposes the imitation game as a test for machine intelligence and predicts that machines will be able to pass it by year 2000.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1956 — 🎉 Birth of AI</div>
+      <div class="timeline-event">Dartmouth Conference — AI is Named</div>
+      <div class="timeline-desc">John McCarthy, Marvin Minsky, Claude Shannon, and others gather at Dartmouth College. McCarthy coins the term "Artificial Intelligence." The conference marks the official birth of AI as a field. The organizers optimistically believed human-level AI would be achieved within a generation.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1957</div>
+      <div class="timeline-event">Perceptron — First Learning Machine</div>
+      <div class="timeline-desc">Frank Rosenblatt creates the Perceptron, the first neural network that could actually learn from data. The US Navy funds it, envisioning it could recognize submarines. It could learn simple patterns but failed at complex ones (like XOR).</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1966–1972 — ❄️ First AI Winter</div>
+      <div class="timeline-event">Hype Crashes into Reality</div>
+      <div class="timeline-desc">Early AI programs were brittle — they worked on tiny toy problems but collapsed in the real world. Machine translation failed. The Lighthill Report (UK) devastatingly criticized AI progress. Funding was cut globally.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1974–1980</div>
+      <div class="timeline-event">Expert Systems Rise</div>
+      <div class="timeline-desc">A new approach: encode human expert knowledge as "if-then" rules. MYCIN diagnoses bacterial infections. DENDRAL identifies chemical structures. These worked but required enormous manual effort and couldn't learn from data.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1986 — 🔑 Key Breakthrough</div>
+      <div class="timeline-event">Backpropagation Popularized — Neural Nets Revive</div>
+      <div class="timeline-desc">Rumelhart, Hinton, and Williams publish the landmark paper on backpropagation — the algorithm that allows neural networks to learn from errors by propagating error signals backward through layers. This is still the core training algorithm of all deep learning today.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1987–1993 — ❄️ Second AI Winter</div>
+      <div class="timeline-event">Expert Systems Collapse, Neural Nets Stall</div>
+      <div class="timeline-desc">Expert systems proved too expensive to maintain. LISP machines were rendered obsolete by cheap PCs. Neural networks were limited by computing power and data. Another funding crash.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1997</div>
+      <div class="timeline-event">Deep Blue Defeats Kasparov</div>
+      <div class="timeline-desc">IBM's Deep Blue beats chess world champion Garry Kasparov in a 6-game match. A massive milestone for AI — though Deep Blue used search trees and evaluation functions, not machine learning. Still, it showed AI could beat humans at complex cognitive tasks.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">1998</div>
+      <div class="timeline-event">LeCun's CNN — Handwriting Recognition</div>
+      <div class="timeline-desc">Yann LeCun demonstrates LeNet, a Convolutional Neural Network, reading handwritten digits on checks. This was a watershed moment: neural networks learning directly from raw pixels. The architecture he developed still underlies modern image AI.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2006 — 🔥 Deep Learning Reborn</div>
+      <div class="timeline-event">Hinton &amp; Bengio Revive Neural Networks</div>
+      <div class="timeline-desc">Geoffrey Hinton (later called "Godfather of AI") and Yoshua Bengio publish papers showing that deep neural networks CAN be trained effectively with new techniques (unsupervised pretraining, better weight initialization). This reignites neural network research after years of dormancy.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2012 — 💥 The ImageNet Revolution</div>
+      <div class="timeline-event">AlexNet — Deep Learning Conquers Vision</div>
+      <div class="timeline-desc">Hinton's student Alex Krizhevsky trains AlexNet — a deep CNN — on ImageNet, a dataset of 1.2 million images. It crushes the competition by a historic 10% margin. The AI community is stunned. GPUs and big data had unlocked deep learning's potential. This single event is often called the start of the modern AI era.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2014</div>
+      <div class="timeline-event">GANs — Machines That Create</div>
+      <div class="timeline-desc">Ian Goodfellow invents Generative Adversarial Networks (GANs) — one network generates fake images, another tries to detect fakes. They compete until the generator creates photorealistic images. The beginning of AI creativity.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2016</div>
+      <div class="timeline-event">AlphaGo Defeats Lee Sedol at Go</div>
+      <div class="timeline-desc">DeepMind's AlphaGo beats the world's best Go player. Go has more possible positions than atoms in the universe — beating it with search algorithms alone was impossible. AlphaGo used reinforcement learning + Monte Carlo tree search + deep neural networks. A defining moment in AI history.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2017 — 🌟 Transformers Change Everything</div>
+      <div class="timeline-event">"Attention Is All You Need" — Google Brain</div>
+      <div class="timeline-desc">The Transformer architecture is introduced. It replaced recurrent networks (RNNs) with a "self-attention" mechanism that could process entire sequences in parallel. Every modern LLM (GPT, BERT, Claude, Gemini) is built on this architecture. Arguably the most important paper in AI history since backpropagation.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2020</div>
+      <div class="timeline-event">GPT-3 — Language at Scale</div>
+      <div class="timeline-desc">OpenAI releases GPT-3 with 175 billion parameters. It can write code, answer questions, translate — all from natural language prompts. No fine-tuning required. AI enters mainstream consciousness.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2022–present — 🚀 AI Renaissance</div>
+      <div class="timeline-event">ChatGPT, Stable Diffusion, AlphaFold &amp; Beyond</div>
+      <div class="timeline-desc">ChatGPT reaches 100M users in 2 months (fastest product in history). AI generates photorealistic images, folds proteins, writes code, controls robots. We are in an AI renaissance driven by: scale (bigger models), data (internet-scale), and compute (GPU clusters).</div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">03</span>The Key Milestones Visualized</h2>
+
+  <div class="diagram-box">
+    <div class="diagram-title">📈 AI Progress — Capability Over Time (Conceptual)</div>
+    <svg class="diagram" viewBox="0 0 700 280">
+      <!-- Grid -->
+      <line x1="60" y1="20" x2="60" y2="240" stroke="#1e2130" stroke-width="1"/>
+      <line x1="60" y1="240" x2="680" y2="240" stroke="#1e2130" stroke-width="1"/>
+      <!-- Y axis labels -->
+      <text x="50" y="240" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#4a4f6a">Low</text>
+      <text x="50" y="130" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#4a4f6a">Mid</text>
+      <text x="50" y="25" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#4a4f6a">High</text>
+      <!-- Horizontal guides -->
+      <line x1="60" y1="130" x2="680" y2="130" stroke="#1e2130" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <!-- The AI capability curve -->
+      <path d="M 60,230 C 90,225 120,220 160,215 C 190,210 210,225 240,228 C 270,232 300,228 330,218 C 360,225 380,235 400,220 C 420,205 440,160 480,120 C 510,85 540,60 580,35 C 620,12 660,10 680,10" fill="none" stroke="url(#progGrad)" stroke-width="2.5"/>
+      <defs>
+        <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#5c6bff"/>
+          <stop offset="70%" stop-color="#00e5c0"/>
+          <stop offset="100%" stop-color="#ff6b6b"/>
+        </linearGradient>
+      </defs>
+      <!-- Winter shading -->
+      <rect x="155" y="20" width="70" height="220" fill="rgba(255,107,107,0.04)" stroke="none"/>
+      <text x="190" y="270" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ff6b6b">Winter 1</text>
+      <rect x="310" y="20" width="80" height="220" fill="rgba(255,107,107,0.04)" stroke="none"/>
+      <text x="350" y="270" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ff6b6b">Winter 2</text>
+      <!-- Milestones -->
+      <circle cx="90" cy="220" r="4" fill="#ffd166"/>
+      <text x="90" y="212" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ffd166">1950</text>
+      <text x="90" y="252" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">Turing</text>
+      <circle cx="120" cy="215" r="4" fill="#ffd166"/>
+      <text x="120" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ffd166">1956</text>
+      <text x="120" y="264" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">Dartmouth</text>
+      <circle cx="280" cy="220" r="4" fill="#ffd166"/>
+      <text x="280" y="212" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ffd166">1986</text>
+      <text x="280" y="252" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">Backprop</text>
+      <circle cx="415" cy="215" r="4" fill="#ffd166"/>
+      <text x="415" y="207" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ffd166">1997</text>
+      <text x="415" y="252" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">Deep Blue</text>
+      <circle cx="470" cy="130" r="4" fill="#00e5c0"/>
+      <text x="470" y="122" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#00e5c0">2012</text>
+      <text x="470" y="264" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">AlexNet</text>
+      <circle cx="530" cy="75" r="4" fill="#00e5c0"/>
+      <text x="530" y="67" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#00e5c0">2017</text>
+      <text x="530" y="264" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">Transformer</text>
+      <circle cx="590" cy="40" r="4" fill="#ff6b6b"/>
+      <text x="590" y="32" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#ff6b6b">2022</text>
+      <text x="590" y="264" text-anchor="middle" font-family="Lora,serif" font-size="8" fill="#7a7f99">ChatGPT</text>
+      <!-- Y Label -->
+      <text x="25" y="140" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#4a4f6a" transform="rotate(-90 25 140)">AI Capability</text>
+    </svg>
+  </div>
+
+  <div class="callout quant">
+    <strong>📊 Quant Connection: AI History Mirrors Quant Finance History</strong>
+    Just as AI went through hype → winter → renaissance, quantitative finance did too. The 1990s quant boom (LTCM, factor investing) → 2008 quant quake (models failed in crisis) → current AI-driven quant renaissance. The lesson: models trained in calm periods fail in crises. Always stress-test your AI models in regime-change scenarios.
+  </div>
+
+  <!-- COLAB EXPERIMENT 2 -->
+  <div class="colab-section">
+    <h3>🧪 Colab Experiment #2 — Visualize the Perceptron (1957 First Neural Net)</h3>
+    <p>Implement the original Perceptron algorithm from scratch in Python. This connects you directly to the 1957 breakthrough and shows you the fundamental learning mechanism that all modern AI descends from.</p>
+    <a class="colab-btn" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/10_neural_nets_with_keras.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Neural Nets with Keras
+    </a>
+    <div class="code-block">
+      <span class="code-lang">Python — Perceptron from Scratch (1957 Algorithm)</span>
+      <pre>
+# =============================================
+# EXPERIMENT 2: Build the 1957 Perceptron!
+# =============================================
+import numpy as np
+import matplotlib.pyplot as plt
+
+class Perceptron:
+    """
+    The original Perceptron — invented by Frank Rosenblatt in 1957.
+    This is the ancestor of ALL modern neural networks.
+    """
+    def __init__(self, learning_rate=0.1, n_iterations=100):
+        self.lr = learning_rate
+        self.n_iter = n_iterations
+        self.weights = None
+        self.bias = None
+
+    def step_function(self, x):
+        """Simple threshold: output 1 if positive, 0 if negative"""
+        return np.where(x >= 0, 1, 0)
+
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+        self.weights = np.zeros(n_features)  # Start with zero weights
+        self.bias = 0
+        self.errors_per_epoch = []
+
+        for epoch in range(self.n_iter):
+            errors = 0
+            for xi, yi in zip(X, y):
+                # Forward pass: compute prediction
+                prediction = self.step_function(np.dot(xi, self.weights) + self.bias)
+                
+                # Compute error
+                error = yi - prediction
+                
+                # Update weights (this is the "learning" part!)
+                # If we were wrong, adjust weights in the right direction
+                self.weights += self.lr * error * xi
+                self.bias += self.lr * error
+                
+                errors += int(error != 0)
+            
+            self.errors_per_epoch.append(errors)
+            if errors == 0:
+                print(f"✅ Converged at epoch {epoch}!")
+                break
+
+    def predict(self, X):
+        return self.step_function(np.dot(X, self.weights) + self.bias)
+
+# Create a simple dataset: classify stocks as "trending" or "not trending"
+# Feature 1: 20-day momentum (normalized)
+# Feature 2: Volume above average (normalized)
+np.random.seed(42)
+
+# Trending stocks: high momentum + high volume
+trending = np.random.randn(50, 2) + np.array([2, 2])
+# Non-trending stocks: low momentum + low volume
+not_trending = np.random.randn(50, 2) + np.array([-2, -2])
+
+X = np.vstack([trending, not_trending])
+y = np.hstack([np.ones(50), np.zeros(50)])
+
+# Shuffle
+idx = np.random.permutation(len(y))
+X, y = X[idx], y[idx]
+
+# Train the 1957 Perceptron
+print("🤖 Training the 1957 Perceptron...")
+p = Perceptron(learning_rate=0.1, n_iterations=50)
+p.fit(X, y)
+
+# Accuracy
+predictions = p.predict(X)
+accuracy = np.mean(predictions == y)
+print(f"\n📊 Accuracy: {accuracy:.1%}")
+print(f"   Learned weights: {p.weights}")
+print(f"   Learned bias: {p.bias:.3f}")
+
+# Visualize
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+fig.patch.set_facecolor('#08090d')
+
+# Plot 1: Data + Decision Boundary
+ax1.set_facecolor('#0f1117')
+ax1.scatter(trending[:, 0], trending[:, 1], c='#00e5c0', s=30, label='Trending', alpha=0.7)
+ax1.scatter(not_trending[:, 0], not_trending[:, 1], c='#ff6b6b', s=30, label='Not Trending', alpha=0.7)
+# Decision boundary
+x_range = np.linspace(-5, 6, 100)
+y_boundary = -(p.weights[0] * x_range + p.bias) / (p.weights[1] + 1e-9)
+ax1.plot(x_range, y_boundary, '#ffd166', linewidth=2, label='Decision Boundary')
+ax1.set_xlabel('Momentum', color='#7a7f99')
+ax1.set_ylabel('Volume Signal', color='#7a7f99')
+ax1.set_title('Perceptron — Stock Classification', color='#e8eaf0', fontweight='bold')
+ax1.legend(facecolor='#161820', edgecolor='#1e2130', labelcolor='#c8cad8')
+ax1.tick_params(colors='#4a4f6a')
+
+# Plot 2: Learning curve
+ax2.set_facecolor('#0f1117')
+ax2.plot(p.errors_per_epoch, '#00e5c0', linewidth=2)
+ax2.fill_between(range(len(p.errors_per_epoch)), p.errors_per_epoch, alpha=0.2, color='#00e5c0')
+ax2.set_xlabel('Training Epoch', color='#7a7f99')
+ax2.set_ylabel('Number of Errors', color='#7a7f99')
+ax2.set_title('Perceptron Learning Curve', color='#e8eaf0', fontweight='bold')
+ax2.tick_params(colors='#4a4f6a')
+
+plt.tight_layout()
+plt.savefig('perceptron_results.png', dpi=150, bbox_inches='tight', facecolor='#08090d')
+plt.show()
+print("\n💡 This is EXACTLY what Rosenblatt built in 1957 — now you know the roots of all AI!")
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 3: AI WINTERS ===================== -->
+<section id="winters" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">Topic 3</span>
+    <h1 class="hero-title">AI Winters &amp; the Current AI Renaissance</h1>
+    <p class="hero-desc">AI didn't grow smoothly from 1950 to today. It went through painful "winters" — periods of funding cuts and lost faith. Understanding why they happened prevents repeating the same mistakes in your own work.</p>
+  </div>
+
+  <div class="topic-progress">
+    <span class="progress-pill done">Prerequisites ✓</span>
+    <span class="progress-pill done">AI Defined ✓</span>
+    <span class="progress-pill done">History ✓</span>
+    <span class="progress-pill current">AI Winters</span>
+    <span class="progress-pill upcoming">AI Types</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span>What is an AI Winter?</h2>
+  <p class="body-text">An <strong>AI Winter</strong> is a period of drastically reduced interest, funding, and progress in AI research — caused by a gap between inflated expectations and actual results. The term is borrowed from "nuclear winter" — a catastrophic cooling that follows a disaster.</p>
+
+  <div class="analogy">
+    <span class="analogy-label">📉 The Hype Cycle Analogy</span>
+    Think of AI winters as the "trough of disillusionment" in the Gartner Hype Cycle. In finance, this is like a bubble: assets become overvalued (hype), then crash when reality doesn't match expectations (winter). AI winters happened for the same reason — researchers overpromised, governments overfunded, and results underdelivered.
+  </div>
+
+  <div class="diagram-box">
+    <div class="diagram-title">📊 The AI Hype Cycle — Two Winters Visualized</div>
+    <svg class="diagram" viewBox="0 0 700 260">
+      <!-- Axes -->
+      <line x1="50" y1="220" x2="680" y2="220" stroke="#1e2130" stroke-width="1.5"/>
+      <line x1="50" y1="20" x2="50" y2="220" stroke="#1e2130" stroke-width="1.5"/>
+      <text x="365" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#4a4f6a">TIME (1950 → Today)</text>
+      <text x="20" y="130" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#4a4f6a" transform="rotate(-90 20 130)">FUNDING / EXCITEMENT</text>
+
+      <!-- Winter shading -->
+      <rect x="165" y="20" width="100" height="200" fill="rgba(92,107,255,0.05)" stroke="rgba(92,107,255,0.15)" stroke-dasharray="4,4"/>
+      <text x="215" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6bff">AI WINTER 1</text>
+      <text x="215" y="47" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#4a4f6a">1966–1973</text>
+
+      <rect x="360" y="20" width="100" height="200" fill="rgba(92,107,255,0.05)" stroke="rgba(92,107,255,0.15)" stroke-dasharray="4,4"/>
+      <text x="410" y="35" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6bff">AI WINTER 2</text>
+      <text x="410" y="47" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#4a4f6a">1987–1993</text>
+
+      <!-- Curve: two humps + final rise -->
+      <path d="M 55,200 C 80,190 110,120 155,100 C 175,93 195,160 215,200 C 235,200 260,180 310,140 C 340,120 370,160 410,210 C 440,220 460,190 500,120 C 530,65 560,30 620,20 C 650,18 670,19 680,19" fill="none" stroke="url(#winterGrad)" stroke-width="2.5"/>
+      <defs>
+        <linearGradient id="winterGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#5c6bff"/>
+          <stop offset="40%" stop-color="#ffd166"/>
+          <stop offset="60%" stop-color="#5c6bff"/>
+          <stop offset="100%" stop-color="#00e5c0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Area fill -->
+      <path d="M 55,200 C 80,190 110,120 155,100 C 175,93 195,160 215,200 C 235,200 260,180 310,140 C 340,120 370,160 410,210 C 440,220 460,190 500,120 C 530,65 560,30 620,20 C 650,18 670,19 680,19 L 680,220 L 55,220 Z" fill="url(#winterGrad)" opacity="0.05"/>
+
+      <!-- Labels on curve -->
+      <text x="140" y="88" font-family="Syne,sans-serif" font-size="9" font-weight="700" fill="#ffd166">1st Peak</text>
+      <text x="140" y="100" font-family="Lora,serif" font-size="8" fill="#7a7f99">Perceptron hype</text>
+      <text x="295" y="128" font-family="Syne,sans-serif" font-size="9" font-weight="700" fill="#ffd166">2nd Peak</text>
+      <text x="295" y="140" font-family="Lora,serif" font-size="8" fill="#7a7f99">Expert Systems</text>
+      <text x="490" y="108" font-family="Syne,sans-serif" font-size="9" font-weight="700" fill="#00e5c0">3rd Peak</text>
+      <text x="490" y="120" font-family="Lora,serif" font-size="8" fill="#7a7f99">Deep Learning</text>
+      <text x="600" y="15" font-family="Syne,sans-serif" font-size="9" font-weight="700" fill="#ff6b6b">Renaissance</text>
+      <text x="600" y="27" font-family="Lora,serif" font-size="8" fill="#7a7f99">LLMs, GenAI</text>
+    </svg>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">02</span>First AI Winter (1966–1973) — Deep Dive</h2>
+  <p class="body-text">The first winter was triggered by a devastating 1966 report by the Automatic Language Processing Advisory Committee (ALPAC), which concluded that machine translation was twice as expensive and twice as slow as human translation — and far less accurate.</p>
+
+  <div class="card-grid">
+    <div class="card accent-3">
+      <div class="card-icon">💬</div>
+      <div class="card-title">The ALPAC Report (1966)</div>
+      <div class="card-body">The US government had poured money into machine translation, expecting to automate Russian-to-English translation during the Cold War. ALPAC declared it a failure. Funding was cut overnight.</div>
+    </div>
+    <div class="card accent-3">
+      <div class="card-icon">🚫</div>
+      <div class="card-title">Perceptron Limitations Exposed</div>
+      <div class="card-body">Marvin Minsky's book "Perceptrons" (1969) mathematically proved that single-layer perceptrons couldn't solve simple problems like XOR. This killed neural network funding for a decade.</div>
+    </div>
+    <div class="card accent-3">
+      <div class="card-icon">📉</div>
+      <div class="card-title">The Lighthill Report (1973)</div>
+      <div class="card-body">UK government commissioned James Lighthill to assess AI. He concluded AI had failed to deliver promised results. UK funding for AI was decimated. Other countries followed.</div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">Root Cause: Combinatorial Explosion</h3>
+  <p class="body-text">Early AI researchers dramatically underestimated complexity. Simple toy problems (10 pieces) scale to impossible problems (1000 pieces) exponentially. A chess board has more possible games than atoms in the universe — brute force doesn't scale.</p>
+
+  <div class="formula">
+    Possible chess games ≈ 10<sup>120</sup>  >  atoms in universe (≈ 10<sup>80</sup>)
+    <div class="formula-caption">This "combinatorial explosion" is why early search-based AI hit a wall. Modern AI learned to approximate rather than search exhaustively.</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">03</span>Second AI Winter (1987–1993) — Deep Dive</h2>
+  <p class="body-text">The second winter was caused by the collapse of the Expert Systems bubble and the failure of hardware that was purpose-built for AI (LISP machines).</p>
+
+  <div class="card-grid">
+    <div class="card accent-2">
+      <div class="card-icon">💸</div>
+      <div class="card-title">Expert Systems Collapse</div>
+      <div class="card-body">Companies spent millions on expert systems. Each required armies of "knowledge engineers" to manually encode expert knowledge. They broke down at edge cases. The maintenance cost was astronomical. The "AI Bubble" of the 1980s burst.</div>
+    </div>
+    <div class="card accent-2">
+      <div class="card-icon">💻</div>
+      <div class="card-title">LISP Machines Obsoleted</div>
+      <div class="card-body">Specialized AI hardware (LISP machines by Symbolics and LISP Machine Inc.) were rendered obsolete by cheap, general-purpose desktop computers. The $10M LISP machine companies went bankrupt by 1987.</div>
+    </div>
+    <div class="card accent-2">
+      <div class="card-icon">🔋</div>
+      <div class="card-title">Neural Nets Hit a Wall</div>
+      <div class="card-body">Despite backpropagation's promise, training deep networks required computing power and data that didn't exist yet. Results on real-world problems were disappointing. Funding dried up again.</div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <strong>⚠️ Lesson for Quant Engineers</strong>
+    The AI winters happened because of "hype-driven investment" rather than "evidence-driven investment." As a quant engineer, you must distinguish between: (1) what AI can demonstrably do today, (2) what researchers believe it might do in 5 years, and (3) what salespeople claim. Apply Bayesian skepticism — extraordinary claims require extraordinary evidence.
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">04</span>The Current AI Renaissance — What Changed?</h2>
+  <p class="body-text">Why did AI finally succeed at scale starting around 2012? Three forces came together simultaneously — this "perfect storm" is what enabled the current AI renaissance:</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🔥 The Three Pillars of the AI Renaissance</div>
+    <svg class="diagram" viewBox="0 0 680 280">
+      <!-- Triangle -->
+      <polygon points="340,30 100,240 580,240" fill="none" stroke="rgba(0,229,192,0.15)" stroke-width="1.5" stroke-dasharray="8,4"/>
+      <!-- Pillar 1: Big Data -->
+      <circle cx="100" cy="240" r="65" fill="rgba(0,229,192,0.07)" stroke="#00e5c0" stroke-width="1.5"/>
+      <text x="100" y="230" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#00e5c0">Big Data</text>
+      <text x="100" y="248" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">ImageNet: 14M images</text>
+      <text x="100" y="262" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Internet-scale text</text>
+      <text x="100" y="276" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Sensors everywhere</text>
+      <!-- Pillar 2: Compute -->
+      <circle cx="580" cy="240" r="65" fill="rgba(92,107,255,0.07)" stroke="#5c6bff" stroke-width="1.5"/>
+      <text x="580" y="230" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#5c6bff">Compute</text>
+      <text x="580" y="248" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">GPUs (NVIDIA CUDA)</text>
+      <text x="580" y="262" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Cloud (AWS, GCP)</text>
+      <text x="580" y="276" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Moore's Law × 50yr</text>
+      <!-- Pillar 3: Algorithms -->
+      <circle cx="340" cy="30" r="65" fill="rgba(255,107,107,0.07)" stroke="#ff6b6b" stroke-width="1.5"/>
+      <text x="340" y="20" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#ff6b6b">Algorithms</text>
+      <text x="340" y="38" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Deep CNNs/RNNs</text>
+      <text x="340" y="52" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Transformers (2017)</text>
+      <text x="340" y="66" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Better optimization</text>
+      <!-- Center label -->
+      <text x="340" y="155" text-anchor="middle" font-family="Syne,sans-serif" font-size="16" font-weight="800" fill="#ffd166">AI</text>
+      <text x="340" y="173" text-anchor="middle" font-family="Syne,sans-serif" font-size="16" font-weight="800" fill="#ffd166">Renaissance</text>
+    </svg>
+  </div>
+
+  <table class="data-table">
+    <thead><tr><th>Factor</th><th>1990 (Winter)</th><th>2023 (Renaissance)</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td>Training Data</td><td>Thousands of examples</td><td>Trillions of tokens</td><td>~10⁹× more</td></tr>
+      <tr><td>GPU Performance</td><td>No GPUs for AI</td><td>NVIDIA H100: 2000 TFLOPS</td><td>Millions× faster</td></tr>
+      <tr><td>Model Parameters</td><td>Millions</td><td>Hundreds of billions (GPT-4)</td><td>~10⁵× bigger</td></tr>
+      <tr><td>Training Cost</td><td>Prohibitively expensive</td><td>Cloud: $100–$1M</td><td>Accessible</td></tr>
+      <tr><td>Open Source</td><td>Almost none</td><td>PyTorch, TensorFlow, HuggingFace</td><td>Democratized</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout quant">
+    <strong>📈 Quant Finance Parallel: The Quant Renaissance</strong>
+    The AI renaissance in finance mirrors Renaissance Technologies' success: Jim Simons built the Medallion Fund using mathematical models and data at a time (1980s–90s) when others dismissed it as impractical. He waited for the data and compute to catch up to the ideas. The lesson: correct ideas can be decades early. Time your bets carefully.
+  </div>
+
+  <!-- COLAB EXPERIMENT 3 -->
+  <div class="colab-section">
+    <h3>🧪 Colab Experiment #3 — Why Compute Matters: Scale Experiments</h3>
+    <p>Compare the same neural network architecture trained with 100, 1,000, and 10,000 data points. Observe how performance changes with scale — this is the core insight behind why AI winters ended when data/compute became abundant.</p>
+    <a class="colab-btn" href="https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/keras/classification.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Keras Classification Colab
+    </a>
+  </div>
+</section>
+
+<!-- ===================== TAB 4: AI TYPES ===================== -->
+<section id="types" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">Topic 4</span>
+    <h1 class="hero-title">Narrow AI vs General AI vs Superintelligence</h1>
+    <p class="hero-desc">These three categories describe the scope of AI intelligence. Every AI system in existence today is Narrow AI. General AI remains a research goal. Superintelligence is theoretical. Understanding this spectrum is essential for realistic thinking about AI's role in quantitative finance.</p>
+  </div>
+
+  <div class="topic-progress">
+    <span class="progress-pill done">Prerequisites ✓</span>
+    <span class="progress-pill done">AI Defined ✓</span>
+    <span class="progress-pill done">History ✓</span>
+    <span class="progress-pill done">AI Winters ✓</span>
+    <span class="progress-pill current">AI Types</span>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span>Narrow AI (ANI) — What We Have Today</h2>
+  <p class="body-text"><strong>Artificial Narrow Intelligence (ANI)</strong>, also called Weak AI, is AI that excels at one specific task — and only that task. It cannot generalize to other domains. Every AI system deployed commercially today is ANI.</p>
+
+  <div class="analogy">
+    <span class="analogy-label">🔭 Analogy: The World-Class Specialist</span>
+    Imagine Magnus Carlsen — the best chess player in history. He is extraordinarily intelligent within chess, but that skill doesn't transfer: he can't use chess strategy to write a novel, perform surgery, or design a bridge. Narrow AI is the same: superhuman performance in one domain, zero capability elsewhere.
+  </div>
+
+  <div class="card-grid">
+    <div class="card accent-1">
+      <div class="card-icon">♟️</div>
+      <div class="card-title">Game AI</div>
+      <div class="card-body">AlphaGo, AlphaZero, Stockfish. Beat every human at their specific game. Cannot play any other game it wasn't trained for.</div>
+    </div>
+    <div class="card accent-1">
+      <div class="card-icon">🖼️</div>
+      <div class="card-title">Image Recognition</div>
+      <div class="card-body">Google Photos identifies faces and objects with superhuman accuracy. Cannot understand what's happening in the image at a semantic level.</div>
+    </div>
+    <div class="card accent-1">
+      <div class="card-icon">💬</div>
+      <div class="card-title">Language Models</div>
+      <div class="card-body">GPT-4, Claude, Gemini — excellent at language tasks. Impressive breadth, but fundamentally pattern-matching on training data, not true reasoning.</div>
+    </div>
+    <div class="card accent-1">
+      <div class="card-icon">📊</div>
+      <div class="card-title">Quant Finance AI</div>
+      <div class="card-body">LSTM models for return prediction, NLP for earnings calls, RL for trade execution — all Narrow AI. Excellent at specific financial tasks.</div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">Current ANI in Quantitative Finance</h3>
+  <table class="data-table">
+    <thead><tr><th>Application</th><th>AI Type Used</th><th>What It Does</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td>Alpha Signal Generation</td><td>Gradient Boosting / LSTM</td><td>Predicts next-day stock returns</td><td>Fails during regime changes</td></tr>
+      <tr><td>Earnings Call NLP</td><td>Transformer / BERT</td><td>Sentiment from transcripts</td><td>Only understands patterns, not causality</td></tr>
+      <tr><td>Optimal Execution</td><td>Reinforcement Learning</td><td>Minimize market impact of large orders</td><td>Brittle in low-liquidity scenarios</td></tr>
+      <tr><td>Credit Scoring</td><td>XGBoost / Neural Net</td><td>Probability of default</td><td>Black box → regulatory risk</td></tr>
+      <tr><td>Fraud Detection</td><td>Anomaly Detection (AE)</td><td>Flag unusual transactions</td><td>High false positive rate</td></tr>
+      <tr><td>Risk Management</td><td>GAN / VAE</td><td>Scenario generation, stress testing</td><td>Cannot anticipate truly novel shocks</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">02</span>Artificial General Intelligence (AGI) — The Research Goal</h2>
+  <p class="body-text"><strong>Artificial General Intelligence (AGI)</strong> refers to a machine that can understand, learn, and apply intelligence across <em>any</em> intellectual task — just like a human. It can transfer knowledge from one domain to another. It can learn from minimal data. It has common sense.</p>
+
+  <p class="body-text">AGI does not yet exist. It is the central long-term goal of AI research. When it will be achieved — or whether it's even possible — is genuinely debated:</p>
+
+  <div class="card-grid">
+    <div class="card accent-4">
+      <div class="card-icon">🔴</div>
+      <div class="card-title">Sam Altman (OpenAI)</div>
+      <div class="card-body">"AGI is possible within the next few years" — believes current scaling of LLMs is approaching AGI.</div>
+    </div>
+    <div class="card accent-4">
+      <div class="card-icon">🟡</div>
+      <div class="card-title">Yann LeCun (Meta AI)</div>
+      <div class="card-body">"Current LLMs will never reach AGI" — believes new architectures (JEPA) are needed.</div>
+    </div>
+    <div class="card accent-4">
+      <div class="card-icon">🟢</div>
+      <div class="card-title">Geoffrey Hinton</div>
+      <div class="card-body">"AGI could happen in 20 years" and worries about existential risk, which is why he left Google.</div>
+    </div>
+  </div>
+
+  <h3 class="sub-title">What Would AGI Actually Mean?</h3>
+  <div class="diagram-box">
+    <div class="diagram-title">🧠 ANI vs AGI Comparison</div>
+    <svg class="diagram" viewBox="0 0 680 220">
+      <!-- ANI side -->
+      <rect x="10" y="10" width="300" height="200" rx="14" fill="rgba(0,229,192,0.04)" stroke="rgba(0,229,192,0.2)"/>
+      <text x="160" y="40" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#00e5c0">Narrow AI (Today)</text>
+      <!-- Capability bars - narrow -->
+      <text x="30" y="70" font-family="Lora,serif" font-size="11" fill="#c8cad8">Chess</text>
+      <rect x="105" y="58" width="185" height="14" rx="4" fill="rgba(0,229,192,0.15)" stroke="rgba(0,229,192,0.3)"/>
+      <rect x="105" y="58" width="185" height="14" rx="4" fill="#00e5c0"/>
+      <text x="297" y="70" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#00e5c0">100%</text>
+      <text x="30" y="95" font-family="Lora,serif" font-size="11" fill="#c8cad8">Language</text>
+      <rect x="105" y="83" width="185" height="14" rx="4" fill="rgba(0,229,192,0.05)"/>
+      <rect x="105" y="83" width="148" height="14" rx="4" fill="rgba(0,229,192,0.5)"/>
+      <text x="297" y="95" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#7a7f99">80%</text>
+      <text x="30" y="120" font-family="Lora,serif" font-size="11" fill="#c8cad8">Transfer</text>
+      <rect x="105" y="108" width="185" height="14" rx="4" fill="rgba(0,229,192,0.05)"/>
+      <rect x="105" y="108" width="20" height="14" rx="4" fill="rgba(255,107,107,0.5)"/>
+      <text x="297" y="120" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b6b">11%</text>
+      <text x="30" y="145" font-family="Lora,serif" font-size="11" fill="#c8cad8">Common Sense</text>
+      <rect x="105" y="133" width="185" height="14" rx="4" fill="rgba(0,229,192,0.05)"/>
+      <rect x="105" y="133" width="10" height="14" rx="4" fill="rgba(255,107,107,0.5)"/>
+      <text x="297" y="145" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b6b">5%</text>
+      <text x="30" y="170" font-family="Lora,serif" font-size="11" fill="#c8cad8">Self-awareness</text>
+      <rect x="105" y="158" width="185" height="14" rx="4" fill="rgba(0,229,192,0.05)"/>
+      <rect x="105" y="158" width="4" height="14" rx="4" fill="rgba(255,107,107,0.5)"/>
+      <text x="297" y="170" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b6b">~0%</text>
+      <!-- AGI side -->
+      <rect x="370" y="10" width="300" height="200" rx="14" fill="rgba(255,209,102,0.04)" stroke="rgba(255,209,102,0.2)"/>
+      <text x="520" y="40" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="700" fill="#ffd166">AGI (Hypothetical)</text>
+      <text x="390" y="70" font-family="Lora,serif" font-size="11" fill="#c8cad8">Chess</text>
+      <rect x="455" y="58" width="195" height="14" rx="4" fill="rgba(255,209,102,0.15)"/>
+      <rect x="455" y="58" width="195" height="14" rx="4" fill="#ffd166"/>
+      <text x="657" y="70" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">100%</text>
+      <text x="390" y="95" font-family="Lora,serif" font-size="11" fill="#c8cad8">Language</text>
+      <rect x="455" y="83" width="195" height="14" rx="4" fill="rgba(255,209,102,0.1)"/>
+      <rect x="455" y="83" width="195" height="14" rx="4" fill="#ffd166"/>
+      <text x="657" y="95" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">100%</text>
+      <text x="390" y="120" font-family="Lora,serif" font-size="11" fill="#c8cad8">Transfer</text>
+      <rect x="455" y="108" width="195" height="14" rx="4" fill="rgba(255,209,102,0.1)"/>
+      <rect x="455" y="108" width="195" height="14" rx="4" fill="#ffd166"/>
+      <text x="657" y="120" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">100%</text>
+      <text x="390" y="145" font-family="Lora,serif" font-size="11" fill="#c8cad8">Common Sense</text>
+      <rect x="455" y="133" width="195" height="14" rx="4" fill="rgba(255,209,102,0.1)"/>
+      <rect x="455" y="133" width="195" height="14" rx="4" fill="#ffd166"/>
+      <text x="657" y="145" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">100%</text>
+      <text x="390" y="170" font-family="Lora,serif" font-size="11" fill="#c8cad8">Self-awareness</text>
+      <rect x="455" y="158" width="195" height="14" rx="4" fill="rgba(255,209,102,0.1)"/>
+      <rect x="455" y="158" width="195" height="14" rx="4" fill="#ffd166"/>
+      <text x="657" y="170" text-anchor="end" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">?</text>
+    </svg>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">03</span>Superintelligence (ASI) — The Theoretical Extreme</h2>
+  <p class="body-text"><strong>Artificial Superintelligence (ASI)</strong> refers to an AI that surpasses the best human capabilities across <em>every</em> domain — science, creativity, social intelligence, strategy, everything. Nick Bostrom defined it as "any intellect that greatly exceeds the cognitive performance of humans in virtually all domains of interest."</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">📊 The Intelligence Spectrum</div>
+    <svg class="diagram" viewBox="0 0 680 120">
+      <!-- Bar -->
+      <rect x="30" y="50" width="620" height="20" rx="10" fill="url(#specGrad)"/>
+      <defs>
+        <linearGradient id="specGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1e2130"/>
+          <stop offset="30%" stop-color="#00e5c0" stop-opacity="0.4"/>
+          <stop offset="60%" stop-color="#ffd166" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#ff6b6b"/>
+        </linearGradient>
+      </defs>
+      <!-- Markers -->
+      <line x1="100" y1="40" x2="100" y2="80" stroke="#5c6bff" stroke-width="2"/>
+      <text x="100" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#5c6bff">NARROW AI</text>
+      <text x="100" y="100" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Today</text>
+      <line x1="280" y1="40" x2="280" y2="80" stroke="#ffd166" stroke-width="2"/>
+      <text x="280" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffd166">HUMAN-LEVEL</text>
+      <text x="280" y="100" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">~Human</text>
+      <line x1="430" y1="40" x2="430" y2="80" stroke="#00e5c0" stroke-width="2"/>
+      <text x="430" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#00e5c0">AGI</text>
+      <text x="430" y="100" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Goal</text>
+      <line x1="600" y1="40" x2="600" y2="80" stroke="#ff6b6b" stroke-width="2"/>
+      <text x="600" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff6b6b">ASI</text>
+      <text x="600" y="100" text-anchor="middle" font-family="Lora,serif" font-size="9" fill="#7a7f99">Theoretical</text>
+    </svg>
+  </div>
+
+  <h3 class="sub-title">Why Does ASI Matter for Quant Finance?</h3>
+  <div class="callout quant">
+    <strong>💹 The Market Efficiency Paradox</strong>
+    Here's a fascinating quant puzzle: If ASI existed and was deployed in markets, it would discover and trade away <em>every possible alpha</em> in milliseconds. Markets would become perfectly efficient. There would be no alpha left to extract. This means the existence of tradeable alpha is itself evidence that ASI doesn't exist yet. The presence of market inefficiencies is a lower bound on the gap between current AI and ASI.
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">04</span>How They Relate — The Full Picture</h2>
+
+  <div class="compare-row">
+    <div class="compare-col">
+      <div class="col-header" style="color: var(--accent);">🎯 Narrow AI (ANI)</div>
+      <ul>
+        <li>Exists today — deployed everywhere</li>
+        <li>One task, one domain</li>
+        <li>Superhuman at specific tasks</li>
+        <li>No real understanding</li>
+        <li>Cannot generalize</li>
+        <li>Examples: GPT, AlphaGo, AlphaFold</li>
+        <li><strong>Quant use: Now</strong></li>
+      </ul>
+    </div>
+    <div class="compare-col">
+      <div class="col-header" style="color: var(--accent4);">🧠 General AI (AGI)</div>
+      <ul>
+        <li>Does not yet exist</li>
+        <li>Any intellectual task</li>
+        <li>Human-level or better across domains</li>
+        <li>Genuine reasoning and understanding</li>
+        <li>Learns from minimal data</li>
+        <li>Timeline: 5–50 years (debated)</li>
+        <li><strong>Quant use: Future</strong></li>
+      </ul>
+    </div>
+    <div class="compare-col">
+      <div class="col-header" style="color: var(--accent3);">⚡ Superintelligence (ASI)</div>
+      <ul>
+        <li>Purely theoretical</li>
+        <li>Surpasses all human capability</li>
+        <li>Self-improving recursively</li>
+        <li>Incomprehensible to humans</li>
+        <li>Could solve all problems — or pose existential risk</li>
+        <li>Timeline: Unknown (if ever)</li>
+        <li><strong>Quant use: Unknown</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- COLAB EXPERIMENT 4 -->
+  <div class="colab-section">
+    <h3>🧪 Colab Experiment #4 — Narrow AI in Action: Multi-Task vs. Single-Task</h3>
+    <p>Train two models: one specialized for stock prediction, one for crypto prediction. Then try using each for the other's task. Experience firsthand why today's AI is "narrow" — and what transfer learning helps (but doesn't fully solve).</p>
+    <a class="colab-btn" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/11_training_deep_neural_networks.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Deep Neural Networks Colab
+    </a>
+    <a class="colab-btn" href="https://colab.research.google.com/github/keras-team/keras-io/blob/master/examples/nlp/ipynb/text_classification_from_scratch.ipynb" target="_blank">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Transfer Learning Demo
+    </a>
+    <div class="code-block">
+      <span class="code-lang">Python — Narrow AI: Domain Specialization Demonstration</span>
+      <pre>
+# ================================================
+# EXPERIMENT 4: Narrow AI — Transfer Learning Gap
+# ================================================
+# This shows WHY current AI is "narrow" — it can't
+# easily transfer knowledge across very different domains
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Simulate: A model trained to predict stock patterns
+# We'll use synthetic data to show the concept clearly
+
+np.random.seed(42)
+
+def generate_stock_data(n=500, regime='bull'):
+    """Simulate stock-like time series"""
+    if regime == 'bull':
+        trend = np.linspace(0, 0.5, n)
+        noise = np.random.normal(0, 0.02, n)
+    else:  # bear
+        trend = np.linspace(0, -0.5, n)
+        noise = np.random.normal(0, 0.03, n)
+    returns = trend/n + noise
+    return returns
+
+def generate_crypto_data(n=500):
+    """Simulate crypto-like time series (very different behavior)"""
+    # Crypto: much higher volatility + fat tails
+    returns = np.random.standard_t(df=3, size=n) * 0.05  # Fat-tailed distribution
+    # Add occasional crashes and moonshots
+    crash_idx = np.random.choice(n, 5)
+    moon_idx = np.random.choice(n, 5)
+    returns[crash_idx] -= 0.15  # Flash crashes
+    returns[moon_idx] += 0.20   # Moonshots
+    return returns
+
+# Generate data
+stock_bull = generate_stock_data(500, 'bull')
+stock_bear = generate_stock_data(500, 'bear')
+crypto = generate_crypto_data(500)
+
+# Simple "model": momentum signal
+def momentum_signal(returns, window=5):
+    """Rolling momentum indicator"""
+    signals = []
+    for i in range(window, len(returns)):
+        past_return = returns[i-window:i].sum()
+        signal = 1 if past_return > 0 else 0  # Buy if recent trend is up
+        signals.append(signal)
+    return np.array(signals)
+
+def backtest(returns, signals):
+    """Simple backtest: hold when signal=1, cash when signal=0"""
+    strategy_returns = returns[5:] * signals
+    return strategy_returns
+
+# Train signal on stock data, test on crypto
+stock_signals = momentum_signal(stock_bull)
+stock_pnl = backtest(stock_bull, stock_signals)
+
+# Apply SAME signal (trained on stocks) to crypto — this is the "narrow AI" problem
+crypto_signals = momentum_signal(crypto)
+crypto_pnl_native = backtest(crypto, crypto_signals)  # Signal retrained on crypto
+crypto_pnl_transfer = backtest(crypto, stock_signals[:len(crypto)-5])  # Stock signal on crypto
+
+# Results
+print("=" * 55)
+print("📊 NARROW AI: Domain Transfer Experiment")
+print("=" * 55)
+print(f"\n📈 Stock signal on STOCK data:")
+print(f"   Sharpe: {stock_pnl.mean()/stock_pnl.std()*np.sqrt(252):.2f}")
+print(f"   Total return: {stock_pnl.sum():.2%}")
+print(f"\n₿  Stock signal on CRYPTO (transfer — narrow AI fails):")
+print(f"   Sharpe: {(backtest(crypto, stock_signals[:len(crypto)-5])).mean()/(backtest(crypto, stock_signals[:len(crypto)-5])).std()*np.sqrt(252):.2f}")
+print(f"   Total return: {(backtest(crypto, stock_signals[:len(crypto)-5])).sum():.2%}")
+print(f"\n₿  Native crypto signal (in-domain):")
+print(f"   Sharpe: {crypto_pnl_native.mean()/crypto_pnl_native.std()*np.sqrt(252):.2f}")
+print(f"   Total return: {crypto_pnl_native.sum():.2%}")
+print(f"\n💡 KEY INSIGHT: The stock-trained signal degrades on crypto.")
+print(f"   This is NARROW AI in action — domain-specific, not general.")
+print(f"   AGI would transfer the pattern-finding skill, not the specific patterns.")
+
+# Visualize
+fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+fig.patch.set_facecolor('#08090d')
+fig.suptitle('Narrow AI: Why Models Fail Across Domains', 
+             color='#e8eaf0', fontsize=14, fontweight='bold', y=0.98)
+
+ax1, ax2 = axes
+for ax in [ax1, ax2]:
+    ax.set_facecolor('#0f1117')
+    ax.tick_params(colors='#4a4f6a')
+
+# Stock returns distribution
+ax1.hist(stock_bull, bins=40, color='#00e5c0', alpha=0.6, label='Stock Returns', density=True)
+ax1.hist(crypto, bins=40, color='#ff6b6b', alpha=0.6, label='Crypto Returns', density=True)
+ax1.set_title('Return Distributions: Stock vs Crypto', color='#e8eaf0')
+ax1.set_xlabel('Daily Return', color='#7a7f99')
+ax1.set_ylabel('Density', color='#7a7f99')
+ax1.legend(facecolor='#161820', edgecolor='#1e2130', labelcolor='#c8cad8')
+ax1.axvline(x=0, color='#4a4f6a', linestyle='--', alpha=0.5)
+
+# Cumulative returns
+ax2.plot(np.cumsum(stock_pnl), color='#00e5c0', linewidth=2, label='Stock signal → Stock (in-domain)')
+ax2.plot(np.cumsum(backtest(crypto, stock_signals[:len(crypto)-5])), color='#ff6b6b', linewidth=2, label='Stock signal → Crypto (transfer)')
+ax2.plot(np.cumsum(crypto_pnl_native), color='#ffd166', linewidth=2, label='Crypto signal → Crypto (in-domain)')
+ax2.axhline(y=0, color='#4a4f6a', linestyle='--', alpha=0.5)
+ax2.set_title('Narrow AI: Transfer Failure Visualization', color='#e8eaf0')
+ax2.set_xlabel('Days', color='#7a7f99')
+ax2.set_ylabel('Cumulative P&L', color='#7a7f99')
+ax2.legend(facecolor='#161820', edgecolor='#1e2130', labelcolor='#c8cad8')
+
+plt.tight_layout()
+plt.savefig('narrow_ai_demo.png', dpi=150, bbox_inches='tight', facecolor='#08090d')
+plt.show()
+</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 5: EXERCISES ===================== -->
+<section id="exercises" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">Practice</span>
+    <h1 class="hero-title">Practice Exercises — All Topics</h1>
+    <p class="hero-desc">Three difficulty tiers for each topic. Complete them in order. Easy builds intuition, Medium tests understanding, Hard builds real quant-engineering skills. These are your checkpoints.</p>
+  </div>
+
+  <!-- PREREQUISITES EXERCISES -->
+  <h2 class="section-title"><span class="num">§0</span>Prerequisites</h2>
+  <div class="exercise-section">
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge easy">Easy</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">E1</span>Write a Python function that takes a list of daily stock prices and returns: the mean price, the standard deviation, and whether tomorrow's price is predicted to go up (use a simple rule: if today &gt; 5-day average → predict up).</li>
+        <li class="exercise-item"><span class="exercise-num">E2</span>In your own words (3 sentences max), explain the difference between an algorithm and a model. Then give one example of each from finance.</li>
+        <li class="exercise-item"><span class="exercise-num">E3</span>Calculate by hand: given stock returns of [+2%, -1%, +3%, -0.5%, +1%], compute the mean return and the standard deviation. Then compute what the Sharpe ratio would be (assume risk-free rate = 0).</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge medium">Medium</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">M1</span>Write a Python script that downloads 2 years of SPY daily data using <code class="inline">yfinance</code>, computes the daily log returns, and plots a histogram of the returns. Then compute the skewness and kurtosis. Discuss: do the returns look normally distributed? What does this imply for traditional risk models?</li>
+        <li class="exercise-item"><span class="exercise-num">M2</span>Explain Bayes' Theorem in the context of trading signals. If your signal has a 60% win rate, and you observe 3 consecutive wins, use Bayes' theorem to update your estimate of the true win rate. Show your work.</li>
+        <li class="exercise-item"><span class="exercise-num">M3</span>Build a simple correlation matrix for SPY, GLD, TLT, and BTC (use yfinance, last 3 years, weekly returns). Visualize it as a heatmap using matplotlib. What does this tell you about portfolio diversification?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge hard">Hard</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">H1</span>Implement a walk-forward optimization framework in Python. Use a 252-day training window and 63-day test window, rolling forward monthly. On each training window, find the optimal lookback for a momentum signal (from 5 to 60 days). Report the in-sample vs. out-of-sample Sharpe ratio. Discuss overfitting.</li>
+        <li class="exercise-item"><span class="exercise-num">H2</span>Prove mathematically why random cross-validation is wrong for time series data. Generate a synthetic trending time series (e.g., cumulative sum of autocorrelated returns), train a simple classifier using both random CV and time-series CV, and show that random CV produces inflated accuracy estimates. Document with plots and statistical tests.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- AI DEFINED EXERCISES -->
+  <h2 class="section-title"><span class="num">§1</span>AI Defined (Narrow / ML / DL)</h2>
+  <div class="exercise-section">
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge easy">Easy</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">E1</span>For each of the following, classify as: Traditional Programming, Machine Learning, or Deep Learning — and explain why: (a) a Black-Scholes pricer, (b) a fraud detection model trained on transaction history, (c) a speech-to-text system, (d) a VaR calculator, (e) GPT-4.</li>
+        <li class="exercise-item"><span class="exercise-num">E2</span>Draw (on paper or in code) the nested Venn diagram of AI ⊃ ML ⊃ DL. Place 6 real-world examples into the correct regions.</li>
+        <li class="exercise-item"><span class="exercise-num">E3</span>List 3 supervised learning tasks, 3 unsupervised learning tasks, and 3 reinforcement learning tasks that are relevant to quantitative finance. For each, specify what the input, the label/reward, and the expected output would be.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge medium">Medium</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">M1</span>Implement the gradient descent algorithm from scratch (no sklearn) to fit a linear regression predicting next-day returns from yesterday's return. Visualize the loss function decreasing over iterations. Compare your result to numpy's least-squares solution.</li>
+        <li class="exercise-item"><span class="exercise-num">M2</span>Research and write a 500-word analysis of one specific AI limitation (from the Scope &amp; Limitations section) as it applies to high-frequency trading. Include a concrete example of how that limitation has caused a real trading loss (research case studies like the 2010 Flash Crash).</li>
+        <li class="exercise-item"><span class="exercise-num">M3</span>Run the Colab Experiment #1 code. Then modify it to: (1) add 3 more features of your choice, (2) try 3 different ML algorithms (Decision Tree, Random Forest, Logistic Regression), (3) create a bar chart comparing their out-of-sample accuracy. Which model wins and why?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge hard">Hard</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">H1</span>Build a complete ML pipeline for equity return prediction: (a) Download 5 years of data for 10 stocks, (b) Engineer 10+ features (technical + fundamental), (c) Train a model with proper walk-forward validation, (d) Implement a simple long-short portfolio based on the model's signals, (e) Report: Sharpe, max drawdown, hit rate, and information coefficient. Compare to a benchmark (SPY buy-and-hold).</li>
+        <li class="exercise-item"><span class="exercise-num">H2</span>Implement a simple 2-layer neural network from scratch (only using NumPy — no PyTorch/TensorFlow). Include forward pass, backward pass (backpropagation), and gradient descent. Train it on the XOR problem (which the original Perceptron couldn't solve). Verify it converges and explain in comments why a 2-layer network can solve XOR but a 1-layer perceptron cannot.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- HISTORY EXERCISES -->
+  <h2 class="section-title"><span class="num">§2</span>History of AI</h2>
+  <div class="exercise-section">
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge easy">Easy</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">E1</span>Create a timeline of the 10 most important events in AI history in your own words. For each event, write one sentence on why it matters for AI in finance today.</li>
+        <li class="exercise-item"><span class="exercise-num">E2</span>The Turing Test has been debated for 70+ years. Write a short argument (150 words) for AND against this statement: "An LLM that passes the Turing Test is intelligent." Which side do you believe and why?</li>
+        <li class="exercise-item"><span class="exercise-num">E3</span>Run the Perceptron experiment (Colab #2). Change the learning rate to 0.001, 0.1, and 1.0. Observe and describe how the learning curve changes. What does this teach you about hyperparameter tuning?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge medium">Medium</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">M1</span>Recreate the AlexNet architecture in PyTorch (just the structure, not training). Comment every layer. Then look up what problem it was solving (ImageNet classification) and compute: how many parameters does a simplified version have? Why was this scale important in 2012?</li>
+        <li class="exercise-item"><span class="exercise-num">M2</span>Research "Transformers in Finance" and find 3 academic papers (Google Scholar) published after 2020 that apply Transformer architectures to financial data. For each paper: summarize the approach (what data, what prediction task, what architecture), report the main result, and identify one limitation the authors acknowledge.</li>
+        <li class="exercise-item"><span class="exercise-num">M3</span>Compare AlphaGo's architecture with a typical supervised ML model used in finance. Draw a diagram showing the similarities and differences. Why can AlphaGo's approach (RL + MCTS + DNN) be powerful for optimal trade execution?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge hard">Hard</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">H1</span>Implement a simplified version of the "Attention" mechanism from the 2017 Transformer paper. Use it to build a simple sequence-to-sequence model that predicts the next value in a financial time series. Compare its performance to an LSTM on the same dataset using walk-forward validation. Explain in your own words what "attention" is learning to pay attention to.</li>
+        <li class="exercise-item"><span class="exercise-num">H2</span>Deep Research Project: Trace the evolution of NLP in finance from bag-of-words (pre-2010) → TF-IDF → Word2Vec → BERT → GPT for earnings call sentiment analysis. For each era: (a) implement a simplified version in Python, (b) test it on the same earnings call dataset, (c) quantify the improvement in sentiment classification accuracy across each generation.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- AI WINTERS EXERCISES -->
+  <h2 class="section-title"><span class="num">§3</span>AI Winters &amp; Renaissance</h2>
+  <div class="exercise-section">
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge easy">Easy</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">E1</span>In your own words, explain what caused each AI winter. Then explain what three factors ended the current winter and started the renaissance. Write as if explaining to a portfolio manager who has never studied AI.</li>
+        <li class="exercise-item"><span class="exercise-num">E2</span>Draw the "AI Hype Cycle" (like the diagram in the tab) for a financial product of your choice (e.g., crypto, SPACs, quantitative easing). Map the phases: Innovation Trigger → Peak of Inflated Expectations → Trough of Disillusionment → Slope of Enlightenment → Plateau of Productivity.</li>
+        <li class="exercise-item"><span class="exercise-num">E3</span>List 5 claims made about AI in mainstream media this year. For each: classify as "likely true," "overhyped," or "false," and justify your classification using what you know about AI's actual capabilities and limitations.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge medium">Medium</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">M1</span>Run the Scale Experiment (inspired by Colab #3): Train the same neural network architecture on 100, 500, 2000, and 10,000 synthetic data points. Plot accuracy vs. dataset size on a log scale. Fit a power law to the relationship. This is the "scaling law" phenomenon — relate it to why the AI renaissance happened when internet-scale data became available.</li>
+        <li class="exercise-item"><span class="exercise-num">M2</span>Interview (or research) a quant fund's AI strategy. Compare what AI could do for them in 2005, 2015, and 2023. What changed (data availability, compute, algorithms)? Write a 600-word case study.</li>
+        <li class="exercise-item"><span class="exercise-num">M3</span>Design an "early warning system" for detecting when an AI model is entering its own "winter" (performance degradation). What metrics would you monitor? Build a simple Python dashboard that plots these metrics in real-time for a trading model.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge hard">Hard</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">H1</span>Regime Detection Challenge: Build a model that automatically detects whether markets are in a "normal" regime or a "crisis" regime (use 2008, 2020, 2022 as crisis periods). Train on pre-2007 data. Evaluate on 2007–2023. Build a switching strategy that uses different AI models depending on regime. Compare Sharpe in-regime vs. out-of-regime. This directly mirrors why AI models fail during "winters" — regime changes.</li>
+        <li class="exercise-item"><span class="exercise-num">H2</span>Build a meta-learning framework ("learning to learn") inspired by the problem that caused AI winters: models that needed too much data. Implement a simple few-shot learning setup (e.g., MAML — Model Agnostic Meta-Learning) applied to financial signal detection. Test: can a model trained on 50 stocks quickly adapt to a new stock using only 10 data points?</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- AI TYPES EXERCISES -->
+  <h2 class="section-title"><span class="num">§4</span>Narrow AI vs AGI vs ASI</h2>
+  <div class="exercise-section">
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge easy">Easy</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">E1</span>For each AI system below, classify as ANI, AGI, or ASI and justify: (a) ChatGPT, (b) AlphaFold, (c) Terminator's Skynet (fictional), (d) a robo-advisor, (e) a self-driving car, (f) the HAL 9000 (fictional), (g) your phone's face unlock.</li>
+        <li class="exercise-item"><span class="exercise-num">E2</span>Imagine you are a quant analyst in 2035. Describe your typical workday if ANI is all that exists. Then describe it if AGI exists. What changes? What stays the same?</li>
+        <li class="exercise-item"><span class="exercise-num">E3</span>Research 3 expert predictions about when AGI will arrive (find quotes from Hinton, LeCun, Altman, Musk, or Tegmark). Who do you find most credible and why? What are the key assumptions behind each prediction?</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge medium">Medium</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">M1</span>Run the domain transfer experiment (Colab #4). Extend it: train a momentum model on equities, then apply it to FX, commodities, and crypto. Measure performance degradation across each domain using Sharpe ratio. Create a "transfer heatmap." This quantifies how "narrow" your current AI is.</li>
+        <li class="exercise-item"><span class="exercise-num">M2</span>The Efficient Market Hypothesis (EMH) says all information is priced in instantly. AGI would achieve perfect pricing. Research and write a 500-word essay: "Does the existence of quant alpha (above-market returns) prove AI is still narrow?" Include specific examples of persistent anomalies (momentum, value, etc.) as evidence.</li>
+        <li class="exercise-item"><span class="exercise-num">M3</span>Build a simple "task breadth" evaluation: take one AI model (e.g., a pre-trained language model via HuggingFace) and test it across 5 very different tasks (text classification, question answering, code generation, math problems, financial analysis). Measure performance on each. Plot the "capability profile." This empirically shows what "narrow" vs. "broad" means in practice.</li>
+      </ul>
+    </div>
+    <div class="exercise-tier">
+      <div class="tier-header"><span class="tier-badge hard">Hard</span></div>
+      <ul class="exercise-list">
+        <li class="exercise-item"><span class="exercise-num">H1</span>Build a multi-task learning model: a single neural network that simultaneously predicts: (a) 1-day ahead return, (b) 5-day ahead return, (c) volatility, (d) whether a stock is in an uptrend. Train with shared lower layers but separate heads. Compare: does multi-task learning improve performance on individual tasks vs. separate models? This is a step toward AGI-like generalization within the financial domain.</li>
+        <li class="exercise-item"><span class="exercise-num">H2</span>Construct a rigorous framework for evaluating AI model "intelligence breadth" in finance. Define at minimum 8 tasks at different levels of complexity and abstraction (from simple signal detection to complex regime analysis to novel pattern discovery). Implement automated evaluation pipelines for each. Run your favorite open-source model through the framework and produce a "financial AI capability report." Discuss the implications for AI progress toward AGI.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 6: RESOURCES ===================== -->
+<section id="resources" class="tab-panel">
+  <div class="hero-section">
+    <span class="hero-tag">External Resources</span>
+    <h1 class="hero-title">Interactive Tools, Courses &amp; Further Reading</h1>
+    <p class="hero-desc">Curated resources to go deeper. These are the best free, interactive tools to visualize, experiment with, and master the concepts in this guide. Prioritized for quant engineering applications.</p>
+  </div>
+
+  <h2 class="section-title"><span class="num">01</span>Interactive Visualizations — See AI in Action</h2>
+  <p class="body-text">These browser-based tools let you interact with AI concepts without writing any code. Start here to build intuition.</p>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://playground.tensorflow.org" target="_blank">
+      <span class="icon">🧠</span>
+      <div>
+        TensorFlow Playground
+        <span class="meta">Neural Net Visualizer</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://distill.pub" target="_blank">
+      <span class="icon">📖</span>
+      <div>
+        Distill.pub
+        <span class="meta">Interactive ML Research</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://poloclub.github.io/cnn-explainer/" target="_blank">
+      <span class="icon">🔍</span>
+      <div>
+        CNN Explainer
+        <span class="meta">Deep Learning Visualized</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://www.r2d3.us/visual-intro-to-machine-learning-part-1/" target="_blank">
+      <span class="icon">🌳</span>
+      <div>
+        Visual ML Intro (r2d3)
+        <span class="meta">Decision Trees Animated</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://projector.tensorflow.org" target="_blank">
+      <span class="icon">🔵</span>
+      <div>
+        TF Embedding Projector
+        <span class="meta">Word Vectors in 3D</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://neuralnetworkplayground.com" target="_blank">
+      <span class="icon">⚡</span>
+      <div>
+        NN Playground
+        <span class="meta">Interactive Backprop</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://seeing-theory.brown.edu" target="_blank">
+      <span class="icon">📊</span>
+      <div>
+        Seeing Theory
+        <span class="meta">Visual Statistics (Brown)</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://activations.vercel.app" target="_blank">
+      <span class="icon">🔥</span>
+      <div>
+        Activation Explorer
+        <span class="meta">Neural Activations Live</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">02</span>Free Courses — Structured Learning</h2>
+  <div class="card-grid">
+    <div class="card accent-1">
+      <div class="card-icon">🎓</div>
+      <div class="card-title">fast.ai — Practical Deep Learning</div>
+      <div class="card-body">The best free practical DL course. Top-down: you build working models first, then understand theory. Free, Colab-compatible.<br><br><a href="https://course.fast.ai" target="_blank" style="color:var(--accent)">→ course.fast.ai</a></div>
+    </div>
+    <div class="card accent-2">
+      <div class="card-icon">📚</div>
+      <div class="card-title">CS229 — Stanford ML (Andrew Ng)</div>
+      <div class="card-body">The classic ML course. Rigorous mathematical treatment. Free lecture notes and problem sets online.<br><br><a href="https://cs229.stanford.edu" target="_blank" style="color:var(--accent2)">→ cs229.stanford.edu</a></div>
+    </div>
+    <div class="card accent-4">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">DeepLearning.AI Specialization</div>
+      <div class="card-body">Andrew Ng's deep learning specialization on Coursera. 5 courses covering all major DL concepts. Audit for free.<br><br><a href="https://www.coursera.org/specializations/deep-learning" target="_blank" style="color:var(--accent4)">→ Coursera DeepLearning.AI</a></div>
+    </div>
+    <div class="card accent-3">
+      <div class="card-icon">💹</div>
+      <div class="card-title">Qlib — Microsoft Quant AI</div>
+      <div class="card-body">Open source AI-oriented quantitative investment platform from Microsoft Research. Excellent tutorials for AI in finance.<br><br><a href="https://github.com/microsoft/qlib" target="_blank" style="color:var(--accent3)">→ github.com/microsoft/qlib</a></div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">03</span>Essential Readings — Papers &amp; Books</h2>
+
+  <h3 class="sub-title">Foundational Papers (Free to read)</h3>
+  <div class="resource-grid">
+    <a class="resource-link" href="https://www.cs.toronto.edu/~hinton/absps/NatureDeepReview.pdf" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        "Deep Learning" (2015)
+        <span class="meta">LeCun, Bengio, Hinton — Nature</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://arxiv.org/abs/1706.03762" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        Attention Is All You Need
+        <span class="meta">Transformer Paper (2017)</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://arxiv.org/abs/1409.0473" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        Neural Machine Translation
+        <span class="meta">Bahdanau Attention (2014)</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://arxiv.org/abs/1512.03385" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        ResNet (He et al. 2015)
+        <span class="meta">Deep Residual Learning</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://www.cs.ox.ac.uk/people/david.silver/web/Publications_files/AlphaGo_Paper.pdf" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        AlphaGo Paper (2016)
+        <span class="meta">DeepMind — Nature</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://arxiv.org/abs/2106.01696" target="_blank">
+      <span class="icon">📄</span>
+      <div>
+        FinBERT Paper
+        <span class="meta">Financial NLP (2020)</span>
+      </div>
+    </a>
+  </div>
+
+  <h3 class="sub-title">Essential Books</h3>
+  <table class="data-table">
+    <thead><tr><th>Book</th><th>Author</th><th>Best For</th><th>Difficulty</th></tr></thead>
+    <tbody>
+      <tr><td>"Deep Learning"</td><td>Goodfellow, Bengio, Courville</td><td>Complete DL textbook — free online</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td>"Hands-On ML with Scikit-Learn &amp; TF"</td><td>Aurélien Géron</td><td>Practical, code-first approach with Colab notebooks</td><td>⭐⭐⭐</td></tr>
+      <tr><td>"The Hundred-Page ML Book"</td><td>Andriy Burkov</td><td>Concise, math-heavy — perfect for quants</td><td>⭐⭐⭐</td></tr>
+      <tr><td>"Advances in Financial ML"</td><td>Marcos López de Prado</td><td>ML applied to finance — essential for quant engineers</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td>"Machine Learning for Asset Managers"</td><td>Marcos López de Prado</td><td>Modern portfolio theory + ML synthesis</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td>"Superintelligence"</td><td>Nick Bostrom</td><td>AGI/ASI concepts, risks, philosophical depth</td><td>⭐⭐⭐</td></tr>
+      <tr><td>"Human Compatible"</td><td>Stuart Russell</td><td>AI safety + AGI — clear and accessible</td><td>⭐⭐⭐</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">04</span>Google Colab — Curated Notebooks</h2>
+  <p class="body-text">These are the best free, ready-to-run Colab notebooks for each major concept in this guide:</p>
+
+  <div class="resource-grid">
+    <a class="resource-link" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/02_end_to_end_machine_learning_project.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        End-to-End ML Project
+        <span class="meta">Géron — Hands-on ML</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/quickstart/beginner.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        TensorFlow Quickstart
+        <span class="meta">Official TF Beginner</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/10_neural_nets_with_keras.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        Neural Nets with Keras
+        <span class="meta">Hands-on ML Chapter 10</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://colab.research.google.com/github/huggingface/notebooks/blob/main/examples/text_classification.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        HuggingFace BERT
+        <span class="meta">NLP for Finance</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://colab.research.google.com/github/ageron/handson-ml3/blob/main/18_reinforcement_learning.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        Reinforcement Learning
+        <span class="meta">RL for Trading Agents</span>
+      </div>
+    </a>
+    <a class="resource-link" href="https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/05.08-Random-Forests.ipynb" target="_blank">
+      <span class="icon">🔬</span>
+      <div>
+        Random Forests
+        <span class="meta">Ensemble Methods</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="sep"></div>
+
+  <h2 class="section-title"><span class="num">05</span>Your Learning Roadmap</h2>
+  <p class="body-text">As a first-time learner targeting quant engineering, here is the recommended sequence to build on these foundations:</p>
+
+  <div class="diagram-box">
+    <div class="diagram-title">🗺️ Suggested Learning Path — From These Foundations to Quant Engineering</div>
+    <div class="timeline" style="margin-left: 0; padding-left: 40px">
+      <div class="timeline-item">
+        <div class="timeline-year">Step 1 — This Guide</div>
+        <div class="timeline-event">AI Foundations (You are here)</div>
+        <div class="timeline-desc">AI/ML/DL definitions, history, AI winters, AI types. Foundation complete. ✅</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Step 2 — 4-6 weeks</div>
+        <div class="timeline-event">Python for Data Science</div>
+        <div class="timeline-desc">NumPy, Pandas, Matplotlib, Scikit-learn. Build 3 end-to-end projects. Resources: fast.ai Part 1, CS229 Problem Sets.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Step 3 — 6-8 weeks</div>
+        <div class="timeline-event">Machine Learning Fundamentals</div>
+        <div class="timeline-desc">Linear/logistic regression, decision trees, ensemble methods, SVMs, cross-validation, regularization. Key book: Hands-On ML (Géron).</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Step 4 — 8-10 weeks</div>
+        <div class="timeline-event">Deep Learning</div>
+        <div class="timeline-desc">Neural networks, CNNs, RNNs, LSTMs, Transformers, attention. Tools: PyTorch or TensorFlow. Course: DeepLearning.AI Specialization.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Step 5 — 6-8 weeks</div>
+        <div class="timeline-event">AI in Finance — Core Skills</div>
+        <div class="timeline-desc">Time-series forecasting, NLP for earnings calls, RL for execution, alternative data. Book: Advances in Financial ML (López de Prado).</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">Step 6 — Ongoing</div>
+        <div class="timeline-event">Build + Deploy + Iterate</div>
+        <div class="timeline-desc">Build a live paper-trading AI strategy. Contribute to open source (Qlib, FinRL). Follow arXiv q-fin.ST for latest research. Network with quant AI community.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <strong>🎯 Final Advice for Aspiring Quant Engineers</strong>
+    The quant finance field rewards people who combine rigorous quantitative thinking with practical engineering skills. AI is not magic — it's applied statistics at scale. Your edge as a quant engineer will come from understanding both the power (pattern recognition at scale) and the limitations (overfitting, non-stationarity, causality failures) of AI. Build honest, rigorous models. Backtest conservatively. The researchers who overpromised caused AI winters; the practitioners who built carefully created durable quant strategies.
+  </div>
+</section>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
